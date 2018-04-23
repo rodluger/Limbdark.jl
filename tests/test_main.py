@@ -1,6 +1,4 @@
 """Test the code."""
-from starry import Star, Planet, System
-import numpy as np
 
 
 def test_main():

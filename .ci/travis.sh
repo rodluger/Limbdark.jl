@@ -11,4 +11,4 @@ conda info -a
 conda create --yes -n test python=$PYTHON_VERSION
 conda activate test
 conda install -c conda-forge numpy=$NUMPY_VERSION scipy matplotlib setuptools pytest pytest-cov pip
-pip install git+git://github.com/rodluger/starry.git#egg=starry
+#pip install git+git://github.com/rodluger/starry.git#egg=starry
