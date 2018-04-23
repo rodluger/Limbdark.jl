@@ -1,0 +1,195 @@
+\documentclass[modern]{aastex61}
+
+\input{stylez}
+
+\begin{document}%\raggedbottom\sloppy\sloppypar\frenchspacing
+
+\setlength{\abovedisplayskip}{1.5em}
+\setlength{\belowdisplayskip}{1.5em}
+
+\title{%
+    Analytical Transit Light Curves for Limb-Darkened Stars
+}
+
+\author[0000-0002-0296-3826]{Rodrigo Luger}
+\affil{Department~of~Astronomy, University~of~Washington, Seattle, WA}
+\author{Eric Agol}
+\affil{Department~of~Astronomy, University~of~Washington, Seattle, WA}
+
+\keywords{methods: analytical --- techniques: photometric}
+
+\begin{abstract}
+    We derive analytical, closed form solutions for the light curve
+    of a planet transiting a star with a limb darkening profile of
+    arbitrary order. We provide updated expressions for the linear
+    and quadratically limb darkened cases that are numerically stable
+    over the entire domain.
+\end{abstract}
+
+% ==============================================================================
+% ------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------
+%
+\section{Introduction}
+\label{sec:intro}
+% ------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------
+% ==============================================================================
+
+Currently I just copy-pasted some relevant stuff from the \starry paper.
+This week I'll organize this into sections and get an outline going.\todo{}
+
+
+% ==============================================================================
+% ------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------
+%
+\section{Reparametrization}
+\label{sec:reparam}
+% ------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------
+% ==============================================================================
+
+From \citet{MandelAgol2002}, the total flux visible during the occultation of a
+body whose surface map is given by $I(x, y) = \sqrt{1 - \x^2 -\y^2}$ may be computed
+as
+%
+\begin{align}
+    \label{eq:s2}
+    s_2 = \frac{2\pi}{3} \left(1 - \frac{3\Lambda}{2} - \Theta(r - b) \right)
+\end{align}
+%
+where $\Theta(\bigdot)$ is the Heaviside step function and
+%
+\begingroup\makeatletter\def\f@size{10}\check@mathfonts
+\def\maketag@@@#1{\hbox{\m@th\large\normalfont#1}}%
+\begin{align}
+    \label{eq:biglam}
+    \Lambda &=
+    \begin{dcases}
+          % I don't think we need this: the k^2>1 term is stable as b --> 0!
+          %-\frac{2}{3}\left(1 - r^2\right)^\frac{3}{2}
+          %& \qquad b = 0
+          %
+          %\\[1.5em]
+          %
+          \frac{1}{9 \pi \sqrt{b r}} \Bigg[
+                \frac{(r + b)^2 - 1}{r + b}
+                \Big(
+                    -2r \,
+                    \big(
+                        2 (r + b)^2 + (r + b)(r - b) - 3
+                    \big)
+                    K(k^2)
+                    &\\ \phantom{XXXX}
+                    + 3 (b - r) \, \Pi\big(k^2 (b + r)^2, \, k^2\big)
+                \Big)
+                - 4 b r (4 - 7 r^2 - b^2) E(k^2)
+          \Bigg]
+          %
+          & \qquad k^2 < 1
+          %
+          \\[1.5em]
+          %
+          \frac{2}{9 \pi} \Bigg[
+                \big(1 - (r + b)^2\big)
+                \Bigg(
+                    \sqrt{1 - (b - r)^2} \,
+                    K\left(\frac{1}{k^2}\right)
+                    + 3 \left(\frac{b-r}{(b+r)\sqrt{1 - (b - r)^2}}\right)
+                    &\\ \phantom{XX}
+                    \times \Pi\left(\frac{1}{k^2(b+r)^2}, \, \frac{1}{k^2}\right)
+                \Bigg)
+                - \sqrt{1 - (b - r)^2}
+                (4 - 7 r^2 - b^2)
+                E\left(\frac{1}{k^2}\right)
+          \Bigg]
+          %
+          & \qquad k^2 \ge 1
+    \end{dcases}
+\end{align}
+\endgroup
+%
+with
+%
+\begin{align}
+    \label{eq:k2}
+    k^2 &= \frac{1 - r^2 - b^2 + 2 b r}{4 b r}
+    \quad.
+\end{align}
+%
+In the expressions above, $K(\bigdot)$, $E(\bigdot)$, and $\Pi(\bigdot, \bigdot)$
+are the complete elliptic integrals of the first, second kind, and third kind,
+respectively, defined as
+%
+\begin{align}
+    \label{eq:elliptic}
+    K(k^2) &\equiv \int_0^{\frac{\pi}{2}} \frac{\dd \varphi}{\sqrt{1 - k^2 \sin^2 \varphi}}
+    \nonumber \\[0.5em]
+    E(k^2) &\equiv \int_0^{\frac{\pi}{2}} \sqrt{1 - k^2 \sin^2 \varphi} \, \dd \varphi
+    \nonumber \\[0.5em]
+    \Pi(n, k^2) &\equiv \int_0^{\frac{\pi}{2}} \frac{\dd \varphi}{(1 - n \sin^2 \varphi)\sqrt{1 - k^2 \sin^2 \varphi}}
+    \quad.
+\end{align}
+
+The solution for $s_2$ (Equation~\ref{eq:s2}) becomes unstable as $b \rightarrow r$ because
+the elliptic integral $\Pi$ diverges. In the vicinity of
+$b = r$ we use Equation (17.7.14) in \citet{Abramowitz1970} to express $\Pi(n, k^2)$
+in terms of Heuman's Lambda function.
+
+The $s_2$ term is also unstable when $r$ (and $b$) become much greater than unity, since
+in this limit $k^2 \rightarrow 0$ and $E(k^2) \rightarrow K(k^2) \rightarrow \frac{\pi}{2}.$
+Since $s_2$ depends on (among other things) a function of the difference between these two
+elliptic integrals, roundoff error in their computation leads to catastrophic cancellation
+in the result. In order to circumvent this, we re-write \eq{biglam} in terms of $E(k^2) - K(k^2)$
+and Taylor expand the expression when $r > 1$ to high order in $k^2$.
+
+% ==============================================================================
+% ------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------
+%
+\section{Quadratic Limb-Darkening}
+\label{sec:quad}
+% ------------------------------------------------------------------------------
+% ------------------------------------------------------------------------------
+% ==============================================================================
+
+Any radially symmetric specific intensity profile can be expressed as a sum
+over the $m = 0$ spherical harmonics.
+%
+In particular, the radial intensity profile of a quadratically
+limb-darkened star,
+%
+\begin{align}
+    \label{eq:quadraticld}
+    I(\upmu) &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2
+    \quad,
+\end{align}
+%
+where $\upmu = \z = \sqrt{1 - \x^2 - \y^2}$ and $u_1$ and $u_2$ are the
+limb darkening coefficients, can be written in terms of spherical harmonics
+by re-writing \eq{quadraticld} as
+%
+\begin{align}
+    I(\x, \y) = (1 - u_1 - 2u_2) + (u_1 + 2u_2) \z + u_2 \x^2 + u_2 \y^2
+           \quad.
+\end{align}
+%
+Performing the change of basis to spherical harmonics \citep{starry}, we have
+%
+\begin{align}
+    \label{eq:qldylm}
+    I(\x, \y) =
+            \frac{2\sqrt{\pi}}{3} (3 - 3u_1 + 4u_2) \, Y_{0,0}
+          + \frac{2\sqrt{\pi}}{\sqrt{3}} (u_1 + 2u_2) \, Y_{1,0}
+          - \frac{4\sqrt{\pi}}{3\sqrt{5}} u_2 \, Y_{2,0}
+      \quad.
+\mathematica{limbdark}
+\end{align}
+%
+Thus, quadratic limb darkening can be expressed exactly as the sum of the first
+three $m = 0$ spherical harmonics.
+
+\bibliography{limbdark}
+
+\end{document}

@@ -1,0 +1,143 @@
+% All the packages
+%\usepackage[letterpaper]{geometry}
+\usepackage{microtype}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{esint}
+\usepackage{amssymb}
+\usepackage{natbib}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{scalerel}
+\usepackage{calc}
+\usepackage{etoolbox}
+\usepackage{marginnote}
+\usepackage{nicefrac}
+\usepackage{tabstackengine}
+\usepackage{diagbox}
+\usepackage[makeroom]{cancel}
+\usepackage{mathdots}
+\usepackage{bbm}
+\usepackage{booktabs}
+\usepackage{xspace}
+\usepackage{upgreek}
+\stackMath
+
+% Page breaks in long equations
+%\allowdisplaybreaks
+
+% Bibliography stuff
+\bibliographystyle{aasjournal}
+
+% Shorthand for this paper
+\newcommand{\starry}{\textsf{starry}\xspace}
+\newcommand{\batman}{\textsf{batman}\xspace}
+\newcommand{\planetplanet}{\textsf{planetplanet}\xspace}
+\newcommand{\Python}{\textsf{Python}\xspace}
+\newcommand{\cpp}{\textsf{C}++\xspace}
+\newcommand{\Mathematica}{\textsf{Mathematica}\xspace}
+\newcommand{\docs}{\href{https://rodluger.github.io/starry/starry.html\#starry.Planet}{documentation}}
+
+% References to text content
+\newcommand{\documentname}{\textsl{article}}
+\newcommand{\figureref}[1]{\ref{fig:#1}}
+\newcommand{\Figure}[1]{Figure~\figureref{#1}}
+\newcommand{\figurelabel}[1]{\label{fig:#1}}
+\renewcommand{\eqref}[1]{\ref{eq:#1}}
+\newcommand{\Eq}[1]{Equation~(\eqref{#1})}
+\newcommand{\eq}[1]{\Eq{#1}}
+\newcommand{\eqalt}[1]{Equation~\eqref{#1}}
+\newcommand{\eqlabel}[1]{\label{eq:#1}}
+
+% Add script hyperlinks as margin notes
+\definecolor{proofcolor}{rgb}{0.1216,0.4667,0.7059}
+\newcommand{\python}[1]{\marginnote{\href{https://github.com/rodluger/starry/tree/master/tex/figures/#1.py}{\includegraphics[width=0.9cm]{figures/plot.png}}}}
+\newcommand{\mathematica}[1]{\marginnote{\href{https://docs.google.com/viewer?url=https://github.com/rodluger/starry/raw/master/tex/notebooks/#1.pdf}{\includegraphics[width=0.9cm]{figures/pen.png}}}}
+\newcommand{\pdf}[1]{\marginnote{\href{https://docs.google.com/viewer?url=https://github.com/rodluger/starry/raw/master/tex/notebooks/#1.pdf}{\includegraphics[width=0.9cm]{figures/pen.png}}}}
+\newcommand{\animation}[1]{\marginnote{\href{https://github.com/rodluger/starry/tree/master/tex/figures/#1.gif}{\includegraphics[width=0.9cm]{figures/play.png}}}}
+\newcommand{\todo}[1]{\marginnote{\includegraphics[width=0.9cm]{figures/todo.png}\\[-1ex]{\color{red}\scriptsize#1}}}
+\newcommand{\pythonlogo}{%
+  \hspace*{0.25em}\raisebox{-1.25ex}{\includegraphics[width=0.8cm]{figures/plot.png}}
+}
+\newcommand{\penlogo}{%
+  \hspace*{0.25em}\raisebox{-1ex}{\includegraphics[width=0.6cm]{figures/pen.png}}
+}
+
+% Force margin notes to always be on the right side
+% https://tex.stackexchange.com/a/69624
+
+% Math stuff
+\newcommand{\ii}{\ensuremath{\mathbf{i}}}
+\newcommand{\T}{\ensuremath{\mathrm{T}}}
+\newcommand{\dd}{\ensuremath{ \mathrm{d}}}
+\newcommand{\unit}[1]{{\ensuremath{\mathrm{#1}}}}
+\newcommand{\bvec}[1]{{\ensuremath{\mathbf{#1}}}}
+\newcommand{\avec}[1]{{\ensuremath{\vec{\mathbf{#1}}}}}
+\newcommand{\x}{\ensuremath{\mbox{$x$}}}
+\newcommand{\y}{\ensuremath{\mbox{$y$}}}
+\newcommand{\z}{\ensuremath{\mbox{$z$}}}
+\newcommand{\xhat}{\ensuremath{\mathbf{\hat{x}}}}
+\newcommand{\yhat}{\ensuremath{\mathbf{\hat{y}}}}
+\newcommand{\zhat}{\ensuremath{\mathbf{\hat{z}}}}
+\DeclareMathAlphabet\mathbfcal{OMS}{cmsy}{b}{n}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\definecolor{dim}{rgb}{0.8,0.8,0.8}
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\setcounter{MaxMatrixCols}{20}
+\newcommand{\sinphi}{\ensuremath{\mbox{$u$}}}
+\newcommand{\sinlambda}{\ensuremath{\mbox{$v$}}}
+\newcommand{\bigdot}{\scaleto{\cdot}{6pt}}
+
+% Bases
+\newcommand{\pbasis}{\ensuremath{\bvec{\tilde{p}}}}
+\newcommand{\gbasis}{\ensuremath{\bvec{\tilde{g}}}}
+\newcommand{\ybasis}{\ensuremath{\bvec{\tilde{y}}}}
+\newcommand{\pbasisn}{\ensuremath{\tilde{p}_n}}
+\newcommand{\gbasisn}{\ensuremath{\tilde{g}_n}}
+\newcommand{\ybasisn}{\ensuremath{\tilde{y}_n}}
+\newcommand{\AOne}{\ensuremath{\bvec{A_1}}}
+\newcommand{\ATwo}{\ensuremath{\bvec{A_2}}}
+
+% Code examples
+\usepackage{listings}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\small\ttfamily,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    aboveskip=1em,
+    belowskip=1em,
+    keywords=[2]{map},
+    keywordstyle=[2]{\color{black!80!black}},
+}
+\lstset{style=mystyle}
+
+% Inverse diagonal dots
+\makeatletter
+\def\Ddots{\mathinner{\mkern1mu\raise\p@
+\vbox{\kern7\p@\hbox{.}}\mkern2mu
+\raise4\p@\hbox{.}\mkern2mu\raise7\p@\hbox{.}\mkern1mu}}
+\makeatother
+
+% Typography obsessions
+\setlength{\parindent}{3.0ex}
+\renewcommand\quad{\hskip\fontdimen3\font}

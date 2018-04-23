@@ -1,0 +1,12 @@
+\begin{thebibliography}{}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\providecommand{\url}[1]{\href{#1}{#1}}
+
+\bibitem[{{Luger} {et~al.}(2018){Luger}, {Agol}, {Lustig-Yaeger}, {Fleming},
+  {Foreman-Mackey}, \& {Deitrick}}]{starry}
+{Luger}, R., {et~al.} 2018, ApJ, XX, YY
+
+\bibitem[{{Mandel} \& {Agol}(2002)}]{MandelAgol2002}
+{Mandel}, K., \& {Agol}, E. 2002, ApJL, 580, L171
+
+\end{thebibliography}
