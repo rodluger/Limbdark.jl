@@ -1,15 +1,22 @@
 # Adapted from http://dfm.io/posts/travis-latex/
-sudo: required
+sudo: false
 
 dist: trusty
 
-language: c
+language: python
 
 addons:
     apt:
         packages:
             - gcc-4.8
             - g++-4.8
+            - texlive-xetex
+            - texlive-latex-recommended
+            - texlive-latex-extra
+            - texlive-fonts-recommended
+            - texlive-fonts-extra
+            - latex-xcolor
+            - lmodern
 
 matrix:
     include:
