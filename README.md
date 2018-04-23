@@ -1,5 +1,7 @@
+<h1 align="center">
+limbdark
+</h1>
 <p align="center">
-  <h1>limbdark</h1>
   Analytic transit light curves for limb-darkened stars.
 </p>
 <p align="center">
