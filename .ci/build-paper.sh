@@ -27,14 +27,10 @@ then
     # Force push the paper to GitHub
     cd $TRAVIS_BUILD_DIR
     git checkout --orphan $TRAVIS_BRANCH-pdf
-    git rm -rf .ci
-    git rm -rf tests
-    git rm -rf LICENSE
-    git rm -rf README.md
-    git rm -rf .gitignore
-    git rm -rf .travis.yml
-    git rm -rf tex/figures
-    # todo: more
+    mv tex/limbdark.pdf ../
+    git rm -rf *
+    mkdir tex
+    mv ../limbdark.pdf tex/
     git add -f tex/limbdark.pdf
     git -c user.name='travis' -c user.email='travis' commit -m "building the paper"
     git push -q -f https://$GITHUB_USER:$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG $TRAVIS_BRANCH-pdf
