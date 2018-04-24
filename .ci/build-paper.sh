@@ -25,12 +25,13 @@ then
     pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex
 
     # Force push the paper to GitHub
-    cd $TRAVIS_BUILD_DIR
+    # NOTE: This is hacky. I couldn't get the old aproach to work for some reason.
+    cd $HOME
+    mkdir tmp && cd tmp
+    git init
     git checkout --orphan $TRAVIS_BRANCH-pdf
-    mv tex/limbdark.pdf ../
-    git rm -rf *
     mkdir tex
-    mv ../limbdark.pdf tex/
+    cp $TRAVIS_BUILD_DIR/tex/limbdark.pdf tex/
     git add -f tex/limbdark.pdf
     git -c user.name='travis' -c user.email='travis' commit -m "building the paper"
     git push -q -f https://$GITHUB_USER:$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG $TRAVIS_BRANCH-pdf
