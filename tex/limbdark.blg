@@ -4,47 +4,47 @@ The top-level auxiliary file: limbdark.aux
 The style file: aasjournal.bst
 Database file #1: limbdarkNotes.bib
 Database file #2: limbdark.bib
-Warning--I didn't find a database entry for "Abramowitz1970"
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
-You've used 2 entries,
+Warning--empty publisher in Abramowitz1970
+You've used 5 entries,
             3222 wiz_defined-function locations,
-            672 strings with 4746 characters,
-and the built_in function-call counts, 930 in all, are:
-= -- 78
-> -- 64
-< -- 1
-+ -- 22
-- -- 22
-* -- 74
-:= -- 173
-add.period$ -- 2
-call.type$ -- 2
-change.case$ -- 14
-chr.to.int$ -- 2
-cite$ -- 2
-duplicate$ -- 36
-empty$ -- 57
-format.name$ -- 28
-if$ -- 184
+            697 strings with 5447 characters,
+and the built_in function-call counts, 1983 in all, are:
+= -- 169
+> -- 110
+< -- 4
++ -- 37
+- -- 35
+* -- 143
+:= -- 362
+add.period$ -- 7
+call.type$ -- 5
+change.case$ -- 27
+chr.to.int$ -- 5
+cite$ -- 6
+duplicate$ -- 86
+empty$ -- 149
+format.name$ -- 47
+if$ -- 407
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 2
-newline$ -- 11
-num.names$ -- 8
-pop$ -- 19
+missing$ -- 5
+newline$ -- 22
+num.names$ -- 20
+pop$ -- 38
 preamble$ -- 1
-purify$ -- 14
+purify$ -- 27
 quote$ -- 0
-skip$ -- 29
+skip$ -- 73
 stack$ -- 0
-substring$ -- 34
+substring$ -- 78
 swap$ -- 0
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 18
-warning$ -- 0
-while$ -- 8
+type$ -- 42
+warning$ -- 1
+while$ -- 19
 width$ -- 0
-write$ -- 24
+write$ -- 57
 (There was 1 warning)

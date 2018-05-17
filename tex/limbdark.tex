@@ -39,15 +39,18 @@
 Currently I just copy-pasted some relevant stuff from the \starry paper.
 This week I'll organize this into sections and get an outline going.\todo{}
 
-\citep{Gimenez2006} derived transit light curves for a limb-darkening
+\cite{Gimenez2006} derived transit light curves for a limb-darkening
 function
 \begin{equation}
 I(\mu) = I(1) \left[\sum_{n=1}^N u_n (1-\mu^n) \right],
 \end{equation}
-where $\mu = \cos{\theta}$, where $\theta$ is the polar angle measured from the 
-sub-observer point), and $u_n$ is a limb-darkening coefficient.
+where $\mu = \cos{\theta} =\sqrt{1-r^2}$, where $\theta$ is the polar angle measured from the 
+sub-observer point), and $u_n$ is a limb-darkening coefficient.  \cite{Gimenez2006}
+found an infinite series for computing the limb-darkened light curve for each $u_n$
+term.  Here we present closed-form expressions for these terms which can be
+easily computed with recursion relations.
 
-\citep{Pal2008} derived the partial derivatives of the quadratic limb-darkening model 
+\cite{Pal2008} derived the partial derivatives of the quadratic limb-darkening model 
 with respect to $b$ and $r$.
 
 
@@ -200,6 +203,21 @@ Performing the change of basis to spherical harmonics \citep{starry}, we have
 %
 Thus, quadratic limb darkening can be expressed exactly as the sum of the first
 three $m = 0$ spherical harmonics.
+
+\section{Radius of order impact parameter limit}
+
+In the limit that $\vert b -r\vert \lll 1$, the edge of the occulter passes
+over the center of the star.  Round-off error can cause the $s_2$ expression
+to have fluctuations in the evaluation of the elliptic integral; this is
+due a term that should cancel the step function...
+Here we present two series expansions valid
+for $\vert \epsilon \vert << 1$, where $\epsilon = b-r$, one of which is valid
+for $b+r <1$ and a second for $b+r > 1$.
+
+\subsection{$b+r <1$}
+
+In the limit of $b+r
+
 
 \bibliography{limbdark}
 
