@@ -36,23 +36,22 @@
 % ------------------------------------------------------------------------------
 % ==============================================================================
 
-Currently I just copy-pasted some relevant stuff from the \starry paper.
-This week I'll organize this into sections and get an outline going.\todo{}
-
-\cite{Gimenez2006} derived transit light curves for a limb-darkening
+\citet{Gimenez2006} derived transit light curves for a limb-darkening
 function
 \begin{equation}
 I(\mu) = I(1) \left[\sum_{n=1}^N u_n (1-\mu^n) \right],
 \end{equation}
-where $\mu = \cos{\theta} =\sqrt{1-r^2}$, where $\theta$ is the polar angle measured from the 
+where $\mu = \cos{\theta} =\sqrt{1-r^2}$, where $\theta$ is the polar angle measured from the
 sub-observer point), and $u_n$ is a limb-darkening coefficient.  \cite{Gimenez2006}
 found an infinite series for computing the limb-darkened light curve for each $u_n$
 term.  Here we present closed-form expressions for these terms which can be
 easily computed with recursion relations.
 
-\cite{Pal2008} derived the partial derivatives of the quadratic limb-darkening model 
-with respect to $b$ and $r$.
 
+\begin{itemize}
+\item \cite{Pal2008} derived the partial derivatives of the quadratic limb-darkening model
+with respect to $b$ and $r$.
+\end{itemize}
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -64,17 +63,9 @@ with respect to $b$ and $r$.
 % ------------------------------------------------------------------------------
 % ==============================================================================
 
-From \citet{MandelAgol2002}, the total flux visible during the occultation of a
-body whose surface map is given by $I(x, y) = \sqrt{1 - \x^2 -\y^2}$ may be computed
-as
-%
-\begin{align}
-    \label{eq:s2}
-    s_2 = \frac{2\pi}{3} \left(1 - \frac{3\Lambda}{2} - \Theta(r - b) \right)
-\end{align}
-%
-where $\Theta(\bigdot)$ is the Heaviside step function and $\Lambda$ is given
-by \todo{Eric}
+From \citet{MandelAgol2002}, the total flux visible during the occultation of a  \todo{Eric}
+body whose surface map is given by $I(\upmu)/I(1) = 1 - u_1(1 - \upmu)$ may be computed
+as...
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -87,40 +78,18 @@ by \todo{Eric}
 % ==============================================================================
 
 Any radially symmetric specific intensity profile can be expressed as a sum
-over the $m = 0$ spherical harmonics.
+over the $m = 0$ spherical harmonics. In analogy with the linear and quadratic
+limb-darkening laws, let us define the polynomial limb-darkening law of
+order $l_\mathrm{max}$ as\todo{Rodrigo}
 %
-In particular, the radial intensity profile of a quadratically
-limb-darkened star,
-%
-\begin{align}
-    \label{eq:quadraticld}
-    I(\upmu) &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2
-    \quad,
-\end{align}
-%
-where $\upmu = \z = \sqrt{1 - \x^2 - \y^2}$ and $u_1$ and $u_2$ are the
-limb darkening coefficients, can be written in terms of spherical harmonics
-by re-writing \eq{quadraticld} as
 %
 \begin{align}
-    I(\x, \y) = (1 - u_1 - 2u_2) + (u_1 + 2u_2) \z + u_2 \x^2 + u_2 \y^2
-           \quad.
+    \label{eq:polynomialld}
+    \frac{I(\upmu)}{I(1)} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - ... - u_{l_\mathrm{lmax}}(1 - \upmu)^{l_\mathrm{lmax}}
+    \quad.
 \end{align}
 %
-Performing the change of basis to spherical harmonics \citep{starry}, we have
-%
-\begin{align}
-    \label{eq:qldylm}
-    I(\x, \y) =
-            \frac{2\sqrt{\pi}}{3} (3 - 3u_1 + 4u_2) \, Y_{0,0}
-          + \frac{2\sqrt{\pi}}{\sqrt{3}} (u_1 + 2u_2) \, Y_{1,0}
-          - \frac{4\sqrt{\pi}}{3\sqrt{5}} u_2 \, Y_{2,0}
-      \quad.
-\mathematica{limbdark}
-\end{align}
-%
-Thus, quadratic limb darkening can be expressed exactly as the sum of the first
-three $m = 0$ spherical harmonics.
+
 
 \section{Radius of order impact parameter limit}
 
@@ -134,7 +103,7 @@ for $b+r <1$ and a second for $b+r > 1$.
 
 \subsection{$b+r <1$}
 
-In the limit of $b+r
+In the limit of $b+r$...
 
 
 \bibliography{limbdark}
