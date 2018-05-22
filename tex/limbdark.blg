@@ -6,45 +6,45 @@ Database file #1: limbdarkNotes.bib
 Database file #2: limbdark.bib
 Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
 Warning--empty publisher in Abramowitz1970
-You've used 5 entries,
+You've used 6 entries,
             3222 wiz_defined-function locations,
-            697 strings with 5447 characters,
-and the built_in function-call counts, 1983 in all, are:
-= -- 169
-> -- 110
-< -- 4
-+ -- 37
-- -- 35
-* -- 143
-:= -- 362
-add.period$ -- 7
-call.type$ -- 5
-change.case$ -- 27
-chr.to.int$ -- 5
-cite$ -- 6
-duplicate$ -- 86
-empty$ -- 149
-format.name$ -- 47
-if$ -- 407
+            708 strings with 5657 characters,
+and the built_in function-call counts, 2320 in all, are:
+= -- 200
+> -- 122
+< -- 5
++ -- 41
+- -- 38
+* -- 165
+:= -- 425
+add.period$ -- 9
+call.type$ -- 6
+change.case$ -- 31
+chr.to.int$ -- 6
+cite$ -- 7
+duplicate$ -- 102
+empty$ -- 177
+format.name$ -- 51
+if$ -- 478
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 5
-newline$ -- 22
-num.names$ -- 20
-pop$ -- 38
+missing$ -- 6
+newline$ -- 26
+num.names$ -- 24
+pop$ -- 42
 preamble$ -- 1
-purify$ -- 27
+purify$ -- 31
 quote$ -- 0
-skip$ -- 73
+skip$ -- 87
 stack$ -- 0
-substring$ -- 78
+substring$ -- 95
 swap$ -- 0
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 42
+type$ -- 51
 warning$ -- 1
-while$ -- 19
+while$ -- 23
 width$ -- 0
-write$ -- 57
+write$ -- 69
 (There was 1 warning)

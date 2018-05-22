@@ -1,6 +1,7 @@
 \documentclass[modern]{aastex61}
 
 \input{stylez}
+\usepackage{graphicx}
 
 \begin{document}%\raggedbottom\sloppy\sloppypar\frenchspacing
 
@@ -131,6 +132,7 @@ with
     k^2 &= \frac{1 - r^2 - b^2 + 2 b r}{4 b r}
     \quad.
 \end{align}
+
 %
 In the expressions above, $K(\bigdot)$, $E(\bigdot)$, and $\Pi(\bigdot, \bigdot)$
 are the complete elliptic integrals of the first, second kind, and third kind,
@@ -145,18 +147,136 @@ respectively, defined as
     \Pi(n, k^2) &\equiv \int_0^{\frac{\pi}{2}} \frac{\dd \varphi}{(1 - n \sin^2 \varphi)\sqrt{1 - k^2 \sin^2 \varphi}}
     \quad.
 \end{align}
+We have transformed the expressions from \citet{MandelAgol2002} using equation
+17.7.17 from \citet{Abramowitz1970} which yields equations that are better
+behaved in the vicinity of $b=r$.  However, these elliptic integrals are still
+subject to numerical instability as $r \rightarrow 1-b$ and $r >> 1$. Through
+trial and error, we have found that these instabilities can be removed by combining 
+elliptic integrals into a general complete elliptic integral defined as
+\begin{equation}
+{\rm cel}(m,k_c,p,a,b) = \int_0^{\pi/2} \frac{a\cos^2{\phi} + b\sin^2{\phi}}{\cos^2{\phi}+p\sin^2{\phi}} \frac{d\phi}{\sqrt{\cos^2{\phi}+k_c^2\sin^2{\phi}}},
+\end{equation}
+where $k_c = \sqrt{1-m}$, as defined by \citet{Bulirsch1969}.  For $b+r > 1$,
+$m=k^2$, while for $b+r < 1$, $m=1/k^2$.  Although $k_c$ can be computed from
+$m$, we have found better numerical stability in computing $k_c$ analytically
+from $b$ and $r$, rather than from $m$:
+\begin{align}
+    k_c &=
+    \begin{dcases}
+     \sqrt{\frac{(b+r)^2-1}{4br}} & \qquad k^2 < 1\\
+     \sqrt{\frac{1-(b+r)^2}{1-(b-r)^2}} & \qquad k^2 > 1
+   \end{dcases}
+\end{align}
+along with several special cases listed in \citet{MandelAgol2002}.
 
-The solution for $s_2$ (Equation~\ref{eq:s2}) becomes unstable as $b \rightarrow r$ because
-the elliptic integral $\Pi$ diverges. In the vicinity of
-$b = r$ we use Equation (17.7.14) in \citet{Abramowitz1970} to express $\Pi(n, k^2)$
-in terms of Heuman's Lambda function.
+We used the following relations from \citet{Bulirsch1969}:
+\begin{eqnarray}
+\lambda K(m) + \mu E(m) &=& {\rm cel}(m,k_c,1,\lambda+\mu,\lambda+\mu k_c^2)\\
+\lambda K(m) + \mu \Pi(n,m) &=& {\rm cel}(m,k_c,p,\lambda+\mu,\lambda+\mu k_c^2)\\
+E(m) &=& {\rm cel}(m,k_c,1,1,1-m)\\
+E(m)-(1-m)K(m) &=& m {\rm cel}(m,k_c,1,1,0)\\
+\Pi(n,m)-K(m)  &=& n {\rm cel}(m,k_c,1-n,0,1),
+\end{eqnarray}
+noting that \citet{Bulirsch1969} uses a different sign convention for $\Pi(n,m)$.
+These transformations lead to the following numerically-stable expression for
+linear limb-darkening flux, $s_2(b,r)$,
+\begin{align}
+    \label{eq:biglam_stable}
+    \Lambda &=
+    \begin{dcases}
+          \frac{1-(b-r)^2}{9 \pi \sqrt{b r}} \Bigg[
+                3\frac{(b+r)^2-1}{4br}(b^2-r^2)cel(m,k_c,(b-r)^2(1-m),0,1)
+                &\\ \phantom{XXXX}
+               - (3-6r^2-2br)cel(m,k_c,1,1,0)-4brE(m)
+          \Bigg]
+          %
+          & \qquad k^2 < 1
+          %
+          \\[1.5em]
+          %
+          \frac{2\sqrt{1-(b-r)^2}}{9 \pi} \Bigg[
+                \big(1 - (r + b)^2\big)
+                {\rm cel}(m,k_c,p,1+\mu,p+\mu)
+                - (4 - 7 r^2 - b^2)
+                E\left(m\right)
+          \Bigg]
+          %
+          & \qquad k^2 > 1
+    \end{dcases}
+\end{align}
+where 
+\begin{eqnarray}
+\mu &=& 3\frac{b-r}{(b+r)(1-(b-r)^2)}\\
+p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
+\end{eqnarray}
+in the $k^2 > 1$ case.
+Note that for $b=0$, $k^2=1$ (when $b=1-r$), and $b=r$ cases need
+to be handled separately (and, trivially, $r=0$, $b\ge 1+r$, and
+$b \le r-1$).
 
-The $s_2$ term is also unstable when $r$ (and $b$) become much greater than unity, since
-in this limit $k^2 \rightarrow 0$ and $E(k^2) \rightarrow K(k^2) \rightarrow \frac{\pi}{2}.$
-Since $s_2$ depends on (among other things) a function of the difference between these two
-elliptic integrals, roundoff error in their computation leads to catastrophic cancellation
-in the result. In order to circumvent this, we re-write \eq{biglam} in terms of $E(k^2) - K(k^2)$
-and Taylor expand the expression when $r > 1$ to high order in $k^2$.
+The $s_2(b,r)$ function is plotted in Figure \ref{s2_plot}.  The
+function varies smoothly from the lower right where the disk is
+unocculted to the upper left where it is completely occulted.
+However, there are several points which need to be handled
+separately as the above expressions become singular or are
+no longer valid.  The solid lines in Figure \ref{s2_plot} show
+these points.  The first and fourth contacts occur at
+$b=1+r$, where $s_2=1$;  this is the upper bound to the $k^2 < 1$ 
+region for $b+r >1$.  
+For $r \ge 1$, the second and third contacts (at the start and
+end of complete occultation) occur when $b=1-r$, which is the
+lower  bound to the $k^2<1$ region when $b+r >1$.  For
+$r < 1$, the second and third contacts occur when $r=1-b$.
+Finally, when $b=r=1/2$, at the intersection of $b=r$ and $b=1-r$,
+a separate expression must be used.
+
+Near these regions, the standard \citet{MandelAgol2002} expression
+is singular, and so we paid particular care to the accuracy of this
+new expression in these regions.  Figure \ref{s2_machine} shows
+that equation \ref{biglam_stable} is accurate in these regimes.
+We tested the accuracy by computing the equations with 256 bit
+arithmetic, which is much less subject to round-off error, and
+hence gives essentially exact expressions.  We implemented the
+pseudocode from \citet{Bulirsch1969} to compute $cel(m,k_c,p,a,b)$,
+which has a termination test that scales as the square root of
+the machine precision.  We find that the transformed expressions
+are accurate to $<5\times 10^{-16}$ when computed in double precision
+within $10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
+
+\begin{figure}\label{s2_plot}
+\includegraphics[width=0.85\linewidth]{figures/transit_linear.pdf}
+\caption{The intensity of a linearly limb-darkened star being eclipsed, $s_2(b,r)$.
+In the limit $b > r+1$, no eclipse occurs, so $s_2=1$.  For $b < r-1$, the star
+is completely eclipsed and $s_2=0$.  In the limits $b=r$ and $b=1-r$, special
+expressions must be used}
+\end{figure}
+
+\begin{figure}\label{s2_machine}
+\includegraphics[width=0.85\linewidth]{figures/s2_machine.png}
+\caption{The accuracy of $s_2(b,r)$ near $b=r$ (left panel) and
+$b=1-r$ (right panel). The x-axese are impact parameter b,
+while the y axes in the top panels show $s_2(b,r)$, with $r$
+given in the legend of each panel. The middle panels plot
+the difference $(s_2(b,b\pm\epsilon)-s_2(b,b))/\epsilon$
+and $(s_2(b,1-b\pm\epsilon)-s_2(b,1-b))/\epsilon$. The bottom
+panels show the numerical precision by the comparing double precision
+computation with \texttt{BigFloat} precision (256-bit).
+}
+\end{figure}
+
+
+
+%The solution for $s_2$ (Equation~\ref{eq:s2}) becomes unstable as $b \rightarrow r$ because
+%the elliptic integral $\Pi$ diverges. In the vicinity of
+%$b = r$ we use Equation (17.7.14) in \citet{Abramowitz1970} to express $\Pi(n, k^2)$
+%in terms of Heuman's Lambda function.
+
+%The $s_2$ term is also unstable when $r$ (and $b$) become much greater than unity, since
+%in this limit $k^2 \rightarrow 0$ and $E(k^2) \rightarrow K(k^2) \rightarrow \frac{\pi}{2}.$
+%Since $s_2$ depends on (among other things) a function of the difference between these two
+%elliptic integrals, roundoff error in their computation leads to catastrophic cancellation
+%in the result. In order to circumvent this, we re-write \eq{biglam} in terms of $E(k^2) - K(k^2)$
+%and Taylor expand the expression when $r > 1$ to high order in $k^2$.
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -216,7 +336,7 @@ for $b+r <1$ and a second for $b+r > 1$.
 
 \subsection{$b+r <1$}
 
-In the limit of $b+r
+In the limit of $b+r$
 
 
 \bibliography{limbdark}
