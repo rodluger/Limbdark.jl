@@ -71,7 +71,7 @@ as
 %
 \begin{align}
     \label{eq:s2}
-    s_2 = \frac{2\pi}{3} \left(1 - \frac{3\Lambda}{2} - \Theta(r - b) \right)
+    s_2 = \frac{2\pi}{3} \left(1 - \frac{3\Lambda(b,r)}{2} - \Theta(r - b) \right)
 \end{align}
 %
 where $\Theta(\bigdot)$ is the Heaviside step function and
@@ -80,7 +80,7 @@ where $\Theta(\bigdot)$ is the Heaviside step function and
 \def\maketag@@@#1{\hbox{\m@th\large\normalfont#1}}%
 \begin{align}
     \label{eq:biglam}
-    \Lambda &=
+    \Lambda(b,r) &=
     \begin{dcases}
           % I don't think we need this: the k^2>1 term is stable as b --> 0!
           %-\frac{2}{3}\left(1 - r^2\right)^\frac{3}{2}
@@ -132,7 +132,8 @@ with
     k^2 &= \frac{1 - r^2 - b^2 + 2 b r}{4 b r}
     \quad.
 \end{align}
-
+For the cases $b=r$, $b=1-r$, $b=0$, $r=0$, or $\vert r-b\vert \ge 1$, there are special
+expressions for $\Lambda(b,r)$ given below.
 %
 In the expressions above, $K(\bigdot)$, $E(\bigdot)$, and $\Pi(\bigdot, \bigdot)$
 are the complete elliptic integrals of the first, second kind, and third kind,
@@ -163,13 +164,15 @@ from $b$ and $r$, rather than from $m$:
 \begin{align}
     k_c &=
     \begin{dcases}
-     \sqrt{\frac{(b+r)^2-1}{4br}} & \qquad k^2 < 1\\
-     \sqrt{\frac{1-(b+r)^2}{1-(b-r)^2}} & \qquad k^2 > 1
+     \sqrt{\frac{(b+r)^2-1}{4br}} & \qquad k^2 \le 1\\
+     \sqrt{\frac{1-(b+r)^2}{1-(b-r)^2}} & \qquad k^2 > 1.
    \end{dcases}
 \end{align}
-along with several special cases listed in \citet{MandelAgol2002}.
+In practice, we let the subroutine that computes ${\rm cel}$ accept both
+$m$ and $k_c$ as input for numerical precision.
 
-We used the following relations from \citet{Bulirsch1969}:
+To transform the elliptic integrals in equation \ref{eq:biglam}, 
+we used the following relations from \citet{Bulirsch1969}:
 \begin{eqnarray}
 \lambda K(m) + q E(m) &=& {\rm cel}(k_c,1,\lambda+q,\lambda+q k_c^2)\\
 \lambda K(m) + q \Pi(n,m) &=& {\rm cel}(k_c,p,\lambda+q,\lambda+q k_c^2)\\
@@ -222,7 +225,8 @@ where
 q &=& 3\frac{b-r}{(b+r)(1-(b-r)^2)}\\
 p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
 \end{eqnarray}
-in the $k^2 > 1$ case.
+in the $k^2 > 1$ case.  Note that in this equation the conditions
+should be evaluated in the order they appear.
 
 The $s_2(b,r)$ function is plotted in Figure \ref{s2_plot}.  The
 function varies smoothly from the lower right where the disk is
@@ -282,9 +286,10 @@ computation with \texttt{BigFloat} precision (256-bit).
 From \citet{MandelAgol2002}, the total flux visible during the occultation of a
 body whose surface map is given by $I(\upmu)/I(1) = 1 - u_1(1 - \upmu)$ may be computed
 as 
-\begin{equation}
-\frac{F(u_1,b,r)}{F_0} = 1-(1-u_1/3)^{-1}\left[\Lambda^e(b,r) + u_1\left(\Lambda(b,r)-\Lambda^e(b,r)+\frac{2}{3}\Theta(r-b)\right)\right],
-\end{equation}
+\begin{eqnarray}
+\frac{F(u_1,b,r)}{F_0} &=& \frac{u_1 s_2(b,r) + \pi(1-u_1)(1-\Lambda^e)}{\frac{2\pi}{3}u_1 + \pi(1-u_1)},\\
+&=& 1-(1-u_1/3)^{-1}\left[(1-u_1)\Lambda^e(b,r) + u_1\left(\Lambda(b,r)+\tfrac{2}{3}\Theta(r-b)\right)\right],
+\end{eqnarray}
 where
 \begin{align}
 \Lambda^e(b,r) &=
