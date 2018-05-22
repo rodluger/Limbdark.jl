@@ -178,6 +178,12 @@ E(m)-(1-m)K(m) &=& m {\rm cel}(m,k_c,1,1,0)\\
 \Pi(n,m)-K(m)  &=& n {\rm cel}(m,k_c,1-n,0,1),
 \end{eqnarray}
 noting that \citet{Bulirsch1969} uses a different sign convention for $\Pi(n,m)$.
+In particular, the expressions for $\Pi(n,m)-K(m)$ and $E(m)-(1-m)K(m)$ are useful for eliminating
+the singularities and cancellations which occur at $m=1$ when $b+r=1$ and $m=0$ when 
+$r \rightarrow \infty$.  The general complete elliptic integral is evaluated
+with the approach of \citet{Bartky1938}, which uses successive transformations
+to approximate the integral to specified precision.
+
 These transformations lead to the following numerically-stable expression for
 linear limb-darkening flux, $s_2(b,r)$,
 \begin{align}
@@ -201,7 +207,8 @@ linear limb-darkening flux, $s_2(b,r)$,
                 E\left(m\right)
           \Bigg]
           %
-          & \qquad k^2 > 1
+          & \qquad k^2 > 1\\
+          0 & \qquad  (b \ge 1+r) {\rm or} (r = 0) {\rm or} 
     \end{dcases}
 \end{align}
 where 
