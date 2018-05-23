@@ -9,7 +9,7 @@
 \setlength{\belowdisplayskip}{1.5em}
 
 \title{%
-    Analytical Transit Light Curves for Limb-Darkened Stars
+    Analytic Transit Light Curves for Limb-Darkened Stars
 }
 
 \author[0000-0002-0296-3826]{Rodrigo Luger}
@@ -17,14 +17,16 @@
 \author{Eric Agol}
 \affil{Department~of~Astronomy, University~of~Washington, Seattle, WA}
 
-\keywords{methods: analytical --- techniques: photometric}
+\keywords{methods: analytic --- techniques: photometric}
 
 \begin{abstract}
-    We derive analytical, closed form solutions for the light curve
+    We derive analytic, closed-form solutions for the light curve
     of a planet transiting a star with a limb darkening profile of
-    arbitrary order. We provide updated expressions for the linear
+    arbitrary integer order.  We provide updated expressions for the linear
     and quadratically limb darkened cases that are numerically stable
-    over the entire domain.
+    over the entire domain.  Our expressions are fast to evaluate,
+    allow for the integration over exposure time adaptively, and
+    can be used to compute the first partical derivatives.
 \end{abstract}
 
 % ==============================================================================
@@ -184,22 +186,22 @@ noting that \citet{Bulirsch1969} uses a different sign convention for $\Pi(n,m)$
 In particular, the expressions for $\Pi(n,m)-K(m)$ and $E(m)-(1-m)K(m)$ are useful for eliminating
 the singularities and cancellations which occur at $m=1$ when $b+r=1$ and $m=0$ when 
 $r \rightarrow \infty$.  The general complete elliptic integral is evaluated
-with the approach of \citet{Bartky1938}, which uses successive transformations
-to approximate the integral to a specified precision.
+with the approach of \citet{Bartky1938}, which uses recursion to approximate the 
+integral to a specified precision.
 
-These transformations lead to the following numerically-stable expression for
-the linear limb-darkening flux, $s_2(b,r)$,
+These elliptic integral transformations lead to the following numerically-stable 
+expression for the linear limb-darkening flux, $s_2(b,r)$,
 \begin{align}
     \label{eq:biglam_stable}
     \Lambda &=
     \begin{dcases}
           0 & \qquad  r = 0\\
           0 & \qquad  \vert r- b\vert \ge 1\\
-          -\frac{2}{3}(1-r^2)^{3/2} & \qquad b = 0\\
-          \frac{1}{3} - \frac{4}{9\pi} & \qquad b = r = \frac{1}{2}\\
-          \frac{1}{3} + \frac{2}{9\pi} {\rm cel}\left(k_c,1,m-3,(1-m)(2m-3)\right) & \qquad b= r < \frac{1}{2}\\
-          \frac{1}{3} + \frac{1}{9\pi r} {\rm cel}\left(k_c,1,m-3,1-m\right) & \qquad b= r > \frac{1}{2}\\
-          \frac{2}{9\pi}\left[3\cos^{-1}(1-2r) -(3+2r-8r^2)\sqrt{rb}-3\pi\Theta(r-\frac{1}{2})\right] & \qquad b+r =1\\
+          -\tfrac{2}{3}(1-r^2)^{3/2} & \qquad b = 0\\
+          \tfrac{1}{3} - \tfrac{4}{9\pi} & \qquad b = r = \tfrac{1}{2}\\
+          \tfrac{1}{3} + \tfrac{2}{9\pi} {\rm cel}\left(k_c,1,m-3,(1-m)(2m-3)\right) & \qquad b= r < \tfrac{1}{2}\\
+          \tfrac{1}{3} + \tfrac{1}{9\pi r} {\rm cel}\left(k_c,1,m-3,1-m\right) & \qquad b= r > \tfrac{1}{2}\\
+          \tfrac{2}{9\pi}\left[3\cos^{-1}(1-2r) -(3+2r-8r^2)\sqrt{rb}-3\pi\Theta(r-\tfrac{1}{2})\right] & \qquad b+r =1\\
           \frac{1-(b-r)^2}{9 \pi \sqrt{b r}} \Bigg[
                 \frac{(b+r)^2-1}{4br}(b^2-r^2){\rm cel}(k_c,(b-r)^2(1-m),0,3)
                 &\\ \phantom{XXXX}
@@ -226,7 +228,8 @@ q &=& 3\frac{b-r}{(b+r)(1-(b-r)^2)}\\
 p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
 \end{eqnarray}
 in the $k^2 > 1$ case.  Note that in this equation the conditions
-should be evaluated in the order they appear.
+should be evaluated in the order they appear, and several typos
+are corrected from \citet{MandelAgol2002}.
 
 The $s_2(b,r)$ function is plotted in Figure \ref{s2_plot}.  The
 function varies smoothly from the lower right where the disk is
@@ -269,8 +272,14 @@ is completely eclipsed and $s_2=0$.  In the limits $b=r$ and $b=1-r$, special
 expressions must be used}
 \end{figure}
 
+\begin{figure}\label{s2_plot}
+\includegraphics[width=0.85\linewidth]{figures/s2_residuals.pdf}
+\caption{The numerical error in computing the flux of an eclipsed,  linearly 
+limb-darkened star ($u_1=1$), $s_2(b,r)$.}
+\end{figure}
+
 \begin{figure}\label{s2_machine}
-\includegraphics[width=0.85\linewidth]{figures/s2_machine.png}
+\includegraphics[width=\linewidth]{figures/s2_machine.png}
 \caption{The accuracy of $s_2(b,r)$ near $b=r$ (left panel) and
 $b=1-r$ (right panel). The x-axese are impact parameter b,
 while the y axes in the top panels show $s_2(b,r)$, with $r$
