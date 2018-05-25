@@ -7,9 +7,8 @@ then
 
     # Generate the Julia figures
     echo "Generating julia figures..."
-    julia -e 'ENV["PYTHON"] = "$HOME/miniconda/bin/python"'
-    julia -e 'Pkg.build("PyCall")'
     cd $TRAVIS_BUILD_DIR/tex/figures/julia
+    julia setup
     for f in *.jl; do
         echo "Running $f..."
         julia "$f"
