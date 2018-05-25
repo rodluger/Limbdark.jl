@@ -154,7 +154,7 @@ We have transformed the expressions from \citet{MandelAgol2002} using equation
 17.7.17 from \citet{Abramowitz1970} which yields equations that are better
 behaved in the vicinity of $b=r$.  However, these elliptic integrals are still
 subject to numerical instability as $r \rightarrow 1-b$ and $r \gg 1$. Through
-trial and error, we have found that these instabilities can be removed by combining 
+trial and error, we have found that these instabilities can be removed by combining
 elliptic integrals into a general complete elliptic integral defined by \citet{Bulirsch1969} as
 \begin{equation}
 {\rm cel}(k_c,p,a,b) = \int_0^{\pi/2} \frac{a\cos^2{\phi} + b\sin^2{\phi}}{\cos^2{\phi}+p\sin^2{\phi}} \frac{d\phi}{\sqrt{\cos^2{\phi}+k_c^2\sin^2{\phi}}},
@@ -173,7 +173,7 @@ from $b$ and $r$, rather than from $m$:
 In practice, we let the subroutine that computes ${\rm cel}$ accept both
 $m$ and $k_c$ as input for numerical precision.
 
-To transform the elliptic integrals in equation \ref{eq:biglam}, 
+To transform the elliptic integrals in equation \ref{eq:biglam},
 we used the following relations from \citet{Bulirsch1969}:
 \begin{eqnarray}
 \lambda K(m) + q E(m) &=& {\rm cel}(k_c,1,\lambda+q,\lambda+q k_c^2)\\
@@ -184,12 +184,12 @@ E(m)-(1-m)K(m) &=& m \, {\rm cel}(k_c,1,1,0)\\
 \end{eqnarray}
 noting that \citet{Bulirsch1969} uses a different sign convention for $\Pi(n,m)$.
 In particular, the expressions for $\Pi(n,m)-K(m)$ and $E(m)-(1-m)K(m)$ are useful for eliminating
-the singularities and cancellations which occur at $m=1$ when $b+r=1$ and $m=0$ when 
+the singularities and cancellations which occur at $m=1$ when $b+r=1$ and $m=0$ when
 $r \rightarrow \infty$.  The general complete elliptic integral is evaluated
-with the approach of \citet{Bartky1938}, which uses recursion to approximate the 
+with the approach of \citet{Bartky1938}, which uses recursion to approximate the
 integral to a specified precision.
 
-These elliptic integral transformations lead to the following numerically-stable 
+These elliptic integral transformations lead to the following numerically-stable
 expression for the linear limb-darkening flux, $s_2(b,r)$,
 \begin{align}
     \label{eq:biglam_stable}
@@ -222,7 +222,7 @@ expression for the linear limb-darkening flux, $s_2(b,r)$,
           & \qquad k^2 > 1\\
     \end{dcases}
 \end{align}
-where 
+where
 \begin{eqnarray}
 q &=& 3\frac{b-r}{(b+r)(1-(b-r)^2)}\\
 p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
@@ -234,20 +234,20 @@ are corrected from \citet{MandelAgol2002}.
 The $s_2(b,r)$ function is plotted in Figure \ref{s2_plot}.  The
 function varies smoothly from the lower right where the disk is
 unocculted to the upper left where it is completely occulted.
-There are several points which need to be handled separately as 
+There are several points which need to be handled separately as
 the equation \ref{eq:biglam} expressions become singular or are
 no longer valid;  the solid lines in Figure \ref{s2_plot} show
 these points.  When $b=0$, the integral over the center of the
-disk simplifies greatly.  When $b=r=1/2$, at the intersection of 
+disk simplifies greatly.  When $b=r=1/2$, at the intersection of
 $b=r$ and $b=1-r$, another simplification occurs.  For $b=r$,
 the disk of the occultor crosses the center of the source;
 this needs to be computed separately in the $r<1/2$, $r=1/2$,
 and $r>1/2$ limits.  The first and fourth contacts occur at
-$b=1+r$, where $s_2=1$;  this is the upper bound to the $k^2 < 1$ 
-region for $b+r >1$.  
+$b=1+r$, where $s_2=1$;  this is the upper bound to the $k^2 < 1$
+region for $b+r >1$.
 For $r \ge 1$, the second and third contacts (at the start and
 end of complete occultation) occur when $b=1-r$, which is the
-lower  bound to the $k^2<1$ region when $b+r >1$.  
+lower  bound to the $k^2<1$ region when $b+r >1$.
 For $r < 1$, the second and third contacts occur when $r=1-b$.
 
 Near these boundaries, the standard \citet{MandelAgol2002} expression
@@ -263,38 +263,43 @@ the machine precision.  We find that the transformed expressions
 are accurate to $\la \times 10^{-15}$ when computed in double precision
 within $10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
 
-\begin{figure}\label{s2_plot}
-\includegraphics[width=0.85\linewidth]{figures/transit_linear.pdf}
-\caption{The intensity of a linearly limb-darkened star ($u_1=1$) being 
-eclipsed, $s_2(b,r)$.
-In the limit $b > r+1$, no eclipse occurs, so $s_2=1$.  For $b < r-1$, the star
-is completely eclipsed and $s_2=0$.  In the limits $b=r$ and $b=1-r$, special
-expressions must be used}
+\begin{figure}\label{transit_linear}
+    \begin{centering}
+    \includegraphics[width=0.85\linewidth]{figures/julia/transit_linear.pdf}
+    \caption{The intensity of a linearly limb-darkened star ($u_1=1$) being
+    eclipsed, $s_2(b,r)$.
+    In the limit $b > r+1$, no eclipse occurs, so $s_2=1$.  For $b < r-1$, the star
+    is completely eclipsed and $s_2=0$.  In the limits $b=r$ and $b=1-r$, special
+    expressions must be used}
+    \end{centering}
 \end{figure}
 
 \begin{figure}\label{s2_plot}
-\includegraphics[width=0.85\linewidth]{figures/s2_residuals.pdf}
-\caption{The numerical error in computing the flux of an eclipsed,  linearly 
-limb-darkened star ($u_1=1$), $s_2(b,r)$.}
+    \begin{centering}
+    \includegraphics[width=0.85\linewidth]{figures/julia/s2_residuals.pdf}
+    \caption{The numerical error in computing the flux of an eclipsed,  linearly
+    limb-darkened star ($u_1=1$), $s_2(b,r)$.}
+    \end{centering}
 \end{figure}
 
 \begin{figure}\label{s2_machine}
-\includegraphics[width=\linewidth]{figures/s2_machine.png}
-\caption{The accuracy of $s_2(b,r)$ near $b=r$ (left panel) and
-$b=1-r$ (right panel). The x-axese are impact parameter b,
-while the y axes in the top panels show $s_2(b,r)$, with $r$
-given in the legend of each panel. The middle panels plot
-the difference $(s_2(b,b\pm\epsilon)-s_2(b,b))/\epsilon$
-and $(s_2(b,1-b\pm\epsilon)-s_2(b,1-b))/\epsilon$. The bottom
-panels show the numerical precision by the comparing double precision
-computation with \texttt{BigFloat} precision (256-bit).
-}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/s2_machine.pdf}
+    \caption{The accuracy of $s_2(b,r)$ near $b=r$ (left panel) and
+    $b=1-r$ (right panel). The x-axese are impact parameter b,
+    while the y axes in the top panels show $s_2(b,r)$, with $r$
+    given in the legend of each panel. The middle panels plot
+    the difference $(s_2(b,b\pm\epsilon)-s_2(b,b))/\epsilon$
+    and $(s_2(b,1-b\pm\epsilon)-s_2(b,1-b))/\epsilon$. The bottom
+    panels show the numerical precision by the comparing double precision
+    computation with \texttt{BigFloat} precision (256-bit).}
+    \end{centering}
 \end{figure}
 
 
 From \citet{MandelAgol2002}, the total flux visible during the occultation of a
 body whose surface map is given by $I(\upmu)/I(1) = 1 - u_1(1 - \upmu)$ may be computed
-as 
+as
 \begin{eqnarray}
 \frac{F(u_1,b,r)}{F_0} &=& \frac{u_1 s_2(b,r) + \pi(1-u_1)(1-\Lambda^e)}{\frac{2\pi}{3}u_1 + \pi(1-u_1)},\\
 &=& 1-(1-u_1/3)^{-1}\left[(1-u_1)\Lambda^e(b,r) + u_1\left(\Lambda(b,r)+\tfrac{2}{3}\Theta(r-b)\right)\right],
@@ -342,6 +347,13 @@ The spherical harmonics of order $m = 0$ may be written
     Y_{l,0} = \sqrt{\frac{2l + 1}{4\pi}}
               \sum_{k=0}
 \end{align}
+
+\begin{figure}[t!]
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/python/python.pdf}
+    \caption{\label{fig:python} Placeholder for a figure generated using Python.}
+    \end{centering}
+\end{figure}
 
 
 \bibliography{limbdark}
