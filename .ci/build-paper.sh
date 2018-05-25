@@ -8,9 +8,17 @@ then
     # Install texlive
     sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full
 
-    # Generate the figures
-    echo "Generating figures..."
-    cd $TRAVIS_BUILD_DIR/tex/figures
+    # Generate the Julia figures
+    echo "Generating julia figures..."
+    cd $TRAVIS_BUILD_DIR/tex/figures/julia
+    for f in *.jl; do
+        echo "Running $f..."
+        julia "$f"
+    done
+
+    # Generate the Python figures
+    echo "Generating python figures..."
+    cd $TRAVIS_BUILD_DIR/tex/figures/python
     for f in *.py; do
         echo "Running $f..."
         python "$f"
