@@ -1,15 +1,14 @@
 #!/bin/bash -x
-#set -e
+set -e
 
 # Are there changes in the tex directory?
 if git diff --name-only $TRAVIS_COMMIT_RANGE | grep 'tex/'
 then
 
-    # Install texlive
-    sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full
-
     # Generate the Julia figures
     echo "Generating julia figures..."
+    julia -e 'ENV["PYTHON"] = "$HOME/miniconda/bin/python"'
+    julia -e 'Pkg.build("PyCall")'
     cd $TRAVIS_BUILD_DIR/tex/figures/julia
     for f in *.jl; do
         echo "Running $f..."
@@ -23,6 +22,9 @@ then
         echo "Running $f..."
         python "$f"
     done
+
+    # Install texlive
+    sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full
 
     # Build the paper
     cd $TRAVIS_BUILD_DIR/tex
