@@ -1,4 +1,3 @@
-# Adapted from http://dfm.io/posts/travis-latex/
 sudo: required
 
 dist: trusty
