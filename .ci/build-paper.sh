@@ -6,12 +6,12 @@ if git diff --name-only $TRAVIS_COMMIT_RANGE | grep 'tex/'
 then
 
     # Generate the Julia figures
+    # https://github.com/JuliaPy/PyPlot.jl/issues/317#issuecomment-337348563
     echo "Generating julia figures..."
     cd $TRAVIS_BUILD_DIR/tex/figures/julia
-    julia setup
     for f in *.jl; do
         echo "Running $f..."
-        julia "$f"
+        LD_PRELOAD=${HOME}/.julia/v0.6/Conda/deps/usr/lib/libz.so julia "$f"
     done
 
     # Generate the Python figures

@@ -1,5 +1,0 @@
-ENV["PYTHON"] = ""
-Pkg.update()
-Pkg.add("PyCall")
-Pkg.build("PyCall")
-Pkg.add("PyPlot")
