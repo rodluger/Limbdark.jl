@@ -12,11 +12,11 @@ matrix:
 script:
     - export LD_LIBRARY_PATH=$HOME/.julia/v0.6/Conda/deps/usr/lib
 
-install:
-    - pip install matplotlib
-
 before_install:
     - julia -e 'ENV["PYTHON"]=""; Pkg.add("Conda"); using Conda; Conda.update(); Conda.add("matplotlib"); Pkg.add("PyCall"); Pkg.build("PyCall"); Pkg.add("PyPlot");'
+
+install:
+    - source .ci/travis.sh
 
 after_success:
     - source .ci/build-paper.sh
