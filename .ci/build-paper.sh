@@ -22,9 +22,6 @@ then
         python "$f"
     done
 
-    # Install texlive
-    sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full
-
     # Build the paper
     cd $TRAVIS_BUILD_DIR/tex
 	pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex

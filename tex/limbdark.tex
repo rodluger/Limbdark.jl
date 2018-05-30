@@ -377,11 +377,11 @@ coefficient, and $!!$ denotes the double factorial.
 
 Our task now is to express the specific intensity function (\ref{eq:polynomialldmatrix})
 in the basis of spherical harmonics (\ref{eq:Ylzero}). We therefore wish to find
-the coefficients $y_l$ for which we may write
+the coefficients $c_l$ for which we may write
 %
 \begin{align}
     \label{eq:sphharmld}
-    \frac{I(\upmu)}{I(1)} &= \sum_{l=0}^{l_\mathrm{lmax}} y_l Y_{l,0}(\upmu)
+    \frac{I(\upmu)}{I(1)} &= \sum_{l=0}^{l_\mathrm{lmax}} c_l Y_{l,0}(\upmu)
     \quad.
 \end{align}
 %
@@ -389,12 +389,12 @@ As before, we can write this as the matrix equation
 %
 \begin{align}
     \label{eq:sphharmldmatrix}
-    \frac{I(\upmu)}{I(1)} &= \bvec{y}^\top \, \bvec{M} \, \pmb{\upmu}
+    \frac{I(\upmu)}{I(1)} &= \bvec{c}^\top \, \bvec{M} \, \pmb{\upmu}
     \quad,
 \end{align}
 %
-where $\bvec{y}^\top$ is a row vector whose value at index
-$l$ is $y_l$ and $\bvec{M}$ is the lower triangular matrix with components given by
+where $\bvec{c}^\top$ is a row vector whose value at index
+$l$ is $c_l$ and $\bvec{M}$ is the lower triangular matrix with components given by
 %
 \begin{align}
     \label{eq:Mlk}
@@ -406,20 +406,20 @@ Equating Equations~(\ref{eq:polynomialldmatrix}) and (\ref{eq:sphharmldmatrix}),
 that we must have
 %
 \begin{align}
-    \bvec{y}^\top \, \bvec{M} = \bvec{u}^\top \, \bvec{L} \quad,
+    \bvec{c}^\top \, \bvec{M} = \bvec{u}^\top \, \bvec{L} \quad,
 \end{align}
 %
 or
 %
 \begin{align}
-    \bvec{y} = (\bvec{M}^{-1} \, \bvec{L})^\top \bvec{u} \quad.
+    \bvec{c} = (\bvec{M}^{-1} \, \bvec{L})^\top \bvec{u} \quad.
 \end{align}
 
 
 \begin{figure}[t!]
     \begin{centering}
-    \includegraphics[width=0.5\linewidth]{figures/python/python.pdf}
-    \caption{\label{fig:python} Placeholder for a figure generated using Python. }
+    \includegraphics[width=\linewidth]{figures/python/high_order_ld.pdf}
+    \caption{\label{fig:high_order_ld} Tenth order limb-darkening example with \starry. }
     \end{centering}
 \end{figure}
 
