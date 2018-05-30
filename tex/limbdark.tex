@@ -414,7 +414,18 @@ or
 \begin{align}
     \bvec{c} = (\bvec{M}^{-1} \, \bvec{L})^\top \bvec{u} \quad.
 \end{align}
-
+%
+In \citet{starry} we described how to compute analytic transit and occultation light curves
+for bodies whose surfaces are expressed as a sum over spherical harmonic coefficients. We
+defined a body's surface map as the vector of spherical harmonic coefficients $\bvec{y}$.
+The vector $\bvec{y}$ corresponding to our coefficients for the $Y_{l,0}$ harmonics is
+related to $\bvec{c}$ via
+%
+\begin{align}
+    y_{l(l + 1)} &= c_l
+\end{align}
+%
+for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\bvec{y}$ are zero.
 
 \begin{figure}[t!]
     \begin{centering}
@@ -423,6 +434,7 @@ or
     \end{centering}
 \end{figure}
 
+{\color{red}We should derive simplified expressions of our formulae in \starry for the $m = 0$ case.} \todo{}
 
 \bibliography{limbdark}
 
