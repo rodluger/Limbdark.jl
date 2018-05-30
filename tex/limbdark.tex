@@ -322,35 +322,103 @@ and $F_0$ is the total unocculted flux.
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 %
+\clearpage
 \section{Polynomial Limb-Darkening}
 \label{sec:quad}
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 % ==============================================================================
 
-Any radially symmetric specific intensity profile can be expressed as a sum
-over the $m = 0$ spherical harmonics. In analogy with the linear and quadratic
+In analogy with the linear and quadratic
 limb-darkening laws, let us define the polynomial limb-darkening law of
-order $l_\mathrm{max}$ as\todo{Rodrigo}
+order $l_\mathrm{max}$ as
 %
 %
 \begin{align}
     \label{eq:polynomialld}
-    \frac{I(\upmu)}{I(1)} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - ... - u_{l_\mathrm{lmax}}(1 - \upmu)^{l_\mathrm{lmax}}
+    \frac{I(\upmu)}{I(1)} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - ... - u_{l_\mathrm{lmax}}(1 - \upmu)^{l_\mathrm{lmax}} \nonumber \\
+                          &= \sum_{l=0}^{l_\mathrm{lmax}} \sum_{k=0}^l u_l {l \choose k} (-1)^k \upmu^k
+    \quad,
+\end{align}
+%
+where $u_0 \equiv 1$. For convenience, this can be expressed as the matrix equation
+%
+\begin{align}
+    \label{eq:polynomialldmatrix}
+    \frac{I(\upmu)}{I(1)} &= \bvec{u}^\top \, \bvec{L} \, \pmb{\upmu}
+    \quad,
+\end{align}
+%
+where $\bvec{u}^\top$ is a row vector whose value at index
+$l$ is $u_l$, $\pmb{\upmu}$ is a column vector whose value at index $k$ is $\upmu^k$,
+and $\bvec{L}$ is the lower triangular matrix with components given by
+%
+\begin{align}
+    \label{eq:Llk}
+    L_{lk} = {l \choose k} (-1)^k
     \quad.
 \end{align}
 %
-
-The spherical harmonics of order $m = 0$ may be written
+It is straightforward to show that this law can be
+expressed exactly as a sum over the $m = 0$ spherical harmonics, which also
+form a complete basis of radially symmetric functions on the sphere.
+%
+Based on the relations in \citet{starry} for the spherical harmonics in Cartesian
+form, the spherical harmonics of order $m = 0$ may be written
 %
 \begin{align}
-    Y_{l,0} = \sqrt{\frac{2l + 1}{4\pi}}
-              \sum_{k=0}
+    \label{eq:Ylzero}
+    Y_{l,0}(\upmu) = \sqrt{\frac{2l + 1}{4\pi}}
+              \sum_{k=0}^l {l \choose k} \frac{(k + l - 1)!!}{(k - l - 1)!!} \upmu^k
 \end{align}
+%
+where $\upmu = z = \sqrt{1 - x^2 - y^2}$, $\binom{\bigdot}{\bigdot}$ is a binomial
+coefficient, and $!!$ denotes the double factorial.
+
+Our task now is to express the specific intensity function (\ref{eq:polynomialldmatrix})
+in the basis of spherical harmonics (\ref{eq:Ylzero}). We therefore wish to find
+the coefficients $y_l$ for which we may write
+%
+\begin{align}
+    \label{eq:sphharmld}
+    \frac{I(\upmu)}{I(1)} &= \sum_{l=0}^{l_\mathrm{lmax}} y_l Y_{l,0}(\upmu)
+    \quad.
+\end{align}
+%
+As before, we can write this as the matrix equation
+%
+\begin{align}
+    \label{eq:sphharmldmatrix}
+    \frac{I(\upmu)}{I(1)} &= \bvec{y}^\top \, \bvec{M} \, \pmb{\upmu}
+    \quad,
+\end{align}
+%
+where $\bvec{y}^\top$ is a row vector whose value at index
+$l$ is $y_l$ and $\bvec{M}$ is the lower triangular matrix with components given by
+%
+\begin{align}
+    \label{eq:Mlk}
+    M_{lk} = \sqrt{\frac{2l + 1}{4\pi}} {l \choose k} \frac{(k + l - 1)!!}{(k - l - 1)!!}
+    \quad.
+\end{align}
+%
+Equating Equations~(\ref{eq:polynomialldmatrix}) and (\ref{eq:sphharmldmatrix}), we see
+that we must have
+%
+\begin{align}
+    \bvec{y}^\top \, \bvec{M} = \bvec{u}^\top \, \bvec{L} \quad,
+\end{align}
+%
+or
+%
+\begin{align}
+    \bvec{y} = (\bvec{M}^{-1} \, \bvec{L})^\top \bvec{u} \quad.
+\end{align}
+
 
 \begin{figure}[t!]
     \begin{centering}
-    \includegraphics[width=\linewidth]{figures/python/python.pdf}
+    \includegraphics[width=0.5\linewidth]{figures/python/python.pdf}
     \caption{\label{fig:python} Placeholder for a figure generated using Python. }
     \end{centering}
 \end{figure}
