@@ -436,6 +436,51 @@ for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\b
 
 {\color{red}We should derive simplified expressions of our formulae in \starry for the $m = 0$ case.} \todo{}
 
+\begin{align}
+    \label{eq:PGnI}
+    \mathcal{P}(\bvec{G}_n) &=
+    \begin{dcases}
+        %
+        r^{l+2} \sum\displaylimits_{i=0}^{\frac{l}{2}}
+                {\frac{l}{2} \choose i}
+                \left(\frac{b}{r}\right)^{\frac{l-2i}{2}}
+                \mathcal{I}_{\frac{l+4}{2}, i}
+            %
+            & \qquad \frac{l}{2} \, \mathrm{even}
+        \\[1em]
+        %
+        -r^{l-2} \left( b \mathcal{J}_{l-3,1} + r \mathcal{J}_{l-3,2} \right)
+        %
+        & \qquad l = 1
+        \\[1em]
+        %
+        r^{l-1} \sum\displaylimits_{i=0}^{\frac{l-1}{2}}
+                {\frac{l-1}{2} \choose i}
+                \left(\frac{b}{r}\right)^{\frac{l-2i-1}{2}}
+                \mathcal{J}_{\frac{l-1}{2}, i}
+            & \qquad \frac{l-1}{2} \, \mathrm{even}
+        \\[1em]
+        %
+        0 & \qquad \mathrm{otherwise}
+    \end{dcases}
+%
+\end{align}
+%
+\begin{align}
+%
+    \nonumber \\
+    \label{eq:QGnI}
+    \mathcal{Q}(\bvec{G}_n) &=
+    \begin{dcases}
+        \mathcal{H}_{\frac{l+4}{2}, \frac{l}{2}}
+        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \frac{l}{2} \, \mathrm{even}
+        \\[1em]
+        %
+        0
+        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \mathrm{otherwise} \quad.
+    \end{dcases}
+\end{align}
+
 \bibliography{limbdark}
 
 \end{document}
