@@ -153,8 +153,12 @@ respectively, defined as
 We have transformed the expressions from \citet{MandelAgol2002} using equation
 17.7.17 from \citet{Abramowitz1970} which yields equations that are better
 behaved in the vicinity of $b=r$.  However, these elliptic integrals are still
-subject to numerical instability as $r \rightarrow 1-b$ and $r \gg 1$. Through
-trial and error, we have found that these instabilities can be removed by combining
+subject to numerical instability as $r \rightarrow 1-b$ and $r \gg 1$.  The main
+issue is the logarithmic divergence of $K$ and $\Pi$ as $k \rightarrow 1$, as
+well as numerical cancellations leading to round-off errors which occur in the 
+limit $k \rightarrow 0$.
+
+Through trial and error, we have found that these instabilities can be removed by combining
 elliptic integrals into a general complete elliptic integral defined by \citet{Bulirsch1969} as
 \begin{equation}
 {\rm cel}(k_c,p,a,b) = \int_0^{\pi/2} \frac{a\cos^2{\phi} + b\sin^2{\phi}}{\cos^2{\phi}+p\sin^2{\phi}} \frac{d\phi}{\sqrt{\cos^2{\phi}+k_c^2\sin^2{\phi}}},
@@ -177,7 +181,7 @@ To transform the elliptic integrals in equation \ref{eq:biglam},
 we used the following relations from \citet{Bulirsch1969}:
 \begin{eqnarray}
 \lambda K(m) + q E(m) &=& {\rm cel}(k_c,1,\lambda+q,\lambda+q k_c^2)\\
-\lambda K(m) + q \Pi(n,m) &=& {\rm cel}(k_c,p,\lambda+q,\lambda+q k_c^2)\\
+\lambda K(m) + q \Pi(n,m) &=& {\rm cel}(k_c,1-n,\lambda+q,\lambda+q k_c^2)\\
 E(m) &=& {\rm cel}(k_c,1,1,1-m)\\
 E(m)-(1-m)K(m) &=& m \, {\rm cel}(k_c,1,1,0)\\
 \Pi(n,m)-K(m)  &=& n \, {\rm cel}(k_c,1-n,0,1),
@@ -316,7 +320,8 @@ r^2 & \qquad b \le 1-r,\\
 1 & \qquad b \le r-1,\\
 \end{dcases}
 \end{align}
-and $F_0$ is the total unocculted flux.
+and $F_0$ is the total unocculted flux.  % Note:  I'm not using this in 
+% transit_poly since it is not as precise as the starry expressions.
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -482,5 +487,148 @@ for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\b
 \end{align}
 
 \bibliography{limbdark}
+
+\appendix
+
+\section{Green's function expansion}
+
+Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2+y^2}$
+$(x,y,z)$ are the coordinates of the unit sphere, then we only require
+Green's functions which have a dependence on $z$.  We choose a Green's function
+of the form
+
+\begin{equation}
+\mathbf{G}_n = f(z) (-y \xhat + x \yhat)
+\end{equation}
+giving
+\begin{eqnarray}
+\gbasisn(x,y) &=& \frac{\dd {G_n}_y}{\dd \x} - \frac{\dd {G_n}_x}{\dd \y}\\
+&=& 2 f(z) + \frac{df}{dz} \frac{z^2-1}{z}.
+\end{eqnarray}
+This yields particularly simple form for the primitive integrals
+\begin{align}
+    \label{eq:primitiveP}
+    \mathcal{P}(\bvec{G}_n) &=
+    \int\displaylimits_{\pi-\phi}^{2\pi + \phi} f(z) (r+b \sin{\varphi}) d\varphi
+    %
+\intertext{and}
+    %
+    \label{eq:primitiveQ}
+    \mathcal{Q}(\bvec{G}_n) &=
+    \int\displaylimits_{\pi-\lambda}^{2\pi + \lambda} f(z) d \varphi
+\end{align}
+
+We choose $f(z) = z^n$, so that
+\begin{equation}
+\gbasisn(x,y) =  (n+2)z^n-n z^{n-2},
+\end{equation}
+is the basis set for polynomial limb-darkening, along with the uniform, $\tilde{g}_0 = z^0$,
+and linear, $\tilde{g}_1 = z^1$, terms which we have derived in \S \ref{sec:reparam}.
+
+With this choice of basis, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for 
+$n \ge 1$ since $z=0$ at the boundary of the star.   The $n=0$ case we have already
+solved for uniform limb-darkening.
+
+The primitive integral
+$\mathcal{P}(\bvec{G}_n)$ also takes a simple form
+\begin{equation}
+\mathcal{P}(\bvec{G}_n) = 
+\int_{\pi-\phi}^{2\pi + \phi} \left(1-r^2-b^2-2br s_\varphi\right)^{\frac{n}{2}} (r+b s_\varphi) r d\varphi
+\end{equation}
+We make the transformation $\xi = \tfrac{1}{2} \left(\varphi - \tfrac{3\pi}{2}\right)$, yielding
+\begin{equation}
+\mathcal{P}(\bvec{G}_n) = 
+2r (4br)^{\frac{n}{2}}\int\displaylimits_{-\tfrac{\kappa}{2}}^{\tfrac{\kappa}{2}} 
+(k^2-\sin^2\xi)^{\tfrac{n}{2}} (r-b + 2b \sin^2 \xi) d\xi,
+\end{equation}
+for even values of $n$ and 
+\begin{equation}
+\mathcal{P}(\bvec{G}_n) =
+2r (4br)^{\frac{n}{2}} k^3 \int\displaylimits_{-\tfrac{\kappa}{2}}^{\tfrac{\kappa}{2}} 
+(k^2-\sin^2\xi)^{\tfrac{n-3}{2}} (1-k^{-2} \sin^2 \xi)^{3/2} (r-b + 2b \sin^2 \xi) d\xi,
+\end{equation}
+for odd values of $n \ge 3$.
+
+Each of the terms $(k^2-\sin^2\xi)^c$ can be exanded with the binomial theorem,
+and then expressed in terms of the integrals $I_v$ and $J_v$ as
+\begin{eqnarray}
+\mathcal{P}(\mathbf{G}_n) &=& \\
+&=& 2r(4br)^{n_0} \sum_{i=0}^{n_0} \binom{n_0}{i}(-1)^{n_0-i} k^{2i} \left[(r-b)\mathcal{I}_{n_0-i} + 2b \mathcal{I}_{n_0-i+1}\right]\\ 
+&=& 2r(1-(r-b)^2)^3(4br)^{n_0} \sum_{i=0}^{n_0} \binom{n_0}{i} (-1)^{n_0-i} k^{2i} \left[(r-b)\mathcal{J}_{n_0-i} + 2b \mathcal{J}_{n_0-i+1}\right],
+\end{eqnarray}
+where $n_0 = n/2$ for even $n$ and $n_0 = (n-3)/2$ for odd $n \ge 3$.
+
+\section{Limb-darkening coefficients}
+
+
+\section{Analytic derivatives}
+
+For computing the derivatives of $\mathcal{P}(\bvec{G}_n)$, we find it more numerically 
+stable to express the $k^2$ terms in terms of $b$ and $r$:
+\begin{eqnarray}
+\mathcal{P}(\mathbf{G}_n) &=& 2r \sum_{i=0}^{n_0} T_i U_i\\
+&=& 2r(1-(r-b)^2)^{3/2} \sum_{i=0}^{n_0} T_i V_i,
+\end{eqnarray}
+where the first line is for even $n$ and the second for odd $n \ge 3$, and
+for compactness, we define
+\begin{eqnarray}
+T_i &=&  \binom{n_0}{i}(-4br)^{n_0-i}(1-(b-r)^2)^{2i},\\
+U_i &=&  \left[(r-b)\mathcal{I}_{n_0-i} + 2b \mathcal{I}_{n_0-i+1}\right],\\
+V_i &=&  \left[(r-b)\mathcal{J}_{n_0-i} + 2b \mathcal{J}_{n_0-i+1}\right],
+\end{eqnarray}
+We then express the derivatives as
+\begin{eqnarray}
+\frac{d \mathcal{P}}{d r} = \frac{\partial \mathcal{P}}{\partial r}  +  \frac{\partial \mathcal{P}}{\partial k} \frac{\partial k}{\partial r},\\
+\frac{d \mathcal{P}}{d b} = \frac{\partial \mathcal{P}}{\partial b}  +  \frac{\partial \mathcal{P}}{\partial k} \frac{\partial k}{\partial b}.
+\end{eqnarray}
+
+Then, these partial derivatives are given by:
+\begin{eqnarray}
+\frac{\partial \mathcal{P}}{\partial r}  &=& \frac{\mathcal{P}}{r}+2r\sum_{i=0}^{n_0} T_i  \left[\left(\frac{2i(b-r)}{1-(b-r)^2} + \frac{n_0-i}{r}\right) U_i + \mathcal{I}_{n_0-i}\right],\\
+\frac{\partial \mathcal{P}}{\partial b}  &=& 2r\sum_{i=0}^{n_0} T_i  \left[\left(\frac{2i(r-b)}{1-(b-r)^2} + \frac{n_0-i}{b}\right) U_i - \mathcal{I}_{n_0-i} + 2\mathcal{I}_{n_0-i+1}\right],\\
+\frac{\partial \mathcal{P}}{\partial k}  &=& 2r\sum_{i=0}^{n_0} T_i  \left[(r-b) \frac{\partial \mathcal{I}_{n_0-i}}{\partial k} + 2b \frac{\partial \mathcal{I}_{n_0-i+1}}{\partial k}\right],
+\end{eqnarray}
+for even $n$ and
+\begin{eqnarray}
+\frac{\partial \mathcal{P}}{\partial r}  &=& \left(\frac{\mathcal{P}}{r}+\frac{3\mathcal{P}(b-r)}{1-(b-r)^2}\right)  + \mathcal{F}\sum_{i=0}^{n_0} T_i \left[\left(\frac{2i(b-r)}{1-(b-r)^2} + \frac{n_0-i}{b}\right) V_i + \mathcal{J}_{n_0-i}\right],\\
+\frac{\partial \mathcal{P}}{\partial b}  &=& \frac{3\mathcal{P}(r-b)}{1-(b-r)^2}  +\mathcal{F}\sum_{i=0}^{n_0} T_i \left[\left(\frac{2i(r-b)}{1-(b-r)^2} + \frac{n_0-i}{b}\right) V_i - \mathcal{J}_{n_0-i} + 2\mathcal{J}_{n_0-i+1}\right],\\
+\frac{\partial \mathcal{P}}{\partial k}  &=& \mathcal{F}\sum_{i=0}^{n_0} T_i \left[(r-b) \frac{\partial\mathcal{J}_{n_0-i}}{\partial k} + 2b \frac{\partial \mathcal{J}_{n_0-i+1}}{\partial k}\right],\\
+\end{eqnarray}
+for odd $n \ge 3$ where $\mathcal{F} = 2r(1-(b-r)^2)^{3/2}$.
+
+The partial derivatives of $k$ are given by
+\begin{array}
+\frac{\partial k}{\partial r} &=& \frac{b^2-r^2-1}{8 k b r^2},\\
+\frac{\partial k}{\partial b} &=& \frac{r^2-b^2-1}{8 k b^2 r}.
+\end{array}
+
+Finally, we need the derivatives of the function $\mathcal{I}_v$ and $\mathcal{J}_v$
+with respect to $k$.  This is given by recursion relations
+\begin{eqnarray}
+\frac{\partial \mathcal{J}_v}{\partial k} &=& -3 k^{-1} \mathcal{J}_v +k^2 \frac{\partial \mathcal{J}_{v-1}}{\partial k},\\
+&=& 3 k^{2v} \int_0^1 u^{v+\tfrac{1}{2}} (1-u)^{1/2} (1-k^2u)^{-1/2}du,\\ 
+&=& 3 k^{2v} \frac{\sqrt{\pi}}{2} \Gamma(v+\tfrac{3}{2}) \,_2{\tilde F}_1(\tfrac{1}{2},v+\tfrac{3}{2},3+v,k^2),
+\frac{\partial \mathcal{J}_0}{\partial k} &=& \frac{2}{k^4}\left[(2-k^2)E(k^2)+2(k^2-1)K(k^2)\right],\\
+\end{eqnarray}
+for $k^2 < 1$ ($b+r > 1$) and an expression for $I_v$
+\begin{equation}
+\frac{\partial \mathcal{I}_v}{\partial k} = 2k^{2v} k_c^{-1}.
+\end{equation}
+
+For $k^2 > 1$ ($b+r <1$), we have
+\begin{eqnarray}
+\frac{\partial \mathcal{J}_0}{\partial k} &=& k^{-3} \left[2(2-k^2)E(k^{-2}) + 2(k^2-1) K(k^{-2})\right]\\ 
+\frac{\partial \mathcal{J}_v}{\partial k} &=& (-1)^{v+1} \frac{3k^{-3}\pi^{3/2}}{\Gamma(-(v+\tfrac{1}{2}))} \,_2\tilde{F}_1(-\tfrac{1}{2},v+\tfrac{3}{2},v+2,k^{-2})
+\end{eqnarray}
+while the same recursion relation applies for $\partial \mathcal{J}_v/\partial k$ as in the $k^2 < 1$ case,
+and $d\mathcal{I}_v/dk = 0$.
+
+
+As with STARRY, we find that upward recursion is more stable for $\tfrac{1}{2} < k^2 < 2$,
+while downward recursion is more stable for $k^2 < \tfrac{1}{2}$ and $k^2 > 2$.  This
+requires computing the derivatives, $\frac{\partial \mathcal{J}_v}{\partial k}$, first 
+for large values of $k$. Rather than using the integral or Hypergeometric functions given
+above, we accomplish this by differentiating each term the series expansion for 
+$\mathcal{J}_v$ with respect to $k$.  TBD
 
 \end{document}
