@@ -1,6 +1,7 @@
 # Uses new formulation from limbdark paper.
 
-include("s2_stable.jl")
+#include("s2_stable.jl")
+include("../../../src/s2.jl")
 
 # Run some tests:
 
@@ -21,6 +22,7 @@ for ib=1:nb
   end
 end
 
+clf()
 img=imshow((fgrid-fgrid_big)',interpolation="nearest",origin="lower",extent=[0,2,0,2])
 plot([0,1],[1,2],label=L"$r=1+b$")
 plot([1,2],[0,1],label=L"$r=b-1$")
