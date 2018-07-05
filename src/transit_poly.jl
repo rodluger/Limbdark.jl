@@ -12,7 +12,7 @@ end
 # height on the star relative to the sky plane if the radius 
 # of the star is unity.
 
-include("sn_bigr.jl")
+include("sn.jl")
 include("IJv_derivative.jl")
 include("area_triangle.jl")
 
@@ -170,7 +170,8 @@ else
   else
     kap = 2*acos(kc)
   end
-  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = sqrt((1-b+r)*(1+b-r)*(b+r-1)*(b+r+1))/(2b);  lam = acos(clam); if slam < 0.; lam = -lam; end
+#  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = sqrt((1-b+r)*(1+b-r)*(b+r-1)*(b+r+1))/(2b);  lam = acos(clam); if slam < 0.; lam = -lam; end
+  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
   sn[1] = lam+pi/2+clam*slam-r^2*kap -4r^2*kc*k*(k2-.5)
 #  sn[1] = lam+pi/2+clam*slam-8*r^2*(Iv[2]-Iv[3])
 # These lines gave poor precision (based on Mandel & Agol 2002):

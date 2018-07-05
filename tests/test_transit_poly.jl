@@ -1,9 +1,9 @@
-include("transit_poly.jl")
+include("../src/transit_poly.jl")
 #nu = 2+ceil(Int64,rand()*20); r=rand(); b=rand()*(1+r); u = rand(nu); u *= rand()/sum(u)
 #r=rand(); b=rand()*(1+r); u = [0.,0.,0.,0.,1.0]; nu=length(u)
 
-flux = transit_poly(r,b,u)
-@time flux = transit_poly(r,b,u)
+@testset "transit_poly" begin
+
 
 # Now, integrate by hand:
 function transit_poly_int(r,b,u)
@@ -33,6 +33,19 @@ fobs = 1-fobs
 return fobs
 end
 
-f_num = transit_poly_int(r,b,u)
-@time f_num = transit_poly_int(r,b,u)
-println("r: ",r," b: ",b," f_an: ",flux," f_num: ",f_num)
+r0=[0.01,0.01,0.01,0.01,0.01,0.1,0.1,0.1,0.1,0.1,1.0,1.0,1.0,10.,10.,10.,100.,100.,100.]
+b0=[0.,0.01,0.99,1.0,1.01, 0.,0.1,0.9,1.0,1.1, 0.,1.0,2.0, 9.,10.,11., 99.,100.,101.]
+
+nu = 2+ceil(Int64,rand()*20); u = rand(nu); u *= rand()/sum(u)
+
+for i=1:length(r0)
+  r=r0[i]; b=b0[i]
+  flux = transit_poly(r,b,u)
+  @time flux = transit_poly(r,b,u)
+  f_num = transit_poly_int(r,b,u)
+  @time f_num = transit_poly_int(r,b,u)
+  @test isapprox(f_num,flux,atol=1e-5)
+  println("r: ",r," b: ",b," f_an: ",flux," f_num: ",f_num," diff: ",flux-f_num)
+end
+
+end

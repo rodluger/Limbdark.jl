@@ -1,5 +1,5 @@
 # Automatic differentiation on sn.jl:
-include("sn_bigr.jl")
+include("sn.jl")
 
 using ForwardDiff
 using DiffResults
@@ -18,8 +18,7 @@ function sn_jac(l_max::Int64,r::T,b::T) where {T <: Real}
   # x should be a two-element vector with values [r,b]
   r_tmp,b_tmp = x
   sn = zeros(typeof(r_tmp),n_max+1)
-#  s_n!(l_max,r_tmp,b_tmp,sn)
-  s_n_bigr!(l_max,r_tmp,b_tmp,sn)
+  s_n!(l_max,r_tmp,b_tmp,sn)
   return sn
   end
 

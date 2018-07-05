@@ -1,6 +1,8 @@
-# Tests automatic differentiation on transit_poly.jl:
-include("transit_poly_gradient.jl")
+# Tests analytic differentiation on transit_poly.jl:
+include("../src/transit_poly.jl")
 using PyPlot
+
+@testset "transit_poly_gradient" begin
 
 # Now, carry out finite-difference derivative computation:
 function transit_poly_grad_num(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
@@ -28,14 +30,14 @@ return convert(Float64,tp),convert(Array{Float64,1},tp_grad_big)
 end
 
 function test_transit_poly_gradient(u_n)
-r0 = [0.01,100.0]; n_u = length(u_n)
+r0 = [0.01,.1,0.5,1.0,2.0,10.,100.0]; n_u = length(u_n)
 nb = 50
 
 epsilon = 1e-12; delta = 1e-3
 dfdrbu = zeros(n_u+2)
 label_name=["r","b","u_0","u_1","u_2","u_3","u_4","u_5","u_6","u_7","u_8","u_9","u_10","u_11","u_12","u_13"]
 floor = 1e-20
-for i=1:2
+for i=1:length(r0)
   fig,axes = subplots(1,1)
   r=r0[i]
   if r < 1.0
@@ -64,10 +66,10 @@ for i=1:2
   tp_grad_grid_ana = zeros(length(b),n_u+2)
   for j=1:length(b)
 #    println("r: ",r," b: ",b[j])
-    tp,tp_grad_array= transit_poly_grad(r,b[j],u_n)
-    transit_poly(r,b[j],u_n)
+#    tp,tp_grad_array= transit_poly_grad(r,b[j],u_n)
+    tp=transit_poly(r,b[j],u_n)
     tp_grid[j,:]=tp
-    tp_grad_grid[j,:]=tp_grad_array
+#    tp_grad_grid[j,:]=tp_grad_array
     # Now compute with BigFloat finite difference:
     tp,tp_grad_array =  transit_poly_grad_num(r,b[j],u_n)
     tp_grad_grid_num[j,:]=tp_grad_array
@@ -75,6 +77,12 @@ for i=1:2
     # Finally, compute analytic result:
     tp = transit_poly!(r,b[j],u_n,dfdrbu)
     tp_grad_grid_ana[j,:]=dfdrbu
+    test1 =  isapprox(dfdrbu,tp_grad_array,atol=1e-8)
+    @test test1
+    if ~test1
+      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array)
+      read(STDIN,Char)
+    end
   end
 # Now, make plots:
   ax = axes
@@ -102,11 +110,10 @@ for i=1:2
     ax[:set_title]("r = 100")
   end
   ax[:legend](loc="upper right")
-  read(STDIN,Char)
+#  read(STDIN,Char)
   clf()
   plot(b,tp_grid)
-  read(STDIN,Char)
-  clf()
+#  read(STDIN,Char)
 ### Loop over n and see where the differences between the finite-difference
 ### and AutoDiff are greater than the derivative value: 
 #l=0; m=0
@@ -141,4 +148,9 @@ for i=1:2
 ###loglog(abs.(reshape(sn_jac_grid,length(b)*(n_max+1)*2)),abs.(reshape(sn_jac_grid_num,length(b)*(n_max+1)*2)),".")
 end
 return
+end
+
+u_n = rand(10); u_n /= sum(u_n)
+
+test_transit_poly_gradient(u_n)
 end

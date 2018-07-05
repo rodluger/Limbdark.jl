@@ -1,8 +1,11 @@
 # Tests automatic differentiation on s2.jl:
-include("s2_stable.jl")
+include("../src/s2.jl")
+
 
 using ForwardDiff
 using DiffResults
+
+@testset "s2_gradient" begin
 
 function s2_grad(r::T,b::T) where {T <: Real}
   # Computes the derivative of s_n(r,b) with respect to r, b.
@@ -65,18 +68,27 @@ s_2=s2!(r,b,s2_grad_ana)
 diff2 = s2_grad_ana-s2_gradient
 println("b : ",b," r: ",r," diff(num-auto): ",diff1," diff(ana-auto): ",diff2 )
 println("gradient: ",s2_gradient," expected: ",-[2,-2./3.])
+@test isapprox(s2_grad_numeric[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_numeric[2],s2_gradient[2],atol=1e-8)
+@test isapprox(s2_grad_ana[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_ana[2],s2_gradient[2],atol=1e-8)
 
 # Try b=0 special case:
 r = 0.3; b= 0.0
 # Autodiff:
 s_2,s2_gradient= s2_grad(r,b)
 # Numerical:
-diff1 = s2_grad_num(r,b)-s2_gradient
+s2_grad_numeric = s2_grad_num(r,b)
+diff1 = s2_grad_numeric-s2_gradient
 # Analytic:
 s_2=s2!(r,b,s2_grad_ana)
 diff2 = s2_grad_ana-s2_gradient
 println("b : ",b," r: ",r," diff(num-auto): ",diff1," diff(ana-auto): ",diff2 )
 println("gradient: ",s2_grad_ana," expected: ",-pi*[2*r*sqrt(1.-r^2),0.])
+@test isapprox(s2_grad_numeric[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_numeric[2],s2_gradient[2],atol=1e-8)
+@test isapprox(s2_grad_ana[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_ana[2],s2_gradient[2],atol=1e-8)
 
 # Try r+b=1 special case:
 r = 0.2; b= 0.8
@@ -88,6 +100,10 @@ s_2=s2!(r,b,s2_grad_ana)
 diff2 = s2_grad_ana-s2_gradient
 println("b : ",b," r: ",r," diff(num-auto): ",diff1," diff(ana-auto): ",diff2 )
 println("gradient: ",s2_grad_ana," expected: ",-8r*sqrt(r*(1-r))*[1,-1/3])
+@test isapprox(s2_grad_numeric[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_numeric[2],s2_gradient[2],atol=1e-8)
+@test isapprox(s2_grad_ana[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_ana[2],s2_gradient[2],atol=1e-8)
 
 # Try r=b <1/2 special case:
 r = 0.3; b= 0.3
@@ -99,6 +115,10 @@ s_2=s2!(r,b,s2_grad_ana)
 diff2 = s2_grad_ana-s2_gradient
 println("b : ",b," r: ",r," diff(num-auto): ",diff1," diff(ana-auto): ",diff2 )
 println("gradient: ",s2_grad_ana," expected: ",-4*r*[cel_bulirsch(4*r^2,1.,1.,1-4*r^2),cel_bulirsch(4*r^2,1.,-1.,1.-4*r^2)/3.])
+@test isapprox(s2_grad_numeric[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_numeric[2],s2_gradient[2],atol=1e-8)
+@test isapprox(s2_grad_ana[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_ana[2],s2_gradient[2],atol=1e-8)
 
 # Try r=b > 1/2 special case:
 r = 3.0; b= 3.0
@@ -110,6 +130,10 @@ s_2=s2!(r,b,s2_grad_ana)
 diff2 = s2_grad_ana-s2_gradient
 println("b : ",b," r: ",r," diff(num-auto): ",diff1," diff(ana-auto): ",diff2 )
 println("gradient: ",s2_grad_ana," expected: ",-2*[cel_bulirsch(.25/r^2,1.,1.,0.),-cel_bulirsch(.25/r^2,1.,1.,2*(1.-.25/r^2))/3.])
+@test isapprox(s2_grad_numeric[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_numeric[2],s2_gradient[2],atol=1e-8)
+@test isapprox(s2_grad_ana[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_ana[2],s2_gradient[2],atol=1e-8)
 
 # Now, try a random case with b+r < 1:
 b=r=2.0
@@ -124,6 +148,10 @@ println("Test b+r < 1:")
 s_2=s2!(r,b,s2_grad_ana)
 diff2 = s2_grad_ana-s2_gradient
 println("b : ",b," r: ",r," diff(num-auto): ",diff1," diff(ana-auto): ",diff2 )
+@test isapprox(s2_grad_numeric[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_numeric[2],s2_gradient[2],atol=1e-8)
+@test isapprox(s2_grad_ana[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_ana[2],s2_gradient[2],atol=1e-8)
 
 # Now, try a random case with b+r > 1:
 b=r=0.
@@ -138,20 +166,24 @@ println("Test b+r > 1:")
 s_2=s2!(r,b,s2_grad_ana)
 diff2 = s2_grad_ana-s2_gradient
 println("b : ",b," r: ",r," diff(num-auto): ",diff1," diff(ana-auto): ",diff2 )
+@test isapprox(s2_grad_numeric[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_numeric[2],s2_gradient[2],atol=1e-8)
+@test isapprox(s2_grad_ana[1],s2_gradient[1],atol=1e-8)
+@test isapprox(s2_grad_ana[2],s2_gradient[2],atol=1e-8)
 
 # Now, try out hard cases - ingress/egress of small planets:
-r0 = [0.01,100.0]
+r0 = [0.01,0.01,1.0,10.0,100.0]
 nb = 200
 #l_max = 20
 l_max = 10
 n_max = l_max^2+2*l_max
 
 using PyPlot
-fig,axes = subplots(1,2)
+fig,axes = subplots(1,length(r0))
 get_cmap("plasma")
 epsilon = 1e-12; delta = 1e-3
 i=1
-for i=1:2
+for i=1:length(r0)
   r=r0[i]
   if r < 1.0
     b = [linspace(1e-15,epsilon,nb); linspace(epsilon,delta,nb); linspace(delta,r-delta,nb);
@@ -173,7 +205,10 @@ for i=1:2
     s_2= s2!(r,b[j],s2_grad_ana)
     s2_grid[j]=s_2
     s2_jac_grid[j,:]=s2_grad_ana
-    s2_jac_grid_num[j,:]= s2_grad_num(r,b[j])
+    s2_grad_numeric = s2_grad_num(r,b[j])
+    s2_jac_grid_num[j,:]= s2_grad_numeric
+    @test isapprox(s2_grad_ana[1],s2_grad_numeric[1],atol=1e-8)
+    @test isapprox(s2_grad_ana[2],s2_grad_numeric[2],atol=1e-8)
 #  println("r: ",r," b: ",b[j]," ds2/dr: ",s2_jac_grid[j,1]," ",s2_jac_grid[j,1]-s2_jac_grid_num[j,1])
 #  println("r: ",r," b: ",b[j]," ds2/db: ",s2_jac_grid[j,2]," ",s2_jac_grid[j,2]-s2_jac_grid_num[j,2])
   end
@@ -187,4 +222,6 @@ for i=1:2
   ax[:set_xlabel]("b values")
   ax[:set_ylabel]("Derivative Error")
 #  ax[:axis]([0,length(b),1e-16,1])
+end
+
 end

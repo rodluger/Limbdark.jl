@@ -1,5 +1,7 @@
 # Tests automatic differentiation on sn.jl:
-include("sn_jacobian.jl")
+include("../src/sn_jacobian.jl")
+
+@testset "sn_jacobian" begin
 
 r0 = [0.01,100.0]
 nb = 20
@@ -16,16 +18,16 @@ function sn_jac_num(l_max::Int64,r::T,b::T) where {T <: Real}
 # Make BigFloat versions of r & b:
   r_big = big(r); b_big = big(b)
 # Compute s_n to BigFloat precision:
-  s_n_bigr!(l_max,r_big,b_big,sn_big)
+  s_n!(l_max,r_big,b_big,sn_big)
 # Now, compute finite differences:
   sn_jac_big= zeros(BigFloat,n_max+1,2)
   sn_plus = zeros(BigFloat,n_max+1)
-  s_n_bigr!(l_max,r_big+dq,b_big,sn_plus)
+  s_n!(l_max,r_big+dq,b_big,sn_plus)
   sn_minus = zeros(BigFloat,n_max+1)
-  s_n_bigr!(l_max,r_big-dq,b_big,sn_minus)
+  s_n!(l_max,r_big-dq,b_big,sn_minus)
   sn_jac_big[:,1] = (sn_plus-sn_minus)*.5/dq
-  s_n_bigr!(l_max,r_big,b_big+dq,sn_plus)
-  s_n_bigr!(l_max,r_big,b_big-dq,sn_minus)
+  s_n!(l_max,r_big,b_big+dq,sn_plus)
+  s_n!(l_max,r_big,b_big-dq,sn_minus)
   sn_jac_big[:,2] = (sn_plus-sn_minus)*.5/dq
 return convert(Array{Float64,2},sn_jac_big)
 end
@@ -93,13 +95,18 @@ for i=1:2
   ax[:set_ylabel]("Derivative Error")
   ax[:axis]([0,length(b),1e-16,1])
 end
-read(STDIN,Char)
+#read(STDIN,Char)
 
 # Loop over n and see where the differences between the finite-difference
 # and AutoDiff are greater than the derivative value: 
 l=0; m=0
 for n=0:n_max
   diff = sn_jac_grid[:,n+1,:]-sn_jac_grid_num[:,n+1,:]
+  for ib=1:length(b)
+    @test isapprox(sn_jac_grid[ib,n+1,1],sn_jac_grid_num[ib,n+1,1])
+    @test isapprox(sn_jac_grid[ib,n+1,2],sn_jac_grid_num[ib,n+1,2])
+  end
+  end
   mask = (abs.(diff) .> 1e-3*abs.(sn_jac_grid[:,n+1,:])) .& (abs.(sn_jac_grid[:,n+1,:]) .> 1e-5)
   if sum(mask) > 0 || mod(l-m,4) == 0
     println("n: ",n," max dsn/dr: ",maximum(abs.(diff)))
@@ -124,7 +131,7 @@ for n=0:n_max
     plot(b,sn_jac_grid_num[:,n+1,1],linestyle="--",linewidth=2)
     plot(b,sn_jac_grid_num[:,n+1,2],linestyle="--",linewidth=2)
     println("n: ",n," l: ",l," m: ",m," mu: ",l-m," nu: ",l+m)
-    read(STDIN,Char)
+#    read(STDIN,Char)
   end
   m +=1
   if m > l
@@ -138,3 +145,4 @@ end
 
 #loglog(abs.(reshape(sn_jac_grid,length(b)*(n_max+1)*2)),abs.(reshape(sn_jac_grid-sn_jac_grid_num,length(b)*(n_max+1)*2)),".")
 #loglog(abs.(reshape(sn_jac_grid,length(b)*(n_max+1)*2)),abs.(reshape(sn_jac_grid_num,length(b)*(n_max+1)*2)),".")
+end

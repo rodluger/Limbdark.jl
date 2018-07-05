@@ -1,6 +1,7 @@
 # Computes s_n vector from Luger et al. (2018) to ~machine
 # precision for b+r > 1:
 include("s2.jl")
+include("area_triangle.jl")
 
 #using GSL
 
