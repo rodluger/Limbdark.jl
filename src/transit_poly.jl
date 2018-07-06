@@ -170,9 +170,13 @@ else
   k=sqrt(k2)
   if k2 < 0.5
     kap = 2*asin(k)
+    kap = 2*atan2(sqrt((1-b+r)*(1-r+b)),sqrt((r-1+b)*(b+r+1)))
+#    kap = convert(Float64,2*atan2(sqrt((1-big(b)+big(r))*(1-big(r)+big(b))),sqrt((big(r)-1+big(b))*(big(b)+big(r)+1))))
   else
     kap = 2*acos(kc)
+#    kap = convert(Float64,acos((big(b)^2+big(r)^2-big(1))/(big(2)*big(b)*big(r))))
   end
+  kap  = atan2(sqrt(sqarea_triangle(one(r),b,r)),(r-1)*(r+1)+b^2)
 #  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = sqrt((1-b+r)*(1+b-r)*(b+r-1)*(b+r+1))/(2b);  lam = acos(clam); if slam < 0.; lam = -lam; end
 #  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
 #  slam = 0.5 * ((1. / b) + (b - r) * (1. + r / b));  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
@@ -461,6 +465,7 @@ else
 #    kap = atan2(b^2+r^2-1,4*area_triangle(1.,b,r))
 #    kap = acos((b^2+r^2-1)/(2*b*r))
   end
+    kap  = atan2(sqrt(sqarea_triangle(one(r),b,r)),(r-1)*(r+1)+b^2)
 #  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = sqrt((1-b+r)*(1+b-r)*(b+r-1)*(b+r+1))/(2b);  lam = acos(clam); if slam < 0.; lam = -lam; end
 #  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
 #  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
