@@ -1,4 +1,6 @@
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
+# How to compute (twice) area squared of triangle with 
+# high precision (Goldberg 1991):
 a,b,c=reverse(sort([a,b,c]))
 area = (a+(b+c))*(c-(a-b))*(c+(a-b))*(a+(b-c))
 return area
@@ -167,25 +169,10 @@ if b <= 1-r
   lam = pi*r^2
   sn[1] = pi-lam
 else
-  k=sqrt(k2)
-  if k2 < 0.5
-    kap = 2*asin(k)
-    kap = 2*atan2(sqrt((1-b+r)*(1-r+b)),sqrt((r-1+b)*(b+r+1)))
-#    kap = convert(Float64,2*atan2(sqrt((1-big(b)+big(r))*(1-big(r)+big(b))),sqrt((big(r)-1+big(b))*(big(b)+big(r)+1))))
-  else
-    kap = 2*acos(kc)
-#    kap = convert(Float64,acos((big(b)^2+big(r)^2-big(1))/(big(2)*big(b)*big(r))))
-  end
-  kap  = atan2(sqrt(sqarea_triangle(one(r),b,r)),(r-1)*(r+1)+b^2)
-#  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = sqrt((1-b+r)*(1+b-r)*(b+r-1)*(b+r+1))/(2b);  lam = acos(clam); if slam < 0.; lam = -lam; end
-#  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
-#  slam = 0.5 * ((1. / b) + (b - r) * (1. + r / b));  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
-  slam = ((1.0-r)*(1.0+r)+b^2)/2;  clam = 2*area_triangle(1.,b,r);  lam = atan2(slam,clam); slam /= b; clam /= b
-  sn[1] = lam+pi/2+clam*slam-r^2*kap -4r^2*kc*k*(k2-.5)
-#  sn[1] = lam+pi/2+clam*slam-8*r^2*(Iv[2]-Iv[3])
-# These lines gave poor precision (based on Mandel & Agol 2002):
-#  lam = r^2*acos((r^2+b^2-1)/(2*b*r))+acos((1-r^2+b^2)/(2*b))-sqrt(b^2-.25*(1+b^2-r^2)^2)
-#  sn[1] = pi-lam
+  kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
+  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
+  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
+  sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
 end
 sn[2] = s2(r,b)
 #if typeof(r) == Float64
@@ -448,38 +435,19 @@ for n=2:N_c
   dsndb[n+1] = -(dpdb+dpdk*dkdb)
 end
 # Just compute sn[1] and sn[2], and then we're done. [ ]
-if b <= 1-r
+if b <= 1-r  # k^2 > 1
   lam = pi*r^2
   sn[1] = pi-lam
   dsndr[1] = -2*pi*r
   dsndb[1] = 0.
 else
-  k=sqrt(k2)
-  if k2 < 0.5
-#    kap = 2*asin(k)
-    kap = 2*atan2(sqrt((1-b+r)*(1-r+b)),sqrt((r-1+b)*(b+r+1)))
-#    kap = convert(Float64,2*atan2(sqrt((1-big(b)+big(r))*(1-big(r)+big(b))),sqrt((big(r)-1+big(b))*(big(b)+big(r)+1))))
-  else
-    kap = 2*acos(kc)
-#    kap = convert(Float64,acos((big(b)^2+big(r)^2-big(1))/(big(2)*big(b)*big(r))))
-#    kap = atan2(b^2+r^2-1,4*area_triangle(1.,b,r))
-#    kap = acos((b^2+r^2-1)/(2*b*r))
-  end
-    kap  = atan2(sqrt(sqarea_triangle(one(r),b,r)),(r-1)*(r+1)+b^2)
-#  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = sqrt((1-b+r)*(1+b-r)*(b+r-1)*(b+r+1))/(2b);  lam = acos(clam); if slam < 0.; lam = -lam; end
-#  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
-#  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
-  slam = ((1.0-r)*(1.0+r)+b^2)/2;  clam = 2*area_triangle(1.,b,r);  lam = atan2(slam,clam); slam /= b; clam /= b
-#  slam = 0.5 * ((1. / b) + (b - r) * (1. + r / b));  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
-#  lam = convert(Float64,asin((big(1.0)-big(r)^2+big(b)^2)/(2*big(b))))
-#  sn[1] = lam+pi/2+clam*slam-r^2*kap -4r^2*kc*k*(k2-.5)
-  dsndr[1]= -2*r*kap
-#  dsndr[1]= -r*(pi+2*asin((1-r^2-b^2)/(2*b*r)))
-  dsndb[1]= 2*clam
-  sn[1] = lam+pi/2+clam*slam-8*r^2*(Iv[2]-Iv[3])
-# These lines gave poor precision (based on Mandel & Agol 2002):
-#  lam = r^2*acos((r^2+b^2-1)/(2*b*r))+acos((1-r^2+b^2)/(2*b))-sqrt(b^2-.25*(1+b^2-r^2)^2)
-#  sn[1] = pi-lam
+  kap  = atan2(sqrt(sqarea_triangle(one(r),b,r)),(r-1)*(r+1)+b^2)
+  kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
+  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
+  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
+  sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
+  dsndr[1]= -2*r*kap0
+  dsndb[1]= kite_area2/b
 end
 s2_grad = zeros(typeof(r),2)
 sn[2] = s2!(r,b,s2_grad)

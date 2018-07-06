@@ -40,16 +40,16 @@ epsilon = 1e-12; delta = 1e-3
 dfdrbu = zeros(n_u+2)
 label_name=["r","b","u_0","u_1","u_2","u_3","u_4","u_5","u_6","u_7","u_8","u_9","u_10","u_11","u_12","u_13"]
 floor = 1e-20
+fig,axes = subplots(3,3)
 for i=1:length(r0)
-  fig,axes = subplots(1,1)
   r=r0[i]
   if r < 1.0
 #    b = [linspace(1e-15,epsilon,nb); linspace(epsilon,delta,nb); linspace(delta,r-delta,nb);
-    b = [linspace(1e-13,epsilon,nb); linspace(epsilon,delta,nb); linspace(delta,r-delta,nb);
+    b = [linspace(1e-15,epsilon,nb); linspace(epsilon,delta,nb); linspace(delta,r-delta,nb);
      r-logspace(log10(delta),log10(epsilon),nb); linspace(r-epsilon,r+epsilon,nb); r+logspace(log10(epsilon),log10(delta),nb);
      linspace(r+delta,1-r-delta,nb); 1-r-logspace(log10(delta),log10(epsilon),nb); linspace(1-r-epsilon,1-r+epsilon,nb);
 #     1-r+logspace(log10(epsilon),log10(delta),nb); linspace(1-r+delta,1+r-delta,nb); 1+r-logspace(log10(delta),log10(epsilon),nb);linspace(1+r-epsilon,1+r,nb)]
-     1-r+logspace(log10(epsilon),log10(delta),nb); linspace(1-r+delta,1+r-delta,nb); 1+r-logspace(log10(delta),log10(epsilon),nb);linspace(1+r-epsilon,1+r-1e-13,nb)]
+     1-r+logspace(log10(epsilon),log10(delta),nb); linspace(1-r+delta,1+r-delta,nb); 1+r-logspace(log10(delta),log10(epsilon),nb);linspace(1+r-epsilon,1+r-1e-15,nb)]
      nticks = 14
      xticknames=[L"$10^{-15}$",L"$10^{-12}$",L"$10^{-3}$",L"$r-10^{-3}$",L"$r-10^{-12}$",L"$r+10^{-12}$",L"$r+10^{-3}$",
      L"$1-r-10^{-3}$",L"$1-r-10^{-12}$",L"$1-r+10^{-12}$",L"$1-r+10^{-3}$",L"$1+r-10^{-3}$",L"$1+r-10^{-12}$",L"$1+r-10^{-15}$"]
@@ -88,7 +88,7 @@ for i=1:length(r0)
     end
   end
 # Now, make plots:
-  ax = axes
+  ax = axes[i]
   y = abs.(asinh.(tp_grid)-asinh.(tp_grid_big)); mask = y .<= floor; y[mask]=floor
   ax[:semilogy](y,lw=1,label="flux")
   for n=1:n_u+2
@@ -102,16 +102,18 @@ for i=1:length(r0)
     end
   end
   ax[:legend](loc="upper right",fontsize=6)
-  ax[:set_xlabel]("b values")
+  if mod(i,3) == 0
+    ax[:set_xlabel]("b values")
+  end
   ax[:set_ylabel]("Derivative Error")
   ax[:axis]([0,length(b),floor,1])
   ax[:set_xticks](nb*linspace(0,nticks-1,nticks))
-  ax[:set_xticklabels](xticknames,rotation=45)
-  ax[:set_title](string("r = ",r0[i]))
+  ax[:set_xticklabels](xticknames,rotation=45,fontsize=6)
+  ax[:set_title](string("r = ",r0[i]),fontsize=6)
   ax[:legend](loc="upper right")
-  read(STDIN,Char)
-  clf()
-  plot(b,tp_grid)
+#  read(STDIN,Char)
+#  clf()
+#  plot(b,tp_grid)
 #  read(STDIN,Char)
 ### Loop over n and see where the differences between the finite-difference
 ### and AutoDiff are greater than the derivative value: 
@@ -151,10 +153,13 @@ end
 
 u_n = [0.0]
 test_transit_poly_gradient2(u_n)
+read(STDIN,Char)
 u_n = [1.0]
 test_transit_poly_gradient2(u_n)
+read(STDIN,Char)
 u_n = [2.0,-1.0]
 test_transit_poly_gradient2(u_n)
+read(STDIN,Char)
 u_n = [3.0,-3.0,1.0]
 test_transit_poly_gradient2(u_n)
 end
