@@ -395,8 +395,10 @@ for n=2:N_c
     dpdb = coeff*(-Jv[n0+1]+2*Jv[n0+2])
 #    dpdr += n0*pofgn/r
 #    dpdb += n0*pofgn/b
-    dpdr  += pofgn*(3*(b-r)/onembmr2+(n0+1)/r)
-    dpdb  += pofgn*(3*(r-b)/onembmr2+n0/b)
+#    dpdr  += pofgn*(3*(b-r)/onembmr2+(n0+1)/r)
+    dpdr  += pofgn*(3*(b-r)*r+(n0+1)*onembmr2)/(r*onembmr2)
+#    dpdb  += pofgn*(3*(r-b)/onembmr2+n0/b)
+    dpdb  += pofgn*(3*(r-b)*b+n0*onembmr2)/(b*onembmr2)
     dpdk = coeff*((r-b)*dJvdk[n0+1]+2b*dJvdk[n0+2])
 #    println("n0: ",n0," i: ",0," coeff: ",coeff)
 # For even n, compute coefficients for the sum over I_v:
@@ -407,8 +409,10 @@ for n=2:N_c
       pofgn += term
       dpdr  +=  coeff*Jv[n0-i+1]
       dpdb  +=  coeff*(-Jv[n0-i+1]+2*Jv[n0-i+2])
-      dpdr  += term*((i*2+3)*(b-r)/onembmr2+(n0+1-i)/r)
-      dpdb  += term*((i*2+3)*(r-b)/onembmr2+(n0-i)/b)
+#      dpdr  += term*((i*2+3)*(b-r)/onembmr2+(n0+1-i)/r)
+      dpdr  += term*((i*2+3)*(b-r)*r+(n0+1-i)*onembmr2)/(r*onembmr2)
+#      dpdb  += term*((i*2+3)*(r-b)/onembmr2+(n0-i)/b)
+      dpdb  += term*((i*2+3)*(r-b)*b+(n0-i)*onembmr2)/(onembmr2*b)
       dpdk  += coeff*((r-b)*dJvdk[n0-i+1]+2b*dJvdk[n0-i+2])
 #      dpdk  += coeff*2*i/k*((r-b)*Jv[n0-i+1]+2b*Jv[n0-i+2])
     end
@@ -428,6 +432,7 @@ for n=2:N_c
 # boundary for n > 0.
 # Compute sn[n]:
   sn[n+1] = -pofgn
+#  println("n: ",n," sn: ",sn[n+1]," dpdr: ",dpdr," dpdk*dkdr: ",dpdk*dkdr," dpdb: ",dpdb," dpdk*dkdb: ",dpdk*dkdb)
   dsndr[n+1] = -(dpdr+dpdk*dkdr)
   dsndb[n+1] = -(dpdb+dpdk*dkdb)
 end
