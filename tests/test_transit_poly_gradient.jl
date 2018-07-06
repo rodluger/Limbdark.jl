@@ -30,7 +30,8 @@ return convert(Float64,tp),convert(Array{Float64,1},tp_grad_big)
 end
 
 function test_transit_poly_gradient(u_n)
-r0 = [0.01,.1,0.5,1.0,2.0,10.,100.0]; n_u = length(u_n)
+r0 = [0.01,.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]; n_u = length(u_n)
+r0_name =["0.01","0.1","0.5","0.99","1","1.01","2","10","100"]
 nb = 50
 
 epsilon = 1e-12; delta = 1e-3
@@ -81,7 +82,7 @@ for i=1:length(r0)
     @test test1
     if ~test1
       println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array)
-      read(STDIN,Char)
+#      read(STDIN,Char)
     end
   end
 # Now, make plots:
@@ -104,13 +105,9 @@ for i=1:length(r0)
   ax[:axis]([0,length(b),floor,1])
   ax[:set_xticks](nb*linspace(0,nticks-1,nticks))
   ax[:set_xticklabels](xticknames,rotation=45)
-  if i==1 
-    ax[:set_title]("r = 0.01")
-  else
-    ax[:set_title]("r = 100")
-  end
+  ax[:set_title](string("r = ",r0[i]))
   ax[:legend](loc="upper right")
-#  read(STDIN,Char)
+  read(STDIN,Char)
   clf()
   plot(b,tp_grid)
 #  read(STDIN,Char)

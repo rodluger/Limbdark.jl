@@ -86,13 +86,13 @@ else
       kc = sqrt(1.-inv(k2))
     else
 #      kc2 = (1-(b+r)^2)/(1-(b-r)^2)
-      kc2 = (1-b-r)*(1+b+r)/(1-b+r)/(1-r+b)
+      kc2 = (1-r-b)*(1+b+r)/(1-b+r)/(1-r+b)
       kc = sqrt(kc2)
     end
   else
     if k2 > 0.5
 #      kc2 = ((b+r)^2-1)/(4*b*r)
-      kc2 = (b+r-1)*(b+r+1)/(4*b*r)
+      kc2 = (r-1+b)*(b+r+1)/(4*b*r)
       kc = sqrt(kc2)
     else
       kc = sqrt(1.-k2)
@@ -297,19 +297,29 @@ else
       kc = sqrt(1.-inv(k2))
     else
 #      kc2 = (1-(b+r)^2)/(1-(b-r)^2)
-      kc2 = (1-b-r)*(1+b+r)/(1-b+r)/(1-r+b)
-#      kc2 = -sqarea_triangle(1.,b,r)
+      kc2 = (1-r-b)*(1+b+r)/(1+r-b)/(1-r+b)
+#      kc2 = -sqarea_triangle(one(r),b,r)
 #      kc2 = -convert(Float64,sqarea_triangle(big(1.0),big(b),big(r)))
       kc = sqrt(kc2)
     end
+#    if typeof(kc) == Float64
+#      kc_error = kc-convert(Float64,sqrt((big(1.0)-big(b)-big(r))*(big(1.0)+big(b)+big(r))/(big(1.0)-big(b)+big(r))/(big(1.0)-big(r)+big(b))))
+#      println("kc: ",kc," error on kc: ",kc_error)
+#    end
   else
     if k2 > 0.5
 #      kc2 = ((b+r)^2-1)/(4*b*r)
-      kc2 = (b+r-1)*(b+r+1)/(4*b*r)
+      kc2 = (r-1+b)*(b+r+1)/(4*b*r)
       kc = sqrt(kc2)
     else
-      kc = sqrt(1.-k2)
+      kc2 = (r-1+b)*(b+r+1)/(4*b*r)
+      kc = sqrt(kc2)
+#      kc = sqrt(1.-k2)
     end
+#    if typeof(kc) == Float64
+#      kc_error = kc-convert(Float64,sqrt((big(b)+big(r)-big(1.0))*(big(1.0)+big(b)+big(r))/(big(4.0)*big(b)*big(r))))
+#      println("kc: ",kc," error on kc: ",kc_error)
+#    end
   end
 end
 
@@ -349,7 +359,7 @@ for n=2:N_c
     pofgn = coeff*((r-b)*Iv[n0+1]+2b*Iv[n0+2])
     dpdr = coeff*Iv[n0+1]
     dpdb = coeff*(-Iv[n0+1]+2*Iv[n0+2])
-    dpdr += n0*pofgn/r
+    dpdr += (n0+1)*pofgn/r
     dpdb += n0*pofgn/b
 #    println("v: ",n0,"-Iv[v]: ",-Iv[n0+1]," 2Iv[v+1]: ",2Iv[n0+2]," diff: ",-Iv[n0+1]+2*Iv[n0+2])
     dpdk = coeff*((r-b)*dIvdk[n0+1]+2b*dIvdk[n0+2])
@@ -362,7 +372,7 @@ for n=2:N_c
       pofgn += term
       dpdr += coeff*Iv[n0-i+1]
       dpdb += coeff*(-Iv[n0-i+1]+2*Iv[n0-i+2])
-      dpdr += term*(-i*2*(r-b)/onembmr2+(n0-i)/r)
+      dpdr += term*(i*2*(b-r)/onembmr2+(n0+1-i)/r)
       dpdb += term*(i*2*(r-b)/onembmr2+(n0-i)/b)
 #      println("v: ",n0-i,"-Iv[v]: ",-Iv[n0-i+1]," 2Iv[v+1]: ",2Iv[n0-i+2]," diff: ",-Iv[n0-i+1]+2*Iv[n0-i+2])
       dpdk += coeff*((r-b)*dIvdk[n0-i+1]+2b*dIvdk[n0-i+2])
@@ -371,7 +381,7 @@ for n=2:N_c
     pofgn *= 2r
     dpdr *= 2r
 #    dpdr += (n0+1)*pofgn/r
-    dpdr += pofgn/r
+#    dpdr += pofgn/r
     dpdb *= 2r
 #    dpdb += n0*pofgn/b
     dpdk *= 2r
@@ -383,8 +393,10 @@ for n=2:N_c
     pofgn = coeff*((r-b)*Jv[n0+1]+2b*Jv[n0+2])
     dpdr = coeff*Jv[n0+1]
     dpdb = coeff*(-Jv[n0+1]+2*Jv[n0+2])
-    dpdr += n0*pofgn/r
-    dpdb += n0*pofgn/b
+#    dpdr += n0*pofgn/r
+#    dpdb += n0*pofgn/b
+    dpdr  += pofgn*(3*(b-r)/onembmr2+(n0+1)/r)
+    dpdb  += pofgn*(3*(r-b)/onembmr2+n0/b)
     dpdk = coeff*((r-b)*dJvdk[n0+1]+2b*dJvdk[n0+2])
 #    println("n0: ",n0," i: ",0," coeff: ",coeff)
 # For even n, compute coefficients for the sum over I_v:
@@ -395,8 +407,8 @@ for n=2:N_c
       pofgn += term
       dpdr  +=  coeff*Jv[n0-i+1]
       dpdb  +=  coeff*(-Jv[n0-i+1]+2*Jv[n0-i+2])
-      dpdr  += term*(i*2*(b-r)/onembmr2+(n0-i)/r)
-      dpdb  += term*(i*2*(r-b)/onembmr2+(n0-i)/b)
+      dpdr  += term*((i*2+3)*(b-r)/onembmr2+(n0+1-i)/r)
+      dpdb  += term*((i*2+3)*(r-b)/onembmr2+(n0-i)/b)
       dpdk  += coeff*((r-b)*dJvdk[n0-i+1]+2b*dJvdk[n0-i+2])
 #      dpdk  += coeff*2*i/k*((r-b)*Jv[n0-i+1]+2b*Jv[n0-i+2])
     end
@@ -404,9 +416,9 @@ for n=2:N_c
     dpdr  *= 2r*onembmr2^1.5
     dpdb  *= 2r*onembmr2^1.5
 #    dpdr += ((n0+1)/r+3*(b-r)/onembmr2)*pofgn
-    dpdr  += (1/r+3*(b-r)/onembmr2)*pofgn
+#    dpdr  += (1/r+3*(b-r)/onembmr2)*pofgn
 #    dpdb += (n0/b-3*(b-r)/onembmr2)*pofgn
-    dpdb  += 3*(r-b)/onembmr2*pofgn
+#    dpdb  += 3*(r-b)/onembmr2*pofgn
 #    dpdb += (n*onembmr2-3*(b-r)*(r+b)-3)/(2*b*onembmr2)*pofgn
     dpdk  *= 2r*onembmr2^1.5
   end
