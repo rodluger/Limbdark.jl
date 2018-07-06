@@ -28,7 +28,7 @@ else
     end
   else
 #    onembpr2 = 1-(b+r)^2; onembmr2=1-(b-r)^2; fourbr = 4b*r
-    onembpr2 = (1-b-r)*(1+b+r); onembmr2=(r-b+1)*(b-r+1); fourbr = 4b*r
+    onembpr2 = (1-b-r)*(1+b+r); onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r
     k2 = onembpr2/fourbr+1
 #    k2 = onembmr2/fourbr
     if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8

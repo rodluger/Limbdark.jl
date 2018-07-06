@@ -79,7 +79,10 @@ if b == 0.0
   return flux/(c_n[1]+2*c_n[2]/3)
 else
 # Next, compute k^2 = m:
-  onembmr2=(r-b+1)*(b-r+1); fourbr = 4b*r
+#  onembmr2=(r+1-b)*(1-r+b); fourbr = 4b*r
+  onembmr2=(r+1-b)*(1-r+b); fourbr = 4b*r
+#  onembpr2 = (1-r-b)*(1+b+r); onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r
+#  k2 = onembpr2/fourbr+1
   k2 = onembmr2/fourbr
   if k2 > 1
     if k2 > 2.0
@@ -171,7 +174,9 @@ else
     kap = 2*acos(kc)
   end
 #  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = sqrt((1-b+r)*(1+b-r)*(b+r-1)*(b+r+1))/(2b);  lam = acos(clam); if slam < 0.; lam = -lam; end
-  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
+#  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
+#  slam = 0.5 * ((1. / b) + (b - r) * (1. + r / b));  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
+  slam = ((1.0-r)*(1.0+r)+b^2)/2;  clam = 2*area_triangle(1.,b,r);  lam = atan2(slam,clam); slam /= b; clam /= b
   sn[1] = lam+pi/2+clam*slam-r^2*kap -4r^2*kc*k*(k2-.5)
 #  sn[1] = lam+pi/2+clam*slam-8*r^2*(Iv[2]-Iv[3])
 # These lines gave poor precision (based on Mandel & Agol 2002):
@@ -286,8 +291,10 @@ if b == 0.0
   return flux/(c_n[1]+2*c_n[2]/3)
 else
 # Next, compute k^2 = m:
-  onembmr2=(r-b+1)*(b-r+1); fourbr = 4b*r
+  onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r
   k2 = onembmr2/fourbr; k = sqrt(k2)
+#  onembpr2 = (1-b-r)*(1+b+r); onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r
+#  k2 = onembpr2/fourbr+1; k = sqrt(k2)
   dkdr = (b^2-r^2-1)/(8*k*b*r^2)
 #  dkdr = ((b-r)*(b+r)-1)/(8*k*b*r^2)
   dkdb = (r^2-b^2-1)/(8*k*b^2*r)
@@ -446,7 +453,8 @@ else
   k=sqrt(k2)
   if k2 < 0.5
 #    kap = 2*asin(k)
-    kap = 2*atan2(sqrt((1-b+r)*(1+b-r)),sqrt((b+r-1)*(b+r+1)))
+    kap = 2*atan2(sqrt((1-b+r)*(1-r+b)),sqrt((r-1+b)*(b+r+1)))
+#    kap = convert(Float64,2*atan2(sqrt((1-big(b)+big(r))*(1-big(r)+big(b))),sqrt((big(r)-1+big(b))*(big(b)+big(r)+1))))
   else
     kap = 2*acos(kc)
 #    kap = convert(Float64,acos((big(b)^2+big(r)^2-big(1))/(big(2)*big(b)*big(r))))
@@ -454,7 +462,11 @@ else
 #    kap = acos((b^2+r^2-1)/(2*b*r))
   end
 #  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = sqrt((1-b+r)*(1+b-r)*(b+r-1)*(b+r+1))/(2b);  lam = acos(clam); if slam < 0.; lam = -lam; end
-  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
+#  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
+#  slam = ((1.0-r)*(1.0+r)+b^2)/(2*b);  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
+  slam = ((1.0-r)*(1.0+r)+b^2)/2;  clam = 2*area_triangle(1.,b,r);  lam = atan2(slam,clam); slam /= b; clam /= b
+#  slam = 0.5 * ((1. / b) + (b - r) * (1. + r / b));  clam = 2*area_triangle(1.,b,r)/b;  lam = acos(clam); if slam < 0.; lam = -lam; end
+#  lam = convert(Float64,asin((big(1.0)-big(r)^2+big(b)^2)/(2*big(b))))
 #  sn[1] = lam+pi/2+clam*slam-r^2*kap -4r^2*kc*k*(k2-.5)
   dsndr[1]= -2*r*kap
 #  dsndr[1]= -r*(pi+2*asin((1-r^2-b^2)/(2*b*r)))
