@@ -14,7 +14,8 @@ end
 # height on the star relative to the sky plane if the radius 
 # of the star is unity.
 
-include("sn.jl")
+#include("sn.jl")
+include("s2.jl")
 include("IJv_derivative.jl")
 include("area_triangle.jl")
 
@@ -111,15 +112,34 @@ if iseven(N_c)
 else
   v_max = round(Int64,(N_c-1)/2)+2
 end
+# Compute sn[1] and sn[2]:
+# Uniform disk case:
+if b <= 1-r
+  lam = pi*r^2
+  sn[1] = pi-lam
+  kap0 = convert(typeof(r),pi); kck = zero(r)
+else
+  # Twice area of kite-shaped region connecting centers of circles & intersection points:
+  kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
+  # Angle of section for occultor:
+  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
+  # Angle of section for source:
+  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
+  # Flux of visible uniform disk:
+  sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
+  kck = kite_area2/(4*b*r)
+end
+sn[2] = s2(r,b)
+#if typeof(r) == Float64
 # Compute the J_v and I_v functions:
 Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
 if k2 > 0
   if k2 < 0.5 || k2 > 2.0
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    IJv_lower!(v_max,k2,kc,Iv,Jv)
+    IJv_lower!(v_max,k2,kck,kc,kap0,Iv,Jv)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    IJv_raise!(v_max,k2,kc,Iv,Jv)
+    IJv_raise!(v_max,k2,kck,kc,kap0,Iv,Jv)
   end
 end
 
@@ -164,18 +184,6 @@ for n=2:N_c
   #println("n: ",n," P(G_n): ",pofgn)
   sn[n+1] = -pofgn
 end
-# Just compute sn[1] and sn[2], and then we're done. [ ]
-if b <= 1-r
-  lam = pi*r^2
-  sn[1] = pi-lam
-else
-  kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
-  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
-  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
-  sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
-end
-sn[2] = s2(r,b)
-#if typeof(r) == Float64
 #  println("r: ",r," b: ",b," s2 error: ",convert(Float64,s2(big(r),big(b)))-sn[2])
 #end
 # That's it!
@@ -328,6 +336,32 @@ else
   v_max = round(Int64,(N_c-1)/2)+2
 end
 #println("v_max: ",v_max," N_c: ",N_c)
+# Compute sn[1] and its derivatives:
+if b <= 1-r  # k^2 > 1
+  lam = pi*r^2
+  sn[1] = pi-lam
+  dsndr[1] = -2*pi*r
+  dsndb[1] = 0.
+  kap0 = convert(typeof(r),pi); kck = zero(r)
+else
+  # Twice area of kite-shaped region connecting centers of circles & intersection points:
+  kite_area2 = sqrt(sqarea_triangle(one(r),b,r)) 
+  # Angle of section for occultor:
+  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
+  # Angle of section for source:
+  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
+  # Flux of visible uniform disk:
+  sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
+  dsndr[1]= -2*r*kap0
+  dsndb[1]= kite_area2/b
+  kck = kite_area2/(4*b*r)
+end
+# Compute sn[2] and its derivatives:
+s2_grad = zeros(typeof(r),2)
+sn[2] = s2!(r,b,s2_grad)
+dsndr[2] = s2_grad[1]
+dsndb[2] = s2_grad[2]
+
 # Compute the J_v and I_v functions:
 Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
 # And their derivatives with respect to k:
@@ -335,10 +369,10 @@ dIvdk = zeros(typeof(k2),v_max+1); dJvdk = zeros(typeof(k2),v_max+1)
 if k2 > 0
   if k2 < 0.5 || k2 > 2.0
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    dIJv_lower_dk!(v_max,k2,kc,Iv,Jv,dIvdk,dJvdk)
+    dIJv_lower_dk!(v_max,k2,kck,kc,kap0,Iv,Jv,dIvdk,dJvdk)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    dIJv_raise_dk!(v_max,k2,kc,Iv,Jv,dIvdk,dJvdk)
+    dIJv_raise_dk!(v_max,k2,kck,kc,kap0,Iv,Jv,dIvdk,dJvdk)
   end
 end
 
@@ -434,25 +468,6 @@ for n=2:N_c
   dsndr[n+1] = -(dpdr+dpdk*dkdr)
   dsndb[n+1] = -(dpdb+dpdk*dkdb)
 end
-# Just compute sn[1] and sn[2], and then we're done. [ ]
-if b <= 1-r  # k^2 > 1
-  lam = pi*r^2
-  sn[1] = pi-lam
-  dsndr[1] = -2*pi*r
-  dsndb[1] = 0.
-else
-  kap  = atan2(sqrt(sqarea_triangle(one(r),b,r)),(r-1)*(r+1)+b^2)
-  kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
-  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
-  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
-  sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
-  dsndr[1]= -2*r*kap0
-  dsndb[1]= kite_area2/b
-end
-s2_grad = zeros(typeof(r),2)
-sn[2] = s2!(r,b,s2_grad)
-dsndr[2] = s2_grad[1]
-dsndb[2] = s2_grad[2]
 #if typeof(r) == Float64
 #  println("r: ",r," b: ",b," s2 error: ",convert(Float64,s2(big(r),big(b)))-sn[2])
 #end

@@ -45,6 +45,45 @@ else # k^2 >=1
 end
 end
 
+function Jv_series(k2::T,v::Int64) where {T <: Real}
+# Use series expansion to compute J_v:
+nmax = 100
+n = 1; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
+# Computing leading coefficient (n=0):
+#coeff = 3pi/(2^(2+v)*factorial(v+2))
+if k2 < 1
+  coeff = 3pi/(2^(2+v)*exp(lfact(v+2)))
+# multiply by (2v-1)!!
+  for i=1:v
+    coeff *= 2.*i-1
+  end
+# Add leading term to J_v:
+  Jv = one(k2)*coeff
+# Now, compute higher order terms until desired precision is reached:
+  while n < nmax && abs(error) > tol
+    coeff *= (2.0*n-1.0)*(2.0*(n+v)-1.0)*.25/(n*(n+v+2))*k2
+    Jv += coeff
+    error = coeff/Jv
+    n +=1
+  end
+  return Jv*k2^v*sqrt(k2)
+else # k^2 >= 1
+  coeff = pi
+  # Compute (2v-1)!!/(2^v v!):
+  for i=1:v
+    coeff *= 1.-.5/i
+  end
+  Jv = one(k2)*coeff; n=1
+  while n < nmax && abs(error) > tol
+    coeff *= (1.-2.5/n)*(1.-.5/(n+v))/k2
+    Jv += coeff
+    error = coeff/Jv
+    n +=1
+  end
+  return Jv
+end
+end
+
 function dJv_seriesdk(k2::T,v::Int64) where {T <: Real}
 # Use series expansion to compute J_v:
 nmax = 100
@@ -95,7 +134,67 @@ else # k^2 >= 1
 end
 end
 
-function dIJv_raise_dk!(v_max::Int64,k2::T,kc::T,Iv::Array{T,1},Jv::Array{T,1},dIvdk::Array{T,1},dJvdk::Array{T,1})  where {T <: Real}
+function IJv_raise!(v_max::Int64,k2::T,kck::T,kc::T,kap::T,Iv::Array{T,1},Jv::Array{T,1})  where {T <: Real}
+# This function needs debugging. [ ]
+# Compute I_v, J_v for 0 <= v <= v_max = l_max+2
+# Define k:
+k = sqrt(k2)
+# Iterate upwards in v:
+v = v_max
+# Compute I_v via upward iteration on v:
+if k2 < 1
+# First, compute value for v=0:
+  if k2 < 0.5
+    Iv[1] = 2*asin(sqrt(k2))
+#  Iv[1] = acos(1.-2k2)
+  else
+    Iv[1] = 2*acos(kc)
+  end
+# Try something else:
+#  Iv[1] = asin(2*kck)
+  Iv[1] = kap
+# Next, iterate upwards in v:
+#  f0 = kc/k
+  f0 = kck
+  v = 1
+# Loop over v, computing I_v and J_v from higher v:
+  while v <= v_max
+    Iv[v+1]=((2v-1)*Iv[v]/2-f0)/v
+    f0 *= k2
+    v += 1
+  end
+else # k^2 >= 1
+  # Compute v=0
+  Iv[1] = pi
+  for v=1:v_max
+    Iv[v+1]=Iv[v]*(1.0-0.5/v)
+  end
+end
+# Need to compute J_v for v=0, 1:
+v= 0
+if k2 < 1
+  # Use cel_bulirsch:
+  if k2 > 0
+    Jv[v+1]=2/(3k2*k)*cel_bulirsch(k2,kc,one(k2),k2*(3k2-1),k2*(1-k2))
+    Jv[v+2]= 2/(15k2*k)*cel_bulirsch(k2,kc,one(k2),2k2*(3k2-2),k2*(4-7k2+3k2*k2))
+  else
+    Jv[v+1]= 0.0
+    Jv[v+2]= 0.0
+  end
+else # k^2 >=1
+  k2inv = inv(k2)
+  Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
+  Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+end
+v=2
+while v <= v_max
+  Jv[v+1] = (2*(v+1+(v-1)*k2)*Jv[v]-k2*(2v-3)*Jv[v-1])/(2v+3)
+  v += 1
+end
+return
+end
+
+function dIJv_raise_dk!(v_max::Int64,k2::T,kck::T,kc::T,kap::T,Iv::Array{T,1},Jv::Array{T,1},dIvdk::Array{T,1},dJvdk::Array{T,1})  where {T <: Real}
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -111,10 +210,10 @@ if k2 < 1
 #    Iv[1] = 2*convert(Float64,acos(big(kc)))
 #    Iv[1] = convert(Float64,acos((big(b)^2+big(r)^2-big(1))/(big(2)*big(b)*big(r))))
   end
-#  Iv[1] = kap
+  Iv[1] = kap
 # Try something else:
 # Next, iterate upwards in v:
-  f0 = kc*k
+  f0 = kck
   v = 1
 # Loop over v, computing I_v and J_v from higher v:
   while v <= v_max
@@ -167,7 +266,7 @@ end
 return
 end
 
-function dIJv_lower_dk!(v_max::Int64,k2::T,kc::T,Iv::Array{T,1},Jv::Array{T,1},dIvdk::Array{T,1},dJvdk::Array{T,1})  where {T <: Real}
+function IJv_lower!(v_max::Int64,k2::T,kck::T,kc::T,kap::T,Iv::Array{T,1},Jv::Array{T,1})  where {T <: Real}
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -179,13 +278,78 @@ v = v_max
 if k2 < 1
   Iv[v+1]=Iv_series(k2,v)
 # Next, iterate downwards in v:
-  f0 = k2^(v-1)*k*kc
+  f0 = k2^(v-1)*kck
 # Loop over v, computing I_v and J_v from higher v:
-  while v >= 1
+  while v >= 2
     Iv[v] = 2/(2v-1)*(v*Iv[v+1]+f0)
     f0 /= k2
     v -= 1
   end
+  Iv[1] = kap
+else # k^2 >= 1
+  # Compute v=0 (no need to iterate downwards in this case):
+  Iv[1] = pi
+  for v=1:v_max
+    Iv[v+1]=Iv[v]*(1-.5/v)
+  end
+end
+v= v_max
+# Need to compute top two for J_v:
+#if typeof(k2) == BigFloat
+  Jv[v]=Jv_series(k2,v-1); Jv[v+1]=Jv_series(k2,v)
+#else
+#  Jv[v]=Jv_hyp(k2,v-1); Jv[v+1]=Jv_hyp(k2,v)
+#end
+#if typeof(k2) == Float64
+#  println("v ",v," k2 ",k2," Jv_ser ",convert(Float64,Jv_series(big(k2),v-1))," ",convert(Float64,Jv_series(big(k2),v))," Jv_hyp ",Jv_hyp(k2,v-1)," ",Jv_hyp(k2,v))
+#end
+# Iterate downwards in v (lower):
+while v >= 2
+  f2 = k2*(2v-3); f1 = 2*(v+1+(v-1)*k2)/f2; f3 = (2v+3)/f2
+  Jv[v-1] = f1*Jv[v]-f3*Jv[v+1]
+  v -= 1
+end
+# Compute first two exactly:
+v= 0
+if k2 < 1
+#  # Use cel_bulirsch:
+#  if k2 > 0
+#    Jv[v+1]=2/(3*k2*k)*cel_bulirsch(k2,kc,one(k2),k2*(3k2-1),k2*(1-k2))
+#    Jv[v+2]=2/(15*k2*k)*cel_bulirsch(k2,kc,one(k2),2*k2*(3k2-2),k2*(4-7k2+3k2*k2))
+##    Jv[v+3] =-2/(35*k)*cel_bulirsch(k2,kc,one(k2),8-11k2+k2*k2,(-8+5k2+2k2*k2)*(1-k2))
+#  else
+#    Jv[v+1]= 0.0
+#    Jv[v+2]= 0.0
+#  end
+else # k^2 >=1
+  k2inv = inv(k2)
+  Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
+  Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+#  Jv[v+3]=2/(35*k2)*cel_bulirsch(k2inv,kc,one(k2),-k2^2+11k2-8,(k2^2+16*k2-16)*(1-k2inv))
+end
+return
+end
+
+function dIJv_lower_dk!(v_max::Int64,k2::T,kck::T,kc::T,kap::T,Iv::Array{T,1},Jv::Array{T,1},dIvdk::Array{T,1},dJvdk::Array{T,1})  where {T <: Real}
+# Compute I_v, J_v for 0 <= v <= v_max = l_max+2
+# Define k:
+k = sqrt(k2)
+# Iterate downwards in v:
+v = v_max
+# Add in k2 > 1 cases [ ]
+# First, compute approximation for large v:
+#Iv[v+1]=Iv_hyp(k2,v)
+if k2 < 1
+  Iv[v+1]=Iv_series(k2,v)
+# Next, iterate downwards in v:
+  f0 = k2^(v-1)*kck
+# Loop over v, computing I_v and J_v from higher v:
+  while v >= 2
+    Iv[v] = 2/(2v-1)*(v*Iv[v+1]+f0)
+    f0 /= k2
+    v -= 1
+  end
+  Iv[1] = kap
   # Now compute compute derivatives:
   dIvdk[1] = 2/kc
   for v=1:v_max
