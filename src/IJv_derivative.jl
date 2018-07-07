@@ -222,7 +222,8 @@ if k2 < 1
     v += 1
   end
   # Now compute compute derivatives:
-  dIvdk[1] = 2/kc
+#  dIvdk[1] = 2/kc
+  dIvdk[1] = 2*k2/kck
   for v=1:v_max
     dIvdk[v+1] = k2*dIvdk[v]
   end

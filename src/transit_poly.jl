@@ -387,6 +387,7 @@ for n=2:N_c
 # For even values of n, sum over I_v:
     n0 = convert(Int64,n/2)
     coeff = (-fourbr)^n0
+    dIv_fac = (1+(r-b)*(r+b))/(2r)
     # Compute i=0 term
     pofgn = coeff*((r-b)*Iv[n0+1]+2b*Iv[n0+2])
     dpdr = coeff*Iv[n0+1]
@@ -394,7 +395,8 @@ for n=2:N_c
     dpdr += (n0+1)*pofgn/r
     dpdb += n0*pofgn/b
 #    println("v: ",n0,"-Iv[v]: ",-Iv[n0+1]," 2Iv[v+1]: ",2Iv[n0+2]," diff: ",-Iv[n0+1]+2*Iv[n0+2])
-    dpdk = coeff*((r-b)*dIvdk[n0+1]+2b*dIvdk[n0+2])
+#    dpdk = coeff*((r-b)*dIvdk[n0+1]+2b*dIvdk[n0+2])
+#    dpdk = coeff*dIvdk[n0+1]*dIv_fac
 # For even n, compute coefficients for the sum over I_v:
 #    println("n0: ",n0," i: ",0," coeff: ",coeff)
     for i=1:n0
@@ -404,10 +406,12 @@ for n=2:N_c
       pofgn += term
       dpdr += coeff*Iv[n0-i+1]
       dpdb += coeff*(-Iv[n0-i+1]+2*Iv[n0-i+2])
-      dpdr += term*(i*2*(b-r)/onembmr2+(n0+1-i)/r)
+#      dpdr += term*(i*2*(b-r)/onembmr2+(n0+1-i)/r)
+      dpdr += coeff*((n0+1)+i*((b-r)*(r+b)-1)/onembmr2)*((1-b/r)*Iv[n0-i+1]+2b/r*Iv[n0-i+2])
       dpdb += term*(i*2*(r-b)/onembmr2+(n0-i)/b)
 #      println("v: ",n0-i,"-Iv[v]: ",-Iv[n0-i+1]," 2Iv[v+1]: ",2Iv[n0-i+2]," diff: ",-Iv[n0-i+1]+2*Iv[n0-i+2])
-      dpdk += coeff*((r-b)*dIvdk[n0-i+1]+2b*dIvdk[n0-i+2])
+#      dpdk += coeff*((r-b)*dIvdk[n0-i+1]+2b*dIvdk[n0-i+2])
+#      dpdk += coeff*dIvdk[n0-i+1]*dIv_fac
 #      dpdk += coeff*2*i/k*((r-b)*Iv[n0-i+1]+2b*Iv[n0-i+2])
     end
     pofgn *= 2r
@@ -416,7 +420,7 @@ for n=2:N_c
 #    dpdr += pofgn/r
     dpdb *= 2r
 #    dpdb += n0*pofgn/b
-    dpdk *= 2r
+#    dpdk *= 2r
   else
 # Now do the same for odd N_c in sum over J_v:
     n0 = convert(Int64,(n-3)/2)
