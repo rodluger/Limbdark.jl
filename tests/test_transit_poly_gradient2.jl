@@ -5,8 +5,8 @@ using PyPlot
 @testset "transit_poly_gradient" begin
 
 # Now, carry out finite-difference derivative computation:
-function transit_poly_grad_num(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
-  dq = big(1e-18)
+function transit_poly_grad_num(r::T,b::T,u_n::Array{T,1},dq0::T) where {T <: Real}
+  dq = big(dq0)
 # Make BigFloat versions of r, b & u_n:
   r_big = big(r); b_big = big(b); u_big = big.(u_n)
 # Compute flux to BigFloat precision:
@@ -30,14 +30,16 @@ return convert(Float64,tp),convert(Array{Float64,1},tp_grad_big)
 end
 
 function test_transit_poly_gradient2(u_n)
-r0 = [0.01,.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]; n_u = length(u_n)
+#r0 = [0.01,.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]; n_u = length(u_n)
+r0 = [0.01,.1,0.5,0.999999,1.0,1.000001,2.0,10.,100.0]; n_u = length(u_n)
 #r0 = [1.0]; n_u = length(u_n)
-r0_name =["0.01","0.1","0.5","0.99","1","1.01","2","10","100"]
+r0_name =["0.01","0.1","0.5","0.999999","1","1.000001","2","10","100"]
 #r0_name =["1"]
 nb = 50
 
 epsilon = 1e-12; delta = 1e-3
 dfdrbu = zeros(n_u+2)
+dfdrbu_big = zeros(BigFloat,n_u+2)
 label_name=["r","b","u_0","u_1","u_2","u_3","u_4","u_5","u_6","u_7","u_8","u_9","u_10","u_11","u_12","u_13"]
 floor = 1e-20
 fig,axes = subplots(3,3)
@@ -50,6 +52,7 @@ for i=1:length(r0)
      linspace(r+delta,1-r-delta,nb); 1-r-logspace(log10(delta),log10(epsilon),nb); linspace(1-r-epsilon,1-r+epsilon,nb);
 #     1-r+logspace(log10(epsilon),log10(delta),nb); linspace(1-r+delta,1+r-delta,nb); 1+r-logspace(log10(delta),log10(epsilon),nb);linspace(1+r-epsilon,1+r,nb)]
      1-r+logspace(log10(epsilon),log10(delta),nb); linspace(1-r+delta,1+r-delta,nb); 1+r-logspace(log10(delta),log10(epsilon),nb);linspace(1+r-epsilon,1+r-1e-13,nb)]
+     b = abs.(b)
      nticks = 14
      xticknames=[L"$10^{-13}$",L"$10^{-12}$",L"$10^{-3}$",L"$r-10^{-3}$",L"$r-10^{-12}$",L"$r+10^{-12}$",L"$r+10^{-3}$",
      L"$1-r-10^{-3}$",L"$1-r-10^{-12}$",L"$1-r+10^{-12}$",L"$1-r+10^{-3}$",L"$1+r-10^{-3}$",L"$1+r-10^{-12}$",L"$1+r-10^{-13}$"]
@@ -67,25 +70,32 @@ for i=1:length(r0)
   tp_grid_big = zeros(length(b))
   tp_grad_grid_num = zeros(length(b),n_u+2)
   tp_grad_grid_ana = zeros(length(b),n_u+2)
+  tp_grad_grid_big = zeros(length(b),n_u+2)
   for j=1:length(b)
 #    println("r: ",r," b: ",b[j])
 #    tp,tp_grad_array= transit_poly_grad(r,b[j],u_n)
     tp=transit_poly(r,b[j],u_n)
     tp_grid[j,:]=tp
 #    tp_grad_grid[j,:]=tp_grad_array
-    # Now compute with BigFloat finite difference:
-    tp,tp_grad_array =  transit_poly_grad_num(r,b[j],u_n)
+    # Now compute with BigFloat finite difference (tests whether derivatives are coded properly):
+    tp,tp_grad_array =  transit_poly_grad_num(r,b[j],u_n,1e-18)
     tp_grad_grid_num[j,:]=tp_grad_array
     tp_grid_big[j,:]=tp
-    # Finally, compute analytic result:
+    # Compute analytic derivatives:
     tp = transit_poly!(r,b[j],u_n,dfdrbu)
     tp_grad_grid_ana[j,:]=dfdrbu
-    test1 =  isapprox(dfdrbu,tp_grad_array,atol=1e-8)
-    @test test1
+    # Compute derivatives in BigFloat (tests precision of derivatives):
+    tp_big = transit_poly!(big(r),big(b[j]),big.(u_n),dfdrbu_big)
+    tp_grad_grid_big[j,:]=dfdrbu_big
+    test1 =  isapprox(dfdrbu,tp_grad_array,atol=1e-12)
     if ~test1
-      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array)
+      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-18")
+      tp,tp_grad_array =  transit_poly_grad_num(r,b[j],u_n,1e-15)
+      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-15")
+      test1 =  isapprox(dfdrbu,dfdrbu_big,atol=1e-13)
 #      read(STDIN,Char)
     end
+    @test test1
   end
 # Now, make plots:
   ax = axes[i]
@@ -93,7 +103,7 @@ for i=1:length(r0)
   ax[:semilogy](y,lw=1,label="flux")
   for n=1:n_u+2
 #    ax[:semilogy](abs.(asinh.(tp_grad_grid[:,n])-asinh.(tp_grad_grid_num[:,n])),lw=1)
-    y = abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_num[:,n])); mask = y .<= floor; y[mask]=floor
+    y = abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_big[:,n])); mask = y .<= floor; y[mask]=floor
 #    ax[:semilogy](abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_num[:,n])),lw=1,label=label_name[n])
     ax[:semilogy](y,lw=1,label=label_name[n])
     if n <= 2
@@ -150,15 +160,23 @@ end
 return
 end
 
+# No limb-darkening:
 u_n = [0.0]
 test_transit_poly_gradient2(u_n)
-read(STDIN,Char)
+#read(STDIN,Char)
+# Linear limb-darkening:
 u_n = [1.0]
 test_transit_poly_gradient2(u_n)
-read(STDIN,Char)
+#read(STDIN,Char)
+# Quadratic limb-darkening:
 u_n = [2.0,-1.0]
 test_transit_poly_gradient2(u_n)
-read(STDIN,Char)
+#read(STDIN,Char)
+# Cubic limb-darkening:
 u_n = [3.0,-3.0,1.0]
 test_transit_poly_gradient2(u_n)
+# Now, for arbitrary limb-darkening:
+u_n = rand(10); u_n /= sum(u_n)
+test_transit_poly_gradient2(u_n)
+
 end

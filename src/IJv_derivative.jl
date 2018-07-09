@@ -222,8 +222,8 @@ if k2 < 1
     v += 1
   end
   # Now compute compute derivatives:
-#  dIvdk[1] = 2/kc
-  dIvdk[1] = 2*k2/kck
+  dIvdk[1] = 2/kc
+#  dIvdk[1] = 2*k2/kck
   for v=1:v_max
     dIvdk[v+1] = k2*dIvdk[v]
   end
@@ -368,14 +368,16 @@ end
 v= v_max
 # Need to compute top two for J_v:
 #if typeof(k2) == BigFloat
-while Jv[v+1] == 0.0  # Loop downward in v until we get a non-zero Jv[v]
-  dJvdk0 = zero(typeof(k2)); dJvdk1 = zero(typeof(k2))
-  Jv[v],dJvdk0 = dJv_seriesdk(k2,v-1); Jv[v+1],dJvdk1=dJv_seriesdk(k2,v)
-  dJvdk[v] = dJvdk0; dJvdk[v+1] = dJvdk1
+if Jv[v+1] == 0.0
+  while Jv[v+1] == 0.0  # Loop downward in v until we get a non-zero Jv[v]
+    dJvdk0 = zero(typeof(k2)); dJvdk1 = zero(typeof(k2))
+    Jv[v],dJvdk0 = dJv_seriesdk(k2,v-1); Jv[v+1],dJvdk1=dJv_seriesdk(k2,v)
+    dJvdk[v] = dJvdk0; dJvdk[v+1] = dJvdk1
 #  println("Jv: ",Jv[v]," Jv+1: ",Jv[v+1])
-  v -=1
+    v -=1
+  end
+  v +=1
 end
-v +=1
 #else
 #  Jv[v]=Jv_hyp(k2,v-1); Jv[v+1]=Jv_hyp(k2,v)
 #end

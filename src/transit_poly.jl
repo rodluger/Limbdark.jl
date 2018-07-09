@@ -17,7 +17,7 @@ end
 #include("sn.jl")
 include("s2.jl")
 include("IJv_derivative.jl")
-include("area_triangle.jl")
+#include("area_triangle.jl")
 
 function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
 # Transform the u_n coefficients to c_n, which are coefficients
@@ -82,7 +82,6 @@ if b == 0.0
   return flux/(c_n[1]+2*c_n[2]/3)
 else
 # Next, compute k^2 = m:
-#  onembmr2=(r+1-b)*(1-r+b); fourbr = 4b*r
   onembmr2=(r+1-b)*(1-r+b); fourbr = 4b*r
 #  onembpr2 = (1-r-b)*(1+b+r); onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r
 #  k2 = onembpr2/fourbr+1
@@ -252,6 +251,8 @@ end
 
 function transit_poly_c!(r::T,b::T,c_n::Array{T,1},dfdrbc::Array{T,1}) where {T <: Real}
 @assert((length(c_n)+2) == length(dfdrbc))
+@assert(r > 0)
+@assert(b > 0)
 # Number of limb-darkening components to include (beyond 0 and 1):
 N_c = length(c_n)-1
 # We are parameterizing these with the function:
@@ -291,7 +292,12 @@ if b == 0.0
 else
 # Next, compute k^2 = m:
   onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r
-  k2 = onembmr2/fourbr; k = sqrt(k2)
+  k2 = onembmr2/fourbr; 
+  if k2 > 0
+    k = sqrt(k2)
+  else
+    println("negative k2: ",k2," r: ",r," b: ",b)
+  end
 #  onembpr2 = (1-b-r)*(1+b+r); onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r
 #  k2 = onembpr2/fourbr+1; k = sqrt(k2)
   dkdr = (b^2-r^2-1)/(8*k*b*r^2)
@@ -387,12 +393,13 @@ for n=2:N_c
 # For even values of n, sum over I_v:
     n0 = convert(Int64,n/2)
     coeff = (-fourbr)^n0
-    dIv_fac = (1+(r-b)*(r+b))/(2r)
+#    dIv_fac = (1+(r-b)*(r+b))/(2r)
     # Compute i=0 term
     pofgn = coeff*((r-b)*Iv[n0+1]+2b*Iv[n0+2])
     dpdr = coeff*Iv[n0+1]
     dpdb = coeff*(-Iv[n0+1]+2*Iv[n0+2])
     dpdr += (n0+1)*pofgn/r
+#    dpdr += coeff*((n0+2-(n0+1)*b/r)*Iv[n0+1]+2*(n0+1)*b/r*Iv[n0+2])
     dpdb += n0*pofgn/b
 #    println("v: ",n0,"-Iv[v]: ",-Iv[n0+1]," 2Iv[v+1]: ",2Iv[n0+2]," diff: ",-Iv[n0+1]+2*Iv[n0+2])
 #    dpdk = coeff*((r-b)*dIvdk[n0+1]+2b*dIvdk[n0+2])
@@ -406,8 +413,8 @@ for n=2:N_c
       pofgn += term
       dpdr += coeff*Iv[n0-i+1]
       dpdb += coeff*(-Iv[n0-i+1]+2*Iv[n0-i+2])
-#      dpdr += term*(i*2*(b-r)/onembmr2+(n0+1-i)/r)
-      dpdr += coeff*((n0+1)+i*((b-r)*(r+b)-1)/onembmr2)*((1-b/r)*Iv[n0-i+1]+2b/r*Iv[n0-i+2])
+      dpdr += term*(i*2*(b-r)/onembmr2+(n0+1-i)/r)
+#      dpdr += coeff*((n0+1)+i*((b-r)*(r+b)-1)/onembmr2)*((1-b/r)*Iv[n0-i+1]+2b/r*Iv[n0-i+2])
       dpdb += term*(i*2*(r-b)/onembmr2+(n0-i)/b)
 #      println("v: ",n0-i,"-Iv[v]: ",-Iv[n0-i+1]," 2Iv[v+1]: ",2Iv[n0-i+2]," diff: ",-Iv[n0-i+1]+2*Iv[n0-i+2])
 #      dpdk += coeff*((r-b)*dIvdk[n0-i+1]+2b*dIvdk[n0-i+2])
