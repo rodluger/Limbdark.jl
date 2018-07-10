@@ -180,7 +180,7 @@ lens-shaped region of overlap of the two circles.
 
 Taking the radius of the larger circle to be unity, the standard formula for
 the lens-shaped overlap area is given by
-\begin{align} \label{eqn:MAuniform}
+\begin{align} \label{eq:MAuniform}
 A_{lens} = \pi \Lambda^e(b,r) &=
 \begin{dcases}
 0 & \qquad 1+r \le b,\\
@@ -205,7 +205,7 @@ the kite is flattened.  The same issue occurs when computing the area of a trian
 in which two of the sides are of similar length;  the kite has an area that is twice
 the area of the triangle connecting the centers of both circles and one of the intersection
 points.  \cite{Goldberg1991} gives a formula for precisely computing the area of
-a triangle, which we reproduce here,
+a triangle, based on a method developed by \citet{Kahan2000}, which we reproduce here,
 \begin{eqnarray}
 A_{kite} &=& \frac{1}{2}\sqrt{(a+(b+c))(c-(a-b))(c+(a-b))(a+(b-c))},\\
 a &\ge& b \ge c,
@@ -233,7 +233,7 @@ in the arctangent formula these denoninator terms cancel (which doesn't happen
 in the arccosine case), which improves numerical stability for small values of $b$.
 
 This gives the equations:
-\begin{eqnarray} \label{eqn:area_of_overlap}
+\begin{eqnarray} \label{eq:area_of_overlap}
 A_{lens} &=& \kappa_1 + r^2\kappa_0 - A_{kite},\\
 \kappa_0 &=& \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\\
 \kappa_1 &=& \mathrm{atan2}(2A_{kite},(r-1)(r+1)-b^2).
@@ -247,7 +247,7 @@ the computation in \texttt{Julia} language, both in double-precision
 subtracted the results to measure the numerical errors of the computation.
 
 We find that the standard
-formula (equation \ref{eqn:MAuniform}) approaches errors of $10^{-8}$
+formula (equation \ref{eq:MAuniform}) approaches errors of $10^{-8}$
 in the limit of $b \rightarrow 1-r$. This error exceeds the value
 of the area of the smaller circle minus the area of overlap for
 values of $1-r < b < 1-r+10^{-8}$.  Thus, even though this calculation
@@ -257,9 +257,9 @@ the error of the standard formula approaches $10^{-8}$, with the
 error exceeding the value of the area of overlap for $1+r-10^{-8} <
 b < 1+r$.
 
-In contrast, equation \ref{eqn:area_of_overlap} gives a precision
+In contrast, equation \ref{eq:area_of_overlap} gives a precision
 that double-precision in both limits.  Figure
-\ref{fig:overlap_precision} shows that equation \ref{eqn:area_of_overlap} 
+\ref{fig:overlap_precision} shows that equation \ref{eq:area_of_overlap} 
 gives a precision of $\approx 10^{-17}$ in the limit $b \rightarrow
 1-r$ for $r=0.1$; this limit is due to the limiting precision of
 representing $\pi r^2$ in double-precision, which in this case
@@ -305,8 +305,8 @@ the higher order limb-darkened light curves.
     \caption{Precision of formulae for the area of overlap of two circles with
     radius ratio $r$.  Plotted are the regions near $b=1-r$ (second and third
     points of contact) and $b=1+r$ (first and fourth points of contact) for
-    the standard formula (equation \ref{eqn:MAuniform}, blue) and our new formula 
-    (equation \ref{eqn:area_of_overlap}, green). 
+    the standard formula (equation \ref{eq:MAuniform}, blue) and our new formula 
+    (equation \ref{eq:area_of_overlap}, green). 
     The high-precision calculation is shown in red for comparison. The
     cyan and magenta circles indicate the positions of the circles at the left
     hand side of the axes.  In the left panels the dash-dot grey line indicates the 
@@ -570,6 +570,81 @@ where
 and $F_0$ is the total unocculted flux.  % Note:  I'm not using this in 
 % transit_poly since it is not as precise as the starry expressions.
 
+\subsection{Derivatives of linear limb-darkening}
+
+It turns out that the expressions for the derivatives of the linear limb-darkening
+light curve with respect to $r,b$ are particularly simple:
+\begin{align}
+    \label{eq:dbiglam_dr}
+    \frac{\partial \Lambda}{\partial r} &=
+    \begin{dcases}
+          0 & \qquad  r = 0\\
+          0 & \qquad  \vert r- b\vert \ge 1\\
+          2 r\sqrt{1-r^2} & \qquad b = 0\\
+           \frac{2}{\pi} & \qquad b = r = \tfrac{1}{2}\\
+          \frac{4r}{\pi} E(4r^2) & \qquad b= r < \tfrac{1}{2}\\
+          \frac{2}{\pi} \mathrm{cel}(k_c,1,1,0) & \qquad b= r > \tfrac{1}{2}\\
+          \frac{8r}{\pi}\sqrt{r(1-r)} & \qquad b+r =1\\
+          \frac{8br^2 E(k^2) + 2r(1-(b+r)^2)K(k^2)}{\pi\sqrt{br}}
+                    &\\ \phantom{XX}
+          = \frac{1}{\pi\sqrt{br}}\mathrm{cel}(k_c,1,2r(1-(b-r)^2),0) & \qquad k^2 < 1
+          %
+          \\[1.5em]
+          %
+          \frac{4r}{\pi}\sqrt{1-(b-r)^2} E(k^{-2})
+                    &\\ \phantom{XX}
+          = \frac{4r}{\pi}\sqrt{1-(b-r)^2} \mathrm{cel}(k_c,1,1,k_c^2)& \qquad k^2 > 1\\
+    \end{dcases}
+\end{align}
+and
+\begin{align}
+    \label{eq:dbiglam_db}
+    \frac{\partial \Lambda}{\partial b} &=
+    \begin{dcases}
+          0 & \qquad  r = 0\\
+          0 & \qquad  \vert r- b\vert \ge 1\\
+          0 & \qquad b = 0\\
+           -\frac{2}{3\pi} & \qquad b = r = \tfrac{1}{2}\\
+          \frac{4r}{3\pi}\mathrm{cel}(k_c,1,-1,k_c^2) & \qquad b= r < \tfrac{1}{2}\\
+          -\frac{2}{3\pi} \mathrm{cel}(k_c,1,1,2k_c^2) & \qquad b= r > \tfrac{1}{2}\\
+          -\frac{8r}{3\pi}\sqrt{r(1-r)} & \qquad b+r =1\\
+           \frac{4r(r^2+b^2-1) E(k^2) + 2r(1-(b+r)^2)K(k^2)}{3\pi\sqrt{br}} 
+                    &\\ \phantom{XX}
+          = \frac{1-(b-r)^2}{3\pi \sqrt{br}} \mathrm{cel}(k_c,1,-2r,(1-(b+r)^2)/b) & \qquad k^2 < 1
+          %
+          \\[1.5em]
+          %
+          \frac{2}{3b\pi}\sqrt{1-(b-r)^2}\left[(r^2+b^2-1) E(k^{-2}) +(1-(b+r)^2)K(k^{-2})\right]
+                    &\\ \phantom{XX}
+          =\frac{4r}{3\pi}\sqrt{1-(b-r)^2}\mathrm{cel}(k_c,1,-1,k_c^2) & \qquad k^2 > 1,\\
+    \end{dcases}
+\end{align}
+where we have given some of the expressions in terms of both the standard elliptic integrals
+and the general elliptic integral.
+
+We have tested these formulae with finite-difference derivatives evaluated at
+256-bit precision, and, as with the total flux term, we find that these are accurate 
+to $\la 2 \times 10^{-15}$, close to machine precision.
+
+Finally, we turn our attention to the general polynomial limb-darkening case,
+$\upmu^n$ with $n \ge 2$.  These terms may be expressed as the sum of
+spherical harmonics with $m=0$, and thus they are a special case of the \starry 
+computation (written in C and Python), which we describe next in \S \ref{sec:quad}.  
+We have also derived a new approach exploiting the azimuthal symmetry of the 
+limb-darkening problem, which we describe below in \S \ref{sec:power_law}, 
+which is implemented in \texttt{Julia}.
+
+%\begin{eqnarray}
+%\frac{\partial \Lambda}{\partial r} &=& \frac{8br^2 E(k^2) + 2r(1-(b+r)^2)K(k^2)}{\pi\sqrt{br}}\\ 
+%&=& \frac{1}{\pi\sqrt{br}}\mathrm{cel}(k_c,1,2r(1-(b-r)^2),0)\\ 
+%\frac{\partial \Lambda}{\partial b} &=& \frac{4r(r^2+b^2-1) E(k^2) + 2r(1-(b+r)^2)K(k^2)}{3\pi\sqrt{br}}\\ 
+%&=& \frac{1-(b-r)^2}{3\pi \sqrt{br}} \mathrm{cel}(k_c,1,-2r,(1-(b+r)^2)/b)\\ 
+%\frac{\partial \Lambda}{\partial r} &=& \frac{4r}{\pi}\sqrt{1-(b-r)^2} E(k^{-2})\\ 
+%&=& \frac{4r}{\pi}\sqrt{1-(b-r)^2} \mathrm{cel}(k_c,1,1,k_c^2)\\ 
+%\frac{\partial \Lambda}{\partial b} &=& \frac{2}{3b\pi}\sqrt{1-(b-r)^2}\left[(r^2+b^2-1) E(k^{-2}) +(1-(b+r)^2)K(k^{-2})\right]\\ 
+%&=& \frac{4r}{3\pi}\sqrt{1-(b-r)^2}\mathrm{cel}(k_c,1,-1,k_c^2)
+%\end{eqnarray}
+
 % ==============================================================================
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
@@ -733,25 +808,22 @@ for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\b
     \end{dcases}
 \end{align}
 
+We have computed derivatives of these expressions using automatic
+differentiation within the \starry code base.
 
-\section{Comparison with other work} \label{sec:comparison}
+\section{Alternative Green's function expansion} \label{sec:power_law}
 
-\section{Discussion}
-
-\section{Conclusions}
-
-
-\acknowledgements
-
-\bibliography{limbdark}
-
-\appendix
-
-\section{Green's function expansion}
+Although the foregoing analysis takes advantage of the existing formalism
+developed for occultation of spheres with arbitrary spherical harmonic
+brightness, the problem can be simplified somewhat for the limb-darkening
+case due to azimuthal symmetry assumed for a star.  This simplification
+leads to analytic expressions for the derivatives, which we find can
+be faster (CHECK THIS) and more accurate to evaluate than with automatic
+differentiation.
 
 Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2+y^2}$,
 where $(x,y,z)$ are the coordinates of the unit sphere, then we only require
-Green's functions which have a dependence on $z$ for axially-symmetric
+Green's functions whose curl has dependence only on $z$ for axially-symmetric
 limb-darkening.  We choose a Green's function of the form
 \begin{equation}
 \mathbf{G}_n = f(z) (-y \xhat + x \yhat)
@@ -780,10 +852,11 @@ We choose $f(z) = z^n$, so that
 \end{equation}
 is the basis set for polynomial limb-darkening, along with the uniform, $\tilde{g}_0 = z^0$,
 and linear, $\tilde{g}_1 = z^1$, terms which we have derived in \S \ref{sec:reparam}.
+Note that the total flux of this basis set integrates to zero.
 
-With this choice of basis, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for 
+Also, with this choice of basis, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for 
 $n \ge 1$ since $z=0$ at the boundary of the star.   The $n=0$ case we have already
-solved for uniform limb-darkening.
+solved for uniform limb-darkening, and so it remains to find $\mathcal{P}(\bvec{G}_n)$.
 
 The primitive integral
 $\mathcal{P}(\bvec{G}_n)$ can be rewritten as
@@ -820,7 +893,8 @@ for even $n$, where $n_0 = n/2$, and
 \end{eqnarray}
 for odd $n \ge 3$, where $n_0 = (n-3)/2$ and
  $\mathcal{F} = 2r(1-(b-r)^2)^{3/2}$.
-\section{Limb-darkening coefficients}
+
+\subsection{Limb-darkening coefficients}
 
 Our expansion for limb-darkening in terms of $u_n(1-\upmu)^n$ needs to
 be re-expressed in terms of the Green's basis terms $c_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right]$.
@@ -834,7 +908,7 @@ I(\upmu) &=& 1 - \sum_{i=1}^N u_i \sum_{j=0}^i \binom{i}{j} (-1)^j \upmu^j,\\
 &=& c_0 + c_1 \upmu + \sum_{n=2}^N c_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right].
 \end{eqnarray}
 The transformation between $u_n$ and $a_n$ is straightforward based on
-looping over the binomial expansion of each of the $u_n$ terms, for
+looping over the binomial expansion of each of the $u_n$ terms (equation \ref{eq:polynomialld}), for
 example, $a_0 = 1 - \sum_{i=1}^N u_i$.  Then,
 with the computed $a_n$ values, we can find $c_n$ from downward recursion
 using the relation
@@ -855,7 +929,7 @@ We note that the unobscured flux for each basis function (for $b \ge 1+r$ or $r=
 all $s_n(r,b)$ with $n \ge 2$, which is why the total unobscured flux,
 $F_0$, only depends upon $c_0$ and $c_1$.
 
-\section{Analytic derivatives}
+\subsection{Analytic derivatives}
 
 For computing the derivatives of $\mathcal{P}(\bvec{G}_n)$, we find it more numerically 
 stable to express the $k^{2i}$ terms in terms of $b$ and $r$.  For compactness, we define
@@ -918,7 +992,7 @@ For $k^2 > 1$ ($b+r <1$), we have
 while the same recursion relation applies for $\partial \mathcal{J}_v/\partial k$ as in the $k^2 < 1$ case,
 and $d\mathcal{I}_v/dk = 0$.
 
-As with STARRY, we find that upward recursion is more stable for $\tfrac{1}{2} < k^2 < 2$,
+As with \starry, we find that upward recursion is more stable for $\tfrac{1}{2} < k^2 < 2$,
 while downward recursion is more stable for $k^2 < \tfrac{1}{2}$ and $k^2 > 2$.  This
 requires computing the derivatives, $\frac{\partial \mathcal{J}_v}{\partial k}$, first 
 for large values of $k$. Rather than using the integral or Hypergeometric functions given
@@ -949,5 +1023,56 @@ chain rule.  Then, the light curve derivatives are given by
 \begin{eqnarray}
 \frac{\partial F/F_0}{\partial u_i} =  \sum_{j} \frac{\partial F/F_0}{\partial c_j}\frac{\partial c_j}{\partial u_i}.
 \end{eqnarray}
+
+\section{Comparison with other work} \label{sec:comparison}
+
+In this section we compare our computations with existing code in terms
+of accuracy and speed.
+
+For uniform, linear or quadratic limb-darkening, the widely used computation 
+by \citet{MandelAgol2002} has been improved in speed by utilizing the 
+\citet{Bulirsch1965a,Bulirsch1965b} expressions for the complete elliptic 
+integral of the third kind which is needed for the linear case, as implemented 
+in the \texttt{EXOFAST} routines \citep{Eastman2013}.
+
+We have carried out a numerical comparison of the \citet{MandelAgol2002}
+for the linear case ($u_1=1$), and find that the most severe errors
+occur for $b = r \pm \epsilon$.  Figure \ref{fig:compareMA} shows
+the computed models and the errors as a function of $r$ for $b=1-r-\epsilon$
+and $b=r-\epsilon$, with $\epsilon = 10^{-12}$ (the results look very
+similar with $+\epsilon$, so we have only plotted one case for clarity).
+In the $b\approx 1-r$ case (near second and third contacts), the errors
+are larger than our new expression, reaching $\approx 10^{-10}$ for
+$r = 1$.  However, the errors become much more severe in the $b \approx r$
+case.  For $b=r \pm 10^{-12}$, the errors grow to $10^{-4}$, and continue
+to grow as $b$ gets closer to $r$.  No such instability occurs for
+our new expressions, demonstrating their utility in all regions of
+parameter space.
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/compare_MA2002_linear.pdf}
+    \caption{Comparison of Mandel \& Agol (2002) with Luger \& Agol (2018).}
+    \label{fig:compareMA}
+    \end{centering} 
+\end{figure}
+
+\begin{itemize}
+\item Compare with Gimenez for speed and accuracy
+for higher order limb-darkening.
+\item Compare with Batman for speed and accuracy.
+\item Compare derivatives with Pal for speed and accuracy.
+\end{itemize}
+
+\section{Discussion}
+
+\section{Conclusions}
+
+
+\acknowledgements
+
+\bibliography{limbdark}
+
+\appendix
 
 \end{document}
