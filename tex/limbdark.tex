@@ -20,15 +20,17 @@ Analytic Transit Light Curves for Limb-Darkened Stars
 \keywords{methods: analytic --- techniques: photometric}
 
 \begin{abstract}
- We derive analytic, closed-form solutions for the light curve
-    of a planet transiting a star with a limb darkening profile of
-    arbitrary integer order.  We provide updated expressions for the linear
-    and quadratically limb darkened cases that are numerically stable
-    over the entire domain, and we present formulae for the derivatives
-    of the light curve with respect to the radius ratio, impact parameter,
-    and limb-darkening parameters.  Our expressions are fast to evaluate,
-    allow for the integration over exposure time adaptively, and
-    can be used to accurately compute the first partial derivatives.
+ We derive analytic, closed-form solutions for the light curve of a planet 
+ transiting a star with a limb darkening profile of
+ arbitrary integer order.  We provide updated analytic expressions for the uniform,
+ linear, quadratic, limb darkened cases, as well as new expressions
+ for higher order integer powers.  The formulae are crafted to be numerically 
+ stable over the expected range of usage.  We additionally present formulae for 
+ the partial derivatives of instantaneous flux with respect to the radius ratio, 
+ impact parameter, and limb-darkening parameters.  Our expressions are rapid to 
+ evaluate, allow for the integration over exposure time adaptively, and
+ can be used to accurately compute the first partial derivatives of transit
+ light curves.
 \end{abstract}
 
 % ==============================================================================
@@ -41,29 +43,247 @@ Analytic Transit Light Curves for Limb-Darkened Stars
 % ------------------------------------------------------------------------------
 % ==============================================================================
 
-The detection of transiting exoplanets has been 
+The precise measurement of the transits of an exoplanet offers a host of information
+about the planet's properties.  To start with, the times of transit give
+the planet's orbital ephemeris.  The depth of transit, corrected for stellar
+limb-darkening, gives the planet's radius relative to that of the star.   The
+shape of the transit, especially the duration of ingress and egress relative to
+the full transit duration, yields the orbital impact parameter of the planet.  
+If the transit depth is seen to vary with wavelength, the presence of spectral 
+features may be used to constrain the chemical composition of the planet's 
+atmosphere.  If the transit times are seen to vary, a dynamical model can constrain 
+the masses of the planet companions (and vice versa).  If the planet is seen in 
+eclipse, its temperature, emission spectrum, and atmospheric circulation patterm 
+can be constrained.  When combined with radial velocity measurements, the bulk 
+density of a planet can be measured, yielding constraints on its bulk composition.
 
-\citet{Gimenez2006} derived transit light curves for a limb-darkening
+And yet, all of these inferences are predicated on the precise computation of models 
+of the planetary transit.  Stars are non-uniform in brightness, with the general
+trend of growing dimmer towards the limb, and so limb-darkening must be accounted
+for to accurately infer the planetary parameters.  Indeed, fast and accurate computation 
+of limb-darkened transit light curve models has enabled the detection and 
+characterization of thousands of transiting exoplanets \citep{MandelAgol2002}.
+The most important ingredient to these models has been a description of the
+limb-darkening model which is flexible enough and accurate enough to describe the 
+emission from a stellar photosphere.  Linear and quadratic limb-darkening laws
+were sufficient for low-precision measurements; however, the measurement of
+transit light curves has steadily improved.  Higher order terms or non-linear laws 
+have become necessary to describe higher precision measurements \citep{Claret2000,
+Gimenez2006}, which tend to involve more computational burden.
+
+In addition to computing transit light curves, the derivatives of these light
+curves with respect to the model parameters are also necessary for accurate
+characterization of exoplanets.   The derivatives enable fast and stable
+optimization of the transit light curve parameters, which is critical for
+obtaining initial estimates for a markov chain Monte Carlo simulation (MCMC).
+In some cases, MCMC can be slow to converge, and derivatives can accelerate
+convergence by adding an artificial momentum term to the log likelihood,
+and then allowing the sampler to follow contours of constant ``energy."
+This so-called ``hybrid" or ``Hamiltonian" MCMC approach holds great promise,
+but its application has been hampered by the lack of models with derivatives,
+as derivatives are in general more difficult to compute.
+
+Finally, the analytic computation of transit light curves with quadratic
+limb-darkening is limited by round-off error for some special cases.  In 
+particular, when the radius equals the impact-parameter, which corresponds to 
+the edge of the planet crossing the center of the star, the computation of the 
+elliptic integrals becomes unstable.  At the second and third points of
+contact, when the radius of the planet plus the impact parameter equals
+the radius of the star, the elliptic integrals diverge.  In the
+limit that the impact parameter approaches zero, the equations can also
+diverge.  All of these special cases are in principle encountered rarely,
+but in practice with thousand of planets with tens to thousands of
+transits each, along with hundreds to hundreds of thousands of light
+curves with time sub-sampled for each exposure, these rare cases can
+be encountered with some frequency.
+
+Based on these considerations, the primary goals of the current paper are
+threefold:
+\begin{enumerate}
+\item To extend the analytic limb-darkening model to higher order.
+\item To compute the derivatives of the model analytically.
+\item To stabilize the analytic light curve computation (and its derivatives)
+in all special cases.
+\end{enumerate}
+Secondary goals include modeling eclipsing binaries, for which the same
+considerations apply, and integrating the light curve model, and its
+derivatives, quickly and accurately over time to account for finite
+exposure times.
+
+Some progress has been made already towards these goals.  To describe this
+progress, we first introduce some notation.  Limb-darkening models are
+parameterized with the cosine of the angle measured from the sub-stellar point, 
+$\upmu = \cos{\theta}$, where $\theta$ is the polar angle on the photosphere, 
+with $\theta=0$ at the center of the observed stellar disk, and $\theta=\pi/2$ 
+at the limb.  Uniform limb-darkening scales as $\upmu^0$ and linear as $\upmu^1$;
+these are the two most important cases which can be integrated analytically, 
+which we describe in detail below in sections \ref{sec:uniform} and 
+\ref{sec:reparam}.  We show that higher order powers of $\upmu^n$ with integer 
+$n$ can be integrated analytically when expressed as recursion relations with 
+these first two cases.  Linear combinations of these laws can be constructed,
+with various parameterizations, to describe stellar limb-darkening more precisely.
+
+The first goal of modelling higher-order limb-darkening was accomplished
+by \citet{Gimenez2006}, who derived transit light curves for a limb-darkening
 function
 \begin{equation}
 I(\upmu) = I(1) \left[\sum_{n=1}^N a_n (1-\upmu^n) \right],
 \end{equation}
 where $\upmu = \cos{\theta} =\sqrt{1-r^2}$, where $\theta$ is the polar angle measured from the
 sub-observer point), $r$ is the normalized stellar radius projected on the sky
-$0\le r \le 1$, and $u_n$ is a limb-darkening coefficient.  \cite{Gimenez2006}
-found an infinite series for computing the limb-darkened light curve for each $u_n$
-term.  Here we present closed-form expressions for these terms which can be
-easily computed with recursion relations.
+$0\le r \le 1$, and $a_n$ is a limb-darkening coefficient.  \cite{Gimenez2006}
+found an infinite series expansion for computing the limb-darkened light curve 
+for each $a_n$ term.  Here we present closed-form expressions for these terms 
+which can be easily computed with recursion relations.
 
-\begin{itemize}
-\item \cite{Pal2008} derived the partial derivatives of the quadratic limb-darkening model
-with respect to $b$ and $r$.
-\end{itemize}
+The second goal of computing dervatives of the light curve with respect to
+the model parameters was accomplished by \cite{Pal2008}.  He derived the partial 
+derivatives of the quadratic limb-darkening model with respect to $b$ and $r$.
+In this work, we give modified expressions which are more numerically stable,
+as well as extend this to higher order limb-darkening.
+
+The third goal of numerical stability has yet to be addressed in the literature.
+Although some numerical approaches are numerically stable, such as \cite{Gimenez2006} 
+and \cite{Kreidberg2015}, these approaces tend to be slow, they have precisions
+which depend upon the tolerance of the computation, and, in addition, they do not 
+yield derivatives of the light curves.
+
+A disadvantage of our approach is that it requires linear powers of the limb-darkening
+expansion.  \citet{Claret2000} has shown that a non-linear limb-darkening law,
+with half-integer powers of $\upmu$, gives an accurate description of stellar
+limb-darkening models.  More recently, the power-law model, $I(\upmu) = 1-
+c_\alpha(1-\upmu^\alpha)$ \citep{Hestroffer1997} was shown to be an accurate 
+limb-darkening law despite only using two parameters \citep{Maxted2018,
+Morello2017}.  We were unable to find an analytic solution for these limb-darkening
+laws, but we will compare with these below in \S \ref{sec:comparison}.
+
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 %
+
+\section{Uniform brightness}\label{sec:uniform}
+
+The transit light curve of a uniformly bright star amounts to computing the
+area of overlap of two disks \citep{MandelAgol2002}.  This has a well-known
+analytic solution;  however, we find that the standard formula leads to
+round-off error which is larger than desirable.  In this section we present
+a new formula which we find yields machine precision for the area of
+overlap, and its derivatives.
+
+Figure \ref{fig:circle_overlap} shows how the area of overlap can be computed
+for two circles.  The sums of the areas of the sectors which overlap minus
+the area of a kite which spans them gives the lens-shaped area of overlap of
+the two circles.
+
+Taking the radius of the larger circle to be unity, the standard formula for
+the lens-shaped overlap area is given by
+\begin{align} \label{eqn:MAuniform}
+A_{lens} = \pi \Lambda^e(b,r) &=
+\begin{dcases}
+0 & \qquad 1+r \le b,\\
+\left[r^2 \kappa_0 + \kappa_1  \right.
+                &\\ \phantom{XXXX}
+\left.-\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}}\right] & \qquad \vert 1-r\vert < b \le 1+r,\\
+\pi r^2 & \qquad b \le 1-r,\\
+\pi & \qquad b \le r-1,\\
+\end{dcases}
+\end{align}
+\citep{MandelAgol 2002}, where
+\begin{eqnarray}
+\cos{\kappa_0} &=& \left(\frac{(1-r)(1+r)+b^2}{2br}\right),\\
+\cos{\kappa_1} &=& -\left(\frac{(1-r)(1+r)-b^2}{2b}\right),
+\end{eqnarray}
+where $\kappa_0$ and $\kappa_1$ are the angles defined in Figure \ref{fig:circle_overlap}.
+However, we find that numerical round-off error limits the precision of this formula when
+$b \approx 0$, $b+r \approx 1$, or $b \approx 1+r$.  The square root in this formula is
+computing the area of the kite-shaped region, which can lead to round-off error when
+the kite is flattened.  The same issue occurs when computing the area of a triangle
+in which two of the sides are of similar length;  the kite has an area that is twice
+the area of the triangle connecting the centers of both circles and one of the intersection
+points.  \cite{Goldberg1991} gives a formula for precisely computing the area of
+a triangle, which we reproduce here,
+\begin{eqnarray}
+A_{kite} &=& \frac{1}{4}\sqrt{(a+(b+c))(c-(a-b))(c+(a-b))(a+(b-c))},\\
+a \ge b \ge c,
+\end{eqnarray}
+where the tuple ${a,b,c}$ equals ${1,r,b}$ sorted from from
+greatest to least.
+
+Next, the inverse cosine formulaes are also imprecise when $\cos{\kappa_0} = x_0 \approx
+1$ and  $\cos{\kappa_1} = x_1 \approx 1$.  The approximate solution
+is $\kappa_0 \approx (2-2x_0)^{1/2}$ and $\kappa_1 \approx (2-2x_1)^{1/2}$, and so round-off 
+error can occur both in the difference and in the square root.
+
+Instead, we use the $\theta = atan2(y,x)$ function with $y=\sin{\theta}$ and
+$x=\cos{\theta}$, which avoids the quadrant and
+division-by-zero problems of the $\theta = tan^{-1}(y/x)$ function.  In particular,
+\begin{eqnarray}
+\sin{\kappa_0} &=& \frac{A_{kite}}{br},\\
+\sin{\kappa_1} &=& \frac{A_{kite}}{b}.
+\end{eqnarray}
+Note that both $\sin{\kappa_0}$ and $\cos{\kappa_0}$ are divided by $br$ and
+$\sin{\kappa_1}$ and $\cos{\kappa_1}$ are divided by $b$, so that
+in the arctangent formula these denoninator terms cancel, which helps with 
+numerical stability for small values of $b$.  
+
+This gives the equations:
+\begin{eqnarray} \label{eqn:area_of_overlap}
+A_{lens} &=& \kappa_1 + r^2\kappa_0 - A_{kite},\\
+\kappa_0 &=& atan2(2A_{kite},(r-1)(r+1)+b^2),\\
+\kappa_1 &=& atan2(2A_{kite},(r-1)(r+1)-b^2).
+\end{eqnarray}
+
+The performance of this formula relative to the standard formula is profiled
+in Figure \ref{fig:area_of_overlap_precision} for $r=0.1$, a typical
+value for transiting exoplanets.  We have carried out
+the computation in \texttt{Julia} language, both in double-precision
+(\texttt{Float64}), and 256-bit precision (\texttt{BigFloat}), and
+subtracted the results for comparison.  We find that the standard
+formulae (equation \ref{eqn:MAuniform}) approaches errors of $10^{-8}$
+in the limits$b \rightarrow 1-r$, with an error that exceeds the value 
+of the area of the smaller circle minus the area of overlap for
+values of $1-r < b < 1-r+10^{-8}$.  Thus, even though this computation
+is carried out in double precision, the precision achieved is of
+order single precision.  Likewise, for $b \rightarrow 1+r$,
+the error of the standard formula approaches $10^{-8}$, with the
+error exceeding the value of the area of overlap for $1+r-10^{-8} <
+b < 1+r$.
+
+In contrast, equation \ref{eqn:area_of_overlap} gives a precision
+that matches or exceeds double-precision in both limits.  Figure
+\ref{fig:precision_overlap} shows that equation \ref{eqn:area_of_overlap} 
+gives a precision of $\approx 10^{-17}$ in the limit $b \rightarrow
+1-r$ for $r=0.1$, while even higher precision is achieved
+for $b \rightarrow 1+r$.
+
+The final modification we make is that when computing the uniform light
+curve, we require $\pi-A_{lens}$, so rather than computing $\kappa_1$
+we compute $\pi-\kappa_1 = -atan2(\sin{\kappa_1},\cos{\kappa_1})$.
+In the remainder of this paper we will use these formulae in computing
+the higher order limb-darkening coefficients.
+
+\begin{figure}\label{fig:circle_overlap}
+    \begin{centering}
+    \includegraphics[width=0.85\linewidth]{Circle_overlap_area.pdf}
+    \caption{The area of overlap of two circles can be computed as the sum of
+    the area of the sectors formed by the centers of each circle and the
+    boundary between the points of intersection, minus the area of the kite-shaped
+    region formed by the centers of the circles and the intersection points.
+    }
+    \end{centering}
+\end{figure}
+
+\begin{figure}\label{fig:overlap_precision}
+    \begin{centering}
+    \includegraphics[width=0.85\linewidth]{figures/area_of_overlap.pdf}
+    \caption{Precision of formulae for the area of overlap of two circles with
+    radius ratio $r$.  Plotted are the regions near $b=1-r$ (second and third
+    points of contact) and $b=1+r$ (first and fourth points of contact).}
+    \end{centering}
+\end{figure}
+
 \section{Linear Limb-Darkening}
 \label{sec:reparam}
 % ------------------------------------------------------------------------------
@@ -312,17 +532,6 @@ as
 &=& 1-(1-u_1/3)^{-1}\left[(1-u_1)\Lambda^e(b,r) + u_1\left(\Lambda(b,r)+\tfrac{2}{3}\Theta(r-b)\right)\right],
 \end{eqnarray}
 where
-\begin{align}
-\Lambda^e(b,r) &=
-\begin{dcases}
-0 & \qquad 1+r \le b,\\
-\frac{1}{\pi}\left[r^2 \cos^{-1}\left(\frac{1-r^2+b^2}{2b}\right) + \cos^{-1}\left(\frac{r^2+b^2-1}{2br}\right) \right.
-                &\\ \phantom{XXXX}
-\left.-\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}}\right] & \qquad \vert 1-r\vert < b \le 1+r,\\
-r^2 & \qquad b \le 1-r,\\
-1 & \qquad b \le r-1,\\
-\end{dcases}
-\end{align}
 and $F_0$ is the total unocculted flux.  % Note:  I'm not using this in 
 % transit_poly since it is not as precise as the starry expressions.
 
@@ -488,6 +697,16 @@ for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\b
         & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \mathrm{otherwise} \quad.
     \end{dcases}
 \end{align}
+
+
+\section{Comparison with other work} \label{sec:comparison}
+
+\section{Discussion}
+
+\section{Conclusions}
+
+
+\acknowledgements
 
 \bibliography{limbdark}
 
