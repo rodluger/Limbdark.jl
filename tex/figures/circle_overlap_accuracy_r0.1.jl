@@ -34,7 +34,7 @@ kap0_big  = atan2(kite_area2,(r_big-1)*(r_big+1)+b_big^2)
 # Angle of section for source:
 kap1_big = atan2(kite_area2_big,-((r_big-1)*(r_big+1)-b_big^2))
 # Flux of visible uniform disk:
-sn_big = convert(Float64,kap1_big + r_big^2*kap0_big - .5*kite_area2_big)
+sn_big = kap1_big + r_big^2*kap0_big - .5*kite_area2_big
 
 return area,sn,sn_big
 end
@@ -43,19 +43,19 @@ end
 using PyPlot
 fig,axes = subplots(2,2)
 
-r = 1.0
+r = 0.1
 nb = 1000
 db = logspace(-15,-2,nb)
 b = 1-r+db
-area=zeros(nb); sn=zeros(nb); sn_big=zeros(nb)
+area=zeros(nb); sn=zeros(nb); sn_big=zeros(BigFloat,nb)
 for i=1:nb
   area[i],sn[i],sn_big[i] = circle_overlap(r,b[i])
 end
 
 ax = axes[1]
-ax[:plot](log10.(db),log10.(abs.(pi*r^2-area)),label="r=1.0, MA(2002)",lw=3)
-ax[:plot](log10.(db),log10.(abs.(pi*r^2-sn)),label="r=1.0, RA(2018)",".")
-ax[:plot](log10.(db),log10.(abs.(pi*r^2-sn_big)),label="r=1.0, BigFloat",linestyle="--")
+ax[:plot](log10.(db),log10.(abs.(pi*r^2-area)),label="r=0.1, MA(2002)",lw=3)
+ax[:plot](log10.(db),log10.(abs.(pi*r^2-sn)),label="r=0.1, RA(2018)",".")
+ax[:plot](log10.(db),log10.(abs.(convert(Array{Float64,1},pi*big(r)^2-sn_big))),label="r=0.1, BigFloat",linestyle="--",lw=3)
 #ax[:set_xlabel](L"$\log_{10}(b-(1-r))$")
 ax[:set_title ](L"$\log_{10}(\pi r^2$-Area of overlap)")
 ax[:legend](loc="lower right",fontsize=8)
@@ -69,8 +69,8 @@ ax[:plot](x2,y2)
 ax[:plot]([-16,-2],[1,1]*log10(pi*.1^2/2^53),c="grey",linestyle="-.")
 
 ax = axes[2]
-ax[:plot](log10.(db),log10.(abs.(area-sn_big)),label="r=1.0, MA(2002)",lw=3)
-ax[:plot](log10.(db),log10.(abs.(sn-sn_big)),label="r=1.0, RA(2018)",".")
+ax[:plot](log10.(db),log10.(abs.(area-convert(Array{Float64,1},sn_big))),label="r=0.1, MA(2002)",lw=3)
+ax[:plot](log10.(db),log10.(abs.(sn-convert(Array{Float64,1},sn_big))),label="r=0.1, RA(2018)",".")
 ax[:set_xlabel](L"$\log_{10}(b-(1-r))$")
 ax[:set_ylabel]("Log Abs(Error in area of overlap)")
 ax[:legend](loc="left",fontsize=8)
@@ -78,16 +78,16 @@ ax[:axis]([-15,-2,-25,-5])
 ax[:plot]([-16,-2],[1,1]*log10(pi*.1^2/2^53),c="grey",linestyle="-.")
 
 b = 1+r-db
-area=zeros(nb); sn=zeros(nb); sn_big=zeros(nb)
+area=zeros(nb); sn=zeros(nb); sn_big=zeros(BigFloat,nb)
 for i=1:nb
   area[i],sn[i],sn_big[i] = circle_overlap(r,b[i])
 end
 
 ax = axes[3]
 mask = area .> 0.
-ax[:plot](log10.(db[mask]),log10.(area[mask]),label="r=1.0, MA(2002)",lw=3)
-ax[:plot](log10.(db),log10.(sn),label="r=1.0, RA(2018)",".")
-ax[:plot](log10.(db),log10.(sn_big),label="r=1.0, BigFloat",linestyle="--")
+ax[:plot](log10.(db[mask]),log10.(area[mask]),label="r=0.1, MA(2002)",lw=3)
+ax[:plot](log10.(db),log10.(sn),label="r=0.1, RA(2018)",".")
+ax[:plot](log10.(db),log10.(convert(Array{Float64,1},sn_big)),label="r=0.1, BigFloat",linestyle="--",lw=3)
 #ax[:set_xlabel](L"$\log_{10}(1+r-b)$")
 ax[:set_title](L"$\log_{10}$ ( Area of overlap)")
 ax[:legend](loc="lower right",fontsize=8)
@@ -98,10 +98,10 @@ ax[:plot](x1,y1)
 ax[:plot](x2,y2)
 
 ax = axes[4]
-ax[:plot](log10.(db),log10.(abs.(area-sn_big)),label="r=1.0, MA(2002)",lw=3)
-ax[:plot](log10.(db),log10.(abs.(sn-sn_big)),label="r=1.0, RA(2018)",".")
+ax[:plot](log10.(db),log10.(abs.(area-convert(Array{Float64,1},sn_big))),label="r=0.1, MA(2002)",lw=3)
+ax[:plot](log10.(db),log10.(abs.(sn-convert(Array{Float64,1},sn_big))),label="r=0.1, RA(2018)",".")
 ax[:set_xlabel](L"$\log_{10}(1+r-b)$")
 #ax[:set_ylabel]("Log Abs(Error in area of overlap)")
 ax[:legend](loc="left",fontsize=8)
 ax[:axis]([-15,-2,-25,-5])
-savefig("area_of_overlap_r1.0.pdf", bbox_inches="tight")
+savefig("area_of_overlap_r0.1.pdf", bbox_inches="tight")
