@@ -252,7 +252,6 @@ end
 function transit_poly_c!(r::T,b::T,c_n::Array{T,1},dfdrbc::Array{T,1}) where {T <: Real}
 @assert((length(c_n)+2) == length(dfdrbc))
 @assert(r > 0)
-@assert(b > 0)
 # Number of limb-darkening components to include (beyond 0 and 1):
 N_c = length(c_n)-1
 # We are parameterizing these with the function:
@@ -280,15 +279,24 @@ if r >= 1+b
 end
 if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
-  flux = zero(r); sqrt1mr2 = sqrt(1-r^2)
-  flux = (c_n[1]*(1-r^2)+2/3*c_n[2]*sqrt1mr2^3)
-  fac= 2r^2*(1-r^2)
+  flux = zero(r); onemr2 = 1-r^2; sqrt1mr2 = sqrt(onemr2)
+  den = inv(c_n[1]+2*c_n[2]/3)
+  flux = (c_n[1]*onemr2+2/3*c_n[2]*sqrt1mr2^3)*den
+  fac  = 2r^2*onemr2*den
+  facd = -2r*den
+  dfdrbc[1] = c_n[1]*facd + c_n[2]*facd*sqrt1mr2
   for i=2:N_c
-    flux += -c_n[i+1]*fac
+    flux -= c_n[i+1]*fac
+    dfdrbc[1] += c_n[i+1]*facd*(2*onemr2-i*r^2)
+    dfdrbc[i+3] -= fac
     fac *= sqrt1mr2
+    facd *= sqrt1mr2
   end
+  #  dfdrbc[2]=0 since the derivative with respect to b is zero.
+  dfdrbc[3] = (onemr2-flux)*den
+  dfdrbc[4] = 2/3*(sqrt1mr2^3-flux)*den
   # Also need to compute derivatives [ ]
-  return flux/(c_n[1]+2*c_n[2]/3)
+  return flux
 else
 # Next, compute k^2 = m:
   onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r

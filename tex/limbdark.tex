@@ -321,6 +321,9 @@ the higher order limb-darkened light curves.
 % ==============================================================================
 
 In this section we turn to the case of linear limb-darkening, $I(\upmu) = \upmu$.
+\footnote{Note that since $\upmu = \sqrt{1-r^2}$, this problem is equivalent to 
+computing the volume of intersection between a sphere and a cylinder, which was
+solved in terms of elliptic integrals by \citet{Lamarche1990}.}
 From \citet{MandelAgol2002}, the total flux visible during the occultation of a
 body whose surface map is given by $I(x, y) = \sqrt{1 - \x^2 -\y^2}$ may be computed
 as
@@ -404,16 +407,17 @@ respectively, defined as
     \Pi(n, k^2) &\equiv \int_0^{\frac{\pi}{2}} \frac{\dd \varphi}{(1 - n \sin^2 \varphi)\sqrt{1 - k^2 \sin^2 \varphi}}
     \quad.
 \end{align}
-We have transformed the expressions from \citet{MandelAgol2002} using equation
-17.7.17 from \citet{Abramowitz1970} which yields equations that are better
-behaved in the vicinity of $b=r$.  However, these elliptic integrals are still
-subject to numerical instability as $r \rightarrow 1-b$ and $r \gg 1$.  The main
-issue is the logarithmic divergence of $K$ and $\Pi$ as $k \rightarrow 1$, as
+In these expressions we have transformed the formulae from \citet{MandelAgol2002} using 
+equation 17.7.17 from \citet{Abramowitz1970} which yields equations that are better
+behaved in the vicinity of $b=r$.\footnote{Note that we corrected several typos
+in \citet{MandelAgol2002}, which are listed in the Appendix.}  However, these elliptic 
+integrals are still subject to numerical instability as $r \rightarrow 1-b$ and $r \gg 1$.  
+The main issue is the logarithmic divergence of $K$ and $\Pi$ as $k \rightarrow 1$, as
 well as numerical cancellations leading to round-off errors which occur in the 
 limit $k \rightarrow 0$.
 
 Through trial and error, we have found that these instabilities can be removed by combining
-elliptic integrals into a generalized complete elliptic integral defined by \citet{Bulirsch1969} as
+elliptic integrals into a general complete elliptic integral defined by \citet{Bulirsch1969} as
 \begin{equation}
 {\rm cel}(k_c,p,a,b) = \int_0^{\pi/2} \frac{a\cos^2{\phi} + b\sin^2{\phi}}{\cos^2{\phi}+p\sin^2{\phi}} \frac{d\phi}{\sqrt{\cos^2{\phi}+k_c^2\sin^2{\phi}}},
 \end{equation}
