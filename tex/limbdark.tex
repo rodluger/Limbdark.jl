@@ -200,7 +200,7 @@ r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\
 \citep{MandelAgol2002}, where
 \begin{eqnarray}
 \cos{\kappa_0} &=& \left(\frac{(r-1)(r+1)+b^2}{2br}\right),\\
-\cos{\kappa_1} &=& \left(\frac{b^2+(1-r)(1+r)}{2b}\right),
+\cos{\kappa_1} &=& \left(\frac{(1-r)(1+r)+b^2}{2b}\right),
 \end{eqnarray}
 where $\kappa_0$ and $\kappa_1$ are the angles defined in Figure \ref{fig:circle_overlap}.
 This is the same as the standard formula with one of the circles scaled
@@ -248,7 +248,7 @@ This gives the equations:
 \begin{eqnarray} \label{eq:area_of_overlap}
 A_{lens} &=& \kappa_1 + r^2\kappa_0 - A_{kite},\\
 \kappa_0 &=& \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\\
-\kappa_1 &=& \mathrm{atan2}(2A_{kite},(r-1)(r+1)-b^2).
+\kappa_1 &=& \mathrm{atan2}(2A_{kite},(1-r)(1+r)+b^2).
 \end{eqnarray}
 
 The performance of this formula relative to the standard formula is profiled
@@ -270,7 +270,7 @@ error exceeding the value of the area of overlap for $1+r-10^{-8} <
 b < 1+r$.
 
 In contrast, equation \ref{eq:area_of_overlap} gives a precision
-that double-precision in both limits.  Figure
+that is double-precision in both limits.  Figure
 \ref{fig:overlap_precision} shows that equation \ref{eq:area_of_overlap} 
 gives a precision of $\approx 10^{-17}$ in the limit $b \rightarrow
 1-r$ for $r=0.1$; this limit is due to the limiting precision of
@@ -282,7 +282,7 @@ even higher precision is achieved since the area of overlap approaches
 zero, as shown in the right hand panels of Figure \ref{fig:overlap_precision}.
 
 The final modification we make when computing the uniform light
-curve is that we require the visible area of the disk, 
+curve is that we require the visible area of the disk,
 \begin{eqnarray}
 s_0(r,b) &=& \pi-A_{lens}\\
 &=&\pi -\kappa_1 - r^2\kappa_0 + A_{kite},
@@ -333,12 +333,12 @@ the higher order limb-darkened light curves.
 % ==============================================================================
 
 In this section we turn to the case of linear limb-darkening, $I(\upmu) = \upmu$.
-\footnote{Note that since $\upmu = \sqrt{1-r^2}$, this problem is equivalent to 
+Note that since $\upmu = \sqrt{1-r^2}$, this problem is equivalent to 
 computing the volume of intersection between a sphere and a cylinder, which was
-solved in terms of elliptic integrals by \citet{Lamarche1990}.}
-From \citet{MandelAgol2002}, the total flux visible during the occultation of a
-body whose surface map is given by $I(x, y) = \sqrt{1 - \x^2 -\y^2}$ may be computed
-as
+solved in terms of elliptic integrals by \citet{Lamarche1990}.
+A similar solution was found by \citet{MandelAgol2002}, who show that the total 
+flux visible during the occultation of a body whose surface map is given by 
+$I(x, y) = \sqrt{1 - \x^2 -\y^2}$ may be computed as
 %
 \begin{align}
     \label{eq:s2}
@@ -502,8 +502,7 @@ q &=& 3\frac{b-r}{(b+r)(1-(b-r)^2)}\\
 p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
 \end{eqnarray}
 in the $k^2 > 1$ case.  Note that in this equation the conditions
-should be evaluated in the order they appear, and several typos
-are corrected from \citet{MandelAgol2002}.
+should be evaluated in the order they appear.
 
 The $s_2(b,r)$ function is plotted in Figure \ref{s2_plot}.  The
 function varies smoothly from the lower right where the disk is
@@ -524,10 +523,11 @@ end of complete occultation) occur when $b=1-r$, which is the
 lower  bound to the $k^2<1$ region when $b+r >1$.
 For $r < 1$, the second and third contacts occur when $r=1-b$.
 
-Near these boundaries, the standard \citet{MandelAgol2002} expression
-can become singular, and so we paid particular care to the accuracy of this
-new expression in these regions.  Figure \ref{s2_machine} shows
-that equation \ref{eq:biglam_stable} is accurate in these regimes.
+Near these boundaries, the standard \citet{MandelAgol2002} expressions
+can become singular, and so we paid particular care to the accuracy of these
+new expressions in these regions.  Figure \ref{s2_machine} shows
+that equation \ref{eq:biglam_stable} is accurate to machine
+precision in all of these regimes.
 We tested the accuracy by computing the equations with 256 bit
 arithmetic, which is much less subject to round-off error, and
 hence gives essentially exact expressions.  We implemented the
