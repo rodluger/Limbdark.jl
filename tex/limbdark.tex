@@ -862,9 +862,11 @@ We choose $f(z) = z^n$, so that
 \begin{equation}
 \gbasisn(x,y) =  (n+2)z^n-n z^{n-2},
 \end{equation}
-is the basis set for polynomial limb-darkening, along with the uniform, $\tilde{g}_0 = z^0$,
+is the basis set for the surface brightness of the polynomial limb-darkening, 
+along with the uniform, $\tilde{g}_0 = z^0$,
 and linear, $\tilde{g}_1 = z^1$, terms which we have derived in \S \ref{sec:reparam}.
-Note that the total flux of this basis set integrates to zero.
+Note that the total flux of each term in this basis set, $\tilde{g}_n$, integrates
+to a total flux of zero for $n \ge 2$.
 
 Also, with this choice of basis, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for 
 $n \ge 1$ since $z=0$ at the boundary of the star.   The $n=0$ case we have already
@@ -1004,10 +1006,10 @@ For $k^2 > 1$ ($b+r <1$), we have
 while the same recursion relation applies for $\partial \mathcal{J}_v/\partial k$ as in the $k^2 < 1$ case,
 and $d\mathcal{I}_v/dk = 0$.
 
-As with \starry, we find that upward recursion is more stable for $\tfrac{1}{2} < k^2 < 2$,
+As with \starry, we find that upward recursion in $v$ is more stable for $\tfrac{1}{2} < k^2 < 2$,
 while downward recursion is more stable for $k^2 < \tfrac{1}{2}$ and $k^2 > 2$.  This
 requires computing the derivatives, $\frac{\partial \mathcal{J}_v}{\partial k}$, first 
-for large values of $k$. Rather than using the integral or Hypergeometric functions given
+for large values of $v$. Rather than using the integral or Hypergeometric functions given
 above, we accomplish this by differentiating each term the series expansion for 
 $\mathcal{J}_v$ with respect to $k$.  TBD
 
@@ -1041,6 +1043,8 @@ chain rule.  Then, the light curve derivatives are given by
 In this section we compare our computations with existing code in terms
 of accuracy and speed.
 
+\subsection{Comparison with Mandel \& Agol}
+
 For uniform, linear or quadratic limb-darkening, the widely used computation 
 by \citet{MandelAgol2002} has been improved in speed by utilizing the 
 \citet{Bulirsch1965a,Bulirsch1965b} expressions for the complete elliptic 
@@ -1069,11 +1073,37 @@ parameter space.
     \end{centering} 
 \end{figure}
 
+\subsection{Derivative comparison with P\'al}
+
+We have computed the quadratic limb-darkened light curve using the \texttt{F77}
+code written by Andr\'as P\'al, \texttt{ntiq\_fortran.f}.  
+Figure \ref{fig:Pal_comparison} shows the results of this comparison.
+The light curve models agree quite well, as do the derivatives, which is
+a good check on both codes.  However, we find that the P\'al model only
+achieves single precision for the computation, with errors reaching as
+much as a fex $\times 10^{-8}$ for the flux and the derivatives with
+respect to the limb-darkening parameters.  \citet{Pal2008} uses the
+Carlson implementation of elliptic integrals \citep{Carlson1979},
+which in practice we find can be both less precise and slower to
+evaluate than the \citet{Bulirsch1965a} code for computing elliptic
+integrals.
+
+{\color{red} Compare the speed of evaluation as well.}
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/compare_pal_r0pt1.pdf}
+    \caption{Comparison of \citet{Pal2008} with Luger \& Agol (2018).}
+    \label{fig:Pal_comparison}
+    \end{centering} 
+\end{figure}
+
+
 \begin{itemize}
 \item Compare with Gimenez for speed and accuracy
 for higher order limb-darkening.
 \item Compare with Batman for speed and accuracy.
-\item Compare derivatives with Pal for speed and accuracy.
+\item Compare derivatives with Pal for speed and accuracy. [x]
 \end{itemize}
 
 \section{Discussion}
