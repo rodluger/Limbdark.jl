@@ -8,23 +8,23 @@ data_pal = readdlm("ntiq_test.out")
 # Now, run the same with transit_poly:
 
 u = [0.2,0.3]
-nb = 1000001; b=zeros(nb)
+nb = 1001; b=zeros(nb)
 r = 0.1  # radius ratio is 0.1
 flux = zeros(nb); fgrad = zeros(4)
 flux_big = zeros(nb); fgrad_big = zeros(BigFloat,4)
 flux_grad = zeros(nb,4)
 flux_grad_big = zeros(nb,4)
 tic()
-for i=0:1000000
-  b[i+1] = sqrt(((i-500000.)/500000.*(1.+2.*r))^2)
+for i=0:1000
+  b[i+1] = sqrt(((i-500.)/500.*(1.+2.*r))^2)
   flux[i+1]= transit_poly!(r,b[i+1],u,fgrad)
   flux_grad[i+1,:] = fgrad
-end
-toc()
-#for i
-#  flux_big[i+1]= convert(Float64,transit_poly!(big(r),big(b[i+1]),big.(u),fgrad_big))
-#  flux_grad_big[i+1,:] = convert(Array{Float64,1},fgrad_big)
 #end
+#toc()
+#for i
+  flux_big[i+1]= convert(Float64,transit_poly!(big(r),big(b[i+1]),big.(u),fgrad_big))
+  flux_grad_big[i+1,:] = convert(Array{Float64,1},fgrad_big)
+end
 
 # Now, plot results:
 
