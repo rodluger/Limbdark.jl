@@ -73,7 +73,7 @@ ax[:plot](log10.(db),log10.(abs.(area-convert(Array{Float64,1},sn_big))),label="
 ax[:plot](log10.(db),log10.(abs.(sn-convert(Array{Float64,1},sn_big))),label="r=0.1, LA(2018)",".")
 ax[:set_xlabel](L"$\log_{10}(b-(1-r))$")
 ax[:set_ylabel]("Log Abs(Error in area of overlap)")
-ax[:legend](loc="left",fontsize=8)
+ax[:legend](loc="center left",fontsize=8)
 ax[:axis]([-15,-2,-25,-5])
 ax[:plot]([-16,-2],[1,1]*log10(pi*.1^2/2^53),c="grey",linestyle="-.")
 
@@ -102,6 +102,6 @@ ax[:plot](log10.(db),log10.(abs.(area-convert(Array{Float64,1},sn_big))),label="
 ax[:plot](log10.(db),log10.(abs.(sn-convert(Array{Float64,1},sn_big))),label="r=0.1, LA(2018)",".")
 ax[:set_xlabel](L"$\log_{10}(1+r-b)$")
 #ax[:set_ylabel]("Log Abs(Error in area of overlap)")
-ax[:legend](loc="left",fontsize=8)
+ax[:legend](loc="center left",fontsize=8)
 ax[:axis]([-15,-2,-25,-5])
 savefig("area_of_overlap.pdf", bbox_inches="tight")
