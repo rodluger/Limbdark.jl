@@ -1088,7 +1088,10 @@ which in practice we find can be both less precise and slower to
 evaluate than the \citet{Bulirsch1965a} code for computing elliptic
 integrals.
 
-{\color{red} Compare the speed of evaluation as well.}
+{\color{red} Compare the speed of evaluation as well. Right now,
+the Pal computation takes 0.96 seconds to compute $10^6$ models
+while the transit\_poly.jl takes 3.5 seconds.  There is probably
+some room for further optimization of the code.}
 
 \begin{figure}
     \begin{centering}

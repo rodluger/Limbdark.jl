@@ -951,10 +951,10 @@ CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
 	integer i
 	real*8	ntiq_diff,n,p,z,diff(4)
         p = 0.1d0
-        do 10 i=0,1000
-          z = sqrt(((1d0+2d0*p)*(i-500.0)/500.)**2)
+        do 10 i=0,1000000
+          z = sqrt(((1d0+2d0*p)*(i-500000.0)/500000.)**2)
      	  n=ntiq_diff(p,z,0.2d0,0.3d0,diff)
-    	  write(6,*) n,diff(1),diff(2),diff(3),diff(4)
+C    	  write(6,*) n,diff(1),diff(2),diff(3),diff(4)
 10	continue
       return
       end
