@@ -12,8 +12,8 @@ conda create --yes -n test python=$PYTHON_VERSION
 conda activate test
 conda install -c conda-forge numpy=$NUMPY_VERSION scipy matplotlib setuptools pytest pytest-cov pip
 
-# Install starry
-pip install git+https://github.com/rodluger/starry
+# Install starry [DISABLED: Let's use conda-forge]
+# pip install git+https://github.com/rodluger/starry
 
 # Install texlive
 sudo apt-get -qq update && sudo apt-get install -y --no-install-recommends texlive-full
