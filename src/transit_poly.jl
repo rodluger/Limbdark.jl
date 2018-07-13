@@ -133,7 +133,7 @@ sn[2] = s2(r,b)
 # Compute the J_v and I_v functions:
 Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
 if k2 > 0
-  if k2 < 0.5 || k2 > 2.0
+  if (k2 < 0.5 || k2 > 2.0) # && v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
     IJv_lower!(v_max,k2,kck,kc,kap0,Iv,Jv)
   else
@@ -205,6 +205,11 @@ dfdrbc = zeros(typeof(r),n+3)
 a_n = zeros(typeof(r),n+1)
 dadu = zeros(typeof(r),n+1,n)
 dcdu = zeros(typeof(r),n+3,n)
+#fill!(c_n,zero(r))
+#fill!(dfdrbc,zero(r))
+#fill!(a_n,zero(r))
+#fill!(dadu,zero(r))
+#fill!(dcdu,zero(r))
 a_n[1] = one(r)  # Add in the first constant coefficient term
 for i=1:n
   # Compute the contribution to a_n*\mu^n
@@ -267,6 +272,9 @@ N_c = length(c_n)-1
 sn = zeros(typeof(r),N_c+1)
 dsndr = zeros(typeof(r),N_c+1)
 dsndb = zeros(typeof(r),N_c+1)
+#fill!(sn,zero(r))
+#fill!(dsndr,zero(r))
+#fill!(dsndb,zero(r))
 fill!(dfdrbc,zero(r))
 # Check for different cases:
 if b >= 1+r || r ==  0.0
@@ -378,10 +386,12 @@ dsndb[2] = s2_grad[2]
 
 # Compute the J_v and I_v functions:
 Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
+#fill!(Iv,zero(k2)); fill!(Jv,zero(k2))
 # And their derivatives with respect to k:
 dIvdk = zeros(typeof(k2),v_max+1); dJvdk = zeros(typeof(k2),v_max+1)
+#fill!(dIvdk,zero(k2)); fill!(dJvdk,zero(k2))
 if k2 > 0
-  if k2 < 0.5 || k2 > 2.0
+  if (k2 < 0.5 || k2 > 2.0) # && v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
     dIJv_lower_dk!(v_max,k2,kck,kc,kap0,Iv,Jv,dIvdk,dJvdk)
   else

@@ -19,9 +19,9 @@ for i=0:1000
   b[i+1] = sqrt(((i-500.)/500.*(1.+2.*r))^2)
   flux[i+1]= transit_poly!(r,b[i+1],u,fgrad)
   flux_grad[i+1,:] = fgrad
-#end
-#toc()
-#for i
+end
+toc()
+for i=0:1000
   flux_big[i+1]= convert(Float64,transit_poly!(big(r),big(b[i+1]),big.(u),fgrad_big))
   flux_grad_big[i+1,:] = convert(Array{Float64,1},fgrad_big)
 end

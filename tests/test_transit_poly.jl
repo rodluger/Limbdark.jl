@@ -1,6 +1,6 @@
 include("../src/transit_poly.jl")
 #nu = 2+ceil(Int64,rand()*20); r=rand(); b=rand()*(1+r); u = rand(nu); u *= rand()/sum(u)
-#r=rand(); b=rand()*(1+r); u = [0.,0.,0.,0.,1.0]; nu=length(u)
+#r=rand(); b=rand()*(1+r); u = [0.,0.,0.,0.,1.0]; n=length(u)
 
 @testset "transit_poly" begin
 
@@ -19,13 +19,13 @@ for j=1:ns
   end
   z = sqrt(1-s[j]^2)
   imu = 1.0
-  for n=1:nu
+  for n=1:n
     imu -= u[n]*(1-z)^n
   end
   fobs += s[j]*ds*dphi*imu
 end
 norm = 1.
-for n=1:nu
+for n=1:n
   norm -= 2*u[n]/(2+3*n+n^2)
 end
 fobs /= pi*norm
@@ -36,7 +36,26 @@ end
 r0=[0.01,0.01,0.01,0.01,0.01,0.1,0.1,0.1,0.1,0.1,1.0,1.0,1.0,10.,10.,10.,100.,100.,100.]
 b0=[0.,0.01,0.99,1.0,1.01, 0.,0.1,0.9,1.0,1.1, 0.,1.0,2.0, 9.,10.,11., 99.,100.,101.]
 
-nu = 2+ceil(Int64,rand()*20); u = rand(nu); u *= rand()/sum(u)
+r = r0[1]
+n = 2+ceil(Int64,rand()*20); u = rand(n); u *= rand()/sum(u)
+#N_c = n+2
+#const c_n = zeros(typeof(r),n+3)
+#const dfdrbc = zeros(typeof(r),n+3)
+#const a_n = zeros(typeof(r),n+1)
+#const dadu = zeros(typeof(r),n+1,n)
+#const dcdu = zeros(typeof(r),n+3,n)
+#const sn = zeros(typeof(r),N_c+1)
+#const dsndr = zeros(typeof(r),N_c+1)
+#const dsndb = zeros(typeof(r),N_c+1)
+#if iseven(N_c)
+#  v_max = round(Int64,N_c/2)+2
+#else
+#  v_max = round(Int64,(N_c-1)/2)+2
+#end
+#const Iv = zeros(typeof(r),v_max+1)
+#const Jv = zeros(typeof(r),v_max+1)
+#const dIvdk = zeros(typeof(r),v_max+1)
+#const dJvdk = zeros(typeof(r),v_max+1)
 
 for i=1:length(r0)
   r=r0[i]; b=b0[i]

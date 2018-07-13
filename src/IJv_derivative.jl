@@ -121,8 +121,9 @@ else # k^2 >= 1
   end
   Jv = one(k2)*coeff; n=1
   dJvdk = zero(k2)
+  k2inv = inv(k2)
   while n < nmax && abs(error) > tol
-    coeff *= (1.-2.5/n)*(1.-.5/(n+v))/k2
+    coeff *= (1.-2.5/n)*(1.-.5/(n+v))*k2inv
     Jv += coeff
     dJvdk -= 2*n*coeff
 #    error = coeff/Jv
@@ -307,6 +308,8 @@ v= v_max
 # Iterate downwards in v (lower):
 while v >= 2
   f2 = k2*(2v-3); f1 = 2*(v+1+(v-1)*k2)/f2; f3 = (2v+3)/f2
+#  k2inv = inv(k2)
+#  f2 = (2v-3); f1 = 2*((v+1)*k2inv+(v-1))/f2; f3 = (2v+3)/f2*k2inv
   Jv[v-1] = f1*Jv[v]-f3*Jv[v+1]
   v -= 1
 end
@@ -387,7 +390,10 @@ end
 # Iterate downwards in v (lower):
 while v >= 2
   f2 = k2*(2v-3); f1 = 2*(v+1+(v-1)*k2)/f2; f3 = (2v+3)/f2
+#  k2inv = inv(k2)
+#  f2 = (2v-3); f1 = 2*((v+1)*k2inv+(v-1))/f2; f3 = (2v+3)/f2*k2inv
   Jv[v-1] = f1*Jv[v]-f3*Jv[v+1]
+#  dJvdk[v-1] = (dJvdk[v]+3/k*Jv[v])*k2inv
   dJvdk[v-1] = (dJvdk[v]+3/k*Jv[v])/k2
   v -= 1
 end
