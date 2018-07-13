@@ -23,6 +23,7 @@ const dIvdk = zeros(typeof(r),v_max+1)
 const dJvdk = zeros(typeof(r),v_max+1)
 
 include("../../../src/transit_poly.jl")
+include("../../../src/dJv_seriesdk.jl")
 using PyPlot
 
 # Now, run the same with transit_poly:

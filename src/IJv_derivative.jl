@@ -7,18 +7,18 @@ include("cel_bulirsch.jl")
 function Iv_series(k2::T,v::Int64) where {T <: Real}
 # Use series expansion to compute I_v:
 nmax = 100
-n = 1; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
+n = 2; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
 # Computing leading coefficient (n=0):
 coeff = 2/(2v+1)
 # Add leading term to I_v:
 Iv = one(k2)*coeff
 # Now, compute higher order terms until desired precision is reached:
 while n < nmax && abs(error) > tol
-  coeff *= (2.0*n-1.0)*.5*(2n+2v-1.0)/(n*(2n+2v+1.0))*k2
+  coeff *= (n-1)*(n+2v-1)/(n*(n+2v+1))*k2
   Iv += coeff
 #  error = coeff/Iv
   error = coeff
-  n += 1
+  n += 2
 end
 return Iv*k2^v*sqrt(k2)
 end
@@ -48,37 +48,39 @@ end
 function Jv_series(k2::T,v::Int64) where {T <: Real}
 # Use series expansion to compute J_v:
 nmax = 100
-n = 1; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
+n = 2; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
 # Computing leading coefficient (n=0):
 #coeff = 3pi/(2^(2+v)*factorial(v+2))
+coeff = zero(k2)
 if k2 < 1
   coeff = 3pi/(2^(2+v)*exp(lfact(v+2)))
 # multiply by (2v-1)!!
-  for i=1:v
-    coeff *= 2.*i-1.0
+  for i=2:2:2v
+    coeff *= i-1
   end
 # Add leading term to J_v:
   Jv = one(k2)*coeff
 # Now, compute higher order terms until desired precision is reached:
   while n < nmax && abs(error) > tol
-    coeff *= (2.0*n-1.0)*(2.0*(n+v)-1.0)*.25/(n*(n+v+2.0))*k2
+    coeff *= (n-1)*(n+2v-1)/(n*(n+2v+4))*k2
     Jv += coeff
     error = coeff/Jv
-    n += 1
+    n += 2
   end
   return Jv*k2^v*sqrt(k2)
 else # k^2 >= 1
   coeff = pi
   # Compute (2v-1)!!/(2^v v!):
-  for i=1:v
-    coeff *= 1.-.5/i
+  for i=2:2:2v
+    coeff *= 1-1/i
   end
-  Jv = one(k2)*coeff; n=1
+  Jv = one(k2)*coeff
   while n < nmax && abs(error) > tol
-    coeff *= (1.-2.5/n)*(1.-.5/(n+v))/k2
+#    coeff *= (1.-2.5/n)*(1.-.5/(n+v))/k2
+    coeff *= (1-5/(n))*(1-1/(n+2v))/k2
     Jv += coeff
     error = coeff/Jv
-    n += 1
+    n += 2
   end
   return Jv
 end
@@ -87,27 +89,28 @@ end
 function dJv_seriesdk(k2::T,v::Int64) where {T <: Real}
 # Use series expansion to compute J_v:
 nmax = 100
-n = 1; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
+n = 2; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
 # Computing leading coefficient (n=0):
 #coeff = 3pi/(2^(2+v)*factorial(v+2))
+coeff = zero(k2)
 if k2 < 1
   coeff = 3pi/(2^(2+v)*exp(lfact(v+2)))
 #  println("coefficient: ",coeff)
 # multiply by (2v-1)!!
-  for i=1:v
-    coeff *= 2.*i-1.0
+  for i=2:2:2v
+    coeff *= i-1
   end
 # Add leading term to J_v:
   Jv = one(k2)*coeff
   dJvdk = one(k2)*coeff*(2v+1)
 # Now, compute higher order terms until desired precision is reached:
   while n < nmax && abs(error) > tol
-    coeff *= (2n-1)*(2(n+v)-1)*.25/(n*(n+v+2))*k2
+    coeff *= (n-1)*(n+2v-1)/(n*(n+2v+4))*k2
     Jv += coeff
-    dJvdk += coeff*(2.0*(n+v)+1.0)
+    dJvdk += coeff*(n+2v+1)
 #    error = coeff/Jv
     error = coeff
-    n += 1
+    n += 2
   end
   dJvdk *= k2^v
   Jv *= k2^v*sqrt(k2)
@@ -116,19 +119,19 @@ if k2 < 1
 else # k^2 >= 1
   coeff = pi
   # Compute (2v-1)!!/(2^v v!):
-  for i=1:v
-    coeff *= 1.-.5/i
+  for i=2:2:2v
+    coeff *= 1-1/i
   end
-  Jv = one(k2)*coeff; n=1
+  Jv = one(k2)*coeff
   dJvdk = zero(k2)
   k2inv = inv(k2)
   while n < nmax && abs(error) > tol
-    coeff *= (1.-2.5/n)*(1.-.5/(n+v))*k2inv
+    coeff *= (1-5/n)*(1-1/(n+2v))*k2inv
     Jv += coeff
-    dJvdk -= 2*n*coeff
+    dJvdk -= n*coeff
 #    error = coeff/Jv
     error = coeff
-    n += 1
+    n += 2
   end
   dJvdk /= sqrt(k2)
   return Jv,dJvdk
@@ -168,7 +171,7 @@ else # k^2 >= 1
   # Compute v=0
   Iv[1] = pi
   for v=1:v_max
-    Iv[v+1]=Iv[v]*(1.0-0.5/v)
+    Iv[v+1]=Iv[v]*(1-1/(2v))
   end
 end
 # Need to compute J_v for v=0, 1:
@@ -232,7 +235,7 @@ else # k^2 >= 1
   # Compute v=0
   Iv[1] = pi
   for v=1:v_max
-    Iv[v+1]=Iv[v]*(1.0-0.5/v)
+    Iv[v+1]=Iv[v]*(1-1/(2v))
   end
   # Derivatives of I_v are zero:
   fill!(dIvdk,zero(k2))

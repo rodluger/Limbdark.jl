@@ -4,7 +4,6 @@ include("../src/transit_poly.jl")
 
 @testset "transit_poly" begin
 
-
 # Now, integrate by hand:
 function transit_poly_int(r,b,u)
 s_1 = maximum([0.0,b-r]); s_2=minimum([1.0,b+r])

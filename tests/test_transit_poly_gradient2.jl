@@ -1,5 +1,6 @@
 # Tests analytic differentiation on transit_poly.jl:
 include("../src/transit_poly.jl")
+#include("../src/dJv_seriesdk.jl")
 using PyPlot
 
 
@@ -98,9 +99,9 @@ for i=1:length(r0)
     tp_grad_grid_big[j,:]=dfdrbu_big
     test1 =  isapprox(dfdrbu,tp_grad_array,atol=1e-12)
     if ~test1
-#      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-18")
+      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-18")
       tp,tp_grad_array =  transit_poly_grad_num(r,b[j],u_n,1e-15)
-#      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-15")
+      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-15")
       test1 =  isapprox(dfdrbu,dfdrbu_big,atol=1e-13)
 #      read(STDIN,Char)
     end

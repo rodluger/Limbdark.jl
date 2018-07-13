@@ -1,6 +1,7 @@
 # Tests the code for computing the derivatives
 # of I_v and J_v with respect to k.
 include("../src/IJv_derivative.jl")
+#include("../src/dJv_seriesdk.jl")
 
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # How to compute (twice) area squared of triangle with
@@ -64,10 +65,10 @@ if k2 > 0
     for v=0:v_max
       dIvdk2_num[v+1] = convert(Float64,(Iv_bigp[v+1]-Iv_bigm[v+1])/(2dq))
       dJvdk2_num[v+1] = convert(Float64,(Jv_bigp[v+1]-Jv_bigm[v+1])/(2dq))
-      test1 =  isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k)
-      test2 = isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k) 
-      @test isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k)
-      @test isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k)
+      test1 =  isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k,atol = 1e-20)
+      test2 = isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k,atol = 1e-20) 
+      @test isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k,atol = 1e-20)
+      @test isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k,atol = 1e-20)
       if ~test1 || ~test2
         println("v: ",v," k2: ",k2," kc: ",kc," Iv: ",Iv[v+1]," Iv_big: ",convert(Float64,Iv_bigp[v+1])," Jv: ",Jv[v+1]," Jv_big: ",convert(Float64,Jv_bigp[v+1])," dIvdk: ",dIvdk[v+1]," dIvdk_num: ",dIvdk2_num[v+1]*2*k," diff: ",dIvdk[v+1]-dIvdk2_num[v+1]*2*k," dJvdk: ",dJvdk[v+1]," dJvdk_num: ",dJvdk2_num[v+1]*2*k," diff: ",dJvdk[v+1]-dJvdk2_num[v+1]*2*k)
       end
@@ -104,10 +105,10 @@ if k2 > 0
     for v=0:v_max
       dIvdk2_num[v+1] = convert(Float64,(Iv_bigp[v+1]-Iv_bigm[v+1])/(2dq))
       dJvdk2_num[v+1] = convert(Float64,(Jv_bigp[v+1]-Jv_bigm[v+1])/(2dq))
-      test1 = isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k)
-      test2 = isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k)
-      @test isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k)
-      @test isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k)
+      test1 = isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k,atol = 1e-20)
+      test2 = isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k,atol = 1e-20)
+      @test isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k,atol = 1e-20)
+      @test isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k,atol = 1e-20)
 #      println("v: ",v," k2: ",k2," kc: ",kc," dIvdk2: ",dIvdk[v+1]/(2*k)," dIvdk2_num: ",dIvdk2_num[v+1]," dJvdk2: ",dJvdk[v+1]/(2k)," dJvdk2_num: ",dJvdk2_num[v+1])
 #      println("v: ",v," k2: ",k2," kc: ",kc," dIvdk: ",dIvdk[v+1]," dIvdk_num: ",dIvdk2_num[v+1]*2*k," diff: ",dIvdk[v+1]-dIvdk2_num[v+1]*2*k," dJvdk: ",dJvdk[v+1]," dJvdk2_num: ",dJvdk2_num[v+1]*2*k," diff: ",dJvdk[v+1]-dJvdk2_num[v+1]*2*k)
       if ~test1 || ~test2
