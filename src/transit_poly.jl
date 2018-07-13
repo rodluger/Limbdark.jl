@@ -1,7 +1,7 @@
-function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
+function sqarea_triangle(x::Array{T,1}) where {T <: Real}
 # How to compute (twice) area squared of triangle with 
 # high precision (Goldberg 1991):
-a,b,c=sort([a,b,c],rev=true)
+a=maximum(x); b=median(x); c=minimum(x)
 area = (a+(b+c))*(c-(a-b))*(c+(a-b))*(a+(b-c))
 return area
 end
@@ -19,37 +19,32 @@ include("s2.jl")
 include("IJv_derivative.jl")
 #include("area_triangle.jl")
 
-function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
-# Transform the u_n coefficients to c_n, which are coefficients
-# of the basis in which the P(G_n) functions are computed.
-n = length(u_n)
-c_n = zeros(typeof(r),n+3)
-a_n = zeros(typeof(r),n+1)
-#c_n = Array{typeof(r)}(n+3)
-#c_n[n+2] = zero(T)
-#c_n[n+3] = zero(T)
-#fill!(a_n,zero(T))
-a_n[1] = one(r)  # Add in the first constant coefficient term
-for i=1:n
-  # Compute the contribution to a_n*\mu^n
-  for j=0:i
-    a_n[j+1] -= u_n[i]*binomial(i,j)*(-1)^j
-#    println("i: ",i," j: ",j," a_i: ",a_n[j+1])
-  end
-end
-# Now, compute the c_n coefficients:
-for j=n:-1:2
-  c_n[j+1] = a_n[j+1]/(j+2)+c_n[j+3]
-end
-c_n[2] = a_n[2]+3*c_n[4]
-c_n[1] = a_n[1]+2*c_n[3]
-#println("u_n: ",u_n)
-#println("a_n: ",a_n)
-#if typeof(r) == Float64
-#  println("c_n: ",c_n)
+#function compute_c_n(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
+## Transform the u_n coefficients to c_n, which are coefficients
+## of the basis in which the P(G_n) functions are computed.
+#n = length(u_n)
+#c_n = zeros(typeof(r),n+3)
+#a_n = zeros(typeof(r),n+1)
+## Pre-allocated memory - just need to zero terms:
+#a_n[1] = one(r)  # Add in the first constant coefficient term
+#for i=1:n
+#  # Compute the contribution to a_n*\mu^n
+#  bcoeff = one(T)
+#  for j=0:i
+##    a_n[j+1] -= u_n[i]*binomial(i,j)*(-1)^j
+#    a_n[j+1] -= u_n[i]*bcoeff*(-1)^j
+#    bcoeff *= (i-j)/(j+1)
+##    println("i: ",i," j: ",j," a_i: ",a_n[j+1])
+#  end
 #end
-return transit_poly_c(r,b,c_n[1:n+1])
-end
+## Now, compute the c_n coefficients:
+#for j=n:-1:2
+#  c_n[j+1] = a_n[j+1]/(j+2)+c_n[j+3]
+#end
+#c_n[2] = a_n[2]+3*c_n[4]
+#c_n[1] = a_n[1]+2*c_n[3]
+#return c_n[1:n+1]
+#end
 
 function transit_poly_c(r::T,b::T,c_n::Array{T,1}) where {T <: Real}
 # Number of limb-darkening components to include (beyond 0 and 1):
@@ -63,8 +58,9 @@ N_c = length(c_n)-1
 
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
-sn = zeros(typeof(r),N_c+1)
-#sn = Array{T}(N_c+1)
+#if ~prealloc
+#  sn = zeros(typeof(r),N_c+1)
+#end
 
 # Check for different cases:
 if b >= 1+r
@@ -124,7 +120,7 @@ if b <= 1-r
   kap0 = convert(typeof(r),pi); kck = zero(r)
 else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
-  kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
+  kite_area2 = sqrt(sqarea_triangle([one(r),b,r]))
   # Angle of section for occultor:
   kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
   # Angle of section for source:
@@ -136,8 +132,9 @@ end
 sn[2] = s2(r,b)
 #if typeof(r) == Float64
 # Compute the J_v and I_v functions:
-Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
-#Iv = Array{T}(v_max+1); Jv = Array{T}(v_max+1)
+#if ~prealloc
+#  Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
+#end
 if k2 > 0
   if (k2 < 0.5 || k2 > 2.0) # && v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
@@ -200,61 +197,51 @@ end
 # That's it!
 
 # Now, for the versions of these functions which include derivatives:
-function transit_poly!(r::T,b::T,u_n::Array{T,1},dfdrbu::Array{T,1}) where {T <: Real}
-# Transform the u_n coefficients to c_n, which are coefficients
-# of the basis in which the P(G_n) functions are computed.
-# Compute the derivatives of the flux with respect to the u coefficients.
-n = length(u_n)
-# We define c_n with two extra elements which are zero:
-c_n = zeros(typeof(r),n+3)
-dfdrbc = zeros(typeof(r),n+3)
-a_n = zeros(typeof(r),n+1)
-dadu = zeros(typeof(r),n+1,n)
-dcdu = zeros(typeof(r),n+3,n)
-#c_n = Array{T}(n+3)
-#c_n[n+2]=zero(T)
-#c_n[n+3]=zero(T)
-#dfdrbc = Array{T}(n+3)
-#a_n = Array{T}(n+1)
-#dadu = Array{T}(n+1,n)
-#dcdu = Array{T}(n+3,n)
-#fill!(c_n,zero(r))
-#fill!(dfdrbc,zero(r))
-#fill!(a_n,zero(T))
-#fill!(dadu,zero(T))
-#fill!(dcdu,zero(r))
-a_n[1] = one(r)  # Add in the first constant coefficient term
-for i=1:n
-  # Compute the contribution to a_n*\mu^n
-  for j=0:i
-    a_n[j+1] -= u_n[i]*binomial(i,j)*(-1)^j
-    dadu[j+1,i] -= binomial(i,j)*(-1)^j
-#    println("i: ",i," j: ",j," a_i: ",a_n[j+1])
-  end
-end
-# Now, compute the c_n coefficients and propagate derivatives:
-for j=n:-1:2
-  c_n[j+1] = a_n[j+1]/(j+2)+c_n[j+3]
-  for i=1:n
-    dcdu[j+1,i] = dadu[j+1,i]/(j+2) + dcdu[j+3,i]
-  end
-end
-c_n[2] = a_n[2]+3*c_n[4]
-for i=1:n
-  dcdu[2,i] = dadu[2,i] + 3*dcdu[4,i]
-end
-c_n[1] = a_n[1]+2*c_n[3]
-for i=1:n
-  dcdu[1,i] = dadu[1,i] + 2*dcdu[3,i]
-end
-#println("a_n: ",a_n)
-#if typeof(r) == Float64
-#  println("u_n: ",u_n)
-#  println("c_n: ",c_n)
-#  println("dcdu: ",dcdu)
+#function compute_c_n(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
+## Transform the u_n coefficients to c_n, which are coefficients
+## of the basis in which the P(G_n) functions are computed.
+## Compute the derivatives of the flux with respect to the u coefficients.
+#n = length(u_n)
+## We define c_n with two extra elements which are zero:
+#c_n = zeros(typeof(r),n+3)
+#dfdrbc = zeros(typeof(r),n+3)
+#a_n = zeros(typeof(r),n+1)
+#dadu = zeros(typeof(r),n+1,n)
+#dcdu = zeros(typeof(r),n+3,n)
+#a_n[1] = one(r)  # Add in the first constant coefficient term
+#for i=1:n
+#  # Compute the contribution to a_n*\mu^n
+#  bcoeff = one(T)
+#  for j=0:i
+##    a_n[j+1] -= u_n[i]*binomial(i,j)*(-1)^j
+#    a_n[j+1] -= u_n[i]*bcoeff*(-1)^j
+##    dadu[j+1,i] -= binomial(i,j)*(-1)^j
+#    dadu[j+1,i] -= bcoeff*(-1)^j
+#    bcoeff *= (i-j)/(j+1)
+##    println("i: ",i," j: ",j," a_i: ",a_n[j+1])
+#  end
 #end
+## Now, compute the c_n coefficients and propagate derivatives:
+#for j=n:-1:2
+#  c_n[j+1] = a_n[j+1]/(j+2)+c_n[j+3]
+#  for i=1:n
+#    dcdu[j+1,i] = dadu[j+1,i]/(j+2) + dcdu[j+3,i]
+#  end
+#end
+#c_n[2] = a_n[2]+3*c_n[4]
+#for i=1:n
+#  dcdu[2,i] = dadu[2,i] + 3*dcdu[4,i]
+#end
+#c_n[1] = a_n[1]+2*c_n[3]
+#for i=1:n
+#  dcdu[1,i] = dadu[1,i] + 2*dcdu[3,i]
+#end
+#return c_n[1:n+1];dcdu[1:n+1,n]
+#end
+
+function transit_poly!(r::T,b::T,c_n::Array{T,1},dcdu::Array{T,2},dfdrbc::Array{T,1},dfdrbu::Array{T,1}) where {T <: Real}
 # Pass c_n (without last two dummy values):
-flux = transit_poly_c!(r,b,c_n[1:n+1],dfdrbc)
+flux = transit_poly_c!(r,b,c_n,dfdrbc)
 # Now, transform derivaties from c to u:
 fill!(dfdrbu,zero(r))
 dfdrbu[1] = dfdrbc[1]  # r derivative
@@ -282,16 +269,11 @@ N_c = length(c_n)-1
 
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
-#sn = Array{T}(N_c+1)
-#dsndr = Array{T}(N_c+1)
-#dsndb = Array{T}(N_c+1)
-sn = zeros(typeof(r),N_c+1)
-dsndr = zeros(typeof(r),N_c+1)
-dsndb = zeros(typeof(r),N_c+1)
-#fill!(sn,zero(r))
-#fill!(dsndr,zero(r))
-#fill!(dsndb,zero(r))
-#fill!(dfdrbc,zero(r))
+#if ~prealloc
+#  sn = zeros(typeof(r),N_c+1)
+#  dsndr = zeros(typeof(r),N_c+1)
+#  dsndb = zeros(typeof(r),N_c+1)
+#end
 # Check for different cases:
 if b >= 1+r || r ==  0.0
   # unobscured - return one:
@@ -342,8 +324,6 @@ else
     else
 #      kc2 = (1-(b+r)^2)/(1-(b-r)^2)
       kc2 = (1-r-b)*(1+b+r)/(1+r-b)/(1-r+b)
-#      kc2 = -sqarea_triangle(one(r),b,r)
-#      kc2 = -convert(Float64,sqarea_triangle(big(1.0),big(b),big(r)))
       kc = sqrt(kc2)
     end
 #    if typeof(kc) == Float64
@@ -383,7 +363,7 @@ if b <= 1-r  # k^2 > 1
   kap0 = convert(typeof(r),pi); kck = zero(r)
 else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
-  kite_area2 = sqrt(sqarea_triangle(one(r),b,r)) 
+  kite_area2 = sqrt(sqarea_triangle([one(r),b,r])) 
   # Angle of section for occultor:
   kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
   # Angle of section for source:
@@ -395,20 +375,19 @@ else
   kck = kite_area2/(4*b*r)
 end
 # Compute sn[2] and its derivatives:
-s2_grad = zeros(typeof(r),2)
-#s2_grad = Array{T}(2)
+#if ~prealloc
+#  s2_grad = zeros(typeof(r),2)
+#end
 sn[2] = s2!(r,b,s2_grad)
 dsndr[2] = s2_grad[1]
 dsndb[2] = s2_grad[2]
 
 # Compute the J_v and I_v functions:
-Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
-#Iv = Array{T}(v_max+1); Jv = Array{T}(v_max+1)
-#fill!(Iv,zero(k2)); fill!(Jv,zero(k2))
-# And their derivatives with respect to k:
-dIvdk = zeros(typeof(k2),v_max+1); dJvdk = zeros(typeof(k2),v_max+1)
-#dIvdk = Array{T}(v_max+1); dJvdk = Array{T}(v_max+1)
-#fill!(dIvdk,zero(k2)); fill!(dJvdk,zero(k2))
+#if ~prealloc
+#  Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
+## And their derivatives with respect to k:
+#  dIvdk = zeros(typeof(k2),v_max+1); dJvdk = zeros(typeof(k2),v_max+1)
+#end
 if k2 > 0
   if (k2 < 0.5 || k2 > 2.0) # && v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
