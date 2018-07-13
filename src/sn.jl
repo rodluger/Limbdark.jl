@@ -107,7 +107,7 @@ if k2 < 1
   end
   return Jv*k2^v*sqrt(k2)
 else # k^2 >= 1
-  coeff = pi
+  coeff = convert(typeof(k2),pi)
   # Compute (2v-1)!!/(2^v v!):
   for i=1:v
     coeff *= 1.-.5/i

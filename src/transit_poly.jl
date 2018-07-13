@@ -1,7 +1,7 @@
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # How to compute (twice) area squared of triangle with 
 # high precision (Goldberg 1991):
-a,b,c=reverse(sort([a,b,c]))
+a,b,c=sort([a,b,c],rev=true)
 area = (a+(b+c))*(c-(a-b))*(c+(a-b))*(a+(b-c))
 return area
 end
@@ -25,6 +25,10 @@ function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
 n = length(u_n)
 c_n = zeros(typeof(r),n+3)
 a_n = zeros(typeof(r),n+1)
+#c_n = Array{typeof(r)}(n+3)
+#c_n[n+2] = zero(T)
+#c_n[n+3] = zero(T)
+#fill!(a_n,zero(T))
 a_n[1] = one(r)  # Add in the first constant coefficient term
 for i=1:n
   # Compute the contribution to a_n*\mu^n
@@ -60,6 +64,7 @@ N_c = length(c_n)-1
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
 sn = zeros(typeof(r),N_c+1)
+#sn = Array{T}(N_c+1)
 
 # Check for different cases:
 if b >= 1+r
@@ -132,6 +137,7 @@ sn[2] = s2(r,b)
 #if typeof(r) == Float64
 # Compute the J_v and I_v functions:
 Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
+#Iv = Array{T}(v_max+1); Jv = Array{T}(v_max+1)
 if k2 > 0
   if (k2 < 0.5 || k2 > 2.0) # && v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
@@ -205,10 +211,17 @@ dfdrbc = zeros(typeof(r),n+3)
 a_n = zeros(typeof(r),n+1)
 dadu = zeros(typeof(r),n+1,n)
 dcdu = zeros(typeof(r),n+3,n)
+#c_n = Array{T}(n+3)
+#c_n[n+2]=zero(T)
+#c_n[n+3]=zero(T)
+#dfdrbc = Array{T}(n+3)
+#a_n = Array{T}(n+1)
+#dadu = Array{T}(n+1,n)
+#dcdu = Array{T}(n+3,n)
 #fill!(c_n,zero(r))
 #fill!(dfdrbc,zero(r))
-#fill!(a_n,zero(r))
-#fill!(dadu,zero(r))
+#fill!(a_n,zero(T))
+#fill!(dadu,zero(T))
 #fill!(dcdu,zero(r))
 a_n[1] = one(r)  # Add in the first constant coefficient term
 for i=1:n
@@ -269,13 +282,16 @@ N_c = length(c_n)-1
 
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
+#sn = Array{T}(N_c+1)
+#dsndr = Array{T}(N_c+1)
+#dsndb = Array{T}(N_c+1)
 sn = zeros(typeof(r),N_c+1)
 dsndr = zeros(typeof(r),N_c+1)
 dsndb = zeros(typeof(r),N_c+1)
 #fill!(sn,zero(r))
 #fill!(dsndr,zero(r))
 #fill!(dsndb,zero(r))
-fill!(dfdrbc,zero(r))
+#fill!(dfdrbc,zero(r))
 # Check for different cases:
 if b >= 1+r || r ==  0.0
   # unobscured - return one:
@@ -380,15 +396,18 @@ else
 end
 # Compute sn[2] and its derivatives:
 s2_grad = zeros(typeof(r),2)
+#s2_grad = Array{T}(2)
 sn[2] = s2!(r,b,s2_grad)
 dsndr[2] = s2_grad[1]
 dsndb[2] = s2_grad[2]
 
 # Compute the J_v and I_v functions:
 Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
+#Iv = Array{T}(v_max+1); Jv = Array{T}(v_max+1)
 #fill!(Iv,zero(k2)); fill!(Jv,zero(k2))
 # And their derivatives with respect to k:
 dIvdk = zeros(typeof(k2),v_max+1); dJvdk = zeros(typeof(k2),v_max+1)
+#dIvdk = Array{T}(v_max+1); dJvdk = Array{T}(v_max+1)
 #fill!(dIvdk,zero(k2)); fill!(dJvdk,zero(k2))
 if k2 > 0
   if (k2 < 0.5 || k2 > 2.0) # && v_max > 3
