@@ -19,12 +19,12 @@ else
       Lambda1 = 1/3-4/(9pi) - 2*(b-0.5)/(3*pi) +2*(r-0.5)/pi # Case 6; I've added in analytic first derivaties.
     elseif r < 0.5
       m = 4r^2
-      Lambda1 = 1/3+2/(9pi)*cel_bulirsch(m,one(r),m-3,(1-m)*(2m-3)) + # Case 5
-        (b-r)*4*r/(3pi)*cel_bulirsch(m,one(r),-one(r),1-m)  # Adding in first derivative
+      Lambda1 = 1/3+2/(9pi)*cel_bulirsch(m,one(T),m-3,(1-m)*(2m-3)) + # Case 5
+        (b-r)*4*r/(3pi)*cel_bulirsch(m,one(T),-one(T),1-m)  # Adding in first derivative
     else
       m = 4r^2; minv = inv(m)
-      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,one(r),m-3,1-m) - # Case 7
-        (b-r)*2/(3pi)*cel_bulirsch(minv,one(r),one(r),2*(1-minv)) # Adding in first derivative
+      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,one(T),m-3,1-m) - # Case 7
+        (b-r)*2/(3pi)*cel_bulirsch(minv,one(T),one(T),2*(1-minv)) # Adding in first derivative
     end
   else
 #    onembpr2 = 1-(b+r)^2; onembmr2=1-(b-r)^2; fourbr = 4b*r
@@ -34,10 +34,10 @@ else
     if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
       k2c = -onembpr2/fourbr; kc = sqrt(k2c); sqbr=sqrt(b*r)
       Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(b),3*k2c*(b-r)*(b+r))+
-          cel_bulirsch(k2,kc,one(b),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
+          cel_bulirsch(k2,kc,one(T),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
       k2inv = inv(k2); k2c =onembpr2/onembmr2; kc = sqrt(k2c)
-      Eofk = cel_bulirsch(k2inv,kc,one(b),one(b),k2c) # Complete elliptic integral of second kind
+      Eofk = cel_bulirsch(k2inv,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
       bmrdbpr = (b-r)/(b+r); 
       mu = 3bmrdbpr/onembmr2
       p = bmrdbpr^2*onembpr2/onembmr2
@@ -79,14 +79,14 @@ else
       s2_grad[2] =  2/3  # dLambda/db
     elseif r < 0.5
       m = 4r^2
-      Lambda1 = 1/3+2/(9pi)*cel_bulirsch(m,one(r),m-3,(1-m)*(2m-3))  # Case 5
-      s2_grad[1] = -4*r*cel_bulirsch(m,one(r),one(r),1-m)      # Adding in first derivative dLambda/dr
-      s2_grad[2] = -4*r/3*cel_bulirsch(m,one(r),-one(r),1-m) # Adding in first derivative dLambda/db
+      Lambda1 = 1/3+2/(9pi)*cel_bulirsch(m,one(T),m-3,(1-m)*(2m-3))  # Case 5
+      s2_grad[1] = -4*r*cel_bulirsch(m,one(T),one(T),1-m)      # Adding in first derivative dLambda/dr
+      s2_grad[2] = -4*r/3*cel_bulirsch(m,one(T),-one(T),1-m) # Adding in first derivative dLambda/db
     else
       m = 4r^2; minv = inv(m); kc = sqrt(1.-minv)
-      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,kc,one(r),m-3,1-m)  # Case 7
-      s2_grad[1] = -2*cel_bulirsch(minv,kc,one(r),one(r),zero(r)) # dLambda/dr
-      s2_grad[2] =  2/3*cel_bulirsch(minv,kc,one(r),one(r),2*(1-minv)) # dLambda/db
+      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,kc,one(T),m-3,1-m)  # Case 7
+      s2_grad[1] = -2*cel_bulirsch(minv,kc,one(T),one(T),zero(r)) # dLambda/dr
+      s2_grad[2] =  2/3*cel_bulirsch(minv,kc,one(T),one(T),2*(1-minv)) # dLambda/db
     end
   else
 #    onembpr2 = 1-(b+r)^2; onembmr2=1-(b-r)^2; fourbr = 4b*r
@@ -95,20 +95,26 @@ else
 #    k2 = onembmr2/fourbr
     if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
       k2c = -onembpr2/fourbr; kc = sqrt(k2c); sqbr=sqrt(b*r)
+      Eofk = cel_bulirsch(k2,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
+      Em1mKdm = cel_bulirsch(k2,kc,one(T),one(T),zero(T)) # (E-(1-m)K)/m
       Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(b),3*k2c*(b-r)*(b+r))+
-          cel_bulirsch(k2,kc,one(b),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
-      s2_grad[1] = -cel_bulirsch(k2,kc,one(r),2r*onembmr2,zero(r))/(sqrt(b*r))
-      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(r),-2r,onembpr2/b)/(3*sqrt(b*r))
+#          cel_bulirsch(k2,kc,one(T),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
+          cel_bulirsch(k2,kc,one(T),-3+6r^2+2*b*r-fourbr,-k2c*fourbr))/(9*pi*sqrt(b*r))
+#          (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)/(9*pi*sqrt(b*r))
+      s2_grad[1] = -cel_bulirsch(k2,kc,one(T),2r*onembmr2,zero(r))/(sqrt(b*r))
+#      s2_grad[1] = -2r*onembmr2*Em1mKdm/(sqrt(b*r))
+      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,onembpr2/b)/(3*sqrt(b*r))
+#      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,-4r*k2c)/(3*sqrt(b*r))
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
       k2inv = inv(k2); k2c =onembpr2/onembmr2; kc = sqrt(k2c)
-      Eofk = cel_bulirsch(k2inv,kc,one(b),one(b),k2c) # Complete elliptic integral of second kind
+      Eofk = cel_bulirsch(k2inv,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
       bmrdbpr = (b-r)/(b+r); 
       mu = 3bmrdbpr/onembmr2
       p = bmrdbpr^2*onembpr2/onembmr2
       Lambda1 = 2*sqrt(onembmr2)*(onembpr2*cel_bulirsch(k2inv,kc,p,1.0+mu,p+mu)
              -(4-7r^2-b^2)*Eofk)/(9*pi)
-      s2_grad[1] = -4*r*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(r),one(r),k2c)
-      s2_grad[2] = -4*r/3*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(r),-one(r),k2c)
+      s2_grad[1] = -4*r*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(T),one(T),k2c)
+      s2_grad[2] = -4*r/3*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(T),-one(T),k2c)
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
       Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(typeof(b),r>.5) 

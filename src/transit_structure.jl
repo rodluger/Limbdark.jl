@@ -1,4 +1,4 @@
-type Transit_Struct{T}
+mutable struct Transit_Struct{T}
   # Structure to hold arrays for transit:
   r :: T
   b :: T
