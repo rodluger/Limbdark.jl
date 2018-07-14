@@ -1,3 +1,5 @@
+include("compute_c_n.jl")
+
 function sqarea_triangle(x::Array{T,1}) where {T <: Real}
 # How to compute (twice) area squared of triangle with 
 # high precision (Goldberg 1991):
@@ -59,7 +61,7 @@ N_c = length(c_n)-1
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
 #if ~prealloc
-#  sn = zeros(typeof(r),N_c+1)
+sn = zeros(typeof(r),N_c+1)
 #end
 
 # Check for different cases:
@@ -133,7 +135,7 @@ sn[2] = s2(r,b)
 #if typeof(r) == Float64
 # Compute the J_v and I_v functions:
 #if ~prealloc
-#  Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
+Iv = zeros(typeof(k2),v_max+1); Jv = zeros(typeof(k2),v_max+1)
 #end
 if k2 > 0
   if (k2 < 0.5 || k2 > 2.0) # && v_max > 3
@@ -238,6 +240,14 @@ end
 #end
 #return c_n[1:n+1];dcdu[1:n+1,n]
 #end
+
+function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
+# Compute the c_n values from u_n:
+c_n = compute_c_n(u_n)
+# Pass c_n (without last two dummy values):
+flux = transit_poly_c(r,b,c_n)
+return flux
+end
 
 function transit_poly!(r::T,b::T,c_n::Array{T,1},dcdu::Array{T,2},dfdrbc::Array{T,1},dfdrbu::Array{T,1}) where {T <: Real}
 # Pass c_n (without last two dummy values):

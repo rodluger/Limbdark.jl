@@ -22,8 +22,16 @@ for j=t.n:-1:2
     t.c_n[j+1] = a_n[j+1]/(j+2)+t.c_n[j+3]
   end
 end
-t.c_n[2] = a_n[2]+3*t.c_n[4]
-t.c_n[1] = a_n[1]+2*t.c_n[3]
+if t.n >= 3
+  t.c_n[2] = a_n[2]+3*t.c_n[4]
+else
+  t.c_n[2] = a_n[2]
+end
+if t.n >= 2
+  t.c_n[1] = a_n[1]+2*t.c_n[3]
+else
+  t.c_n[1] = a_n[1]
+end
 return t.c_n
 end
 

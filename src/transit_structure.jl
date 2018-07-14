@@ -28,7 +28,7 @@ if iseven(n)
 else
   v_max = round(Int64,(n-1)/2)+2
 end
-trans = Transit_Struct{Float64}(r,b,u_n,n,v_max,
+trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zeros(T,n+1),    # c_n
   zeros(T,n+1),  # sn
   zeros(T,v_max+1),# Iv

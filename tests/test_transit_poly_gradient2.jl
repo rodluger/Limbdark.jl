@@ -1,5 +1,6 @@
 # Tests analytic differentiation on transit_poly.jl:
-include("../src/transit_poly.jl")
+#include("../src/transit_poly.jl")
+include("../src/transit_poly_struct.jl")
 #include("../src/dJv_seriesdk.jl")
 using PyPlot
 
@@ -17,8 +18,14 @@ function transit_poly_grad_num(r::T,b::T,u_n::Array{T,1},dq0::T) where {T <: Rea
   tp_minus = transit_poly(r_big-dq,b_big,u_big)
   tp_grad_big[1] = (tp_plus-tp_minus)*.5/dq
   tp_plus = transit_poly(r_big,b_big+dq,u_big)
-  tp_minus = transit_poly(r_big,b_big-dq,u_big)
-  tp_grad_big[2] = (tp_plus-tp_minus)*.5/dq
+  if b_big > dq
+    tp_minus = transit_poly(r_big,b_big-dq,u_big)
+    width = 2dq
+  else
+    tp_minus = tp
+    width = dq
+  end
+  tp_grad_big[2] = (tp_plus-tp_minus)/width
   for i=1:length(u_n)
     u_tmp = copy(u_big); u_tmp[i] += dq
     tp_plus = transit_poly(r_big,b_big,u_tmp)
@@ -30,10 +37,11 @@ return convert(Float64,tp),convert(Array{Float64,1},tp_grad_big)
 end
 
 function test_transit_poly_gradient2(u_n,test_name)
-#r0 = [0.01,.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]; n_u = length(u_n)
-r0 = [0.01,.1,0.5,0.999999,1.0,1.000001,2.0,10.,100.0]; n_u = length(u_n)
+r0 = [0.01,.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]; n_u = length(u_n)
+#r0 = [0.01,.1,0.5,0.999999,1.0,1.000001,2.0,10.,100.0]; n_u = length(u_n)
 #r0 = [1.0]; n_u = length(u_n)
-r0_name =["0.01","0.1","0.5","0.999999","1","1.000001","2","10","100"]
+#r0_name =["0.01","0.1","0.5","0.999999","1","1.000001","2","10","100"]
+r0_name =["0.01","0.1","0.5","0.99","1","1.01","2","10","100"]
 #r0_name =["1"]
 nb = 50
 
@@ -98,8 +106,8 @@ for i=1:length(r0)
     tp_big = transit_poly!(big(r),big(b[j]),big.(u_n),dfdrbu_big)
     tp_grad_grid_big[j,:]=dfdrbu_big
     test1 =  isapprox(dfdrbu,tp_grad_array,atol=1e-12)
+    println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-18")
     if ~test1
-      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-18")
       tp,tp_grad_array =  transit_poly_grad_num(r,b[j],u_n,1e-15)
       println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-15")
       test1 =  isapprox(dfdrbu,dfdrbu_big,atol=1e-13)

@@ -1,4 +1,5 @@
 include("transit_structure.jl")
+include("compute_c_n_struct.jl")
 include("s2.jl")
 include("IJv_derivative_struct.jl")
 
@@ -156,8 +157,34 @@ return flux
 end
 # That's it!
 
-function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
+function transit_poly!(r::T,b::T,u_n::Array{T,1},dfdrbu::Array{T,1}) where {T <: Real}
+t = transit_init(r,b,u_n,true)
+compute_c_n_grad!(t)
 # Pass c_n (without last two dummy values):
+flux = transit_poly_c!(t)
+# Now, transform derivaties from c to u:
+fill!(dfdrbu,zero(T))
+dfdrbu[1] = t.dfdrbc[1]  # r derivative
+dfdrbu[2] = t.dfdrbc[2]  # b derivative
+# u_n derivatives:
+for i=1:t.n, j=0:t.n
+  dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
+end
+return flux
+end
+
+function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
+t = transit_init(r,b,u_n,false)
+t.c_n = compute_c_n(t)
+# Pass c_n (without last two dummy values):
+return transit_poly_c!(t) 
+end
+
+function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
+# This function assumes that c_n has already been computed from u_n
+# (this can be used to save compute time when limb-darkening is fixed for
+# a range of radii/impact parameters).
+# Pass transit structure, and compute flux:
 flux = transit_poly_c!(t)
 # Now, transform derivaties from c to u:
 fill!(t.dfdrbu,zero(T))

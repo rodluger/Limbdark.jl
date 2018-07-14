@@ -67,8 +67,8 @@ for i=1:length(r0)
     tp_big = transit_poly!(big(r),big(b[j]),big.(u_n),dfdrbu_big)
     tp_grad_grid_big[j,:]=dfdrbu_big
     test1 =  isapprox(dfdrbu,tp_grad_array,atol=1e-12)
+#    println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-18")
     if ~test1
-#      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-18")
       tp,tp_grad_array =  transit_poly_grad_num(r,b[j],u_n,1e-15)
 #      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-15")
       test1 =  isapprox(dfdrbu,dfdrbu_big,atol=1e-13)

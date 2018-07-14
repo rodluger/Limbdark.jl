@@ -1,4 +1,6 @@
-include("../src/transit_poly.jl")
+#include("../src/compute_c_n_struct.jl")
+include("../src/transit_poly_struct.jl")
+#include("../src/transit_poly.jl")
 #nu = 2+ceil(Int64,rand()*20); r=rand(); b=rand()*(1+r); u = rand(nu); u *= rand()/sum(u)
 #r=rand(); b=rand()*(1+r); u = [0.,0.,0.,0.,1.0]; n=length(u)
 
