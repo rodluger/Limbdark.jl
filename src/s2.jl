@@ -99,22 +99,26 @@ else
       Em1mKdm = cel_bulirsch(k2,kc,one(T),one(T),zero(T)) # (E-(1-m)K)/m
       Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(b),3*k2c*(b-r)*(b+r))+
 #          cel_bulirsch(k2,kc,one(T),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
-          cel_bulirsch(k2,kc,one(T),-3+6r^2+2*b*r-fourbr,-k2c*fourbr))/(9*pi*sqrt(b*r))
-#          (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)/(9*pi*sqrt(b*r))
-      s2_grad[1] = -cel_bulirsch(k2,kc,one(T),2r*onembmr2,zero(r))/(sqrt(b*r))
-#      s2_grad[1] = -2r*onembmr2*Em1mKdm/(sqrt(b*r))
-      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,onembpr2/b)/(3*sqrt(b*r))
+#          cel_bulirsch(k2,kc,one(T),-3+6r^2+2*b*r-fourbr,-k2c*fourbr))/(9*pi*sqrt(b*r))
+          (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)/(9*pi*sqrt(b*r))
+#      s2_grad[1] = -cel_bulirsch(k2,kc,one(T),2r*onembmr2,zero(r))/(sqrt(b*r))
+      s2_grad[1] = -2r*onembmr2*Em1mKdm/(sqrt(b*r))
+#      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,onembpr2/b)/(3*sqrt(b*r))
 #      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,-4r*k2c)/(3*sqrt(b*r))
+      s2_grad[2] = onembmr2*(-2r*Em1mKdm+ 4r*Eofk)/(3*sqrt(b*r))
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
       k2inv = inv(k2); k2c =onembpr2/onembmr2; kc = sqrt(k2c)
       Eofk = cel_bulirsch(k2inv,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
+      Em1mKdm = cel_bulirsch(k2inv,kc,one(T),one(T),zero(T)) # (E-(1-m)K)/m
       bmrdbpr = (b-r)/(b+r); 
       mu = 3bmrdbpr/onembmr2
       p = bmrdbpr^2*onembpr2/onembmr2
       Lambda1 = 2*sqrt(onembmr2)*(onembpr2*cel_bulirsch(k2inv,kc,p,1.0+mu,p+mu)
              -(4-7r^2-b^2)*Eofk)/(9*pi)
-      s2_grad[1] = -4*r*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(T),one(T),k2c)
-      s2_grad[2] = -4*r/3*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(T),-one(T),k2c)
+#      s2_grad[1] = -4*r*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(T),one(T),k2c)
+      s2_grad[1] = -4*r*sqrt(onembmr2)*Eofk
+#      s2_grad[2] = -4*r/3*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(T),-one(T),k2c)
+      s2_grad[2] = -4*r/3*sqrt(onembmr2)*(Eofk - 2*Em1mKdm)
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
       Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(typeof(b),r>.5) 
