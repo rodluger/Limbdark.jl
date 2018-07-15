@@ -105,7 +105,7 @@ else
       s2_grad[1] = -2r*onembmr2*Em1mKdm/(sqrt(b*r))
 #      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,onembpr2/b)/(3*sqrt(b*r))
 #      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,-4r*k2c)/(3*sqrt(b*r))
-      s2_grad[2] = onembmr2*(-2r*Em1mKdm+ 4r*Eofk)/(3*sqrt(b*r))
+      s2_grad[2] = 2r*onembmr2*(-Em1mKdm+2*Eofk)/(3*sqrt(b*r))
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
       k2inv = inv(k2); k2c =onembpr2/onembmr2; kc = sqrt(k2c)
       Eofk = cel_bulirsch(k2inv,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind

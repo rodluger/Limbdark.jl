@@ -3,7 +3,6 @@ include("compute_c_n_struct.jl")
 include("s2.jl")
 include("IJv_derivative_struct.jl")
 
-
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # How to compute (twice) area squared of triangle with 
 # high precision (Goldberg 1991):
@@ -36,7 +35,6 @@ end
 # of the star is unity.
 
 function transit_poly_c(t::Transit_Struct{T}) where {T <: Real}
-r=t.r; b=t.b; n = t.n
 # Number of limb-darkening components to include (beyond 0 and 1):
 # We are parameterizing these with the function:
 # g_n = c_n [(n+2) z^n - n z^{n-2}] for n >= 2
@@ -44,7 +42,9 @@ r=t.r; b=t.b; n = t.n
 # which gives a Green's integral of:
 # P(G_n) = \int_{\pi-\phi}^{2\pi+\phi} (1-r^2-b^2-2br s_\varphi)^{n/2} (r+b s_\varphi) d\varphi
 # for which we have a solution in terms of I_v (for even n) and J_v (for odd n).
-
+# The variable "t" is a structure which contains transit parameters
+# and intermediate quantities computed from these:
+r=t.r; b=t.b; n = t.n
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
 
