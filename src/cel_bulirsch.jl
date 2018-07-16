@@ -1,6 +1,6 @@
 # Computes the function cel(kc,p,a,b) from Bulirsch (1969).
 function cel_bulirsch(k2::T,p::T,a::T,b::T) where {T <: Real}
-@assert (k2 <= 1.0)
+@assert (k2 <= one(T))
 ca = sqrt(eps(k2))
 # Avoid undefined k2=1 case:
 if k2 != 1.0
@@ -27,13 +27,13 @@ end
 if iter == itmax
   println("k2 ",k2," kc ",kc,"abs(g-kc) ",abs(g-kc)," g*ca ",g*ca)
 end
-return pi/2*(a*m+b)/(m*(m+p))
+return 0.5*pi*(a*m+b)/(m*(m+p))
 end
 
 # Version called with kc (this is to improve precision of computation):
 function cel_bulirsch(k2::T,kc::T,p::T,a::T,b::T) where {T <: Real}
 #println("cel ",k2," ",kc," ",p," ",a," ",b)
-@assert (k2 <= 1.0)
+@assert (k2 <= one(T))
 ca = sqrt(eps(k2))
 # Avoid undefined k2=1 case:
 if k2 == 1.0 || kc == 0.0
@@ -52,11 +52,21 @@ end
 f=a; a += b/p; g=ee/p; b += f*g; b +=b; p +=g; g=m; m += kc
 iter = 0; itmax = 50
 while abs(g-kc) > g*ca && iter < itmax
-  kc=sqrt(ee); kc += kc; ee = kc*m
-  f=a; a += b/p; g=ee/p; b += f*g; b +=b; p +=g; g=m; m += kc; iter +=1
+  kc=sqrt(ee)
+  kc += kc 
+  ee = kc*m
+  f=a
+  a += b/p
+  g=ee/p
+  b += f*g
+  b +=b
+  p +=g
+  g=m
+  m += kc
+  iter +=1
 end
 if iter == itmax
-  println("k2 ",k2," kc ",kc," abs(g-kc) ",abs(g-kc)," g*ca ",g*ca," cel ",pi/2*(a*m+b)/(m*(m+p)))
+  println("k2 ",k2," kc ",kc," abs(g-kc) ",abs(g-kc)," g*ca ",g*ca," cel ",0.5*pi*(a*m+b)/(m*(m+p)))
 end
-return pi/2*(a*m+b)/(m*(m+p))
+return 0.5*pi*(a*m+b)/(m*(m+p))
 end

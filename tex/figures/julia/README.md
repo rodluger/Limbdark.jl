@@ -5,7 +5,7 @@ as follows:
 
 1).  Compile code from the prompt with:
 
-tests$ gfortran -ffixed-line-length-none ntiq-fortran.f -o ntiq-fortran
+tests$ gfortran -O3 -ffixed-line-length-none ntiq-fortran.f -o ntiq-fortran
 
 2).  Run the program:
 

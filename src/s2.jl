@@ -3,7 +3,7 @@ include("cel_bulirsch.jl")
 
 function s2(r::T,b::T) where {T <: Real}
 # For now, just compute linear component:
-Lambda1 = zero(typeof(b))
+Lambda1 = zero(T)
 if b >= 1.0+r ||  r == 0.0
   # No occultation:
   Lambda1 = zero(b)  # Case 1
@@ -45,12 +45,12 @@ else
              -(4-7r^2-b^2)*Eofk)/(9*pi)
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
-      Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(typeof(b),r>.5) -
+      Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(T,r>.5) -
           8/(3pi)*(r+b-1)*r*sqrt(r*(1-r)) # Adding in first derivatives
     end
   end
 end
-flux = 1.0-1.5*Lambda1-convert(typeof(b),r>b)
+flux = 1.0-1.5*Lambda1-convert(T,r>b)
 return flux*2pi/3
 end
 
@@ -58,7 +58,7 @@ function s2!(r::T,b::T,s2_grad::Array{T,1}) where {T <: Real}
 # Computes the linear limb-darkening case, as well as the gradient,
 # s2_grad=[ds_2/dr,ds_2/db] is a pre-allocated two-element array.
 # For now, just compute linear component:
-Lambda1 = zero(typeof(b))
+Lambda1 = zero(T)
 fill!(s2_grad,zero(r))
 if b >= 1.0+r ||  r == 0.0
   # No occultation:
@@ -121,12 +121,12 @@ else
       s2_grad[2] = -4*r/3*sqrt(onembmr2)*(Eofk - 2*Em1mKdm)
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
-      Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(typeof(b),r>.5) 
+      Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(T,r>.5) 
       s2_grad[1] = -8*r*sqrt(r*(1-r))
       s2_grad[2] = -s2_grad[1]/3
     end
   end
 end
-flux = 1.0-1.5*Lambda1-convert(typeof(b),r>b)
+flux = 1.0-1.5*Lambda1-convert(T,r>b)
 return flux*2pi/3
 end
