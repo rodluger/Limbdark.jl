@@ -14,7 +14,7 @@ function s2_grad_func(r::T,b::T) where {T <: Real}
   function diff_s2(x::Array{T,1}) where {T <: Real}
   # x should be a two-element vector with values [r,b]
   rc,bc = x
-  s2c,Eofk,Em1mKdm = s2(rc,bc)
+  s2c= s2(rc,bc)
   return s2c
   end
 
@@ -42,14 +42,14 @@ dq = big(1e-18)
 # Make BigFloat versions of r & b:
 r_big = big(r); b_big = big(b)
 # Compute s_n to BigFloat precision:
-s_2_big,Eofk,Em1mKdm = s2(r_big,b_big)
+s_2_big= s2(r_big,b_big)
 # Now, compute finite differences:
 s2_grad_big= zeros(BigFloat,2)
-s2_plus,Eofk,Em1mKdm = s2(r_big+dq,b_big)
-s2_minus,Eofk,Em1mKdm = s2(r_big-dq,b_big)
+s2_plus= s2(r_big+dq,b_big)
+s2_minus= s2(r_big-dq,b_big)
 s2_grad_big[1] = (s2_plus-s2_minus)*.5/dq
-s2_plus,Eofk,Em1mKdm=s2(r_big,b_big+dq)
-s2_minus,Eofk,Em1mKdm=s2(r_big,b_big-dq)
+s2_plus=s2(r_big,b_big+dq)
+s2_minus=s2(r_big,b_big-dq)
 s2_grad_big[2] = (s2_plus-s2_minus)*.5/dq
 return convert(Float64,s_2_big),convert(Array{Float64,1},s2_grad_big)
 end
@@ -145,7 +145,7 @@ for i=1:length(r0)
     s2_big,s2_grad_numeric = s2_grad_num(r,b[j])
     s2_grid_big[j]=s2_big
     s2_jac_grid_num[j,:]= s2_grad_numeric
-    println("r: ",r," b: ",b[j]," s2: ",s_2," s2_big: ",s2_big)
+#    println("r: ",r," b: ",b[j]," s2: ",s_2," s2_big: ",s2_big)
     @test isapprox(s_2,s2_big,atol=1e-8)
     @test isapprox(s2_grad_ana[1],s2_grad_numeric[1],atol=1e-8)
     @test isapprox(s2_grad_ana[2],s2_grad_numeric[2],atol=1e-8)

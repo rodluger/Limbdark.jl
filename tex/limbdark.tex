@@ -9,39 +9,34 @@
 \setlength{\belowdisplayskip}{1.5em}
 
 \title{%
-Analytic Transit Light Curves for Limb-Darkened Stars
+Analytic Transit Light Curves for Limb-Darkened Stars with Polynomial Dependence
 }
 
+
+\author[0000-0002-0802-9145]{Eric Agol}\altaffiliation{Guggenheim Fellow}
 \author[0000-0002-0296-3826]{Rodrigo Luger}
-\affil{Department~of~Astronomy, University~of~Washington, Seattle, WA}
-\author{Eric Agol}
 \affil{Department~of~Astronomy, University~of~Washington, Seattle, WA}
 
 \keywords{methods: analytic --- techniques: photometric}
 
 \begin{abstract}
  We derive analytic, closed-form solutions for the light curve of a planet 
- transiting a star with a limb darkening profile of
- arbitrary integer order.  We provide updated analytic expressions for the
+ transiting a star with a limb darkening profile which is a polynomial function 
+ up to arbitrary integer order.  We provide updated analytic expressions for the
  uniform and linear limb darkened cases, as well as new expressions
  for higher order integer powers.  The formulae are crafted to be numerically 
- stable over the expected range of usage.  We additionally present formulae for 
+ stable over the expected range of usage.  We additionally present formulae for
  the partial derivatives of instantaneous flux with respect to the radius ratio,
  impact parameter, and limb-darkening parameters.  Our expressions are rapid to 
- evaluate, allow for the integration over exposure time adaptively, and
- can be used to accurately compute the first partial derivatives of transit
- light curves.
+ evaluate and can be used to accurately compute the first partial derivatives of 
+ transit light curves.
 \end{abstract}
 
-% ==============================================================================
-% ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 %
 \section{Introduction}
 \label{sec:intro}
 % ------------------------------------------------------------------------------
-% ------------------------------------------------------------------------------
-% ==============================================================================
 
 The precise measurement of the transits of an exoplanet offers a host of information
 about the planet's properties.  To start with, the times of transit give
@@ -1011,7 +1006,12 @@ while downward recursion is more stable for $k^2 < \tfrac{1}{2}$ and $k^2 > 2$. 
 requires computing the derivatives, $\frac{\partial \mathcal{J}_v}{\partial k}$, first 
 for large values of $v$. Rather than using the integral or Hypergeometric functions given
 above, we accomplish this by differentiating each term the series expansion for 
-$\mathcal{J}_v$ with respect to $k$.  TBD
+$\mathcal{J}_v$ with respect to $k$.  This is given by
+\begin{equation}
+    \label{eq:Jlargek}
+\frac{\partial \mathcal{J}_v}{\partial k} 
+=             \pi \sum_{j=0}^\infty (-1)^j \binom{3/2}{j} \frac{(2j+2v-1)!!}{2^{j+v} (j+v)!} (-2j)k^{-2j-1}.
+\end{equation}
 
 With the computation of $s_n = -\mathcal{P}(\bvec{G}_n)$ for $n \ge 2$, we then
 compute the derivatives of the light curve as 
@@ -1037,6 +1037,51 @@ chain rule.  Then, the light curve derivatives are given by
 \begin{eqnarray}
 \frac{\partial F/F_0}{\partial u_i} =  \sum_{j} \frac{\partial F/F_0}{\partial c_j}\frac{\partial c_j}{\partial u_i}.
 \end{eqnarray}
+
+\section{Benchmarking}\label{sec:benchmark}
+
+We have measured the performance of the limb-darkened light curves
+with derivatives as a function of the number of computed data points
+and as a function of the number of limb-darkening coefficients.  We
+have computed the timing for $r=0.1$ and for a number of impact
+parameters ranging from $10^2$ to $10^6$, and the number of limb-darkening
+coefficients ranging from $1$ to $89$.  For each set of timing benchmark
+parameters, we carried out nine measurements  of the timing, and
+we use the median of these for plotting purposes.  The benchmarking
+for the \texttt{Julia} code was carried out with \texttt{v0.7} of
+Julia on a MacBook Pro with 2.8 GHz Intel Core i7.
+No sub-sampling was carried out in this computation.
+
+Figure \ref{fig:ncoeff} shows that the time dependence is linear with the
+number of $b$ values (which is equivalent to the number of data points
+in the light curve).  The linear scaling with time holds for each value of
+the number of limb-darkening coefficients.  
+
+Figure \ref{fig:nlimb} shows that the time dependence scales approximately
+as $n^{1/3}$.  As with the number of light-curve points, we have taken
+the median over nine measurements for each set of parameters.  We then
+scaled the timing to the single-coefficient case, and took a second
+median over the number of light curve points as the cube-root scaling scales 
+about the same with different numbers of points in the light curve.
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/benchmark_poly_transit.pdf}
+    \caption{Scaling of the computation time in seconds with the number of
+    data points in the light curve for $r=0.1$ with $b$ ranging from $0$ to $1.2$.}
+    \label{fig:ncoeff}
+    \end{centering}
+\end{figure}
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/benchmark_limbdark_timing.pdf}
+    \caption{Scaling of the computation time with the number of
+    limb-darkening coeffients.  The $y$-axis scales the timing with respect
+    to the timing for a single limb-darkening coefficient.}
+    \label{fig:nlimb}
+    \end{centering}
+\end{figure}
 
 \section{Comparison with other work} \label{sec:comparison}
 
@@ -1068,7 +1113,7 @@ parameter space.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_MA2002_linear.pdf}
-    \caption{Comparison of Mandel \& Agol (2002) with Luger \& Agol (2018).}
+    \caption{Comparison of Mandel \& Agol (2002) with Agol \& Luger (2018).}
     \label{fig:compareMA}
     \end{centering} 
 \end{figure}
@@ -1088,38 +1133,126 @@ which in practice we find can be both less precise and slower to
 evaluate than the \citet{Bulirsch1965a} code for computing elliptic
 integrals.
 
-{\color{red} Compare the speed of evaluation as well. Right now,
-the Pal computation takes 0.96 seconds to compute $10^6$ models
-while the transit\_poly.jl takes 3.5 seconds.  There is probably
-some room for further optimization of the code.}
+We have also compared the evaluation speed of our code with P\'al's as well.
+We compiled P\'al's code using \texttt{gfortrans -O3}, and found that
+the computation of quadratic limb-darkened light curves and
+derivatives takes an average of 0.52 seconds to compute $10^6$ models. 
+while the \texttt{transit\_poly\_struct.jl} takes an average of 0.29 seconds, 
+giving our Julia code a 44\% speed advantage over the Fortran code;
+we have yet to optimize all aspects of the code, so there may be room
+for improvement on this benchmark.
 
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_pal_r0pt1.pdf}
-    \caption{Comparison of \citet{Pal2008} with Luger \& Agol (2018).}
+    \caption{Comparison of \citet{Pal2008} with Agol \& Luger (2018).}
     \label{fig:Pal_comparison}
     \end{centering} 
 \end{figure}
-
 
 \begin{itemize}
 \item Compare with Gimenez for speed and accuracy for higher order limb-darkening. [ ]
 \item Compare with Batman for speed and accuracy. [ ]
 \item Compare derivatives with Pal for speed and accuracy. [x]
 \item Show the scaling with the number of points in the light curve
-and with the number of limb-darkening components. [ ]
+and with the number of limb-darkening components. [x]
 \end{itemize}
-
 
 \section{Discussion}
 
+Any model for the surface brightness of a star can only be approximate:  most stars 
+are convective, rotationally-oblate, spotted, oscillating, flaring, etc.  The
+model we have presented, then, will only resemble any given star to
+a precision which is limited by the lack of uniformity of the actual stellar surface.
+This begs the question of why a numerically precise model is required for
+modelling transit light curves.  The answer is computational stability:
+this more accurate model can be used over all of parameter speace, and the
+high precision enables computation of derivatives which are beneficial when
+optimizing model parameters, computing the Fisher information matrix, or
+deriving parameter posteriors with MCMC.
+
+The imprecision of the model can be absorbed into noise models that account
+for outliers or account for correlations in the noise.  Since we are limited
+in the knowledge of the properties of any given star, the discrepancies of
+an azimuthally-symmetric limb-darkened model can be treated as a source
+of noise.
+
+Example applications:  
+\begin{enumerate}
+\item optimization with and without analytic derivatives;
+\item fitting to stellar limb-darkening models;
+\item time integrated model with derivatives;
+\item HMC.
+\end{enumerate}
+
 \section{Conclusions}
 
+We have presented an analytic model for the transits, occultations, and
+eclipses of limb-darkened bodies with a polynomial dependence of the limb-darkening
+on the $z$ component of the stellar surface (or, alternatively, the
+cosine of the angle from the sub-stellar point).  The model is more precise
+and accurate than prior models, especially in special limits such as
+the points of contact, and the coincidence of the edge of the occultor
+with the center of the source.  The model also compares favorably in
+speed of evaluation, about a factor of two faster than the code due
+to \citet{Pal2008}, XXX faster than Gimenez, YYY faster than batman,
+and ZZZ faster than ExoFast.
+
+We expect that this code may be used both as a workhorse model for
+general fitting of transit models, as well as a tool for more 
+specialized applications, such as photodynamical modeling of
+interacting planets, triple stars, and transiting circumbinary planets.
+{\color{red} Add references for these use cases.}
+
+The code is open source, and has two versions:  one of which is a part
+of the \starry package, \texttt{http://github.com/luger/starry/}, written
+in a combination of C++ and Python, and a new code written in Julia as
+part of the development of the equations in this paper,
+\texttt{http://github.com/luger/limbdark/}.
 
 \acknowledgements
+
+We thank Andr\'as P\'al for sharing his Fortran code, \texttt{ntiq-fortran.f}.
+We thank Andr\'as P\'al, Kevin Stevenson, Kai Ueltzh\"offer, Mario Damasso,
+Matthew Heising, Robert Morehead, and Laura Kreidberg for pointing out
+errors or inaccuracies in the Mandel \& Agol paper and code, which we have
+hopefully rectified in this paper. 
+E.A. acknowledges NSF grant AST-1615315, NASA grant NNX14AK26G and from 
+the NASA Astrobiology Institute's Virtual Planetary Laboratory Lead Team, 
+funded through the NASA Astrobiology Institute under solicitation NNH12ZDA002C 
+and Cooperative Agreement Number NNA13AA93A.
 
 \bibliography{limbdark}
 
 \appendix
+
+Here are a list of errata for \citet{MandelAgol2002}:
+\begin{enumerate}
+\item In equation 7, $\lambda_4$ should read $E(2p)$ and $K(2p)$,
+{\it not} $E(2k)$ and $K(2k)$.  This mistake is not present in the code.
+
+\item In equation 7, $\lambda_3$ should read $E(1/2p)$ and $K(1/2p)$,
+{\it not} $E(1/2k)$ and $K(1/2k)$.  This mistake is also not present in the code.
+
+\item In equation 7, $\lambda_5$ should read:
+$\lambda_5 = \frac{2}{3\pi}\cos^{-1}(1-2p)-\frac{4}{9\pi}(3+2p-8p^2)
+\sqrt{p(1-p)} - \frac{2}{3}\Theta(p-1/2)$.
+
+(The last term cancels the $\Theta(p-z)$ term in the expression for $F$
+just before equation 7).  This mistake is also not present in the code.
+
+\item For Case 11 in Table 1, $\eta^d$ should be 1/2, not 1, and
+$\lambda^d$ should be zero, not 1.  This mistake affects the code,
+but it is never encountered for planets that transit main-sequence
+stars since $p<1$.  This typo was discussed in \citet{Eastman2013}.
+
+\item The case $z=1-p$ is missing for $z<p$ (as pointed out by
+Pal 2008).  This case is rarely encountered as it is a set
+of measure zero.
+
+\item There is a $\pi$ missing in the denominator of the second term
+on the right hand side of equation (8).  This mistake is not
+present in the code.
+\end{enumerate}
 
 \end{document}

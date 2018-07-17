@@ -32,7 +32,7 @@ function sn_jac(l_max::Int64,r::T,b::T) where {T <: Real}
   sn_jacobian = DiffResults.jacobian(out)
   # Add in s2:
   s2_grad=zeros(typeof(r),2)
-  s_2=s2!(r,b,s2_grad)
+  s_2,Eofk,Em1mKdm=s2!(r,b,s2_grad)
   sn_jacobian[3,:]=s2_grad
 return sn,sn_jacobian
 end

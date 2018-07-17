@@ -13,8 +13,8 @@ include("transit_poly_struct.jl")
 # Instantiate a transit with r=0.1, b=0.5, u_n=[0.2,0.3]:
 trans = transit_init(0.1,0.5,[0.2,0.3],true)
 
-# Transform from u_n to c_n coefficients:
-compute_c_n_grad!(trans)
+# Transform from u_n to c_n coefficients (this is now added to transit_init function):
+#compute_c_n_grad!(trans) 
 
 # Load in PyPlot (Julia matplotlib wrapper):
 using PyPlot

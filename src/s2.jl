@@ -2,6 +2,11 @@
 include("cel_bulirsch.jl")
 
 function s2(r::T,b::T) where {T <: Real}
+s_2,Eofk,Em1mKdm = s2_ell(r,b)
+return s_2
+end
+
+function s2_ell(r::T,b::T) where {T <: Real}
 # For now, just compute linear component:
 Eofk = zero(T)
 Em1mKdm = zero(T)
@@ -116,11 +121,10 @@ else
       m = 4r^2; minv = inv(m); kc = sqrt(1.-minv)
       Eofk = cel_bulirsch(minv,one(T),one(T),1-minv)
       Em1mKdm = cel_bulirsch(minv,one(T),one(T),zero(T))
-#      Lambda1 = 1/3+1/(9pi*r)*(Eofk + (minv-4)*Em1mKdm)  # Case 7
       Lambda1 = 1/3+1/(9pi*r)*(-m*Eofk + (2m-3)*Em1mKdm)  # Case 7
       s2_grad[1] = -2*Em1mKdm # dLambda/dr
       s2_grad[2] =  2/3*(2*Eofk-Em1mKdm)  # dLambda/db
-#      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,kc,one(T),minv-3,1-minv)  # Case 7
+#      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,kc,one(T),m-3,1-m)  # Case 7
 #      s2_grad[1] = -2*cel_bulirsch(minv,kc,one(T),one(T),zero(T)) # dLambda/dr
 #      s2_grad[2] =  2/3*cel_bulirsch(minv,kc,one(T),one(T),2*(1-minv)) # dLambda/db
     end

@@ -43,5 +43,6 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zeros(T,n+3),    # dfdrbc
   zeros(T,n+2)     # dfdrbu
 )
+compute_c_n_grad!(trans)
 return trans
 end

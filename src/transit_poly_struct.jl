@@ -106,7 +106,7 @@ else
   t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
   kck = kite_area2/(4*b*r)
 end
-t.sn[2],Eofk,Em1mKdm = s2(r,b)
+t.sn[2],Eofk,Em1mKdm = s2_ell(r,b)
 # Compute the J_v and I_v functions:
 if k2 > 0
   if k2 < 0.5 || k2 > 2.0
@@ -159,7 +159,7 @@ end
 
 function transit_poly!(r::T,b::T,u_n::Array{T,1},dfdrbu::Array{T,1}) where {T <: Real}
 t = transit_init(r,b,u_n,true)
-compute_c_n_grad!(t)
+#compute_c_n_grad!(t) #This is now included in transit_init function
 # Pass c_n (without last two dummy values):
 flux = transit_poly_c!(t)
 # Now, transform derivaties from c to u:
@@ -175,7 +175,7 @@ end
 
 function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
 t = transit_init(r,b,u_n,false)
-t.c_n = compute_c_n(t)
+#t.c_n = compute_c_n(t) #This is now included in transit_init function
 # Pass c_n (without last two dummy values):
 return transit_poly_c!(t) 
 end
