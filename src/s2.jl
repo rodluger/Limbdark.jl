@@ -3,6 +3,8 @@ include("cel_bulirsch.jl")
 
 function s2(r::T,b::T) where {T <: Real}
 # For now, just compute linear component:
+Eofk = zero(T)
+Em1mKdm = zero(T)
 Lambda1 = zero(T)
 if b >= 1.0+r ||  r == 0.0
   # No occultation:
@@ -14,17 +16,29 @@ else
   if b == 0 
 #    Lambda1 = -2/3*sqrt(1.0-r^2)^3 # Case 10
     Lambda1 = -2/3*sqrt(1.0-r^2)^3 # Case 10
+    Eofk = .5*pi
+    Em1mKdm = .25*pi
   elseif b==r
     if r == 0.5
       Lambda1 = 1/3-4/(9pi) - 2*(b-0.5)/(3*pi) +2*(r-0.5)/pi # Case 6; I've added in analytic first derivaties.
+      Eofk = one(T)
+      Em1mKdm = one(T)
     elseif r < 0.5
       m = 4r^2
-      Lambda1 = 1/3+2/(9pi)*cel_bulirsch(m,one(T),m-3,(1-m)*(2m-3)) + # Case 5
-        (b-r)*4*r/(3pi)*cel_bulirsch(m,one(T),-one(T),1-m)  # Adding in first derivative
+      Eofk = cel_bulirsch(m,one(T),one(T),1-m)
+      Em1mKdm = cel_bulirsch(m,one(T),one(T),zero(T))
+      Lambda1 = 1/3+2/(9pi)*((2m-3)*Eofk - m*Em1mKdm)+ # Case 5
+        (b-r)*4*r/(3pi)*(Eofk-2*Em1mKdm)  # Adding in first derivative
+#      Lambda1 = 1/3+2/(9pi)*cel_bulirsch(m,one(T),m-3,(1-m)*(2m-3)) + # Case 5
+#        (b-r)*4*r/(3pi)*cel_bulirsch(m,one(T),-one(T),1-m)  # Adding in first derivative
     else
       m = 4r^2; minv = inv(m)
-      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,one(T),m-3,1-m) - # Case 7
-        (b-r)*2/(3pi)*cel_bulirsch(minv,one(T),one(T),2*(1-minv)) # Adding in first derivative
+      Eofk = cel_bulirsch(minv,one(T),one(T),1-minv)
+      Em1mKdm = cel_bulirsch(minv,one(T),one(T),zero(T))
+#      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,one(T),m-3,1-m) - # Case 7
+#        (b-r)*2/(3pi)*cel_bulirsch(minv,one(T),one(T),2*(1-minv)) # Adding in first derivative
+      Lambda1 = 1/3+1/(9pi*r)*(-m*Eofk + (2m-3)*Em1mKdm) - # Case 7
+        (b-r)*2/(3pi)*(2*Eofk-Em1mKdm) # Adding in first derivative
     end
   else
 #    onembpr2 = 1-(b+r)^2; onembmr2=1-(b-r)^2; fourbr = 4b*r
@@ -33,31 +47,39 @@ else
 #    k2 = onembmr2/fourbr
     if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
       k2c = -onembpr2/fourbr; kc = sqrt(k2c); sqbr=sqrt(b*r)
-      Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(T),3*k2c*(b-r)*(b+r))+
-          cel_bulirsch(k2,kc,one(T),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
+      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(T),one(T),one(T),3*k2c*(b-r)*(b+r),k2c,zero(T))
+      Lambda1 = onembmr2*(Piofk+ (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)/(9*pi*sqrt(b*r))
+#      Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(T),3*k2c*(b-r)*(b+r))+
+#          cel_bulirsch(k2,kc,one(T),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
       k2inv = inv(k2); k2c =onembpr2/onembmr2; kc = sqrt(k2c)
-      Eofk = cel_bulirsch(k2inv,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
-      bmrdbpr = (b-r)/(b+r); 
+#      Eofk = cel_bulirsch(k2inv,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
+      bmrdbpr = (b-r)/(b+r)
       mu = 3bmrdbpr/onembmr2
       p = bmrdbpr^2*onembpr2/onembmr2
-      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*cel_bulirsch(k2inv,kc,p,1.0+mu,p+mu)
-             -(4-7r^2-b^2)*Eofk)/(9*pi)
+      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2inv,kc,p,1+mu,one(T),one(T),p+mu,k2c,zero(T))
+      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)/(9*pi)
+#      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*cel_bulirsch(k2inv,kc,p,1.0+mu,p+mu)
+#             -(4-7r^2-b^2)*Eofk)/(9*pi)
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
       Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(T,r>.5) -
           8/(3pi)*(r+b-1)*r*sqrt(r*(1-r)) # Adding in first derivatives
+      Eofk = one(T)
+      Em1mKdm = one(T)
     end
   end
 end
 flux = 1.0-1.5*Lambda1-convert(T,r>b)
-return flux*2pi/3
+return flux*2pi/3,Eofk,Em1mKdm
 end
 
 function s2!(r::T,b::T,s2_grad::Array{T,1}) where {T <: Real}
 # Computes the linear limb-darkening case, as well as the gradient,
 # s2_grad=[ds_2/dr,ds_2/db] is a pre-allocated two-element array.
 # For now, just compute linear component:
+Eofk = zero(T)
+Em1mKdm = zero(T)
 Lambda1 = zero(T)
 fill!(s2_grad,zero(T))
 if b >= 1.0+r ||  r == 0.0
@@ -72,21 +94,35 @@ else
     sqrt1mr2 = sqrt(1.0-r^2)
     Lambda1 = -2/3*sqrt1mr2^3 # Case 10
     s2_grad[1] = -2pi*r*sqrt1mr2 # dLambda/dr (dLambda/db= 0)
+    Eofk = .5*pi
+    Em1mKdm = .25*pi
   elseif b==r
     if r == 0.5
       Lambda1 = 1/3-4/(9pi) # Case 6; added in analytic first derivaties.
       s2_grad[1] = -2      # dLambda/dr
       s2_grad[2] =  2/3  # dLambda/db
+      Eofk = one(T)
+      Em1mKdm = one(T)
     elseif r < 0.5
       m = 4r^2
-      Lambda1 = 1/3+2/(9pi)*cel_bulirsch(m,one(T),m-3,(1-m)*(2m-3))  # Case 5
-      s2_grad[1] = -4*r*cel_bulirsch(m,one(T),one(T),1-m)      # Adding in first derivative dLambda/dr
-      s2_grad[2] = -4*r/3*cel_bulirsch(m,one(T),-one(T),1-m) # Adding in first derivative dLambda/db
+      Eofk = cel_bulirsch(m,one(T),one(T),1-m)
+      Em1mKdm = cel_bulirsch(m,one(T),one(T),zero(T))
+      Lambda1 = 1/3+2/(9pi)*((2m-3)*Eofk - m*Em1mKdm) # Case 5
+#      Lambda1 = 1/3+2/(9pi)*cel_bulirsch(m,one(T),m-3,(1-m)*(2m-3))  # Case 5
+#      s2_grad[1] = -4*r*cel_bulirsch(m,one(T),one(T),1-m)      # Adding in first derivative dLambda/dr
+      s2_grad[1] = -4*r*Eofk      # Adding in first derivative dLambda/dr
+      s2_grad[2] = -4*r/3*(Eofk-2*Em1mKdm) # Adding in first derivative dLambda/db
     else
       m = 4r^2; minv = inv(m); kc = sqrt(1.-minv)
-      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,kc,one(T),m-3,1-m)  # Case 7
-      s2_grad[1] = -2*cel_bulirsch(minv,kc,one(T),one(T),zero(T)) # dLambda/dr
-      s2_grad[2] =  2/3*cel_bulirsch(minv,kc,one(T),one(T),2*(1-minv)) # dLambda/db
+      Eofk = cel_bulirsch(minv,one(T),one(T),1-minv)
+      Em1mKdm = cel_bulirsch(minv,one(T),one(T),zero(T))
+#      Lambda1 = 1/3+1/(9pi*r)*(Eofk + (minv-4)*Em1mKdm)  # Case 7
+      Lambda1 = 1/3+1/(9pi*r)*(-m*Eofk + (2m-3)*Em1mKdm)  # Case 7
+      s2_grad[1] = -2*Em1mKdm # dLambda/dr
+      s2_grad[2] =  2/3*(2*Eofk-Em1mKdm)  # dLambda/db
+#      Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,kc,one(T),minv-3,1-minv)  # Case 7
+#      s2_grad[1] = -2*cel_bulirsch(minv,kc,one(T),one(T),zero(T)) # dLambda/dr
+#      s2_grad[2] =  2/3*cel_bulirsch(minv,kc,one(T),one(T),2*(1-minv)) # dLambda/db
     end
   else
 #    onembpr2 = 1-(b+r)^2; onembmr2=1-(b-r)^2; fourbr = 4b*r
@@ -99,10 +135,9 @@ else
 #      Eofk = cel_bulirsch(k2,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
 #      Em1mKdm = cel_bulirsch(k2,kc,one(T),one(T),zero(T)) # (E-(1-m)K)/m
 #      Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(T),3*k2c*(b-r)*(b+r))+
-      Lambda1 = onembmr2*(Piofk+
+      Lambda1 = onembmr2*(Piofk+ (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)/(9*pi*sqrt(b*r))
 #          cel_bulirsch(k2,kc,one(T),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
 #          cel_bulirsch(k2,kc,one(T),-3+6r^2+2*b*r-fourbr,-k2c*fourbr))/(9*pi*sqrt(b*r))
-          (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)/(9*pi*sqrt(b*r))
 #      s2_grad[1] = -cel_bulirsch(k2,kc,one(T),2r*onembmr2,zero(T))/(sqrt(b*r))
       s2_grad[1] = -2r*onembmr2*Em1mKdm/(sqrt(b*r))
 #      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,onembpr2/b)/(3*sqrt(b*r))
@@ -116,9 +151,8 @@ else
       mu = 3bmrdbpr/onembmr2
       p = bmrdbpr^2*onembpr2/onembmr2
       Piofk,Eofk,Em1mKdm = cel_bulirsch(k2inv,kc,p,1+mu,one(T),one(T),p+mu,k2c,zero(T))
+      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)/(9*pi)
 #      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*cel_bulirsch(k2inv,kc,p,1.0+mu,p+mu)
-      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk
-             -(4-7r^2-b^2)*Eofk)/(9*pi)
 #      s2_grad[1] = -4*r*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(T),one(T),k2c)
       s2_grad[1] = -4*r*sqrt(onembmr2)*Eofk
 #      s2_grad[2] = -4*r/3*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(T),-one(T),k2c)
@@ -128,9 +162,11 @@ else
       Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(T,r>.5) 
       s2_grad[1] = -8*r*sqrt(r*(1-r))
       s2_grad[2] = -s2_grad[1]/3
+      Eofk = one(T)
+      Em1mKdm = one(T)
     end
   end
 end
 flux = 1.0-1.5*Lambda1-convert(T,r>b)
-return flux*2pi/3
+return flux*2pi/3,Eofk,Em1mKdm
 end

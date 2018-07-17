@@ -2,6 +2,8 @@
 #include("cel_bulirsch.jl")
 include("/Users/ericagol/Computer/Julia/Transit/cel_bulirsch.jl")
 
+# Negative values don't work right now - it's unclear
+# if the numerical integral is converging.
 p = -rand(); a=rand(3); b=rand(3)
 kc = rand(); k2 = 1.-kc^2
 ell1 = zeros(3); ell2=zeros(3)

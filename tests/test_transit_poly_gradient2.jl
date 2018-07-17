@@ -123,9 +123,10 @@ for i=1:length(r0)
     for n=1:n_u+2
 #    ax[:semilogy](abs.(asinh.(tp_grad_grid[:,n])-asinh.(tp_grad_grid_num[:,n])),lw=1)
       y = abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_big[:,n])); mask = y .<= floor; y[mask]=floor
-#    y = abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_num[:,n])); mask = y .<= floor; y[mask]=floor
 #    ax[:semilogy](abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_num[:,n])),lw=1,label=label_name[n])
-      ax[:semilogy](y,lw=1,label=label_name[n])
+      ax[:semilogy](y,lw=1,label=string(label_name[n]," vs. big"))
+      y = abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_num[:,n])); mask = y .<= floor; y[mask]=floor
+      ax[:semilogy](y,lw=1,label=string(label_name[n]," vs. num"))
       if n <= 2
 #      println("first: ",label_name[n]," ",tp_grad_grid_ana[1:3,n]," ",tp_grad_grid_num[1:3,n])
 #      println("last:  ",label_name[n]," ",tp_grad_grid_ana[length(b)-2:length(b),n]," ",tp_grad_grid_num[length(b)-2:length(b),n])

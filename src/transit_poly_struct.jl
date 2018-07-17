@@ -106,15 +106,15 @@ else
   t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
   kck = kite_area2/(4*b*r)
 end
-t.sn[2] = s2(r,b)
+t.sn[2],Eofk,Em1mKdm = s2(r,b)
 # Compute the J_v and I_v functions:
 if k2 > 0
   if k2 < 0.5 || k2 > 2.0
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    IJv_lower!(k2,kck,kc,kap0,t)
+    IJv_lower!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    IJv_raise!(k2,kck,kc,kap0,t)
+    IJv_raise!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
   end
 end
 
@@ -224,6 +224,7 @@ end
 if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
   flux = zero(T); onemr2 = 1-r^2; sqrt1mr2 = sqrt(onemr2)
+  fill!(t.dfdrbc,zero(T))
   den = inv(t.c_n[1]+2*t.c_n[2]/3)
   flux = (t.c_n[1]*onemr2+2/3*t.c_n[2]*sqrt1mr2^3)*den
   fac  = 2r^2*onemr2*den
@@ -292,7 +293,7 @@ else
   kck = kite_area2/(4*b*r)
 end
 # Compute sn[2] and its derivatives:
-t.sn[2] = s2!(r,b,t.s2_grad)
+t.sn[2],Eofk,Em1mKdm = s2!(r,b,t.s2_grad)
 t.dsndr[2] = t.s2_grad[1]
 t.dsndb[2] = t.s2_grad[2]
 
@@ -300,10 +301,10 @@ t.dsndb[2] = t.s2_grad[2]
 if k2 > 0
   if (k2 < 0.5 || k2 > 2.0) # && v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    dIJv_lower_dk!(k2,kck,kc,kap0,t)
+    dIJv_lower_dk!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    dIJv_raise_dk!(k2,kck,kc,kap0,t)
+    dIJv_raise_dk!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
   end
 end
 

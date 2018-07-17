@@ -152,7 +152,7 @@ else # k^2 >= 1
 end
 end
 
-function IJv_raise!(k2::T,kck::T,kc::T,kap::T,t::Transit_Struct{T})  where {T <: Real}
+function IJv_raise!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
 # This function needs debugging. [ ]
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
@@ -184,16 +184,20 @@ v= 0
 if k2 < 1
   # Use cel_bulirsch:
   if k2 > 0
-    t.Jv[v+1]=2/(3k2*k)*cel_bulirsch(k2,kc,one(k2),k2*(3k2-1),k2*(1-k2))
-    t.Jv[v+2]= 2/(15k2*k)*cel_bulirsch(k2,kc,one(k2),2k2*(3k2-2),k2*(4-7k2+3k2*k2))
+#    t.Jv[v+1]=2/(3k2*k)*cel_bulirsch(k2,kc,one(k2),k2*(3k2-1),k2*(1-k2))
+#    t.Jv[v+2]= 2/(15k2*k)*cel_bulirsch(k2,kc,one(k2),2k2*(3k2-2),k2*(4-7k2+3k2*k2))
+    t.Jv[v+1]=2/(3k2*k)*(k2*(3k2-2)*Em1mKdm+k2*Eofk)
+    t.Jv[v+2]= 2/(15k2*k)*(k2*(4-3k2)*Eofk+k2*(9k2-8)*Em1mKdm)
   else
     t.Jv[v+1]= 0.0
     t.Jv[v+2]= 0.0
   end
 else # k^2 >=1
   k2inv = inv(k2)
-  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
-  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+#  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
+#  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+  t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
+  t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
 end
 v=2
 while v <= t.v_max
@@ -203,7 +207,7 @@ end
 return
 end
 
-function dIJv_raise_dk!(k2::T,kck::T,kc::T,kap::T,t::Transit_Struct{T})  where {T <: Real}
+function dIJv_raise_dk!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -246,10 +250,13 @@ v= 0
 if k2 < 1
   # Use cel_bulirsch:
   if k2 > 0
-    t.Jv[v+1]=2/(3k2*k)*cel_bulirsch(k2,kc,one(k2),k2*(3k2-1),k2*(1-k2))
-    t.Jv[v+2]= 2/(15k2*k)*cel_bulirsch(k2,kc,one(k2),2k2*(3k2-2),k2*(4-7k2+3k2*k2))
+#    t.Jv[v+1]=2/(3k2*k)*cel_bulirsch(k2,kc,one(k2),k2*(3k2-1),k2*(1-k2))
+#    t.Jv[v+2]= 2/(15k2*k)*cel_bulirsch(k2,kc,one(k2),2k2*(3k2-2),k2*(4-7k2+3k2*k2))
+    t.Jv[v+1]=2/(3k2*k)*(k2*(3k2-2)*Em1mKdm+k2*Eofk)
+    t.Jv[v+2]= 2/(15k2*k)*(k2*(4-3k2)*Eofk+k2*(9k2-8)*Em1mKdm)
     if t.grad
-      t.dJvdk[v+1] = 2*cel_bulirsch(k2,kc,one(k2),inv(k2),(1-inv(k2)))
+#      t.dJvdk[v+1] = 2*cel_bulirsch(k2,kc,one(k2),inv(k2),(1-inv(k2)))
+      t.dJvdk[v+1] = -2/k2*Eofk
       t.dJvdk[v+2] = -3*t.Jv[v+2]/k+k2*t.dJvdk[v+1]
     end
   else
@@ -262,10 +269,13 @@ if k2 < 1
   end
 else # k^2 >=1
   k2inv = inv(k2)
-  t.Jv[v+1] = 2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
-  t.Jv[v+2] = cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+#  t.Jv[v+1] = 2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
+#  t.Jv[v+2] = cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+  t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
+  t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
   if t.grad
-    t.dJvdk[v+1] = 2/(k2*k)*cel_bulirsch(k2inv,kc,one(k2),one(k2),2*(1-k2inv))
+#    t.dJvdk[v+1] = 2/(k2*k)*cel_bulirsch(k2inv,kc,one(k2),one(k2),2*(1-k2inv))
+    t.dJvdk[v+1] = 2/(k2*k)*(2*Eofk-Em1mKdm)
     t.dJvdk[v+2] = -3*t.Jv[v+2]/k+k2*t.dJvdk[v+1]
   end
 end
@@ -278,7 +288,7 @@ end
 return
 end
 
-function IJv_lower!(k2::T,kck::T,kc::T,kap::T,t::Transit_Struct{T})  where {T <: Real}
+function IJv_lower!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -317,13 +327,16 @@ end
 v= 0
 if k2 >= 1
   k2inv = inv(k2)
-  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
-  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+#  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
+#  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+#  t.Jv[v+1]=2/3*(3-k2inv)*Eofk
+  t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
+  t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
 end
 return
 end
 
-function dIJv_lower_dk!(k2::T,kck::T,kc::T,kap::T,t::Transit_Struct{T})  where {T <: Real}
+function dIJv_lower_dk!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -379,8 +392,11 @@ end
 v= 0
 if k2 >= 1
   k2inv = inv(k2)
-  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
-  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+#  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
+#  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
+#  t.Jv[v+1]=2/3*(3-k2inv)*Eofk
+  t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
+  t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
 end
 return
 end

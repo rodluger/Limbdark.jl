@@ -629,7 +629,7 @@ l = 0; n = 0; m = 0; pofgn = zero(typeof(r)); qofgn = zero(typeof(r))
 Lfac = (1-(b-r)^2)^1.5
 while n <= n_max
   if n == 2
-    sn[n+1] = s2(r,b)
+    sn[n+1],Eofk,Em1mKdm = s2(r,b)
   else
     mu = l-m; nu = l+m; u=0; v=0
     pofgn = zero(typeof(r)); qofgn = zero(typeof(r))
