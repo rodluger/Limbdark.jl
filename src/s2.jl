@@ -6,10 +6,10 @@ function s2(r::T,b::T) where {T <: Real}
 Lambda1 = zero(T)
 if b >= 1.0+r ||  r == 0.0
   # No occultation:
-  Lambda1 = zero(b)  # Case 1
+  Lambda1 = zero(T)  # Case 1
 elseif b <= r-1.0
   # Full occultation:
-  Lambda1 = zero(b)  # Case 11
+  Lambda1 = zero(T)  # Case 11
 else 
   if b == 0 
 #    Lambda1 = -2/3*sqrt(1.0-r^2)^3 # Case 10
@@ -33,7 +33,7 @@ else
 #    k2 = onembmr2/fourbr
     if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
       k2c = -onembpr2/fourbr; kc = sqrt(k2c); sqbr=sqrt(b*r)
-      Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(b),3*k2c*(b-r)*(b+r))+
+      Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(T),3*k2c*(b-r)*(b+r))+
           cel_bulirsch(k2,kc,one(T),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
       k2inv = inv(k2); k2c =onembpr2/onembmr2; kc = sqrt(k2c)
@@ -59,13 +59,13 @@ function s2!(r::T,b::T,s2_grad::Array{T,1}) where {T <: Real}
 # s2_grad=[ds_2/dr,ds_2/db] is a pre-allocated two-element array.
 # For now, just compute linear component:
 Lambda1 = zero(T)
-fill!(s2_grad,zero(r))
+fill!(s2_grad,zero(T))
 if b >= 1.0+r ||  r == 0.0
   # No occultation:
-  Lambda1 = zero(b)  # Case 1
+  Lambda1 = zero(T)  # Case 1
 elseif b <= r-1.0
   # Full occultation:
-  Lambda1 = zero(b)  # Case 11
+  Lambda1 = zero(T)  # Case 11
 else 
   if b == 0 
 #    Lambda1 = -2/3*sqrt(1.0-r^2)^3 # Case 10
@@ -85,7 +85,7 @@ else
     else
       m = 4r^2; minv = inv(m); kc = sqrt(1.-minv)
       Lambda1 = 1/3+1/(9pi*r)*cel_bulirsch(minv,kc,one(T),m-3,1-m)  # Case 7
-      s2_grad[1] = -2*cel_bulirsch(minv,kc,one(T),one(T),zero(r)) # dLambda/dr
+      s2_grad[1] = -2*cel_bulirsch(minv,kc,one(T),one(T),zero(T)) # dLambda/dr
       s2_grad[2] =  2/3*cel_bulirsch(minv,kc,one(T),one(T),2*(1-minv)) # dLambda/db
     end
   else
@@ -95,25 +95,29 @@ else
 #    k2 = onembmr2/fourbr
     if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
       k2c = -onembpr2/fourbr; kc = sqrt(k2c); sqbr=sqrt(b*r)
-      Eofk = cel_bulirsch(k2,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
-      Em1mKdm = cel_bulirsch(k2,kc,one(T),one(T),zero(T)) # (E-(1-m)K)/m
-      Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(b),3*k2c*(b-r)*(b+r))+
+      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(T),one(T),one(T),3*k2c*(b-r)*(b+r),k2c,zero(T))
+#      Eofk = cel_bulirsch(k2,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
+#      Em1mKdm = cel_bulirsch(k2,kc,one(T),one(T),zero(T)) # (E-(1-m)K)/m
+#      Lambda1 = onembmr2*(cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(T),3*k2c*(b-r)*(b+r))+
+      Lambda1 = onembmr2*(Piofk+
 #          cel_bulirsch(k2,kc,one(T),-3+6r^2-2*b*r,onembpr2))/(9*pi*sqrt(b*r))
 #          cel_bulirsch(k2,kc,one(T),-3+6r^2+2*b*r-fourbr,-k2c*fourbr))/(9*pi*sqrt(b*r))
           (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)/(9*pi*sqrt(b*r))
-#      s2_grad[1] = -cel_bulirsch(k2,kc,one(T),2r*onembmr2,zero(r))/(sqrt(b*r))
+#      s2_grad[1] = -cel_bulirsch(k2,kc,one(T),2r*onembmr2,zero(T))/(sqrt(b*r))
       s2_grad[1] = -2r*onembmr2*Em1mKdm/(sqrt(b*r))
 #      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,onembpr2/b)/(3*sqrt(b*r))
 #      s2_grad[2] = -onembmr2*cel_bulirsch(k2,kc,one(T),-2r,-4r*k2c)/(3*sqrt(b*r))
       s2_grad[2] = 2r*onembmr2*(-Em1mKdm+2*Eofk)/(3*sqrt(b*r))
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
       k2inv = inv(k2); k2c =onembpr2/onembmr2; kc = sqrt(k2c)
-      Eofk = cel_bulirsch(k2inv,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
-      Em1mKdm = cel_bulirsch(k2inv,kc,one(T),one(T),zero(T)) # (E-(1-m)K)/m
+#      Eofk = cel_bulirsch(k2inv,kc,one(T),one(T),k2c) # Complete elliptic integral of second kind
+#      Em1mKdm = cel_bulirsch(k2inv,kc,one(T),one(T),zero(T)) # (E-(1-m)K)/m
       bmrdbpr = (b-r)/(b+r); 
       mu = 3bmrdbpr/onembmr2
       p = bmrdbpr^2*onembpr2/onembmr2
-      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*cel_bulirsch(k2inv,kc,p,1.0+mu,p+mu)
+      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2inv,kc,p,1+mu,one(T),one(T),p+mu,k2c,zero(T))
+#      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*cel_bulirsch(k2inv,kc,p,1.0+mu,p+mu)
+      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk
              -(4-7r^2-b^2)*Eofk)/(9*pi)
 #      s2_grad[1] = -4*r*sqrt(onembmr2)*cel_bulirsch(k2inv,kc,one(T),one(T),k2c)
       s2_grad[1] = -4*r*sqrt(onembmr2)*Eofk

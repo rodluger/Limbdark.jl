@@ -23,14 +23,14 @@ using PyPlot
 # and defines arrays to hold the results:
 
 function profile_transit_poly(trans)
-nb = 1000001; b=zeros(nb)
+nb = 10000001; b=zeros(nb)
 flux = zeros(nb); fgrad = zeros(4)
 flux_big = zeros(nb); fgrad_big = zeros(BigFloat,4)
 flux_grad = zeros(nb,4)
 flux_grad_big = zeros(nb,4)
 tic()
-for i=0:1000000
-  b[i+1] = sqrt(((i-500000.)/500000.*(1.+2.*trans.r))^2)
+for i=0:10000000
+  b[i+1] = sqrt(((i-5000000.)/5000000.*(1.+2.*trans.r))^2)
 #  flux[i+1]= transit_poly!(r,b[i+1],u,fgrad)
   trans.b = b[i+1]
   flux[i+1]= transit_poly!(trans)
