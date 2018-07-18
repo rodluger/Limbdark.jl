@@ -1171,11 +1171,32 @@ high precision enables computation of derivatives which are beneficial when
 optimizing model parameters, computing the Fisher information matrix, or
 deriving parameter posteriors with MCMC.
 
-The imprecision of the model can be absorbed into noise models that account
-for outliers or account for correlations in the noise.  Since we are limited
-in the knowledge of the properties of any given star, the discrepancies of
-an azimuthally-symmetric limb-darkened model can be treated as a source
-of noise.
+Since we are limited in the knowledge of the properties of any given star, 
+the discrepancies of an azimuthally-symmetric limb-darkened model can be 
+treated as a source of noise.
+The deviation of the star from the model can be absorbed into noise models that 
+account for outliers, account for correlations in the noise, or actually
+try to model the deviations of the star from azimuthal symmetry.
+
+In additional to the variability and inhomogeneity of stars, the limb-darkening model
+can only describe the variation of surface brightness with a limited accuracy.
+Our analytic model can be thought of as a Taylor series with which the
+limb-darkening can be expanded to as high an order as the data require.
+
+One question is what order of the limb-darkening model to choose to
+fit the data?  Here we suggest several possibile solutions.  The order of the
+limb-darkening can be varied until the chi-square no longer improves (subject
+to a penalty for the greater freedom in the model, such as Bayesian Information
+Criterion).  A high-order limb-darkening model can be chosen, with the
+coefficients regularized to favor small values;  should the data require
+a higher-order model, then the coefficients will increase to acommodate
+the data.  The parameterization of the limb-darkening with terms with
+$c_n ((n+2)\upmu^n-\upmu^{n-2})$ for $n \ge 2$ may be particularly
+convenient for this model in that these terms do not contribute to the
+total flux of the star.  A third possibility is to fit stellar atmosphere
+models with the polynomial limb-darkening model until a sufficient precision
+is reached given that warranted by the data, and then to place priors
+on the limb-darkening parameters.
 
 Example applications:  
 \begin{enumerate}
@@ -1228,18 +1249,11 @@ and Cooperative Agreement Number NNA13AA93A.
 
 Here are a list of errata for \citet{MandelAgol2002}:
 \begin{enumerate}
-\item In equation 7, $\lambda_4$ should read $E(2p)$ and $K(2p)$,
-{\it not} $E(2k)$ and $K(2k)$.  This mistake is not present in the code.
+\item In equation 7, $\lambda_3$ and $\lambda_4$ should have $2k \rightarrow
+2p$ in arguments of the elliptic integrals.
 
-\item In equation 7, $\lambda_3$ should read $E(1/2p)$ and $K(1/2p)$,
-{\it not} $E(1/2k)$ and $K(1/2k)$.  This mistake is also not present in the code.
-
-\item In equation 7, $\lambda_5$ should read:
-$\lambda_5 = \frac{2}{3\pi}\cos^{-1}(1-2p)-\frac{4}{9\pi}(3+2p-8p^2)
-\sqrt{p(1-p)} - \frac{2}{3}\Theta(p-1/2)$.
-
-(The last term cancels the $\Theta(p-z)$ term in the expression for $F$
-just before equation 7).  This mistake is also not present in the code.
+\item In equation 7, $\lambda_5$ should have $- \frac{2}{3}\Theta(p-1/2)$
+at the end.
 
 \item For Case 11 in Table 1, $\eta^d$ should be 1/2, not 1, and
 $\lambda^d$ should be zero, not 1.  This mistake affects the code,
@@ -1247,12 +1261,12 @@ but it is never encountered for planets that transit main-sequence
 stars since $p<1$.  This typo was discussed in \citet{Eastman2013}.
 
 \item The case $z=1-p$ is missing for $z<p$ (as pointed out by
-Pal 2008).  This case is rarely encountered as it is a set
-of measure zero.
+Pal 2008).
 
 \item There is a $\pi$ missing in the denominator of the second term
-on the right hand side of equation (8).  This mistake is not
-present in the code.
+on the right hand side of equation (8).
 \end{enumerate}
 
+With the exception of 3, none of these errors affected the publicly
+available code.
 \end{document}

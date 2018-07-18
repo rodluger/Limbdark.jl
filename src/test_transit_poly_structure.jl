@@ -50,5 +50,7 @@ println("f: ",minimum(flux)," ",maximum(flux))
 return
 end
 
+savefig("transit_poly_derivatives.pdf", bbox_inches="tight")
+
 # Call the function:
 profile_transit_poly(trans)
