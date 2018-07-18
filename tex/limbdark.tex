@@ -68,10 +68,12 @@ have become necessary to describe higher precision measurements \citep{Claret200
 Gimenez2006}, which tend to involve more computational burden.
 
 In addition to computing transit light curves, the derivatives of these light
-curves with respect to the model parameters are also necessary for accurate
+curves with respect to the model parameters are also beneficial for accurate
 characterization of exoplanets.   The derivatives enable fast and stable
 optimization of the transit light curve parameters, which is critical for
-obtaining initial estimates for a markov chain Monte Carlo simulation (MCMC).
+obtaining initial estimates for a markov chain Monte Carlo simulation (MCMC),
+for looking for multi-modal solutions, for initializing the multi-nest
+algorithm, or for computing the Fisher information matrix.
 In some cases, MCMC can be slow to converge, and derivatives can accelerate
 convergence by adding an artificial momentum term to the log likelihood,
 and then allowing the sampler to follow contours of constant ``energy."
@@ -80,12 +82,13 @@ but its application has been hampered by the lack of models with derivatives,
 as derivatives are in general more difficult to compute.
 
 Finally, the analytic computation of transit light curves with quadratic
-limb-darkening is limited by round-off error for some special cases.  In 
+limb-darkening is limited by numerical round-off error for limiting
+values near some special cases.  In 
 particular, when the radius equals the impact-parameter, which corresponds to 
 the edge of the planet crossing the center of the star, the computation of the 
 elliptic integrals becomes unstable.  At the second and third points of
 contact, when the radius of the planet plus the impact parameter equals
-the radius of the star, the elliptic integrals diverge.  In the
+the radius of the star, the elliptic integrals diverge logarithmically.  In the
 limit that the impact parameter approaches zero, the equations can also
 diverge.  All of these special cases are in principle encountered rarely,
 but in practice with thousand of planets with tens to thousands of
@@ -96,10 +99,10 @@ be encountered with some frequency.
 Based on these considerations, the primary goals of the current paper are
 threefold:
 \begin{enumerate}
-\item To extend the analytic limb-darkening model to higher order.
+\item To extend the analytic quadratic limb-darkened transit model to higher order.
 \item To compute the derivatives of the model analytically.
 \item To stabilize the analytic light curve computation (and its derivatives)
-in all special cases.
+in all limits near special cases.
 \end{enumerate}
 Secondary goals include modeling eclipsing binaries, for which the same
 considerations apply, and integrating the light curve model, and its
@@ -112,7 +115,7 @@ parameterized with the cosine of the angle measured from the sub-stellar point,
 $\upmu = \cos{\theta}$, where $\theta$ is the polar angle on the photosphere, 
 with $\theta=0$ at the center of the observed stellar disk, and $\theta=\pi/2$ 
 at the limb.  In terms of $r$, the normalized radius projected on the sky,
-$\upmu = \cos{\theta} =\sqrt{1-r^2}$, where $0\le r \le 1$.
+this parameter is given by $\upmu = \cos{\theta} =\sqrt{1-r^2}$, where $0\le r \le 1$.
 
 Uniform limb-darkening scales as $\upmu^0$ and linear as $\upmu^1$;
 these are the two most important cases which can be integrated analytically, 
@@ -131,19 +134,21 @@ I(\upmu) = I(1) \left[\sum_{n=1}^N a_n (1-\upmu^n) \right],
 where $a_n$ is a limb-darkening coefficient.  \cite{Gimenez2006}
 found an infinite series expansion for computing the limb-darkened light curve 
 for each $a_n$ term.  Here we present closed-form expressions for these terms 
-which can be easily computed with recursion relations.
+which can be easily computed with recursion relations, although for purposes
+of numerical stability we need to revert to series solutions in some limits.
 
 The second goal, of computing dervatives of the light curve with respect to
 the model parameters, was accomplished by \cite{Pal2008} for the quadratic
 limb-darkening case.  He derived the partial derivatives of the quadratic 
-limb-darkening model with respect to $b$, $r$, and the two quadratic limb-
-darkening coefficients.  In this work, we give modified expressions which are 
+limb-darkening model with respect to $b$, $r$, and the two quadratic 
+limb-darkening coefficients.  In this work, we give modified expressions 
+for the quadratic limb-darkened flux and its derivatives which are 
 more numerically stable, as well as extend the computation of derivatives
 to higher order limb-darkening.
 
 The third goal, of numerical stability, has yet to be addressed in the literature.
 Although some numerical approaches are numerically stable, such as \cite{Gimenez2006} 
-and \cite{Kreidberg2015}, these approaces tend to be slower, they have precisions
+and \cite{Kreidberg2015}, these approaches tend to be slower, they have precisions
 which depend upon the tolerance of the computation, and, in addition, they do not 
 yield derivatives of the light curves.
 

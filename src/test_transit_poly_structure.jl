@@ -3,15 +3,14 @@
 # computation:
 
 # Defines the transit Type:
-include("transit_structure.jl")
+#include("transit_structure.jl")
 # Defines the function that computes the c_n coefficients:
-include("compute_c_n_struct.jl")
+#include("compute_c_n_struct.jl")
 
 # Defines the function that computes the transit:
 include("transit_poly_struct.jl")
 
 # Instantiate a transit with r=0.1, b=0.5, u_n=[0.2,0.3]:
-trans = transit_init(0.1,0.5,[0.2,0.3],true)
 
 # Transform from u_n to c_n coefficients (this is now added to transit_init function):
 #compute_c_n_grad!(trans) 
@@ -25,9 +24,7 @@ using PyPlot
 function profile_transit_poly(trans)
 nb = 1000001; b=zeros(nb)
 flux = zeros(nb); fgrad = zeros(4)
-flux_big = zeros(nb); fgrad_big = zeros(BigFloat,4)
 flux_grad = zeros(nb,4)
-flux_grad_big = zeros(nb,4)
 tic()
 for i=0:1000000
   b[i+1] = sqrt(((i-500000.)/500000.*(1.+2.*trans.r))^2)
@@ -50,7 +47,9 @@ println("f: ",minimum(flux)," ",maximum(flux))
 return
 end
 
-savefig("transit_poly_derivatives.pdf", bbox_inches="tight")
+trans = transit_init(0.1,0.5,[0.2,0.3],true)
 
 # Call the function:
 profile_transit_poly(trans)
+
+savefig("transit_poly_derivatives.pdf", bbox_inches="tight")
