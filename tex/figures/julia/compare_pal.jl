@@ -1,7 +1,7 @@
 # Compares with Pal's computation:
 
 using PyPlot
-include("../../../src/transit_poly.jl")
+include("../../../src/transit_poly_struct.jl")
 
 data_pal = readdlm("ntiq_test.out")
 

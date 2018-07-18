@@ -1,15 +1,15 @@
 # Profiles transit_poly.jl
 
-include("../../../src/transit_structure.jl")
+include("../../../src/transit_poly_struct.jl")
+#include("../../../src/transit_structure.jl")
 
 r = 0.1  # radius ratio is 0.1
 u = [0.2,0.3]
 b=0.0
 trans = transit_init(r,b,u,true)
 
-include("../../../src/compute_c_n.jl")
+#include("../../../src/compute_c_n.jl")
 
-include("../../../src/transit_poly_struct.jl")
 #include("../../../src/dJv_seriesdk.jl")
 using PyPlot
 
@@ -25,7 +25,7 @@ tic()
 for i=0:1000000
   b[i+1] = sqrt(((i-500000.)/500000.*(1.+2.*r))^2)
   trans.b = b[i+1]
-  flux[i+1]= transit_poly_struct!(trans)
+  flux[i+1]= transit_poly!(trans)
   flux_grad[i+1,:] = trans.dfdrbu
 end
 toc()

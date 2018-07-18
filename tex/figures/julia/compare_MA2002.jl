@@ -1,6 +1,6 @@
 #include("/Users/ericagol/Courses/PlanetaryDynamics/ExoJulia/ExoJulia/Transit/occultquad.jl")
 include("occultquad.jl")
-include("../../../src/transit_poly.jl")
+include("../../../src/transit_poly_struct.jl")
 
 # Plot accuracy of occultquad vs. transit_poly:
 

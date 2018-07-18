@@ -25,7 +25,7 @@ for j=1:length(nb)
       trans.b = b
       flux= transit_poly!(trans)
     end
-    tmean[k] = toc()
+    tmean[k] = toq()
   end
   timing[j] = median(tmean)
 end

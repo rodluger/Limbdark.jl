@@ -23,8 +23,9 @@ const Jv = zeros(typeof(r),v_max+1)
 const dIvdk = zeros(typeof(r),v_max+1)
 const dJvdk = zeros(typeof(r),v_max+1)
 
-include("../../../src/transit_poly_prealloc.jl")
-include("../../../src/dJv_seriesdk.jl")
+#include("../../../src/transit_poly_prealloc.jl")
+include("../../../src/transit_poly_struct.jl")
+#include("../../../src/dJv_seriesdk.jl")
 using PyPlot
 
 # Now, run the same with transit_poly:
