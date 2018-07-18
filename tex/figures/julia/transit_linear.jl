@@ -14,7 +14,7 @@ for ib=1:nb
 #    println("Finished: ",ib/nr*100,"%")
 #  end
   for ir=1:nr
-    fgrid[ir,ib],Eofk,Em1mKdm=s2(r[ir],b[ib])
+    fgrid[ir,ib]=s2(r[ir],b[ib])
   end
 end
 
