@@ -256,7 +256,8 @@ if k2 < 1
     t.Jv[v+2]= 2/(15k2*k)*(k2*(4-3k2)*Eofk+k2*(9k2-8)*Em1mKdm)
     if t.grad
 #      t.dJvdk[v+1] = 2*cel_bulirsch(k2,kc,one(k2),inv(k2),(1-inv(k2)))
-      t.dJvdk[v+1] = -2/k2*Eofk
+#      t.dJvdk[v+1] = 2*inv(k2)*cel_bulirsch(k2,kc,one(k2),2-1,-(1-k2))
+      t.dJvdk[v+1] = 2/k2*(-Eofk+2*Em1mKdm)
       t.dJvdk[v+2] = -3*t.Jv[v+2]/k+k2*t.dJvdk[v+1]
     end
   else
@@ -329,7 +330,6 @@ if k2 >= 1
   k2inv = inv(k2)
 #  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
 #  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
-#  t.Jv[v+1]=2/3*(3-k2inv)*Eofk
   t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
   t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
 end
@@ -394,7 +394,6 @@ if k2 >= 1
   k2inv = inv(k2)
 #  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
 #  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
-#  t.Jv[v+1]=2/3*(3-k2inv)*Eofk
   t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
   t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
 end

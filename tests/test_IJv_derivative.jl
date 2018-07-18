@@ -1,6 +1,6 @@
 # Tests the code for computing the derivatives
 # of I_v and J_v with respect to k.
-include("../src/IJv_derivative.jl")
+include("../src/IJv_derivative_struct.jl")
 #include("../src/dJv_seriesdk.jl")
 
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}

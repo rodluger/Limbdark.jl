@@ -165,4 +165,6 @@ for i=1:length(r0)
 #  ax[:axis]([0,length(b),1e-16,1])
 end
 
+savefig("test_s2_gradient.pdf", bbox_inches="tight")
+
 end

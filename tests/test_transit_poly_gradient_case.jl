@@ -9,7 +9,7 @@ nb = 50
 epsilon = 1e-12; delta = 1e-3
 dfdrbu = zeros(n_u+2)
 dfdrbu_big = zeros(BigFloat,n_u+2)
-label_name=["r","b","u_0","u_1","u_2","u_3","u_4","u_5","u_6","u_7","u_8","u_9","u_10","u_11","u_12","u_13"]
+label_name=["r","b","u_1","u_2","u_3","u_4","u_5","u_6","u_7","u_8","u_9","u_10","u_11","u_12","u_13"]
 floor = 1e-20
 if ~skip_plots
   fig,axes = subplots(3,3)
@@ -66,15 +66,15 @@ for i=1:length(r0)
     # Compute derivatives in BigFloat (tests precision of derivatives):
     tp_big = transit_poly!(big(r),big(b[j]),big.(u_n),dfdrbu_big)
     tp_grad_grid_big[j,:]=dfdrbu_big
-    test1 =  isapprox(dfdrbu,tp_grad_array,atol=1e-12)
+    @test isapprox(dfdrbu,tp_grad_array,atol=1e-6)
 #    println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-18")
-    if ~test1
-      tp,tp_grad_array =  transit_poly_grad_num(r,b[j],u_n,1e-15)
+#    if ~test1
+#      tp,tp_grad_array =  transit_poly_grad_num(r,b[j],u_n,1e-15)
 #      println("r: ",r," b: ",b[j]," dfdrbu: ",dfdrbu," tp_grad: ",tp_grad_array," diff: ",dfdrbu-tp_grad_array," dq = 1e-15")
-      test1 =  isapprox(dfdrbu,dfdrbu_big,atol=1e-13)
+    @test isapprox(dfdrbu,dfdrbu_big,atol=1e-11)
 #      read(STDIN,Char)
-    end
-    @test test1
+#    end
+    
   end
   if ~skip_plots
 # Now, make plots:
@@ -84,9 +84,10 @@ for i=1:length(r0)
     for n=1:n_u+2
 #    ax[:semilogy](abs.(asinh.(tp_grad_grid[:,n])-asinh.(tp_grad_grid_num[:,n])),lw=1)
       y = abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_big[:,n])); mask = y .<= floor; y[mask]=floor
-#    y = abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_num[:,n])); mask = y .<= floor; y[mask]=floor
+      ax[:semilogy](y,lw=1,label=string(label_name[n]," vs. big"))
+      y = abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_num[:,n])); mask = y .<= floor; y[mask]=floor
+      ax[:semilogy](y,lw=1,label=string(label_name[n]," vs. num"))
 #    ax[:semilogy](abs.(asinh.(tp_grad_grid_ana[:,n])-asinh.(tp_grad_grid_num[:,n])),lw=1,label=label_name[n])
-      ax[:semilogy](y,lw=1,label=label_name[n])
       if n <= 2
 #      println("first: ",label_name[n]," ",tp_grad_grid_ana[1:3,n]," ",tp_grad_grid_num[1:3,n])
 #      println("last:  ",label_name[n]," ",tp_grad_grid_ana[length(b)-2:length(b),n]," ",tp_grad_grid_num[length(b)-2:length(b),n])
