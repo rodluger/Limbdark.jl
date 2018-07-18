@@ -1,11 +1,18 @@
+# Include definition of Transit structure type:
 include("transit_structure.jl")
+# Include code which transforms from u_n to c_n:
 include("compute_c_n_struct.jl")
+# Include code which computes linear limb-darkening term:
 include("s2.jl")
+# Include code which computes I_v, J_v, and derivatives wrt k:
 include("IJv_derivative_struct.jl")
 
+# Function which computes sixteen times the square of the area
+# of a triangle with sides a, b and c using Kahan method.
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
-# How to compute (twice) area squared of triangle with 
-# high precision (Goldberg 1991):
+# How to compute (sixteen times the) area squared of triangle with 
+# high precision (Goldberg 1991).
+# First, do a quick sort of three numbers:
 if c > b
   tmp = c; c = b; b = tmp
 end
@@ -19,6 +26,7 @@ area = (a+(b+c))*(c-(a-b))*(c+(a-b))*(a+(b-c))
 return area
 end
 
+# This version is less efficient:
 function sqarea_triangle(x::Array{T,1}) where {T <: Real}
 # How to compute (twice) area squared of triangle with 
 # high precision (Goldberg 1991):
