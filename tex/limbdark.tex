@@ -129,7 +129,7 @@ The first goal, of modelling higher-order limb-darkening, was accomplished
 by \citet{Gimenez2006}, who derived transit light curves for a limb-darkening
 function
 \begin{equation}
-I(\upmu) = I(1) \left[\sum_{n=1}^N a_n (1-\upmu^n) \right],
+I(\upmu) = I(1) \left[1-\sum_{n=1}^N a_n (1-\upmu^n) \right],
 \end{equation}
 where $a_n$ is a limb-darkening coefficient.  \cite{Gimenez2006}
 found an infinite series expansion for computing the limb-darkened light curve 
@@ -537,7 +537,7 @@ hence gives essentially exact expressions.  We implemented the
 pseudocode from \citet{Bulirsch1969} to compute ${\rm cel}(k_c,p,a,b)$,
 which has a termination test that scales as the square root of
 the machine precision.  We find that the transformed expressions
-are accurate to $\la \times 10^{-15}$ when computed in double precision
+are accurate to $\la \times 10^{-14}$ when computed in double precision
 within $10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
 
 \begin{figure}\label{transit_linear}
@@ -923,10 +923,11 @@ I(\upmu) &=& 1 - \sum_{i=1}^N u_i \sum_{j=0}^i \binom{i}{j} (-1)^j \upmu^j,\\
 &=& \sum_{n=0}^N a_n \upmu^n,\\
 &=& d_0 + d_1 \upmu + \sum_{n=2}^N d_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right].
 \end{eqnarray}
+Note that $a_0= 1-\sum_{n=1}^N a_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
 The transformation between $u_n$ and $a_n$ is straightforward based on
-looping over the binomial expansion of each of the $u_n$ terms (equation \ref{eq:polynomialld}), for
-example, $a_0 = 1 - \sum_{i=1}^N u_i$.  Then,
-with the computed $a_n$ values, we can find $d_n$ from downward recursion
+looping over the binomial expansion of each of the $u_n$ terms (equation \ref{eq:polynomialld}),
+for example $a_1 = \sum_{n=1}^N n u_n$.
+Then, with the computed $a_n$ values, we can find $d_n$ from downward recursion
 using the relation
 \begin{equation}
 d_n = \frac{a_n}{n+2} + d_{n+2},
@@ -1090,6 +1091,23 @@ about the same with different numbers of points in the light curve.
     \end{centering}
 \end{figure}
 
+\section{Non-linear limb-darkening}
+
+\citet{Claret2000} introduced a ``non-linear" limb-darkening model which
+he found to be an effective model for describing the limb-darkening functions
+which are produced by models of stellar atmospheres.
+Although we can only model limb-darkening which is integer powers of $\upmu$,
+we can use the polynomial model as an effective limb-darkening model.
+
+\begin{itemize}
+\item Compare polynomial models to non-linear light curves.
+\item Fit polynomial model to stellar limb-darkening models.
+\end{itemize}
+
+\section{Examples}
+
+Give some examples of the usage: non-linear optimization, HMC.
+
 \section{Comparison with other work} \label{sec:comparison}
 
 In this section we compare our computations with existing code in terms
@@ -1133,7 +1151,7 @@ Figure \ref{fig:Pal_comparison} shows the results of this comparison.
 The light curve models agree quite well, as do the derivatives, which is
 a good check on both codes.  However, we find that the P\'al model only
 achieves single precision for the computation, with errors reaching as
-much as a fex $\times 10^{-8}$ for the flux and the derivatives with
+much as a few $\times 10^{-8}$ for the flux and the derivatives with
 respect to the limb-darkening parameters.  \citet{Pal2008} uses the
 Carlson implementation of elliptic integrals \citep{Carlson1979},
 which in practice we find can be both less precise and slower to
@@ -1143,7 +1161,7 @@ integrals.
 We have also compared the evaluation speed of our code with P\'al's as well.
 We compiled P\'al's code using \texttt{gfortrans -O3}, and found that
 the computation of quadratic limb-darkened light curves and
-derivatives takes an average of 0.52 seconds to compute $10^6$ models. 
+derivatives takes an average of 0.52 seconds to compute $10^6$ models, 
 while the \texttt{transit\_poly\_struct.jl} takes an average of 0.29 seconds, 
 giving our Julia code a 44\% speed advantage over the Fortran code;
 we have yet to optimize all aspects of the code, so there may be room
