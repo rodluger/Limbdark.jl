@@ -20,8 +20,8 @@ end
 
 function area_overlap(R::T,r::T,b::T) where {T <: Real}
 # Compute the light curve of a uniform source:
-if b <= R-r
-  area = pi*r^2
+if b <= abs(R-r)
+  area = pi*minimum([r,R])^2
 else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
   kite_area2 = sqrt(abs(sqarea_triangle(R,b,r)))
@@ -50,7 +50,7 @@ function occult_nonlinear(r::T,b::T,c1::T,c2::T,c3::T,c4::T) where {T <: Real}
   x0 = maximum([b-r,zero(T)]); xn = minimum([b+r,one(T)])
   theta1 = asin(x0); theta2 = asin(xn);
   nint = 16; delta0 = one(T); delta1 = zero(T)
-  tol = 1e-6; iter = 0; itmax = 20
+  tol = 1e-8; iter = 0; itmax = 20
   while abs(delta0-delta1) > tol*delta0 && iter <= itmax
     xgrid = sin.(linspace(theta1,theta2,nint))
     delta0 = delta1
@@ -69,7 +69,7 @@ end
 
 nx = 1024
 x = linspace(-1.2,1.2,nx)
-y = 0.5
+y = 0.
 b = sqrt.(x.^2+y.^2)
 c1 = 0.2; c2 = 0.2; c3 = 0.2; c4 = 0.2
 r=0.1; flux = zeros(nx)
@@ -84,6 +84,7 @@ end
 using PyPlot
 clf()
 plot(x,1.-flux/pi)
+flux = 1.-flux/pi
 # The following two lines are used to check occult_nonlinear
 # when c1 = c3 = 0, which yields the quadratic case:
 #u2 = -c4; u1 = c2-2*u2
@@ -102,9 +103,9 @@ function optimize_fit!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n:
   trans = transit_init(r,b[1],u_n,true)
   # Compute model & gradient at each point:
   smat = zeros(T,nu+1,nu+1); fdots = zeros(T,nu+1)
-  for i=1:b
+  for i=1:nb
     trans.b = b[i]
-    flux = transit_poly!(trans)
+    fcur = transit_poly!(trans)
     for j=1:nu+1
       fdots[j] += fobs[i]*trans.sn[j]
       for k=1:nu+1
@@ -113,6 +114,73 @@ function optimize_fit!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n:
     end
   end
   # Now, invert to find coefficients of:  f_obs = \sum_j \alpha_j s_j:
+#  println("f.s: ",fdots," s^T s: ",smat)
   alpha = \(smat,fdots)
-return
+#  println("alpha: ",alpha)
+  fill!(fmod,zero(T))
+  for i=1:nb
+    trans.b = b[i]
+    fcur = transit_poly!(trans)
+    for j=1:nu+1
+      fmod[i] += alpha[j]*trans.sn[j]
+    end
+#    println("b: ",b[i]," fobs: ",fobs[i]," fmod: ",fmod[i])
+  end
+return fmod
 end
+
+clf()
+#plot(b,flux)
+fig,axes = subplots(2,1)
+ax = axes[2]
+dev = zeros(6)
+fmod = copy(flux)
+#u_n = [.1]
+#fmod = optimize_fit!(r,b,flux,fmod,u_n)
+#plot(b,flux-fmod,linestyle="--",label="linear")
+#println("linear: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+u_n = [.1,.1]
+fmod = optimize_fit!(r,b,flux,fmod,u_n)
+ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="quadratic")
+println("quad: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+u_n = [.1,.1,.1]
+fmod = optimize_fit!(r,b,flux,fmod,u_n)
+ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="cubic")
+println("cubic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+u_n = [.1,.1,.1,.1]
+fmod = optimize_fit!(r,b,flux,fmod,u_n)
+ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="quartic")
+println("quartic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+u_n = [.1,.1,.1,.1,.1]
+fmod = optimize_fit!(r,b,flux,fmod,u_n)
+ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="quintic")
+println("quintic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+u_n = [.1,.1,.1,.1,.1,.1]
+fmod = optimize_fit!(r,b,flux,fmod,u_n)
+ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="sextic")
+println("sextic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+u_n = [.1,.1,.1,.1,.1,.1,.1]
+fmod = optimize_fit!(r,b,flux,fmod,u_n)
+ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="septic")
+println("septic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+u_n = [.1,.1,.1,.1,.1,.1,.1,.1]
+#fmod = optimize_fit!(r,b,flux,fmod,u_n)
+#plot(b,flux-fmod,linestyle="--",label="octic")
+#println("octic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+#u_n = [.1,.1,.1,.1,.1,.1,.1,.1,.1]
+#fmod = optimize_fit!(r,b,flux,fmod,u_n)
+#plot(b,flux-fmod,linestyle="--",label="nonic")
+#println("nonic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+ax[:legend](loc = "upper left",fontsize=6)
+ax[:set_ylabel]("Deviation of fit [ppm]")
+ax[:set_xlabel]("Impact parameter, b")
+ax[:axis]([0,1.2,-10,10])
+ax = axes[1]
+
+ax[:plot](b,flux,linewidth=2,label="non-linear")
+ax[:plot](b,fmod,linestyle="--",label="septic",linewidth=2)
+ax[:set_title](L"$c_1 = c_2=c_3=c_4=0.2$")
+ax[:legend](loc="upper left")
+ax[:axis]([0,1.2,0.984,1.001])
+ax[:set_ylabel]("Relative flux")
+savefig("occult_nonlinear_poly.pdf",bbox_inches="tight")

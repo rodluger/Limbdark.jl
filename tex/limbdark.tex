@@ -1075,7 +1075,7 @@ in the light curve).  The linear scaling with time holds for each value of
 the number of limb-darkening coefficients.  
 
 Figure \ref{fig:nlimb} shows that the time dependence scales approximately
-as $n^{1/3}$.  As with the number of light-curve points, we have taken
+as $n^{1/3-3/8}$.  As with the number of light-curve points, we have taken
 the median over nine measurements for each set of parameters.  We then
 scaled the timing to the single-coefficient case, and took a second
 median over the number of light curve points as the cube-root scaling scales 
@@ -1106,12 +1106,48 @@ about the same with different numbers of points in the light curve.
 he found to be an effective model for describing the limb-darkening functions
 which are produced by models of stellar atmospheres.
 Although we can only model limb-darkening which is integer powers of $\upmu$,
-we can use the polynomial model as an effective limb-darkening model.
+we can use the polynomial model as an alternative limb-darkening model.
 
 \begin{itemize}
-\item Compare polynomial models to non-linear light curves.
+\item Compare polynomial models to non-linear light curves. [x]
 \item Fit polynomial model to stellar limb-darkening models.
 \end{itemize}
+
+We have computed an example non-linaer light curve with $r=0.1$ and
+$c_1=c_2=c_3=c_4=0.2$, and fit it with successive orders of the
+polynomial approximation.  The model we compute with a ``layer-cake"
+model in which sums of layers of surface brightness with different
+radii are added together to approximate the lightcurve;  this
+is the approach taken in the numerical model used to compute the
+non-linear limb-darkening light curves in the code of \citet{MandelAgol2002},
+and it is also the approach taken by \citet{Kreidberg2015} for
+computing models with arbitrary limb-darkening profiles.
+We note that the fit of the polynomial light curve is simply a linear 
+problem:  if we express the light curve as linear combinations
+of $S_n$, then we can optimize the fit with linear regression.
+
+We find that the fit improves steadily up until $N=6$ (a sextic
+polynomial), while beyond sextic, the RMS improves, while the
+maximum deviation remains about constant, at a level of $1.5 \times 10^{-6}$
+in this example, and does not improve for higher order polynomial
+limb-darkening fits.  This deviation is fairly small and localized;
+the RMS of the sextic fit for this example is $5 \times 10^{-7}$
+relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/occult_nonlinear_poly.pdf}
+    \caption{Comparison of the non-linear limb-darkening with polynomial
+    fits of various orders.  The maximum deviation ceases to improve
+    beyond a sextic fit.}
+    \label{fig:nonlinear}
+    \end{centering} 
+\end{figure}
+
+Since the non-linear model is just an effective model of stellar
+atmospheres, we next turn to fitting the non-linear model to
+computed stellar atmospheres, and comparing these fits with
+polynomial limb-darkening to different orders.
 
 \section{Examples}
 
