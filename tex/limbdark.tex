@@ -1149,6 +1149,21 @@ atmospheres, we next turn to fitting the non-linear model to
 computed stellar atmospheres, and comparing these fits with
 polynomial limb-darkening to different orders.
 
+\citet{Claret2018} discusses a precise means for fitting limb-darkening
+models to spherically-symmetric models for stellar atmospheres.  The
+stellar surface brightness drops rapidly from a finite value to zero surface
+brightness over a few scale heights of the stellar atmosphere.
+The scale height of an atmosphere is small compared with the size of a star,
+and so the limb-darkening model can treat the radius of the star as a
+free parameter, and then treat the drop in surface brightness as a step-
+function near the limb of the star.  This gives a more precise model
+for the limb-darkening, and \citet{Claret2018} finds good precision
+using the non-linear limb-darkening model.
+
+We used the same set of atmospheres as \citet{Claret2018}, but fit these
+with the polynomial model, varying the order of the polynomial until the
+fit no longer improves.
+
 \section{Examples}
 
 Give some examples of the usage: non-linear optimization, HMC.
