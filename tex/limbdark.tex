@@ -304,6 +304,12 @@ ratio, $r$, and impact parameter, $b$, turn out to be straightforward:
 \frac{\partial S_0(r,b)}{\partial b} &=& \frac{A_{kite}}{b},
 \end{eqnarray}
 which can be computed from the quantities used in calculating $S_0$.
+At the contact points, when $b = \vert 1\pm r\vert$, the derivatives are undefined.
+In practice this can be a problen when taking finite-differences across
+the discontinuous boundary, but with the analytic formulae, these points
+are a set of measure zero, and so we simply set the derivatives to zero
+at these points.
+
 In the remainder of this paper we will need to use these formulae in computing
 the higher order limb-darkened light curves.
 
@@ -641,6 +647,10 @@ and
 \end{align}
 where we have given some of the expressions in terms of both the standard elliptic integrals
 and the general elliptic integral.
+
+Note that if we had included the radius of the source star in these formulae,
+then the derivatives with respect to the radius of the star yield the
+transit light curve of a uniform emission shell \citep{Schlawin2010}.
 
 We have tested these formulae with finite-difference derivatives evaluated at
 256-bit precision, and, as with the total flux term, we find that these are accurate 
@@ -1245,15 +1255,27 @@ and with the number of limb-darkening components. [x]
 
 \section{Discussion}
 
-Any model for the surface brightness of a star can only be approximate:  most stars 
-are convective, rotationally-oblate, spotted, oscillating, flaring, etc.  The
-model we have presented, then, will only resemble any given star to
-a precision which is limited by the lack of uniformity of the actual stellar surface.
-This begs the question of why a numerically precise model is required for
-modelling transit light curves.  The answer is computational stability:
-this more accurate model can be used over all of parameter speace, and the
-high precision enables computation of derivatives which are beneficial when
-optimizing model parameters, computing the Fisher information matrix, or
+We have presented formulae for the transit (or occultation/eclipse) of a 
+limb-darkened body with a limb-darkening profile which is given by a polynomial 
+in $\upmu$.  These formulae have multiple assumptions built in:  both bodies 
+are treated as spherical \citep{Seager2002,Hui2002}, so that their projected
+sufaces are assumed to be circular \citep{Barnes2003,Barnes2004,Barnes2009b};  limb-
+darkening is treated as azimuthally-symmetric \citep{Barnes2009a}; refraction 
+and any relativistic effects are ignored \citep{Sidis2010}; the edges of both 
+bodies are assumed to have a sharp boundary.
+All of these assumptions are violated in every transit event to some extent, 
+but in many cases can yield an adequate approximation given a particular
+signal-to-noise ratio.
+
+However, any model for the surface brightness of a star can only be approximate:  
+most stars are convective, rotationally-oblate, spotted, oscillating, flaring, 
+etc.  The model we have presented, then, will only resemble any given star to
+a precision which is limited by the lack of uniformity of the actual stellar 
+surface.  This begs the question of why a numerically precise model is required 
+for modelling transit light curves.  The answer is computational accuracy
+and stability: this more accurate model can be used over all of parameter space, 
+and the high precision enables computation of derivatives which are beneficial 
+when optimizing model parameters, computing the Fisher information matrix, or
 deriving parameter posteriors with MCMC.
 
 Since we are limited in the knowledge of the properties of any given star, 
@@ -1261,12 +1283,22 @@ the discrepancies of an azimuthally-symmetric limb-darkened model can be
 treated as a source of noise.
 The deviation of the star from the model can be absorbed into noise models that 
 account for outliers, account for correlations in the noise, or actually
-try to model the deviations of the star from azimuthal symmetry.
+try to model the deviations of the star from azimuthal symmetry 
+\citep[e.g.][]{SanchisOjeda2011}.
 
 In additional to the variability and inhomogeneity of stars, the limb-darkening model
 can only describe the variation of surface brightness with a limited accuracy.
 Our analytic model can be thought of as a Taylor series with which the
 limb-darkening can be expanded to as high an order as the data require.
+In fact, for planetary transits in which $r$ is small, an arbitrary limb-darkening 
+model could be treated as a Taylor series about the location of the planet,
+using the analytic formulae to compute an approximate light curve.  This
+would require varying the polynomial limb-darkening coefficients as the
+planet moved across the disk of the star, which would need to be propagated
+through the derivatives properly.  Such a model could be a faster, and
+perhaps, more accurate way to treat arbitrary limb-darkening laws, such
+as ``non-linear" limb-darkening \citep{Claret2000} or power-law limb-darkening
+\citep{Maxted2018}.
 
 One question is what order of the limb-darkening model to choose to
 fit the data?  Here we suggest several possibile solutions.  The order of the
@@ -1281,7 +1313,7 @@ convenient for this model in that these terms do not contribute to the
 total flux of the star.  A third possibility is to fit stellar atmosphere
 models with the polynomial limb-darkening model until a sufficient precision
 is reached given that warranted by the data, and then to place priors
-on the limb-darkening parameters.
+on the limb-darkening parameters. 
 
 Example applications:  
 \begin{enumerate}
