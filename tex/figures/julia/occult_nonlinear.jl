@@ -39,7 +39,8 @@ end
 # sources:
 
 function occult_nonlinear(r::T,b::T,c1::T,c2::T,c3::T,c4::T) where {T <: Real}
-#  Computes non-linear limb-darkening with numerical integration:
+#  Computes non-linear limb-darkening with numerical integration
+#  using the same approach as Batman:
 
   function Iofmu(r::T) where {T <: Real}
   mu = sqrt(one(T)-r^2)
