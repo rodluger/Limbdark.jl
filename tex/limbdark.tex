@@ -1324,6 +1324,21 @@ Example applications:
 \item HMC.
 \end{enumerate}
 
+The detection of transit-timing variations with low-amplitude sinusoidal
+variations can make use of the fact that small variations in transit time
+can be expanded as a Taylor series to linear order so that perturbations
+in the transit time are the sum of a periodic component and a constant
+times the derivative of the limb-darkened light curve \citep{Ofir2018}.
+This approach requires derivatives of the light curve with respect to
+time, for which the \citett{MandelAgol2002} computation is too
+imprecise near the points of contact, $b \approx r$ and $b \approx 1-r$, 
+within an impact parameter distance of $10^{-4}$, as shown by \citet{Ofir2018}.
+They extrapolated over these regions with polynomials.
+However, our new precise formulae, with derivatives, will be useful
+for the perturbative approach to the detection of transit timing
+variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
+model.
+
 \section{Conclusions}
 
 We have presented an analytic model for the transits, occultations, and
