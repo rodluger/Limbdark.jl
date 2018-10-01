@@ -202,7 +202,7 @@ r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\
 \end{dcases}
 \end{align}
 \citep[e.g.][]{MandelAgol2002}, where
-\begin{eqnarray}\label{eqn:cosine_formulation}
+\begin{eqnarray}\label{eq:cosine_formulation}
 \cos{\kappa_0} &=& \left(\frac{(r-1)(r+1)+b^2}{2br}\right),\\
 \cos{\kappa_1} &=& \left(\frac{(1-r)(1+r)+b^2}{2b}\right),
 \end{eqnarray}
@@ -247,7 +247,7 @@ Note that both $\sin{\kappa_0}$ and $\cos{\kappa_0}$ are divided by $br$, and
 $\sin{\kappa_1}$ and $\cos{\kappa_1}$ are divided by $b$, so that
 in the arctangent formula these denoninator terms cancel, which can improve
 numerical stability for small values of $b$ or $r$; this cancellation doesn't happen
-in the arccosine case given in equation \ref{eqn:cosine_formulation}.
+in the arccosine case given in equation \ref{eq:cosine_formulation}.
 
 This gives the equations:
 \begin{eqnarray} \label{eq:area_of_overlap}
@@ -651,7 +651,7 @@ and the general elliptic integral.
 
 Note that if we had included the radius of the source star in these formulae,
 then the derivatives with respect to the radius of the star yield the
-transit light curve of a uniform emission shell \citep{Schlawin2010}.
+transit light curve of a uniform, thin emission shell \citep{Schlawin2010}.
 
 We have tested these formulae with finite-difference derivatives evaluated at
 256-bit precision, and, as with the total flux term, we find that these are accurate
@@ -847,13 +847,13 @@ differentiation within the \starry code base.
 Although the foregoing analysis takes advantage of the existing formalism
 developed for occultation of spheres with arbitrary spherical harmonic
 brightness, the problem can be simplified somewhat for the limb-darkening
-case due to azimuthal symmetry assumed for a star.  This simplification
+case due to the azimuthal symmetry assumed for a star.  This simplification
 leads to analytic expressions for the derivatives, which we find can be
-faster and more accurate to evaluate than with automatic differentiation.
+evaluated with greater speed and accuracy compared with automatic differentiation.
 
 Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2-y^2}$,
 where $(x,y,z)$ are the coordinates of the unit sphere, then we only require
-Green's functions whose curl has dependence only on $z$ for axially-symmetric
+Green's functions whose curl has dependence on $z$ for axially-symmetric
 limb-darkening.  Following Luger et al. (2018), we choose a Green's function
 of the form
 \begin{equation}
@@ -885,7 +885,7 @@ is the basis set for the surface brightness of the polynomial limb-darkening,
 along with the uniform, $\tilde{g}_0 = z^0$,
 and linear, $\tilde{g}_1 = z^1$, terms which we have derived in \S \ref{sec:reparam}.
 Note that the total flux of each term in this basis set, $\tilde{g}_n$, integrates
-to a total flux of zero for $n \ge 2$.
+to zero for $n \ge 2$.
 
 Also, with this choice of basis, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for
 $n \ge 1$ since $z=0$ at the boundary of the star.   The $n=0$ case we have already
@@ -910,8 +910,10 @@ for even values of $n$ and
 2r (4br)^{\frac{n}{2}} k^3 \int\displaylimits_{-\tfrac{\kappa}{2}}^{\tfrac{\kappa}{2}}
 (k^2-\sin^2\xi)^{\tfrac{n-3}{2}} (1-k^{-2} \sin^2 \xi)^{3/2} (r-b + 2b \sin^2 \xi) d\xi,
 \end{equation}
-for odd values of $n \ge 3$, where $\kappa = 2 \cos^{-1}k$ for $k^2 \le 1$ and
-$\kappa = \pi$ for $k^2 > 1$.
+for odd values of $n \ge 3$, where $\kappa = 2 \sin^{-1}k$ for $k^2 \le 1$ and
+$\kappa = \pi$ for $k^2 > 1$.  Note that $\kappa = \kappa_0$, so in practice we
+reuse the value of $\kappa_0$ which was computed in the uniform limb-darkening
+case (\S \ref{sec:uniform}).
 
 Each of the terms $(k^2-\sin^2\xi)^c$ can be expanded with the binomial theorem,
 and then expressed in terms of the integrals $\mathcal{I}_v(k)$ and $\mathcal{J}_v(k)$
@@ -928,10 +930,18 @@ for even $n$, where $n_0 = n/2$, and
 for odd $n \ge 3$, where $n_0 = (n-3)/2$ and
  $\mathcal{F} = 2r(1-(b-r)^2)^{3/2}$.
 
+For completeness we list the expressions for the functions $\mathcal{I}_v(k)$ and $\mathcal{J}_v(k)$:
+\begin{eqnarray}
+\mathcal{I}_{v} &=& \int_{-\kappa/2}^{\kappa/2} s_\varphi^{2v} d\varphi \quad,\\
+\mathcal{J}_v &=& \int_{-\kappa/2}^{\kappa/2} d\varphi s^{2v}_\varphi\left(1-k^{-2}s^2_\varphi\right)^{3/2},
+\end{eqnarray}
+where, again, we note that $\kappa$ is a simple function of $k$.
+
 \subsection{Limb-darkening coefficients}
 
-Our expansion for limb-darkening in terms of $u_n(1-\upmu)^n$ needs to
-be re-expressed in terms of the Green's basis terms $d_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right]$.
+Our expansion for limb-darkening in terms of $u_n(1-\upmu)^n$ (equation \ref{eq:polynomialld}) needs to
+be re-expressed in terms of the Green's basis terms $d_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right]$,
+where $d_n$ are constants.
 We accomplish this by first transforming $u_n$ to coefficients of $a_n \upmu^n$,
 and then transforming from $a_n$ to $d_n$.
 
