@@ -30,7 +30,7 @@ else
   # Angle of section for source:
   kap1 = atan2(kite_area2,(R-r)*(r+R)+b^2)
   # Flux of visible uniform disk:
-  area = R^2*kap1 + r^2*kap0 - .5*kite_area2
+  area = R^2*kap1 + r^2*kap0 - 0.5*kite_area2
 end
 return area 
 end
@@ -57,7 +57,7 @@ function occult_nonlinear(r::T,b::T,c1::T,c2::T,c3::T,c4::T) where {T <: Real}
     delta0 = delta1
     delta1 = zero(T)
     for i=2:nint
-      sb = Iofmu(.5*(xgrid[i]+xgrid[i-1]))
+      sb = Iofmu(0.5*(xgrid[i]+xgrid[i-1]))
 #      println(xgrid[i]," ",xgrid[i-1])
       da = area_overlap(xgrid[i],r,b)-area_overlap(xgrid[i-1],r,b)
       delta1 += sb*da
@@ -70,11 +70,11 @@ end
 
 nx = 1024
 x = linspace(-1.2,1.2,nx)
-y = 0.
+y = 0.0
 b = sqrt.(x.^2+y.^2)
 c1 = 0.2; c2 = 0.2; c3 = 0.2; c4 = 0.2
 r=0.1; flux = zeros(nx)
-omega = (1.-c1-c2-c3-c4)+.8*c1+2.*c2/3.+4.*c3/7.+c4/2.
+omega = (1.0-c1-c2-c3-c4)+0.8*c1+2.0*c2/3.0+4.0*c3/7.0+c4/2.0
 for i=1:nx
   if b[i] < 1.0+r
     flux[i]=occult_nonlinear(r,b[i],c1,c2,c3,c4)/omega
@@ -84,8 +84,8 @@ end
 
 using PyPlot
 clf()
-plot(x,1.-flux/pi)
-flux = 1.-flux/pi
+plot(x,1.0-flux/pi)
+flux = 1.0-flux/pi
 # The following two lines are used to check occult_nonlinear
 # when c1 = c3 = 0, which yields the quadratic case:
 #u2 = -c4; u1 = c2-2*u2
@@ -140,31 +140,31 @@ fmod = copy(flux)
 #fmod = optimize_fit!(r,b,flux,fmod,u_n)
 #plot(b,flux-fmod,linestyle="--",label="linear")
 #println("linear: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [.1,.1]
+u_n = [0.1,0.1]
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="quadratic")
 println("quad: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [.1,.1,.1]
+u_n = [0.1,0.1,0.1]
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="cubic")
 println("cubic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [.1,.1,.1,.1]
+u_n = [0.1,0.1,0.1,0.1]
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="quartic")
 println("quartic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [.1,.1,.1,.1,.1]
+u_n = [0.1,0.1,0.1,0.1,0.1]
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="quintic")
 println("quintic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [.1,.1,.1,.1,.1,.1]
+u_n = [0.1,0.1,0.1,0.1,0.1,0.1]
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="sextic")
 println("sextic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [.1,.1,.1,.1,.1,.1,.1]
+u_n = [0.1,0.1,0.1,0.1,0.1,0.1,0.1]
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="septic")
 println("septic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [.1,.1,.1,.1,.1,.1,.1,.1]
+u_n = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
 #fmod = optimize_fit!(r,b,flux,fmod,u_n)
 #plot(b,flux-fmod,linestyle="--",label="octic")
 #println("octic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))

@@ -21,7 +21,7 @@ for j=1:length(nb)
   for k=1:9
     tic()
     for i=0:nb0
-      b = sqrt(((i-float(nb0)/2)*2/float(nb0)*(1.+2.*trans.r))^2)
+      b = sqrt(((i-float(nb0)/2)*2/float(nb0)*(1.0+2.0*trans.r))^2)
       trans.b = b
       flux= transit_poly!(trans)
     end

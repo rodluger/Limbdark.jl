@@ -16,7 +16,7 @@ flux_grad = zeros(nb,4)
 flux_grad_big = zeros(nb,4)
 tic()
 for i=0:1000
-  b[i+1] = sqrt(((i-500.)/500.*(1.+2.*r))^2)
+  b[i+1] = sqrt(((i-500.0)/500.0*(1.0+2.0*r))^2)
   flux[i+1]= transit_poly!(r,b[i+1],u,fgrad)
   flux_grad[i+1,:] = fgrad
 end
@@ -31,7 +31,7 @@ end
 fig,axes = subplots(3,1)
 
 ax = axes[1]
-ax[:plot](b,1.-data_pal[:,1],label="Pal",lw=3)
+ax[:plot](b,1.0-data_pal[:,1],label="Pal",lw=3)
 ax[:plot](b,flux,label="AL 2018",linestyle="-.",lw=3,color="r")
 ax[:set_xlabel]("b")
 ax[:set_ylabel]("Flux")
@@ -41,12 +41,12 @@ ax[:set_title]("r = 0.1")
 ax = axes[2]
 ax[:plot](b,-data_pal[:,2],label="df/dr Pal",lw=3)
 ax[:plot](b,-data_pal[:,3],label="df/db Pal",lw=3)
-ax[:plot](b,-50.*data_pal[:,4],label="50x df/du1 Pal",lw=3)
-ax[:plot](b,-50.*data_pal[:,5],label="50x df/du2 Pal",lw=3)
+ax[:plot](b,-50.0*data_pal[:,4],label="50x df/du1 Pal",lw=3)
+ax[:plot](b,-50.0*data_pal[:,5],label="50x df/du2 Pal",lw=3)
 ax[:plot](b,flux_grad[:,1],label="df/dr AL 2018",linestyle="-.",lw=3)
 ax[:plot](b,flux_grad[:,2],label="df/db AL 2018",linestyle="-.",lw=3)
-ax[:plot](b,50.*flux_grad[:,3],label="50x df/du1 AL 2018",linestyle="-.",lw=3)
-ax[:plot](b,50.*flux_grad[:,4],label="50x df/du2 AL 2018",linestyle="-.",lw=3)
+ax[:plot](b,50.0*flux_grad[:,3],label="50x df/du1 AL 2018",linestyle="-.",lw=3)
+ax[:plot](b,50.0*flux_grad[:,4],label="50x df/du2 AL 2018",linestyle="-.",lw=3)
 ax[:legend](loc="center left",fontsize=6)
 ax[:set_xlabel]("b")
 ax[:set_ylabel]("Derivatives")

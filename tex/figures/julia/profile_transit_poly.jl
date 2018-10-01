@@ -38,7 +38,7 @@ flux_grad = zeros(nb,4)
 flux_grad_big = zeros(nb,4)
 tic()
 for i=0:1000000
-  b[i+1] = sqrt(((i-500000.)/500000.*(1.+2.*trans.r))^2)
+  b[i+1] = sqrt(((i-500000.0)/500000.0*(1.0+2.0*trans.r))^2)
   flux[i+1]= transit_poly!(r,b[i+1],u,fgrad)
   flux_grad[i+1,:] = fgrad
 end

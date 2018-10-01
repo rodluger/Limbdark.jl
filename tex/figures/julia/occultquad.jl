@@ -50,7 +50,7 @@ function occultquad(z0::Float64,u1::Float64,u2::Float64,p::Float64)
     etad = (kap1 + p^2*(p^2+2z^2)*kap0 - 0.25*(1+5p^2+z^2)*sqrt((1-a)*(b-1)))/(2pi)
     sqt=0.25*(4z^2-(1+z^2-p^2)^2)
     lambdae = (p^2*kap0+kap1-sqrt(sqt*(sqt >= 0)))/pi
-    return 1.0 - ((1.-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
+    return 1.0 - ((1.0-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
 #    println(z,' ',"Case 2")
   end
 # Cases 3/9: planet within disk of star
@@ -64,7 +64,7 @@ function occultquad(z0::Float64,u1::Float64,u2::Float64,p::Float64)
     etad = 0.5*p^2*(p^2+2z^2)
 #    println("etad ",etad)
     lambdae = p^2
-    return 1.0 - ((1.-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
+    return 1.0 - ((1.0-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
 #    println("lambdae ",lambdae)
 #    println(z,' ',"Cases 3/9")
   end
@@ -83,7 +83,7 @@ function occultquad(z0::Float64,u1::Float64,u2::Float64,p::Float64)
     lambdad = 1//3 + 2//9/pi*(4*(2p^2-1)*ek+(1-4p^2)*kk)
     etad = 0.5*p^2*(p^2+2z^2)
     lambdae = p^2
-    return 1.0 - ((1.-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
+    return 1.0 - ((1.0-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
 #    println("Case 5")
   end
 # Case 6: edge of planet at center of star, p=1/2
@@ -91,7 +91,7 @@ function occultquad(z0::Float64,u1::Float64,u2::Float64,p::Float64)
     lambdad = 1//3 - 4//9/pi
     etad = 3//32
     lambdae = p^2
-    return 1.0 - ((1.-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
+    return 1.0 - ((1.0-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
 #    println("Case 6")
   end
 # Cases 7/8 
@@ -120,14 +120,14 @@ function occultquad(z0::Float64,u1::Float64,u2::Float64,p::Float64)
     etad = (kap1 + p^2*(p^2+2z^2)*kap0 - 0.25*(1+5p^2+z^2)*sqrt((1-a)*(b-1)))/(2pi)
     lambdae = (p^2*kap0+kap1-sqrt(0.25*(4z^2-(1+z^2-p^2)^2)))/pi
 #    println("z ",z," p ",p," lambdae ",lambdae," kap0 ",kap0," kap1 ",kap1)
-    return 1.0 - ((1.-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
+    return 1.0 - ((1.0-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
   end
 # Case 10: planet centered on star
   if (0 < p < 1) && z == 0
     lambdad = -2//3*(1-p^2)^(3//2)
     etad = 0.5*p^2*(p^2+2z^2)
     lambdae = p^2
-    return 1.0 - ((1.-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
+    return 1.0 - ((1.0-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
 #    println("Case 10")
   end
 # Should have already returned
