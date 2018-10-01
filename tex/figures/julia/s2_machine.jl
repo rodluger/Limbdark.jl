@@ -25,21 +25,21 @@ for ib=1:nb
   fepsm[ib] = float(s2(b[ib]-epsilon,b[ib]))
 end
 ax = axes[1]
-ax[:plot](b,fepsp,label=L"$s_2(b,b+10^{-8})$")
-ax[:plot](b,fepsm,label=L"$s_2(b,b-10^{-8})$")
-ax[:plot](b,s2.(b,b),label=L"$s_2(b,b)$")
+ax[:plot](b,fepsp,label=L"$S_1(b+10^{-8},b)$")
+ax[:plot](b,fepsm,label=L"$S_1(b-10^{-8},b)$")
+ax[:plot](b,s2.(b,b),label=L"$S_1(b,b)$")
 ax[:legend](loc="upper right",fontsize=10)
 ax = axes[2]
-ax[:plot](b,(fepsp-s2.(b,b))/epsilon,label=L"$s_2(b,b+10^{-8})-s_2(b,b)$")
-ax[:plot](b,(fepsbigp-s2.(b,b))/epsilon,linewidth=2,linestyle="--",label=L"$s_2(b,b+10^{-8})-s_2(b,b)$, big")
-ax[:plot](b,(fepsm-s2.(b,b))/epsilon,label=L"$s_2(b,b-10^{-8})-s_2(b,b)$")
-ax[:plot](b,(fepsbigm-s2.(b,b))/epsilon,linewidth=2,linestyle="--",label=L"$s_2(b,b-10^{-8})-s_2(b,b)$, big")
+ax[:plot](b,(fepsp-s2.(b,b))/epsilon,label=L"$S_1(b+10^{-8},b)-S_1(b,b)$")
+ax[:plot](b,(fepsbigp-s2.(b,b))/epsilon,linewidth=2,linestyle="--",label=L"$S_1(b+10^{-8},b)-S_1(b,b)$, big")
+ax[:plot](b,(fepsm-s2.(b,b))/epsilon,label=L"$S_1(b-10^{-8},b)-S_1(b,b)$")
+ax[:plot](b,(fepsbigm-s2.(b,b))/epsilon,linewidth=2,linestyle="--",label=L"$S_1(b-10^{-8},b)-S_1(b,b)$, big")
 ax[:legend](loc="right",fontsize=5)
 ax = axes[3]
-ax[:plot](b,s2diff.(b,b+epsilon),label=L"$s_2(b,b+10^{-8})-$ big")
-ax[:plot](b,s2diff.(b,b-epsilon),linewidth=2,linestyle="--",label=L"$s_2(b,b-10^{-8})-$ big")
-#ax[:plot](b,fepsp-fepsbigp,label=L"$s_2(b,b+10^{-8})-$ big")
-#ax[:plot](b,fepsm-fepsbigm,linewidth=2,linestyle="--",label=L"$s_2(b,b-10^{-8})-$ big")
+ax[:plot](b,s2diff.(b,b+epsilon),label=L"$S_1(b+10^{-8},b)-$ big")
+ax[:plot](b,s2diff.(b,b-epsilon),linewidth=2,linestyle="--",label=L"$S_1(b-10^{-8},b)-$ big")
+#ax[:plot](b,fepsp-fepsbigp,label=L"$S_1(b+10^{-8},b)-$ big")
+#ax[:plot](b,fepsm-fepsbigm,linewidth=2,linestyle="--",label=L"$S_1(b-10^{-8},b)-$ big")
 ax[:legend](loc="lower right",fontsize=6)
 
 # Compute b+r = 1+-\epsilon
@@ -52,18 +52,18 @@ for ib=1:nr
   fepsm[ib] = float(s2(1.0-b[ib]-epsilon,b[ib]))
 end
 ax = axes[4]
-ax[:plot](b,fepsp,label=L"$s_2(b,1-b+10^{-8})$")
-ax[:plot](b,fepsm,label=L"$s_2(b,1-b-10^{-8})$")
-ax[:plot](b,s2.(1.0-b,b),label=L"$s_2(b,1-b)$")
+ax[:plot](b,fepsp,label=L"$S_1(1-b+10^{-8},b)$")
+ax[:plot](b,fepsm,label=L"$S_1(1-b-10^{-8},b)$")
+ax[:plot](b,s2.(1.0-b,b),label=L"$S_1(1-b,b)$")
 ax[:legend](loc="lower right",fontsize=10)
 ax = axes[5]
-ax[:plot](b,(fepsp-s2.(1.0-b,b))/epsilon,label=L"$s_2(b,1-b+10^{-8})-s_2(b,1-b)$")
-ax[:plot](b,(fepsbigp-s2.(1.0-b,b))/epsilon,linewidth=2,linestyle="--",label=L"$s_2(b,1-b+10^{-8})-s_2(b,1-b)$, big")
-ax[:plot](b,(fepsm-s2.(1.0-b,b))/epsilon,label=L"$s_2(b,1-b-10^{-8})-s_2(b,1-b)$")
-ax[:plot](b,(fepsbigm-s2.(1.0-b,b))/epsilon,linewidth=2,linestyle="--",linestyle="--",label=L"$s_2(b,1-b-10^{-8})-s_2(b,1-b)$, big")
+ax[:plot](b,(fepsp-s2.(1.0-b,b))/epsilon,label=L"$S_1(1-b+10^{-8},b)-S_1(1-b,b)$")
+ax[:plot](b,(fepsbigp-s2.(1.0-b,b))/epsilon,linewidth=2,linestyle="--",label=L"$S_1(1-b+10^{-8},b)-S_1(1-b,b)$, big")
+ax[:plot](b,(fepsm-s2.(1.0-b,b))/epsilon,label=L"$S_1(1-b-10^{-8},b)-S_1(1-b,b)$")
+ax[:plot](b,(fepsbigm-s2.(1.0-b,b))/epsilon,linewidth=2,linestyle="--",linestyle="--",label=L"$S_1(1-b-10^{-8},b)-S_1(1-b,b)$, big")
 ax[:legend](loc="lower right",fontsize=5)
 ax = axes[6]
-ax[:plot](b,s2diff.(1.0-b+epsilon,b),label=L"$s_2(b,1-b+10^{-8})-$ big")
-ax[:plot](b,s2diff.(1.0-b-epsilon,b),linewidth=2,linestyle="--",label=L"$s_2(b,1-b+10^{-8})-$ big")
+ax[:plot](b,s2diff.(1.0-b+epsilon,b),label=L"$S_1(1-b+10^{-8},b)-$ big")
+ax[:plot](b,s2diff.(1.0-b-epsilon,b),linewidth=2,linestyle="--",label=L"$S_1(1-b+10^{-8},b)-$ big")
 ax[:legend](loc="upper right",fontsize=6)
 savefig("s2_machine.pdf", bbox_inches="tight")

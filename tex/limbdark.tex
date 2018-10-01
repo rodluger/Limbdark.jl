@@ -9,7 +9,7 @@
 \setlength{\belowdisplayskip}{1.5em}
 
 \title{%
-Analytic Transit Light Curves for Limb-Darkened Stars with Polynomial Dependence
+Analytic Transit Light Curves for Stars with Polynomial Limb-Darkening
 }
 
 
@@ -24,10 +24,10 @@ Analytic Transit Light Curves for Limb-Darkened Stars with Polynomial Dependence
  transiting a star with a limb darkening profile which is a polynomial function
  up to arbitrary integer order.  We provide updated analytic expressions for the
  uniform and linear limb darkened cases, as well as new expressions
- for higher order integer powers.  The formulae are crafted to be numerically
+ for higher order integer powers of limb darkening.  The formulae are crafted to be numerically
  stable over the expected range of usage.  We additionally present formulae for
  the partial derivatives of instantaneous flux with respect to the radius ratio,
- impact parameter, and limb-darkening parameters.  Our expressions are rapid to
+ impact parameter, and limb-darkening coefficients.  Our expressions are rapid to
  evaluate and can be used to accurately compute the first partial derivatives of
  transit light curves.
 \end{abstract}
@@ -49,8 +49,8 @@ the presence of spectral features may be used to constrain the chemical composit
 of the planet's atmosphere.  If the transit times are seen to vary, a dynamical
 model can constrain the masses of the planet companions (and vice versa).  If
 the planet is seen in eclipse, its temperature, emission spectrum, and atmospheric
-circulation patterm can be constrained.  When combined with radial velocity
-measurements, the bulk density of a planet can be measured, yielding constraints
+circulation pattern can be constrained.  When combined with radial velocity
+measurements, the bulk density of a planet can be inferred, yielding constraints
 on its bulk composition.
 
 And yet, all of these inferences are predicated on the precise computation of models
@@ -63,7 +63,7 @@ The most important ingredient to these models has been a description of the
 limb-darkening model which is flexible enough and accurate enough to describe the
 emission from a stellar photosphere.  Linear and quadratic limb-darkening laws
 were sufficient for lower-precision measurements; however, the measurement of
-transit light curves has steadily improved.  Higher order terms or non-linear laws
+transit light curves has steadily improved in precision.  Higher order terms or non-linear laws
 have become necessary to describe higher precision measurements \citep{Claret2000,
 Gimenez2006}, which tend to involve more computational burden.
 
@@ -202,7 +202,7 @@ r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\
 \end{dcases}
 \end{align}
 \citep[e.g.][]{MandelAgol2002}, where
-\begin{eqnarray}
+\begin{eqnarray}\label{eqn:cosine_formulation}
 \cos{\kappa_0} &=& \left(\frac{(r-1)(r+1)+b^2}{2br}\right),\\
 \cos{\kappa_1} &=& \left(\frac{(1-r)(1+r)+b^2}{2b}\right),
 \end{eqnarray}
@@ -245,9 +245,9 @@ which can be derived from the area of the triangles formed by the centers of
 the circles and one intersection point.
 Note that both $\sin{\kappa_0}$ and $\cos{\kappa_0}$ are divided by $br$, and
 $\sin{\kappa_1}$ and $\cos{\kappa_1}$ are divided by $b$, so that
-in the arctangent formula these denoninator terms cancel, , which can improve
+in the arctangent formula these denoninator terms cancel, which can improve
 numerical stability for small values of $b$ or $r$; this cancellation doesn't happen
-in the arccosine case.
+in the arccosine case given in equation \ref{eqn:cosine_formulation}.
 
 This gives the equations:
 \begin{eqnarray} \label{eq:area_of_overlap}
@@ -259,7 +259,7 @@ A_{lens} &=& \kappa_1 + r^2\kappa_0 - A_{kite},\\
 The performance of this formula relative to the standard formula is profiled
 in Figure \ref{fig:overlap_precision} for $r=0.1$, a typical
 value for transiting exoplanets.  We have carried out
-the computation in \texttt{Julia} language, both in double-precision
+the computation in the \texttt{Julia} language, both in double-precision
 (\texttt{Float64}), and 256-bit precision (\texttt{BigFloat}), and
 subtracted the results to measure the numerical errors of the computation.
 
@@ -303,7 +303,7 @@ ratio, $r$, and impact parameter, $b$, turn out to be straightforward:
 \frac{\partial S_0(r,b)}{\partial r} &=& -2r \kappa_0,\\
 \frac{\partial S_0(r,b)}{\partial b} &=& \frac{A_{kite}}{b},
 \end{eqnarray}
-which can be computed from the quantities used in calculating $S_0$.
+which can be computed from the quantities already used in calculating $S_0$.
 At the contact points, when $b = \vert 1\pm r\vert$, the derivatives are undefined.
 In practice this can be a problen when taking finite-differences across
 the discontinuous boundary, but with the analytic formulae, these points
@@ -416,7 +416,7 @@ with
     k^2 &= \frac{1 - r^2 - b^2 + 2 b r}{4 b r}
     \quad.
 \end{align}
-Note that $S_1 = s_2$ in the spherical harmonic expansion used in \starry as
+Note that $S_1(r,b) = s_2(r,b)$ in the spherical harmonic expansion used in \starry as
 described in Luger et al. (2018).
 For the cases $b=r$, $b=1-r$, $b=0$, $r=0$, or $\vert r-b\vert \ge 1$, there are special
 expressions for $\Lambda(r,b)$ given below.
@@ -448,10 +448,10 @@ elliptic integrals into a general complete elliptic integral defined by \citet{B
 \begin{equation}
 {\rm cel}(k_c,p,a,b) = \int_0^{\pi/2} \frac{a\cos^2{\phi} + b\sin^2{\phi}}{\cos^2{\phi}+p\sin^2{\phi}} \frac{d\phi}{\sqrt{\cos^2{\phi}+k_c^2\sin^2{\phi}}},
 \end{equation}
-where $k_c = \sqrt{1-m}$ where for $b+r \ge 1$,
+where $k_c = \sqrt{1-m}$, and for $b+r \ge 1$,
 $m=k^2$, while for $b+r \le 1$, $m=1/k^2$.  Although $k_c$ can be computed from
 $m$, we have found better numerical stability in computing $k_c$ analytically
-from $b$ and $r$, rather than from $m$:
+from $b$ and $r$:
 \begin{align}
     k_c &=
     \begin{dcases}
@@ -479,7 +479,7 @@ with the approach of \citet{Bartky1938}, which uses recursion to approximate the
 integral to a specified precision.
 
 These elliptic integral transformations lead to the following numerically-stable
-expression for the linear limb-darkening flux, $s_2(r,b) = S_1(r,b)$, in which
+expression for the linear limb-darkening flux, $S_1(r,b) = s_2(r,b)$, in which
 \begin{align}
     \label{eq:biglam_stable}
     \Lambda &=
@@ -519,7 +519,7 @@ p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
 in the $k^2 > 1$ case.  Note that in this equation the conditions
 should be evaluated in the order they appear.
 
-The $s_2(r,b)$ function is plotted in Figure \ref{s2_plot}.  The
+The $S_1(r,b)$ function is plotted in Figure \ref{s2_plot}.  The
 function varies smoothly from the lower right where the disk is
 unocculted to the upper left where it is completely occulted.
 There are several points which need to be handled separately as
@@ -531,7 +531,7 @@ $b=r$ and $b=1-r$, another simplification occurs.  For $b=r$,
 the disk of the occultor crosses the center of the source;
 this needs to be computed separately in the $r<1/2$, $r=1/2$,
 and $r>1/2$ limits.  The first and fourth contacts occur at
-$b=1+r$, where $s_2=1$;  this is the upper bound to the $k^2 < 1$
+$b=1+r$, where $S_1=1$;  this is the upper bound to the $k^2 < 1$
 region for $b+r >1$.
 For $r \ge 1$, the second and third contacts (at the start and
 end of complete occultation) occur when $b=1-r$, which is the
@@ -545,7 +545,7 @@ that equation \ref{eq:biglam_stable} is accurate to machine
 precision in all of these regimes.
 We tested the accuracy by computing the equations with 256 bit
 arithmetic, which is much less subject to round-off error, and
-hence gives essentially exact expressions.  We implemented the
+hence gives more precise expressions than double precision.  We implemented the
 pseudocode from \citet{Bulirsch1969} to compute ${\rm cel}(k_c,p,a,b)$,
 which has a termination test that scales as the square root of
 the machine precision.  We find that the transformed expressions
@@ -556,10 +556,10 @@ within $10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     \begin{centering}
     \includegraphics[width=0.85\linewidth]{figures/julia/transit_linear.pdf}
     \caption{The intensity of a linearly limb-darkened star ($u_1=1$) being
-    eclipsed, $s_2(r,b)$.
-    In the limit $b > r+1$, no eclipse occurs, so $s_2=1$.  For $b < r-1$, the star
-    is completely eclipsed and $s_2=0$.  In the limits $b=r$ and $b=1-r$, special
-    expressions must be used}
+    eclipsed, $S_1(r,b)$.
+    In the limit $b > r+1$, no eclipse occurs, so $S_1=1$.  For $b < r-1$, the star
+    is completely eclipsed and $S_1=0$.  In the limits $b=r$ and $b=1-r$, special
+    expressions must be used.}
     \end{centering}
 \end{figure}
 
@@ -567,19 +567,19 @@ within $10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     \begin{centering}
     \includegraphics[width=0.85\linewidth]{figures/julia/s2_residuals.pdf}
     \caption{The numerical error in computing the flux of an eclipsed,  linearly
-    limb-darkened star ($u_1=1$), $s_2(r,b)$.}
+    limb-darkened star ($u_1=1$), $S_1(r,b)$.}
     \end{centering}
 \end{figure}
 
 \begin{figure}\label{s2_machine}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/s2_machine.pdf}
-    \caption{The accuracy of $s_2(r,b)$ near $b=r$ (left panel) and
+    \caption{The accuracy of $S_1(r,b)$ near $b=r$ (left panel) and
     $b=1-r$ (right panel). The x-axese are impact parameter b,
-    while the y axes in the top panels show $s_2(r,b)$, with $r$
+    while the y axes in the top panels show $S_1(r,b)$, with $r$
     given in the legend of each panel. The middle panels plot
-    the difference $(s_2(b,b\pm\epsilon)-s_2(b,b))/\epsilon$
-    and $(s_2(b,1-b\pm\epsilon)-s_2(b,1-b))/\epsilon$. The bottom
+    the difference $(S_1(b,b\pm\epsilon)-S_1(b,b))/\epsilon$
+    and $(S_1(b,1-b\pm\epsilon)-S_1(b,1-b))/\epsilon$. The bottom
     panels show the numerical precision by the comparing double precision
     computation with \texttt{BigFloat} precision (256-bit).}
     \end{centering}
