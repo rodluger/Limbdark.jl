@@ -1135,8 +1135,8 @@ we can use the polynomial model as an alternative limb-darkening model.
 \item Fit polynomial model to stellar limb-darkening models.
 \end{itemize}
 
-We have computed an example non-linaer light curve with $r=0.1$ and
-$c_1=c_2=c_3=c_4=0.2$, and fit it with successive orders of the
+We have computed an example non-linear light curve with $r=0.1$ and
+$c_1=c_2=c_3=c_4=0.2$, and then fit it with successive orders of the
 polynomial approximation.  The model we compute with a ``layer-cake"
 model in which sums of layers of surface brightness with different
 radii are added together to approximate the lightcurve;  this
@@ -1184,7 +1184,7 @@ using the non-linear limb-darkening model.
 
 We used the same set of atmospheres as \citet{Claret2018}, but fit these
 with the polynomial model, varying the order of the polynomial until the
-fit no longer improves.
+fit no longer improves. TBD
 
 \section{Examples}
 
@@ -1252,7 +1252,8 @@ for improvement on this benchmark.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_pal_r0pt1.pdf}
-    \caption{Comparison of \citet{Pal2008} with Agol \& Luger (2018).}
+    \caption{Comparison of \citet{Pal2008} with Agol \& Luger (2018).  The 
+    coefficients are $u_1=0.2$ and $u_2=0.3$.}
     \label{fig:Pal_comparison}
     \end{centering}
 \end{figure}
