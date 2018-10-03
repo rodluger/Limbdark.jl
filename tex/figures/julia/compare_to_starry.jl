@@ -6,8 +6,8 @@ using PyCall
 
 # System properties
 npts = 1000
-iu = 30
-u_n = ones(iu) / iu
+iu = 3
+u_n = 0.5*ones(iu) / iu
 r = 0.1
 b = zeros(npts)
 for i=1:npts
