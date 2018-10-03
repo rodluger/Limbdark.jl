@@ -1,9 +1,10 @@
-# Computes I_v(k) and I_v(k) vectors from Luger et al. (2018), along 
+# Computes I_v(k) and I_v(k) vectors from Luger et al. (2018), along
 # the derivatives with respect to k using recursion.
 include("transit_structure.jl")
 include("cel_bulirsch.jl")
 
 #using GSL
+using SpecialFunctions
 
 function Iv_series(k2::T,v::Int64) where {T <: Real}
 # Use series expansion to compute I_v:

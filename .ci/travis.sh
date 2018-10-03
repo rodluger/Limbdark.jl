@@ -10,7 +10,7 @@ conda update -q conda
 conda info -a
 conda create --yes -n test python=$PYTHON_VERSION
 conda activate test
-conda install -c conda-forge numpy=$NUMPY_VERSION scipy matplotlib setuptools pytest pytest-cov pip
+conda install -c conda-forge numpy=$NUMPY_VERSION scipy matplotlib setuptools pytest pytest-cov pip starry
 
 # Install starry [DISABLED: Let's use conda-forge]
 # pip install git+https://github.com/rodluger/starry
