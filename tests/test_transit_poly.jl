@@ -10,7 +10,7 @@ include("../src/transit_poly_struct.jl")
 function transit_poly_int(r,b,u)
 if b < (1.0+r)
   s_1 = maximum([0.0,b-r]); s_2=minimum([1.0,b+r])
-  ns = 10000; ds=(s_2-s_1)/ns
+  ns = 20000; ds=(s_2-s_1)/ns
   s = linspace(s_1+.5*ds,s_2-.5*ds,ns)
   fobs = zero(r)
   for j=1:ns
@@ -97,5 +97,8 @@ using PyPlot
 
 plot(b0,lc_ana, linewidth=2, label="Analytic")
 plot(b0,lc_num, linewidth=1, label="Numeric")
+
+println("Maximum difference of lightcurve for N=",iu,": ",maxabs(lc_ana-lc_num))
+@test isapprox(lc_ana,lc_num,rtol=1e-4)
 
 end

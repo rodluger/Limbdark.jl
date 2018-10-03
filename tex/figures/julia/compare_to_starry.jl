@@ -6,7 +6,7 @@ using PyCall
 
 # System properties
 npts = 1000
-iu = 3
+iu = 30
 u_n = 0.5*ones(iu) / iu
 r = 0.1
 b = zeros(npts)
@@ -19,7 +19,8 @@ flux_julia = zeros(npts)
 trans = transit_init(r, 0.0, u_n, true)
 for i=1:npts
     trans.b = abs(b[i])
-    flux_julia[i] = transit_poly!(trans)
+#    flux_julia[i] = transit_poly!(trans)
+    flux_julia[i] = transit_poly(r,abs(b[i]),u_n)
 end
 
 # Starry flux
@@ -38,3 +39,5 @@ ylabel("Flux")
 legend()
 ylim(0.985, 1.01)
 savefig("compare_to_starry_" * string(iu) * ".pdf", bbox_inches="tight")
+
+
