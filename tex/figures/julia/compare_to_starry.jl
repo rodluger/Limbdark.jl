@@ -19,8 +19,9 @@ flux_julia = zeros(npts)
 trans = transit_init(r, 0.0, u_n, true)
 for i=1:npts
     trans.b = abs(b[i])
-#    flux_julia[i] = transit_poly!(trans)
-    flux_julia[i] = transit_poly(r,abs(b[i]),u_n)
+    trans = transit_init(r, abs(b[i]), u_n, true)
+    flux_julia[i] = transit_poly!(trans)
+#    flux_julia[i] = transit_poly(r,abs(b[i]),u_n)
 end
 
 # Starry flux
