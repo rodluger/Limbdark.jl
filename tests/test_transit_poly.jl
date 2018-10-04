@@ -84,12 +84,15 @@ for i=1:npts
 end
 
 lc_ana = zeros(npts); lc_num=zeros(npts)
+trans = transit_init(r,0.0,u_n,false)
 for i=1:length(b0)
   b=b0[i]
   if mod(i,10) == 0
     println("i: ",i,"b: ",b)
   end
-  lc_ana[i] = transit_poly(r,abs(b),u_n)
+#  lc_ana[i] = transit_poly(r,abs(b),u_n)
+  trans.b = abs(b)
+  lc_ana[i] = transit_poly!(trans)
   lc_num[i] = transit_poly_int(r,abs(b),u_n)
 end
 
@@ -98,7 +101,7 @@ using PyPlot
 plot(b0,lc_ana, linewidth=2, label="Analytic")
 plot(b0,lc_num, linewidth=1, label="Numeric")
 
-println("Maximum difference of lightcurve for N=",iu,": ",maxabs(lc_ana-lc_num))
+println("Maximum difference of lightcurve for N=",iu,": ",maximum(abs,lc_ana-lc_num))
 @test isapprox(lc_ana,lc_num,rtol=1e-4)
 
 end

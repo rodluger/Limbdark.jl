@@ -33,7 +33,7 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zeros(T,n+1),  # sn
   zeros(T,v_max+1),# Iv
   zeros(T,v_max+1),# Jv
-  true,            # grad
+  grad,            # grad
   zeros(T,v_max+1),# dIvdk
   zeros(T,v_max+1),# dJvdk
   zeros(T,2),      # s2_grad
@@ -43,6 +43,10 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zeros(T,n+3),    # dfdrbc
   zeros(T,n+2)     # dfdrbu
 )
-compute_c_n_grad!(trans)
+if grad
+  compute_c_n_grad!(trans)
+else
+  compute_c_n(trans)
+end
 return trans
 end
