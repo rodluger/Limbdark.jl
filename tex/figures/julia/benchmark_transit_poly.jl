@@ -18,16 +18,19 @@ timing = zeros(length(nb))
 tmean = zeros(9)
 for j=1:length(nb)
   nb0 = nb[j]
+  b = zeros(nb0)
+  flux = zeros(nb0)
   for k=1:9
     tic()
-    for i=0:nb0
-      b = sqrt(((i-float(nb0)/2)*2/float(nb0)*(1.0+2.0*trans.r))^2)
-      trans.b = b
-      flux= transit_poly!(trans)
+    for i=1:nb0
+      b[i] = sqrt(((i-float(nb0)/2)*2/float(nb0)*(1.0+2.0*trans.r))^2)
+      trans.b = b[i]
+      flux[i]= transit_poly!(trans)
     end
     tmean[k] = toq()
   end
   timing[j] = median(tmean)
+#  println("nb = ",nb0," min(b): ",minimum(b)," max(b): ",maximum(b)," min(flux): ",minimum(flux)," max(flux): ",maximum(flux))
 end
 return timing
 end
@@ -44,7 +47,7 @@ for iu = 1:nnu
 #compute_c_n_grad!(trans)  # Now included in transit_init function
 
 # Call the function:
-  timing=profile_transit_poly(trans,nb)
+  @time timing=profile_transit_poly(trans,nb)
   if iu == 1
     timing_ratio[:,iu]=timing
   else
@@ -58,7 +61,6 @@ xlabel("Number of points")
 ylabel("Timing [sec]")
 timing_ratio[:,1]=1.0
 #clf()
-## Now, plot the flux and derivatives:
 #plot(b,flux-1,label="flux-1")
 #plot(b,trans.r*flux_grad[:,1],label="r*dfdr")
 #plot(b,trans.r*flux_grad[:,2],label="r*dfdb")
@@ -71,10 +73,14 @@ timing_ratio[:,1]=1.0
 savefig("benchmark_poly_transit.pdf", bbox_inches="tight")
 
 clf()
-loglog(nu,vec(median(timing_ratio,1)),"o")
-loglog(nu,vec(median(timing_ratio,1)),label="Measured",linewidth=2)
-plot(nu,(nu).^(1./3.),linestyle="--",label=L"$n^{1/3}$",linewidth=2)
-plot(nu,(nu).^(3./8.),linestyle="--",label=L"$n^{3/8}$",linewidth=2)
+tmed = vec(median(timing_ratio,1))
+semilogx(nu,tmed,"o")
+semilogx(nu,tmed,label="Measured",linewidth=2)
+alp = log(tmed[nnu])/log(nu[nnu])
+semilogx(nu,nu.^alp,linestyle="--",label=L"$n^{0.237}$")
+#plot(nu,(nu).^(1./3.),linestyle="--",label=L"$n^{1/3}$",linewidth=2)
+#plot(nu,(nu).^(3./8.),linestyle="--",label=L"$n^{3/8}$",linewidth=2)
+#plot(nu,(nu).^(3./8.),linestyle="--",label=L"$n^{3/8}$",linewidth=2)
 xlabel("Number of limb-darkening coefficients")
 ylabel("Relative timing")
 legend(loc="upper left")
