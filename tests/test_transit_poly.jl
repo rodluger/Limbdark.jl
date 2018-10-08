@@ -4,13 +4,14 @@ include("../src/transit_poly_struct.jl")
 #nu = 2+ceil(Int64,rand()*20); r=rand(); b=rand()*(1+r); u = rand(nu); u *= rand()/sum(u)
 #r=rand(); b=rand()*(1+r); u = [0.,0.,0.,0.,1.0]; n=length(u)
 
-@testset "transit_poly" begin
+#@testset "transit_poly" begin
 
 # Now, integrate by hand:
-function transit_poly_int(r,b,u)
+function transit_poly_int(r,b,u,ns)
 if b < (1.0+r)
   s_1 = maximum([0.0,b-r]); s_2=minimum([1.0,b+r])
-  ns = 20000; ds=(s_2-s_1)/ns
+#  ns = 20000; ds=(s_2-s_1)/ns
+  ds=(s_2-s_1)/ns
   s = linspace(s_1+.5*ds,s_2-.5*ds,ns)
   fobs = zero(r)
   for j=1:ns
@@ -62,12 +63,13 @@ n = 2+ceil(Int64,rand()*20); u = rand(n); u *= rand()/sum(u)
 #const dIvdk = zeros(typeof(r),v_max+1)
 #const dJvdk = zeros(typeof(r),v_max+1)
 
+ns = 20000
 for i=1:length(r0)
   r=r0[i]; b=b0[i]
   flux = transit_poly(r,b,u)
   @time flux = transit_poly(r,b,u)
-  f_num = transit_poly_int(r,b,u)
-  @time f_num = transit_poly_int(r,b,u)
+  f_num = transit_poly_int(r,b,u,ns)
+  @time f_num = transit_poly_int(r,b,u,ns)
   @test isapprox(f_num,flux,atol=1e-5)
   println("r: ",r," b: ",b," f_an: ",flux," f_num: ",f_num," diff: ",flux-f_num)
 end
@@ -93,7 +95,7 @@ for i=1:length(b0)
 #  lc_ana[i] = transit_poly(r,abs(b),u_n)
   trans.b = abs(b)
   lc_ana[i] = transit_poly!(trans)
-  lc_num[i] = transit_poly_int(r,abs(b),u_n)
+  lc_num[i] = transit_poly_int(r,abs(b),u_n,ns)
 end
 
 using PyPlot
@@ -104,4 +106,4 @@ plot(b0,lc_num, linewidth=1, label="Numeric")
 println("Maximum difference of lightcurve for N=",iu,": ",maximum(abs,lc_ana-lc_num))
 @test isapprox(lc_ana,lc_num,rtol=1e-4)
 
-end
+#end

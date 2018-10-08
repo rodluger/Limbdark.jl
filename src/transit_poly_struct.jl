@@ -195,13 +195,26 @@ function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
 # Pass transit structure, and compute flux:
 flux = transit_poly_c!(t)
 # Now, transform derivaties from c to u:
-fill!(t.dfdrbu,zero(T))
+#fill!(t.dfdrbu,zero(T))
 t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
 t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
 # u_n derivatives:
-for i=1:t.n, j=0:t.n
-  t.dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
-end
+t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
+#t.dfdrbu[3:t.n+2] = t.dcdu' * t.dfdrbc[3:t.n+3]
+#println("Mult: ",t.dfdrbu)
+#fill!(t.dfdrbu,zero(T))
+#t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
+#t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
+#for i=1:t.n, j=0:t.n
+#  t.dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
+#end
+#for j=0:t.n
+#  t.dfdrbu[3:t.n+2] += t.dfdrbc[j+3]*t.dcdu[j+1,1:t.n]
+#end
+#for i=1:t.n
+#  t.dfdrbu[i+2] += dot(t.dfdrbc[3:t.n+3],t.dcdu[:,i])
+#end
+#println("Loop: ",t.dfdrbu)
 return flux
 end
 
@@ -316,7 +329,9 @@ if k2 > 0
   end
 end
 
+rinv = inv(r); binv = inv(b); rmb_on_onembmr2=(r-b)*inv(onembmr2)
 # Next, loop over the Green's function components:
+Iv1 = zero(T); Iv2=zero(T); Jv1=zero(T); Jv2=zero(T)
 for n=2:t.n
   pofgn = zero(T)
   dpdr = zero(T)
@@ -327,20 +342,22 @@ for n=2:t.n
     n0 = convert(Int64,n/2)
     coeff = (-fourbr)^n0
     # Compute i=0 term
-    pofgn = coeff*((r-b)*t.Iv[n0+1]+2b*t.Iv[n0+2])
-    dpdr = coeff*t.Iv[n0+1]
-    dpdb = coeff*(-t.Iv[n0+1]+2*t.Iv[n0+2])
-    dpdr += (n0+1)*pofgn/r
-    dpdb += n0*pofgn/b
+    Iv1 = t.Iv[n0+1]; Iv2 = t.Iv[n0+2]
+    pofgn = coeff*((r-b)*Iv1+2b*Iv2)
+    dpdr = coeff*Iv1
+    dpdb = coeff*(-Iv1+2*Iv2)
+    dpdr += (n0+1)*pofgn*rinv
+    dpdb += n0*pofgn*binv
 # For even n, compute coefficients for the sum over I_v:
     for i=1:n0
+      Iv2 = Iv1; Iv1 = t.Iv[n0-i+1]
       coeff *= -(n0-i+1)/i*k2
-      term =  coeff*((r-b)*t.Iv[n0-i+1]+2b*t.Iv[n0-i+2])
+      term =  coeff*((r-b)*Iv1+2b*Iv2)
       pofgn += term
-      dpdr += coeff*t.Iv[n0-i+1]
-      dpdb += coeff*(-t.Iv[n0-i+1]+2*t.Iv[n0-i+2])
-      dpdr += term*(i*2*(b-r)/onembmr2+(n0+1-i)/r)
-      dpdb += term*(i*2*(r-b)/onembmr2+(n0-i)/b)
+      dpdr += coeff*Iv1
+      dpdb += coeff*(-Iv1+2*Iv2)
+      dpdr += term*(-i*2*rmb_on_onembmr2+(n0+1-i)*rinv)
+      dpdb += term*( i*2*rmb_on_onembmr2+(n0-i)*binv)
     end
     pofgn *= 2r
     dpdr *= 2r
@@ -350,27 +367,30 @@ for n=2:t.n
     n0 = convert(Int64,(n-3)/2)
     coeff = (-fourbr)^n0
     # Compute i=0 term
-    pofgn = coeff*((r-b)*t.Jv[n0+1]+2b*t.Jv[n0+2])
-    dpdr = coeff*t.Jv[n0+1]
-    dpdb = coeff*(-t.Jv[n0+1]+2*t.Jv[n0+2])
-    dpdr  += pofgn*(3*(b-r)*r+(n0+1)*onembmr2)/(r*onembmr2)
-    dpdb  += pofgn*(3*(r-b)*b+n0*onembmr2)/(b*onembmr2)
+    Jv1 = t.Jv[n0+1]; Jv2 = t.Jv[n0+2]
+    pofgn = coeff*((r-b)*Jv1+2b*Jv2)
+    dpdr = coeff*Jv1
+    dpdb = coeff*(-Jv1+2*Jv2)
+    dpdr  += pofgn*(-3*rmb_on_onembmr2+(n0+1)*rinv)
+    dpdb  += pofgn*( 3*rmb_on_onembmr2+n0*binv)
     dpdk = coeff*((r-b)*t.dJvdk[n0+1]+2b*t.dJvdk[n0+2])
 # For even n, compute coefficients for the sum over I_v:
     for i=1:n0
       coeff *= -(n0-i+1)/i*k2
-      term = coeff*((r-b)*t.Jv[n0-i+1]+2b*t.Jv[n0-i+2])
+      Jv2 = Jv1; Jv1 = t.Jv[n0-i+1]
+      term = coeff*((r-b)*Jv1+2b*Jv2)
       pofgn += term
-      dpdr  +=  coeff*t.Jv[n0-i+1]
-      dpdb  +=  coeff*(-t.Jv[n0-i+1]+2*t.Jv[n0-i+2])
-      dpdr  += term*((i*2+3)*(b-r)*r+(n0+1-i)*onembmr2)/(r*onembmr2)
-      dpdb  += term*((i*2+3)*(r-b)*b+(n0-i)*onembmr2)/(onembmr2*b)
+      dpdr  +=  coeff*Jv1
+      dpdb  +=  coeff*(-Jv1+2*Jv2)
+      dpdr  += term*(-(i*2+3)*rmb_on_onembmr2+(n0+1-i)*rinv)
+      dpdb  += term*( (i*2+3)*rmb_on_onembmr2+(n0-i)*binv)
       dpdk  += coeff*((r-b)*t.dJvdk[n0-i+1]+2b*t.dJvdk[n0-i+2])
     end
-    pofgn *= 2r*onembmr2^1.5
-    dpdr  *= 2r*onembmr2^1.5
-    dpdb  *= 2r*onembmr2^1.5
-    dpdk  *= 2r*onembmr2^1.5
+    norm = 2r*onembmr2^1.5
+    pofgn *= norm
+    dpdr  *= norm
+    dpdb  *= norm
+    dpdk  *= norm
   end
 # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
 # boundary for n > 0.
