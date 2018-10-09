@@ -28,6 +28,3 @@ figures/julia/%.pdf: figures/julia/%.jl
 
 figures/python/%.pdf: figures/python/%.py
 	cd $(<D);python $(<F)
-
-publish:
-	cd ..; ./publish.sh

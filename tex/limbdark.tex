@@ -1,5 +1,6 @@
 \documentclass[modern]{aastex61}
 
+\usepackage{fontspec}
 \input{stylez}
 \usepackage{graphicx}
 
@@ -315,7 +316,7 @@ the higher order limb-darkened light curves.
 
 \begin{figure}
     \begin{centering}
-    \includegraphics[width=\linewidth]{Circle_overlap_area.pdf}
+    \includegraphics[width=\linewidth]{figures/python/overlap.pdf}
     \caption{The area of overlap of two circles can be computed as the sum of
     the area of the sectors formed by the centers of each circle and the
     boundary between the points of intersection, minus the area of the kite-shaped
@@ -792,8 +793,6 @@ for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\b
     \end{centering}
 \end{figure}
 
-{\color{red}We should derive simplified expressions of our formulae in \starry for the $m = 0$ case.} \todo{}
-
 \begin{align}
     \label{eq:PGnI}
     \mathcal{P}(\bvec{G}_n) &=
@@ -1252,7 +1251,7 @@ for improvement on this benchmark.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_pal_r0pt1.pdf}
-    \caption{Comparison of \citet{Pal2008} with Agol \& Luger (2018).  The 
+    \caption{Comparison of \citet{Pal2008} with Agol \& Luger (2018).  The
     coefficients are $u_1=0.2$ and $u_2=0.3$.}
     \label{fig:Pal_comparison}
     \end{centering}

@@ -30,13 +30,13 @@ r = 0.1
 b = np.linspace(-1.5, 1.5, npts)
 
 # Second-order
-map = starry.LimbDarkenedMap()
+map = starry.Map()
 map[1] = u[1]
 map[2] = u[2]
 flux = map.flux(xo=b, yo=0, ro=r)
 
 # Tenth-order
-map10 = starry.LimbDarkenedMap(10)
+map10 = starry.Map(10)
 for l in range(1, len(u10)):
     map10[l] = u10[l]
 flux10 = map10.flux(xo=b, yo=0, ro=r)

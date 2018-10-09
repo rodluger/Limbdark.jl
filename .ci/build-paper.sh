@@ -22,16 +22,11 @@ then
         python "$f"
     done
 
-    # Build the paper
+    # Build the paper with tectonic
     cd $TRAVIS_BUILD_DIR/tex
-	pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex
-	bibtex limbdark
-	pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex
-	pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex
-    pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex
+	tectonic limbdark.tex
 
     # Force push the paper to GitHub
-    # NOTE: This is hacky. I couldn't get the old aproach to work for some reason.
     cd $HOME
     mkdir tmp && cd tmp
     git init
