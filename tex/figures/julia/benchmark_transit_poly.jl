@@ -5,7 +5,9 @@
 # Defines the function that computes the transit:
 include("../../../src/transit_poly_struct.jl")
 
+#nu = [1,2,3,5,8,13,21,34,55,89,144,233,377,610]; nnu = length(nu)
 nu = [1,2,3,5,8,13,21,34,55,89,144,233,377,610]; nnu = length(nu)
+#nu = [1,2,3,5,8,13,21,34,40,45,50]; nnu = length(nu)
 nb = [100,316,1000,3160,10000,31600,100000]; nnb = length(nb)
 timing_ratio = zeros(nnb,nnu)
 
@@ -28,6 +30,7 @@ for j=1:length(nb)
       flux[i]= transit_poly!(trans)
     end
     tmean[k] = toq()
+    plot(b,flux)
   end
   timing[j] = median(tmean)
 #  println("nb = ",nb0," min(b): ",minimum(b)," max(b): ",maximum(b)," min(flux): ",minimum(flux)," max(flux): ",maximum(flux))
@@ -42,6 +45,8 @@ using PyPlot
 clf()
 for iu = 1:nnu
   u_n = ones(nu[iu])/nu[iu]
+#  u_n = rand(nu[iu]); u_n /= sum(u_n)
+#  u_n = zeros(nu[iu]); u_n[nu[iu]] = 1.0
   trans = transit_init(r,b,u_n,true)
 # Transform from u_n to c_n coefficients:
 #compute_c_n_grad!(trans)  # Now included in transit_init function
@@ -52,9 +57,10 @@ for iu = 1:nnu
     timing_ratio[:,iu]=timing
   else
     timing_ratio[:,iu]=timing./timing_ratio[:,1]
-  end 
-  loglog(nb,timing)
-  loglog(nb,timing,"o",label=string("n: ",nu[iu]))
+  end
+  println("nu: ",nu[iu])
+#  loglog(nb,timing)
+#  loglog(nb,timing,"o",label=string("n: ",nu[iu]))
 end
 xlabel("Number of points")
 ylabel("Timing [sec]")
