@@ -5,8 +5,10 @@
 # Defines the function that computes the transit:
 include("../../../src/transit_poly_struct.jl")
 
-nu = [1,2,3,5,8,13,21,34,55,89,144,233,377,610]; nnu = length(nu)
-nb = [100,316,1000,3160,10000,31600,100000]; nnb = length(nb)
+nu = [1,2,3,5,8,13,21,34,55,89,144]; #233,377,610];
+nnu = length(nu)
+nb = [100,316,1000,3160,10000,31600,100000];
+nnb = length(nb)
 timing_ratio = zeros(nnb,nnu)
 
 # Define a function that loops over impact parameter
@@ -15,12 +17,12 @@ timing_ratio = zeros(nnb,nnu)
 function profile_transit_poly(trans,nb)
 fgrad = zeros(2+trans.n)
 timing = zeros(length(nb))
-tmean = zeros(1)
+tmean = zeros(5)
 for j=1:length(nb)
   nb0 = nb[j]
   b = zeros(nb0)
   flux = zeros(nb0)
-  for k=1:1
+  for k=1:5
     tic()
     for i=1:nb0
       b[i] = sqrt(((i-float(nb0)/2)*2/float(nb0)*(1.0+2.0*trans.r))^2)
@@ -40,6 +42,7 @@ r = 0.1; b = 0.5
 # Load in PyPlot (Julia matplotlib wrapper):
 using PyPlot
 clf()
+cmap = get_cmap("plasma")
 for iu = 1:nnu
   u_n = ones(nu[iu])/nu[iu]
   trans = transit_init(r,b,u_n,true)
@@ -53,12 +56,12 @@ for iu = 1:nnu
   else
     timing_ratio[:,iu]=timing./timing_ratio[:,1]
   end
-  loglog(nb,timing)
-  loglog(nb,timing,"o",label=string("n: ",nu[iu]))
+  loglog(nb,timing,color=cmap(float(iu)/nnu))
+  loglog(nb,timing,"o",color=cmap(float(iu)/nnu),label=string("n: ",nu[iu]))
 end
 xlabel("Number of points")
 ylabel("Timing [sec]")
-legend(loc="upper left",fontsize=8)
+legend(loc="upper left",fontsize=8,ncol=3)
 timing_ratio[:,1]=1.0
 #clf()
 #plot(b,flux-1,label="flux-1")
@@ -69,7 +72,6 @@ timing_ratio[:,1]=1.0
 #legend(loc="lower right")
 #println("b: ",minimum(b)," ",maximum(b))
 #println("f: ",minimum(flux)," ",maximum(flux))
-
 savefig("benchmark_transit_poly.pdf", bbox_inches="tight")
 
 clf()
@@ -85,5 +87,5 @@ plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="--",label=L"$n^1$")
 xlabel("Number of limb-darkening coefficients")
 ylabel("Relative timing")
 legend(loc="upper left")
-axis([1,1e3,1,1e4])
+axis([1,144,0.7,2e2])
 savefig("benchmark_limbdark_timing.pdf", bbox_inches="tight")
