@@ -19,6 +19,7 @@ before_install:
 
 install:
     - source .ci/travis.sh
+    - julia -e 'Pkg.build("PyCall")'
 
 after_success:
     - source .ci/build-paper.sh
