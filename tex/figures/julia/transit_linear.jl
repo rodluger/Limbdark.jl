@@ -19,12 +19,30 @@ for ib=1:nb
 end
 
 clf()
-img=imshow(fgrid,interpolation="nearest",origin="lower",extent=[0,2,0,2])
-plot([0,1],[1,2],label=L"$r=1+b$")
-plot([1,2],[0,1],label=L"$r=b-1$")
-plot([0,2],[0,2],label=L"$r=b$")
-plot([0,1],[1,0],label=L"$r=1-b$")
-legend(loc="upper left",fontsize=10)
+img=imshow(fgrid,interpolation="nearest",origin="lower",extent=[0,2,0,2],
+           cmap="plasma")
+plot([0,1],[1,2],"k-")
+plot([1,2],[0,1],"k-")
+plot([0,0.38],[0,0.38],"k-")
+plot([0.5,2],[0.5,2],"k-")
+plot([0,1],[1,0],"k-")
+
+annotate(L"$r = 1 + b$", xy=(0.5, 1.5), xytext=(0, 0), xycoords="data",
+         textcoords="offset points", ha="center", va="bottom",
+         fontsize=12, color="w", rotation=45)
+
+annotate(L"$r = b$", xy=(1, 1), xytext=(0, 0), xycoords="data",
+         textcoords="offset points", ha="center", va="bottom",
+         fontsize=12, color="k", rotation=45)
+
+annotate(L"$r = b - 1$", xy=(1.5, 0.5), xytext=(0, 0), xycoords="data",
+         textcoords="offset points", ha="center", va="bottom",
+         fontsize=12, color="k", rotation=45)
+
+annotate(L"$r = 1 - b$", xy=(0.5, 0.5), xytext=(-9, -9), xycoords="data",
+         textcoords="offset points", ha="center", va="center",
+         fontsize=12, color="k", rotation=-45)
+
 xlabel("Impact parameter")
 ylabel("Radius ratio")
 colorbar(img)
