@@ -15,12 +15,19 @@ script:
     - export LD_LIBRARY_PATH=$HOME/.julia/v0.6/Conda/deps/usr/lib
 
 before_install:
-    - julia -e 'ENV["PYTHON"]=""; Pkg.add("Conda"); using Conda; Conda.update(); Conda.add("matplotlib"); Conda.add_channel("conda-forge"); Conda.add("starry")'
-    - julia -e 'Pkg.add("PyCall"); Pkg.add("PyPlot"); Pkg.add("SpecialFunctions"); Pkg.add("ForwardDiff")'
+    - julia -e 'ENV["PYTHON"]="";\
+                Pkg.add("Conda");\
+                using Conda; Conda.update();\
+                Conda.add("matplotlib");\
+                Conda.add_channel("conda-forge"); Conda.add("starry");\
+                Pkg.add("PyCall");\
+                Pkg.build("PyCall");\
+                Pkg.add("PyPlot");\
+                Pkg.add("SpecialFunctions");\
+                Pkg.add("ForwardDiff")'
 
 install:
     - source .ci/travis.sh
-    - julia -e 'Pkg.build("PyCall")'
 
 cache:
     directories:
