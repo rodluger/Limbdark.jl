@@ -5,13 +5,13 @@ using PyCall
 
 
 # System properties
-npts = 1000
-nu = 3
+npts = 10000
+nu = 5
 u_n = 0.5*ones(nu) / nu
 r = 0.1
 b = zeros(npts)
 for i=1:npts
-    b[i] = 3.0 * (i / float(npts) - 0.5)
+    b[i] = 3.0 * ((i-0.5) / float(npts) - 0.5)
 end
 
 # Julia flux
@@ -75,12 +75,12 @@ ax[:set_ylabel]("Flux")
 ax = axes[4]
 ax[:semilogy](b, abs.(grad["ro"]-dfdx[1,:]),label=L"$df/dr$ diff")
 ax[:plot](b, abs.(grad["xo"]-dfdx[2,:]),label=L"$df/db$ diff")
-#for iu=1:nu
-#  ax[:plot](b, abs.(grad["u"][iu,:]-dfdx[2+iu,:]),label=L"$df/du$ diff")
-#end
+for iu=1:nu
+  ax[:plot](b, abs.(grad["u"][iu,:]-dfdx[2+iu,:]),label=L"$df/du$ diff")
+end
 ax[:set_xlabel]("Derivative differences")
 ax[:set_ylabel]("Flux")
-ax[:legend](fontsize=1,loc="lower right")
+ax[:legend](fontsize=4,loc="lower right")
 #ax[:axis]([-1.5,1.5,1e-10,1e-5])
 
 savefig("compare_to_starry_" * string(nu) * ".pdf", bbox_inches="tight")
