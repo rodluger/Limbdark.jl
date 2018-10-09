@@ -7,9 +7,9 @@ include("s2.jl")
 # Include code which computes I_v, J_v, and derivatives wrt k:
 include("IJv_derivative_struct.jl")
 
+function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # Function which computes sixteen times the square of the area
 # of a triangle with sides a, b and c using Kahan method.
-function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # How to compute (sixteen times the) area squared of triangle with 
 # high precision (Goldberg 1991).
 # First, do a quick sort of three numbers:
@@ -152,7 +152,7 @@ for n=2:t.n
       coeff *= -(n0-i+1)/i*k2
       pofgn += coeff*((r-b)*t.Jv[n0-i+1]+2b*t.Jv[n0-i+2])
     end
-    pofgn *= 2r*onembmr2^1.5
+    pofgn *= 2r*onembmr2*sqrt(onembmr2)
   end
 # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
 # boundary for n > 0.
@@ -332,6 +332,7 @@ end
 rinv = inv(r); binv = inv(b); rmb_on_onembmr2=(r-b)*inv(onembmr2)
 # Next, loop over the Green's function components:
 Iv1 = zero(T); Iv2=zero(T); Jv1=zero(T); Jv2=zero(T)
+nmi = zero(Int64); fac1 = zero(T)
 for n=2:t.n
   pofgn = zero(T)
   dpdr = zero(T)
@@ -350,14 +351,16 @@ for n=2:t.n
     dpdb += n0*pofgn*binv
 # For even n, compute coefficients for the sum over I_v:
     for i=1:n0
-      Iv2 = Iv1; Iv1 = t.Iv[n0-i+1]
-      coeff *= -(n0-i+1)/i*k2
+      nmi = n0-i+1
+      Iv2 = Iv1; Iv1 = t.Iv[nmi]
+      coeff *= -nmi/i*k2
       term =  coeff*((r-b)*Iv1+2b*Iv2)
       pofgn += term
       dpdr += coeff*Iv1
-      dpdb += coeff*(-Iv1+2*Iv2)
-      dpdr += term*(-i*2*rmb_on_onembmr2+(n0+1-i)*rinv)
-      dpdb += term*( i*2*rmb_on_onembmr2+(n0-i)*binv)
+      dpdb += coeff*(-Iv1+2.0*Iv2)
+      fac1 = i*2.0*rmb_on_onembmr2
+      dpdr += term*(-fac1+nmi*rinv)
+      dpdb += term*( fac1+(nmi-1.0)*binv)
     end
     pofgn *= 2r
     dpdr *= 2r
@@ -376,17 +379,19 @@ for n=2:t.n
     dpdk = coeff*((r-b)*t.dJvdk[n0+1]+2b*t.dJvdk[n0+2])
 # For even n, compute coefficients for the sum over I_v:
     for i=1:n0
-      coeff *= -(n0-i+1)/i*k2
-      Jv2 = Jv1; Jv1 = t.Jv[n0-i+1]
+      nmi = n0-i+1
+      coeff *= -nmi/i*k2
+      Jv2 = Jv1; Jv1 = t.Jv[nmi]
       term = coeff*((r-b)*Jv1+2b*Jv2)
       pofgn += term
       dpdr  +=  coeff*Jv1
-      dpdb  +=  coeff*(-Jv1+2*Jv2)
-      dpdr  += term*(-(i*2+3)*rmb_on_onembmr2+(n0+1-i)*rinv)
-      dpdb  += term*( (i*2+3)*rmb_on_onembmr2+(n0-i)*binv)
-      dpdk  += coeff*((r-b)*t.dJvdk[n0-i+1]+2b*t.dJvdk[n0-i+2])
+      dpdb  +=  coeff*(-Jv1+2.0*Jv2)
+      fac1 = (i*2.0+3.0)*rmb_on_onembmr2
+      dpdr  += term*(-fac1+nmi*rinv)
+      dpdb  += term*( fac1+(nmi-1.0)*binv)
+      dpdk  += coeff*((r-b)*t.dJvdk[nmi]+2b*t.dJvdk[nmi+1])
     end
-    norm = 2r*onembmr2^1.5
+    norm = 2r*onembmr2*sqrt(onembmr2)
     pofgn *= norm
     dpdr  *= norm
     dpdb  *= norm
