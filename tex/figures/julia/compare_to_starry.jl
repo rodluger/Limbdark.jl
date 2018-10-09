@@ -6,7 +6,7 @@ using PyCall
 
 # System properties
 npts = 1000
-nu = 30
+nu = 3
 u_n = 0.5*ones(nu) / nu
 r = 0.1
 b = zeros(npts)
@@ -22,9 +22,12 @@ dfdx = zeros(nu+2,npts)
 #trans_big = transit_init(big(r), big(0.0), big.(u_n), false)
 for i=1:npts
     trans.b = abs(b[i])
-#    trans = transit_init(r, abs(b[i]), u_n, true)
+    trans = transit_init(r, abs(b[i]), u_n, true)
     flux_julia[i] = transit_poly!(trans)
     dfdx[:,i] = trans.dfdrbu
+    if b[i] < 0.0
+      dfdx[2,i] *= -1.0
+    end
 #    trans_big.b = big(abs(b[i]))
 #    flux_big[i] = convert(Float64,transit_poly!(trans_big))
 #    flux_julia[i] = transit_poly(r,abs(b[i]),u_n)
@@ -54,7 +57,7 @@ ax[:semilogy](b, abs.(flux_julia-flux_starry), linewidth=2, label="julia-starry"
 #ax[:plot](b, abs.(flux_starry-flux_big), linewidth=2, label="starry-big")
 ax[:set_xlabel]("abs(Difference)")
 ax[:legend]()
-ax[:axis]([-1.5,1.5,1e-10,1e-5])
+#ax[:axis]([-1.5,1.5,1e-10,1e-5])
 
 ax = axes[3]
 ax[:plot](b, grad["ro"],label=L"$df/dr$ (starry)")
