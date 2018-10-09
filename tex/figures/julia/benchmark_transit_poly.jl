@@ -52,7 +52,7 @@ for iu = 1:nnu
     timing_ratio[:,iu]=timing
   else
     timing_ratio[:,iu]=timing./timing_ratio[:,1]
-  end 
+  end
   loglog(nb,timing)
   loglog(nb,timing,"o",label=string("n: ",nu[iu]))
 end
@@ -70,7 +70,7 @@ timing_ratio[:,1]=1.0
 #println("b: ",minimum(b)," ",maximum(b))
 #println("f: ",minimum(flux)," ",maximum(flux))
 
-savefig("benchmark_poly_transit.pdf", bbox_inches="tight")
+savefig("benchmark_transit_poly.pdf", bbox_inches="tight")
 
 clf()
 tmed = vec(median(timing_ratio,1))

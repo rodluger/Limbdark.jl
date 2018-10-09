@@ -53,4 +53,4 @@ ax[:semilogy](b, abs.(flux_julia-flux_starry), linewidth=2, label="julia-starry"
 ax[:legend]()
 ax[:axis]([-1.5,1.5,1e-10,1e-5])
 
-savefig("compare_to_starry_" * string(iu) * ".pdf", bbox_inches="tight")
+savefig("compare_to_starry.pdf", bbox_inches="tight")

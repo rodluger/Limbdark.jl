@@ -37,7 +37,7 @@ for i=1:nr
 end
 
 b4 = r+delta
-f_MA4 = occultquad.(b4,u1,u2,r); 
+f_MA4 = occultquad.(b4,u1,u2,r);
 f_AL4 = zeros(Float64,nr); f_AL_big4 = zeros(Float64,nr)
 for i=1:nr
   f_AL4[i] = transit_poly(r[i],b4[i],[u1;u2])
@@ -75,4 +75,4 @@ ax[:set_ylabel]("Error")
 #ax[:legend](loc="left",fontsize=8)
 ax[:axis]([-0.01,1.01,1e-18,1e-4])
 
-savefig("compare_MA2002_linear.pdf", bbox_inches="tight")
+savefig("compare_MA2002.pdf", bbox_inches="tight")

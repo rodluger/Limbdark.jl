@@ -62,4 +62,4 @@ ax[:set_xlabel]("b")
 ax[:set_ylabel]("Differences of flux, derivatives")
 ax[:legend](loc="lower left",fontsize=6)
 
-savefig("compare_pal_r0pt1.pdf", bbox_inches="tight")
+savefig("compare_pal.pdf", bbox_inches="tight")
