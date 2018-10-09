@@ -70,7 +70,7 @@ if b == 0.0
   flux = zero(T); sqrt1mr2 = sqrt(1-r^2)
   flux = (t.c_n[1]*(1-r^2)+2/3*t.c_n[2]*sqrt1mr2^3)
   fac= 2r^2*(1-r^2)
-  for i=2:t.n
+  @inbounds for i=2:t.n
     flux += -t.c_n[i+1]*fac
     fac *= sqrt1mr2
   end
@@ -127,7 +127,7 @@ if k2 > 0
 end
 
 # Next, loop over the Green's function components:
-for n=2:t.n
+@inbounds for n=2:t.n
   pofgn = zero(T)
   if iseven(n)
 # For even values of n, sum over I_v:
@@ -136,7 +136,7 @@ for n=2:t.n
     # Compute i=0 term
     pofgn = coeff*((r-b)*t.Iv[n0+1]+2b*t.Iv[n0+2])
 # For even n, compute coefficients for the sum over I_v:
-    for i=1:n0
+    @inbounds for i=1:n0
       coeff *= -(n0-i+1)/i*k2
       pofgn += coeff*((r-b)*t.Iv[n0-i+1]+2b*t.Iv[n0-i+2])
     end
@@ -148,7 +148,7 @@ for n=2:t.n
     # Compute i=0 term
     pofgn = coeff*((r-b)*t.Jv[n0+1]+2b*t.Jv[n0+2])
 # For even n, compute coefficients for the sum over I_v:
-    for i=1:n0
+    @inbounds for i=1:n0
       coeff *= -(n0-i+1)/i*k2
       pofgn += coeff*((r-b)*t.Jv[n0-i+1]+2b*t.Jv[n0-i+2])
     end
@@ -175,7 +175,7 @@ fill!(dfdrbu,zero(T))
 dfdrbu[1] = t.dfdrbc[1]  # r derivative
 dfdrbu[2] = t.dfdrbc[2]  # b derivative
 # u_n derivatives:
-for i=1:t.n, j=0:t.n
+@inbounds for i=1:t.n, j=0:t.n
   dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
 end
 return flux
@@ -196,18 +196,18 @@ function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
 flux = transit_poly_c!(t)
 # Now, transform derivaties from c to u:
 #fill!(t.dfdrbu,zero(T))
-t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
-t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
-# u_n derivatives:
-t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
-#t.dfdrbu[3:t.n+2] = t.dcdu' * t.dfdrbc[3:t.n+3]
-#println("Mult: ",t.dfdrbu)
-#fill!(t.dfdrbu,zero(T))
 #t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
 #t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
-#for i=1:t.n, j=0:t.n
-#  t.dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
-#end
+# u_n derivatives:
+#t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
+#t.dfdrbu[3:t.n+2] = t.dcdu' * t.dfdrbc[3:t.n+3]
+#println("Mult: ",t.dfdrbu)
+fill!(t.dfdrbu,zero(T))
+t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
+t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
+@inbounds for i=1:t.n, j=0:t.n
+  t.dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
+end
 #for j=0:t.n
 #  t.dfdrbu[3:t.n+2] += t.dfdrbc[j+3]*t.dcdu[j+1,1:t.n]
 #end
@@ -251,7 +251,7 @@ if b == 0.0
   fac  = 2r^2*onemr2*den
   facd = -2r*den
   t.dfdrbc[1] = t.c_n[1]*facd + t.c_n[2]*facd*sqrt1mr2
-  for i=2:t.n
+  @inbounds for i=2:t.n
     flux -= t.c_n[i+1]*fac
     t.dfdrbc[1] += t.c_n[i+1]*facd*(2*onemr2-i*r^2)
     t.dfdrbc[i+3] -= fac
@@ -333,7 +333,7 @@ rinv = inv(r); binv = inv(b); rmb_on_onembmr2=(r-b)*inv(onembmr2)
 # Next, loop over the Green's function components:
 Iv1 = zero(T); Iv2=zero(T); Jv1=zero(T); Jv2=zero(T)
 nmi = zero(Int64); fac1 = zero(T)
-for n=2:t.n
+@inbounds for n=2:t.n
   pofgn = zero(T)
   dpdr = zero(T)
   dpdb = zero(T)
@@ -350,7 +350,7 @@ for n=2:t.n
     dpdr += (n0+1)*pofgn*rinv
     dpdb += n0*pofgn*binv
 # For even n, compute coefficients for the sum over I_v:
-    for i=1:n0
+    @inbounds for i=1:n0
       nmi = n0-i+1
       Iv2 = Iv1; Iv1 = t.Iv[nmi]
       coeff *= -nmi/i*k2
@@ -378,7 +378,7 @@ for n=2:t.n
     dpdb  += pofgn*( 3*rmb_on_onembmr2+n0*binv)
     dpdk = coeff*((r-b)*t.dJvdk[n0+1]+2b*t.dJvdk[n0+2])
 # For even n, compute coefficients for the sum over I_v:
-    for i=1:n0
+    @inbounds for i=1:n0
       nmi = n0-i+1
       coeff *= -nmi/i*k2
       Jv2 = Jv1; Jv1 = t.Jv[nmi]
@@ -413,7 +413,7 @@ den = inv(pi*(t.c_n[1]+2*t.c_n[2]/3))
 flux = zero(T)
 t.dfdrbc[1]=zero(T)  # Derivative with respect to r
 t.dfdrbc[2]=zero(T)  # Derivative with respect to b
-for i=0:n
+@inbounds for i=0:n
   # derivatives with respect to the coefficients:
   t.dfdrbc[i+3]= t.sn[i+1]*den
   # total flux:

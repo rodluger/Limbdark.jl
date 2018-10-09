@@ -55,10 +55,10 @@ for iu = 1:nnu
   end 
   loglog(nb,timing)
   loglog(nb,timing,"o",label=string("n: ",nu[iu]))
-  legend(loc="upper left")
 end
 xlabel("Number of points")
 ylabel("Timing [sec]")
+legend(loc="upper left",fontsize=8)
 timing_ratio[:,1]=1.0
 #clf()
 #plot(b,flux-1,label="flux-1")
