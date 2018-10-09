@@ -41,7 +41,8 @@ end
 
 
 using PyPlot
-fig,axes = subplots(2,2)
+fig,axes = subplots(2,2,figsize=(12, 7))
+fig[:subplots_adjust](wspace=0.25)
 
 r = 0.1
 nb = 1000
@@ -53,32 +54,43 @@ for i=1:nb
 end
 
 ax = axes[1]
-ax[:plot](db,abs.(pi*r^2-area),label="r=0.1, MA(2002)",lw=3)
-ax[:plot](db,abs.(pi*r^2-sn),label="r=0.1, AL(2018)",".")
-ax[:plot](db,abs.(convert(Array{Float64,1},pi*big(r)^2-sn_big)),label="r=0.1, BigFloat",linestyle="--",lw=3)
-#ax[:set_xlabel](L"$\log_{10}(b-(1-r))$")
-ax[:set_title ](L"$\pi r^2$-Area of overlap")
+ax[:plot](db,abs.(pi*r^2-area),label=L"$r=0.1$, MA(2002)",lw=2)
+ax[:plot](db,abs.(pi*r^2-sn),label=L"$r=0.1$, AL(2018)",".")
+ax[:plot](db,abs.(convert(Array{Float64,1},pi*big(r)^2-sn_big)),label=L"$r=0.1$, BigFloat",linestyle="--",lw=2)
+ax[:set_ylabel](L"$\pi r^2 - A_\mathrm{overlap}$", fontsize=14)
 ax[:legend](loc="lower right",fontsize=8)
 ax[:set_xscale]("log")
 ax[:set_yscale]("log")
-ax[:axis]([1e-15,1e-2,1e-22,1e-2])
-t1 = linspace(0,2pi,100)
-aspect = 1.4*24.0/17.0
-x1 = -12.0+cos.(t1); y1=-5.0+aspect*sin.(t1)
-x2 = -11.1+0.1*cos.(t1); y2=-5.0+0.1*aspect*sin.(t1)
-ax[:plot](x1,y1)
-ax[:plot](x2,y2)
+ax[:axis]([1e-15,1e-2,1e-25,1e-2])
 ax[:plot]([1e-16,1e-2],[1,1]*(pi*0.1^2/2^53),c="grey",linestyle="-.")
 
+ax = fig[:add_axes]((0.25, 0.925, 0.1, 0.1))
+t1 = linspace(0,2pi,100)
+x1 = cos.(t1); y1 = sin.(t1)
+x2 = 0.8 + 0.2 * cos.(t1); y2 = 0.2 * sin.(t1)
+ax[:plot](x1,y1,"k-",lw=1.5)
+ax[:fill_between](x2,0,y2,facecolor="k")
+ax[:set_aspect](1)
+ax[:axis]("off")
+
+ax = fig[:add_axes]((0.685, 0.925, 0.1, 0.1))
+t1 = linspace(0,2pi,100)
+x1 = cos.(t1); y1 = sin.(t1)
+x2 = 1.2 + 0.2 * cos.(t1); y2 = 0.2 * sin.(t1)
+ax[:plot](x1,y1,"k-",lw=1.5)
+ax[:fill_between](x2,0,y2,facecolor="k")
+ax[:set_aspect](1)
+ax[:axis]("off")
+
 ax = axes[2]
-ax[:plot](db,abs.(area-convert(Array{Float64,1},sn_big)),label="r=0.1, MA(2002)",lw=3)
-ax[:plot](db,abs.(sn-convert(Array{Float64,1},sn_big)),label="r=0.1, AL(2018)",".")
-ax[:set_xlabel](L"$b-(1-r)$")
-ax[:set_ylabel]("Abs(Error in area of overlap)")
-ax[:legend](loc="center left",fontsize=8)
+ax[:plot](db,abs.(area-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, MA(2002)",lw=2)
+ax[:plot](db,abs.(sn-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, AL(2018)",".")
+ax[:set_xlabel](L"$b-(1-r)$", fontsize=14)
+ax[:set_ylabel]("error", fontsize=14)
+ax[:legend](loc="upper right",fontsize=8)
 ax[:set_xscale]("log")
 ax[:set_yscale]("log")
-ax[:axis]([1e-15,1e-2,1e-25,1e-5])
+ax[:axis]([1e-15,1e-2,1e-25,1e-2])
 ax[:plot]([1e-16,1e-2],[1,1]*(pi*0.1^2/2^53),c="grey",linestyle="-.")
 
 b = 1+r-db
@@ -89,27 +101,22 @@ end
 
 ax = axes[3]
 mask = area .> 0.0
-ax[:plot](db[mask],area[mask],label="r=0.1, MA(2002)",lw=3)
-ax[:plot](db,sn,label="r=0.1, AL(2018)",".")
-ax[:plot](db,convert(Array{Float64,1},sn_big),label="r=0.1, BigFloat",linestyle="--",lw=3)
-#ax[:set_xlabel](L"$\log_{10}(1+r-b)$")
-ax[:set_title](L"Area of overlap")
+ax[:plot](db[mask],area[mask],label=L"$r=0.1$, MA(2002)",lw=2)
+ax[:plot](db,sn,label=L"$r=0.1$, AL(2018)",".")
+ax[:plot](db,convert(Array{Float64,1},sn_big),label=L"$r=0.1$, BigFloat",linestyle="--",lw=2)
+ax[:set_ylabel](L"$A_\mathrm{overlap}$", fontsize=14)
 ax[:legend](loc="lower right",fontsize=8)
 ax[:set_xscale]("log")
 ax[:set_yscale]("log")
-ax[:axis]([1e-15,1e-2,1e-22,1e-2])
-x1 = -12.0+cos.(t1); y1=-5.0+aspect*sin.(t1)
-x2 = -10.9+0.1*cos.(t1); y2=-5.0+0.1*aspect*sin.(t1)
-ax[:plot](x1,y1)
-ax[:plot](x2,y2)
+ax[:axis]([1e-15,1e-2,1e-25,1e-2])
 
 ax = axes[4]
-ax[:plot](db,abs.(area-convert(Array{Float64,1},sn_big)),label="r=0.1, MA(2002)",lw=3)
-ax[:plot](db,abs.(sn-convert(Array{Float64,1},sn_big)),label="r=0.1, AL(2018)",".")
+ax[:plot](db,abs.(area-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, MA(2002)",lw=2)
+ax[:plot](db,abs.(sn-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, AL(2018)",".")
+ax[:set_ylabel]("error", fontsize=14)
 ax[:set_xscale]("log")
 ax[:set_yscale]("log")
-ax[:set_xlabel](L"$1+r-b$")
-#ax[:set_ylabel]("Log Abs(Error in area of overlap)")
-ax[:legend](loc="center left",fontsize=8)
-ax[:axis]([1e-15,1e-2,1e-25,1e-5])
+ax[:set_xlabel](L"$1+r-b$", fontsize=14)
+ax[:legend](loc="upper right",fontsize=8)
+ax[:axis]([1e-15,1e-2,1e-25,1e-2])
 savefig("area_of_overlap_r01.pdf", bbox_inches="tight")
