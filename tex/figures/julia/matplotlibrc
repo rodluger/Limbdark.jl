@@ -1,2 +1,2 @@
-backend: agg
-#backend: MacOSX
+#backend: agg
+backend: MacOSX
