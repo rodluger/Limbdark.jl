@@ -235,11 +235,13 @@ r = t.r; b=t.b; n = t.n
 # this is a different vector than the Starry case:
 # Check for different cases:
 if b >= 1+r || r ==  0.0
-  # unobscured - return one:
+  # unobscured - return one, and zero derivatives:
+  fill!(t.dfdrbc,zero(T))
   return one(T)
 end
 if r >= 1+b
-  # full obscuration - return zero:
+  # full obscuration - return zero, and zero derivatives:
+  fill!(t.dfdrbc,zero(T))
   return zero(T)
 end
 if b == 0.0
