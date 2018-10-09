@@ -22,11 +22,7 @@ dfdx = zeros(nu+2,npts)
 #trans_big = transit_init(big(r), big(0.0), big.(u_n), false)
 for i=1:npts
     trans.b = abs(b[i])
-#    trans = transit_init(r, abs(b[i]), u_n, true)
     flux_julia[i] = transit_poly!(trans)
-    trans2 = transit_init(r, abs(b[i]), u_n, true)
-    transit_poly!(trans2)
-#    println("b: ",b[i]," diff dIvdk: ",maximum(abs,trans.dIvdk-trans2.dIvdk)," dJvdk: ",maximum(abs,trans.dJvdk-trans2.dJvdk)," diff s2_grad: ",maximum(abs,trans.s2_grad-trans2.s2_grad))
     dfdx[:,i] = trans.dfdrbu
     if b[i] < 0.0
       dfdx[2,i] *= -1.0
