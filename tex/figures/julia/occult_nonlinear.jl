@@ -1,6 +1,8 @@
 include("occultquad.jl")
 include("../../../src/transit_poly_struct.jl")
-include("../../../tests/loglinspace.jl")
+include("../../../test/loglinspace.jl")
+
+using Optim
 
 if VERSION >= v"0.7"
   using Statistics
@@ -67,12 +69,10 @@ function occult_nonlinear(r::T,b::T,c1::T,c2::T,c3::T,c4::T) where {T <: Real}
     delta1 = zero(T)
     for i=2:nint
       sb = Iofmu(0.5*(xgrid[i]+xgrid[i-1]))
-#      println(xgrid[i]," ",xgrid[i-1])
       da = area_overlap(xgrid[i],r,b)-area_overlap(xgrid[i-1],r,b)
       delta1 += sb*da
     end
     nint *=2; iter +=1
-#    println("nint: ",nint," delta: ",delta1)
   end
 return delta1
 end
@@ -112,7 +112,7 @@ end
 
 
 
-nx = 2048
+nx = 1024
 if VERSION >= v"0.7"
  x = range(-1.2,stop=1.2,length=nx)
 else
@@ -128,7 +128,6 @@ for i=1:nx
   if b[i] < 1.0+r
     flux1[i]=occult_nonlinear(r,b[i],c1,c2,c3,c4)/omega
     flux2[i]=transit_poly_int(r,b[i],[c1,c2,c3,c4],ns)
-#    println(i," r: ",r," b: ",b[i]," flux: ",flux[i])
   end
 end
 
@@ -147,39 +146,56 @@ savefig("occult_nonlinear.pdf", bbox_inches="tight")
 
 # Now, optimize a fit with polynomial limb-darkening:
 
-function optimize_fit_linear!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n::Array{T,1}) where {T <: Real}
+function optimize_fit!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n::Array{T,1}) where {T <: Real}
   nb = length(b)   # Number of points in "light curve"
   nu = length(u_n) # Number of limb-darkening coefficients
   # Optimizes a polynomial limb-darkening model to "data":
   # Compute a limb-darkening model with the impact parameter grid b
   # Initialize:
   trans = transit_init(r,b[1],u_n,true)
-  # Compute model & gradient at each point:
-  smat = zeros(T,nu+1,nu+1); fdots = zeros(T,nu+1)
-  for i=1:nb
-    trans.b = b[i]
-    fcur = transit_poly!(trans)
-    for j=1:nu+1
-      fdots[j] += fobs[i]*trans.sn[j]
-      for k=1:nu+1
-        smat[j,k] += trans.sn[j]*trans.sn[k]
+
+  # Compute model:
+  function transit_model(u)
+    fmodel = zeros(b)
+    trans = transit_init(r,b[1],u,true)
+    for i=1:nb
+      trans.b = b[i]
+      fmodel[i] = transit_poly!(trans)
+    end
+    return fmodel
+  end
+
+  # Compute "chi-square":
+  function transit_fit(u)
+    chisquare = 0.0
+    trans = transit_init(r,b[1],u,true)
+    for i=1:nb
+      trans.b = b[i]
+      chisquare += (fobs[i]-transit_poly!(trans))^2
+    end
+    return chisquare
+  end
+
+  # Compute gradient of chi-square with respect to limb-darkening coefficients:
+  function transit_gradient!(G,u)
+    fill!(G,0.0)
+    trans = transit_init(r,b[1],u,true)
+    for i=1:nb
+      trans.b = b[i]
+      fmodel = transit_poly!(trans)
+      for j = 1:trans.n
+        G[j] -= 2.*(fobs[i]-fmodel)*trans.dfdrbu[j+2]
       end
     end
+    return
   end
-  # Now, invert to find coefficients of:  f_obs = \sum_j \alpha_j s_j:
-#  println("f.s: ",fdots," s^T s: ",smat)
-  alpha = \(smat,fdots)
-#  println("alpha: ",alpha)
-  fill!(fmod,zero(T))
-  for i=1:nb
-    trans.b = b[i]
-    fcur = transit_poly!(trans)
-    for j=1:nu+1
-      fmod[i] += alpha[j]*trans.sn[j]
-    end
-#    println("b: ",b[i]," fobs: ",fobs[i]," fmod: ",fmod[i])
-  end
-return fmod
+
+  # Now, optimize limb-darkening coefficients of the fit:
+  result = optimize(transit_fit, transit_gradient! , u_n, LBFGS())
+  # Then, compute the model again:
+  u_n .= result.minimizer
+  println("optimized limb-darkening params: ",u_n)
+return transit_model(u_n)
 end
 
 function optimize_fit_linear!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n::Array{T,1}) where {T <: Real}
@@ -202,9 +218,7 @@ function optimize_fit_linear!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,
     end
   end
   # Now, invert to find coefficients of:  f_obs = \sum_j \alpha_j s_j:
-#  println("f.s: ",fdots," s^T s: ",smat)
   alpha = \(smat,fdots)
-#  println("alpha: ",alpha)
   fill!(fmod,zero(T))
   for i=1:nb
     trans.b = b[i]
@@ -212,7 +226,6 @@ function optimize_fit_linear!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,
     for j=1:nu+1
       fmod[i] += alpha[j]*trans.sn[j]
     end
-#    println("b: ",b[i]," fobs: ",fobs[i]," fmod: ",fmod[i])
   end
 return fmod
 end
@@ -222,36 +235,41 @@ clf()
 fig,axes = subplots(2,1, figsize=(8,8))
 ax = axes[2]
 dev = zeros(6)
-flux = flux2
+flux = flux1
 fmod = copy(flux)
-#u_n = [.1]
+#u_n = [.8]
 #fmod = optimize_fit!(r,b,flux,fmod,u_n)
 #plot(b,flux-fmod,linestyle="--",label="linear")
-#println("linear: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [0.1,0.1]
+u_n = [0.1,0.8]
+#u_n = push!(u_n,0.01)
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="quadratic")
 println("quad: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
 u_n = [0.1,0.1,0.1]
+#u_n = push!(u_n,0.01)
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="cubic")
 println("cubic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [0.1,0.1,0.1,0.1]
+u_n = [0.01,0.01,0.01,0.8]
+#u_n = push!(u_n,0.01)
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="quartic")
 println("quartic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [0.1,0.1,0.1,0.1,0.1]
+u_n = [0.01,0.01,0.01,0.01,0.8]
+#u_n = push!(u_n,0.01)
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="quintic")
 println("quintic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [0.1,0.1,0.1,0.1,0.1,0.1]
+u_n = [0.01,0.01,0.01,0.01,0.01,0.8]
+#u_n = push!(u_n,0.01)
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="sextic")
 println("sextic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [0.1,0.1,0.1,0.1,0.1,0.1,0.1]
-fmod = optimize_fit!(r,b,flux,fmod,u_n)
-ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="septic")
-println("septic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
+#u_n = [0.01,0.01,0.01,0.01,0.01,0.01,0.8]
+#u_n = push!(u_n,-0.01)
+#fmod = optimize_fit!(r,b,flux,fmod,u_n)
+#ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="septic")
+#println("septic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
 #u_n = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
 #fmod = optimize_fit!(r,b,flux,fmod,u_n)
 #plot(b,flux-fmod,linestyle="--",label="octic")
@@ -267,7 +285,7 @@ ax[:axis]([0,1.2,-10,10])
 ax = axes[1]
 
 ax[:plot](b,flux,linewidth=2,label="non-linear")
-ax[:plot](b,fmod,linestyle="--",label="septic",linewidth=2)
+ax[:plot](b,fmod,linestyle="--",label="sextic",linewidth=2)
 ax[:set_title](L"$c_1 = c_2=c_3=c_4=0.2$")
 ax[:legend](loc="upper left", fontsize=8)
 ax[:axis]([0,1.2,0.984,1.001])
