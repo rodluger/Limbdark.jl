@@ -107,9 +107,9 @@ else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
   kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
   # Angle of section for occultor:
-  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
+  kap0  = atan(kite_area2,(r-1)*(r+1)+b^2)
   # Angle of section for source:
-  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
+  pimkap1 = atan(kite_area2,(r-1)*(r+1)-b^2)
   # Flux of visible uniform disk:
   t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
   kck = kite_area2/(4*b*r)
@@ -304,9 +304,9 @@ else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
   kite_area2 = sqrt(sqarea_triangle(one(r),b,r)) 
   # Angle of section for occultor:
-  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
+  kap0  = atan(kite_area2,(r-1)*(r+1)+b^2)
   # Angle of section for source:
-  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
+  pimkap1 = atan(kite_area2,(r-1)*(r+1)-b^2)
   # Flux of visible uniform disk:
   t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
   t.dsndr[1]= -2*r*kap0

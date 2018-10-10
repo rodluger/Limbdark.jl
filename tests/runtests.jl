@@ -1,4 +1,5 @@
-using Base.Test
+#using Base.Test
+using Test
 
 #include("test_IJv_derivative.jl")
 #include("test_sn_jacobian2.jl")

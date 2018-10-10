@@ -3,11 +3,11 @@
 include("../src/cel_bulirsch.jl")
 
 function test_cel(kc,p,a,b)
-k2 = 1.-kc^2
+k2 = 1.0-kc^2
 ell1 = zeros(3)
 nphi = 100000
 if p < 0
-  phi0 = asin(sqrt(1./(1.-p)))
+  phi0 = asin(sqrt(1.0/(1.0-p)))
   phi1 = reverse(phi0-logspace(log10(1e-8),log10(phi0),nphi+1))
   dphi = phi1[2:nphi]-phi1[1:nphi-1]
   phi = .5*(phi1[2:nphi]+phi1[1:nphi-1])
@@ -86,7 +86,7 @@ end
   end
   # Test large kc values:
   p = rand(); a=rand(3); b=rand(3)
-  kc = 1.-1e-4
+  kc = 1.0-1e-4
   ell1,ell2,ell3 = test_cel(kc,p,a,b)
   println("ell1: ",ell1)
   println("ell2: ",ell2)
