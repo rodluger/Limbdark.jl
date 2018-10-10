@@ -44,36 +44,35 @@ for i=1:2
   fig,axes = subplots(1,1)
   r=r0[i]
   if r < 1.0
-    b = [linspace(epsilon,delta,nb); linspace(delta,r-delta,nb);
-     r-logspace(log10(delta),log10(epsilon),nb); linspace(r-epsilon,r+epsilon,nb); r+logspace(log10(epsilon),log10(delta),nb);
-     linspace(r+delta,1-r-delta,nb); 1-r-logspace(log10(delta),log10(epsilon),nb); linspace(1-r-epsilon,1-r+epsilon,nb);
-     1-r+logspace(log10(epsilon),log10(delta),nb); linspace(1-r+delta,1+r-delta,nb); 1+r-logspace(log10(delta),log10(epsilon),nb)]
+    b = [linearspace(epsilon,delta,nb); linearspace(delta,r-delta,nb);
+     -logarithmspace(log10(delta),log10(epsilon),nb) .+r; linearspace(r-epsilon,r+epsilon,nb); logarithmspace(log10(epsilon),log10(delta),nb) .+r;
+     linearspace(r+delta,1-r-delta,nb); -logarithmspace(log10(delta),log10(epsilon),nb) .+(1-r); linearspace(1-r-epsilon,1-r+epsilon,nb);
+     logarithmspace(log10(epsilon),log10(delta),nb).+(1-r); linearspace(1-r+delta,1+r-delta,nb); -logarithmspace(log10(delta),log10(epsilon),nb) .+(1+r)]
      nticks = 14
      xticknames=[L"$10^{-15}$",L"$10^{-12}$",L"$10^{-3}$",L"$r-10^{-3}$",L"$r-10^{-12}$",L"$r+10^{-12}$",L"$r+10^{-3}$",
      L"$1-r-10^{-3}$",L"$1-r-10^{-12}$",L"$1-r+10^{-12}$",L"$1-r+10^{-3}$",L"$1+r-10^{-3}$",L"$1+r-10^{-12}$",L"$1+r-10^{-15}$"]
   else
-    b = [r-1+logspace(log10(epsilon),log10(delta),nb); linspace(r-1+delta,r-delta,nb);
-     r-logspace(log10(delta),log10(epsilon),nb); linspace(r-epsilon,r+epsilon,nb); r+logspace(log10(epsilon),log10(delta),nb);
-     linspace(r+delta,r+1-delta,nb); r+1-logspace(log10(delta),log10(epsilon),nb)]
+    b = [logarithmspace(log10(epsilon),log10(delta),nb).+(r-1); linearspace(r-1+delta,r-delta,nb);
+     -logarithmspace(log10(delta),log10(epsilon),nb) .+r; linearspace(r-epsilon,r+epsilon,nb); logarithmspace(log10(epsilon),log10(delta),nb) .+r;
+     linearspace(r+delta,r+1-delta,nb); -logarithmspace(log10(delta),log10(epsilon),nb) .+(r+1)]
      nticks = 8
      xticknames=[L"$r-1+10^{-12}$",L"$r-1+10^{-3}$",L"$r-10^{-3}$",L"$r-10^{-12}$",L"$r+10^{-12}$",L"$r+10^{-3}$",
      L"$r+1-10^{-3}$",L"$r+1-10^{-12}$"]
   end
 #  if r < 1.0
-#    b = [linspace(1e-8,epsilon,nb); linspace(epsilon,delta,nb); linspace(delta,r-delta,nb);
-##     linspace(r-delta,r-epsilon,nb); linspace(r-epsilon,r,nb); linspace(r,r+epsilon,nb); linspace(r+epsilon,r+delta,nb);  
-#     linspace(r-delta,r-epsilon,nb); linspace(r-epsilon,r+epsilon,nb); linspace(r+epsilon,r+delta,nb);  
-#     linspace(r+delta,1-r-delta,nb); linspace(1-r-delta,1-r-epsilon,nb); linspace(1-r-epsilon,1-r+epsilon,nb);
-#     linspace(1-r+epsilon,1-r+delta,nb); linspace(1-r+delta,1+r-delta,nb); linspace(1+r-delta,1+r-epsilon,nb);linspace(1+r-epsilon,1+r-1e-8,nb)]
+#    b = [linearspace(1e-8,epsilon,nb); linearspace(epsilon,delta,nb); linearspace(delta,r-delta,nb);
+##     linearspace(r-delta,r-epsilon,nb); linearspace(r-epsilon,r,nb); linearspace(r,r+epsilon,nb); linearspace(r+epsilon,r+delta,nb);  
+#     linearspace(r-delta,r-epsilon,nb); linearspace(r-epsilon,r+epsilon,nb); linearspace(r+epsilon,r+delta,nb);  
+#     linearspace(r+delta,1-r-delta,nb); linearspace(1-r-delta,1-r-epsilon,nb); linearspace(1-r-epsilon,1-r+epsilon,nb);
+#     linearspace(1-r+epsilon,1-r+delta,nb); linearspace(1-r+delta,1+r-delta,nb); linearspace(1+r-delta,1+r-epsilon,nb);linearspace(1+r-epsilon,1+r-1e-8,nb)]
 #  else
-#    b = [linspace(r-1+1e-8,r-1+epsilon,nb); linspace(r-1+epsilon,r-1+delta,nb); linspace(r-1+delta,r-delta,nb); 
-##     linspace(r-delta,r-epsilon,nb); linspace(r-epsilon,r,nb); linspace(r,r+epsilon,nb); linspace(r+epsilon,r+delta,nb);  
-#     linspace(r-delta,r-epsilon,nb); linspace(r-epsilon,r+epsilon,nb); linspace(r+epsilon,r+delta,nb);  
-#     linspace(r+delta,r+1-delta,nb); linspace(r+1-delta,r+1-epsilon,nb); linspace(r+1-epsilon,r+1-1e-8,nb)]
+#    b = [linearspace(r-1+1e-8,r-1+epsilon,nb); linearspace(r-1+epsilon,r-1+delta,nb); linearspace(r-1+delta,r-delta,nb); 
+##     linearspace(r-delta,r-epsilon,nb); linearspace(r-epsilon,r,nb); linearspace(r,r+epsilon,nb); linearspace(r+epsilon,r+delta,nb);  
+#     linearspace(r-delta,r-epsilon,nb); linearspace(r-epsilon,r+epsilon,nb); linearspace(r+epsilon,r+delta,nb);  
+#     linearspace(r+delta,r+1-delta,nb); linearspace(r+1-delta,r+1-epsilon,nb); linearspace(r+1-epsilon,r+1-1e-8,nb)]
 #  end
   k2 = (1.-(r-b).^2)./(4.*b.*r)
   k2H = ((b+1).^2-r.^2)./(4b)
-  igrid=linspace(1,length(b),length(b))-1
   sn_jac_grid = zeros(length(b),n_max+1,2)
   sn_jac_array= zeros(n_max+1,2)
   sn_grid = zeros(length(b),n_max+1)
@@ -126,7 +125,7 @@ for i=1:2
   ax[:set_xlabel]("b values")
   ax[:set_ylabel]("Derivative Error")
   ax[:axis]([0,length(b),1e-16,1])
-  ax[:set_xticks](nb*linspace(0,nticks-1,nticks))
+  ax[:set_xticks](nb*linearspace(0,nticks-1,nticks))
   ax[:set_xticklabels](xticknames,rotation=45)
   if i==1 
     ax[:set_title]("r = 0.01")
@@ -167,13 +166,6 @@ for n=0:n_max
 # Now, plot derivatives for each value of n:
 #for n=0:n_max
     clf()
-#    plot(sn_grid[:,n+1])
-#    plot(sn_jac_grid[:,n+1,1])
-#    plot(igrid[mask[:,1]],sn_jac_grid[mask[:,1],n+1,1],"o")
-#    plot(sn_jac_grid[:,n+1,2])
-#    plot(igrid[mask[:,2]],sn_jac_grid[mask[:,2],n+1,2],"o")
-#    plot(igrid,sn_jac_grid_num[:,n+1,1],linestyle="--",linewidth=2)
-#    plot(igrid,sn_jac_grid_num[:,n+1,2],linestyle="--",linewidth=2)
     plot(b,sn_grid[:,n+1])
     plot(b,sn_jac_grid[:,n+1,1])
     plot(b[mask[:,1]],sn_jac_grid[mask[:,1],n+1,1],"o")

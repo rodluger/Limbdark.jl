@@ -24,12 +24,12 @@ dIvdk2_num = zeros(Float64,v_max+1); dJvdk2_num = zeros(Float64,v_max+1)
 # This computes I_v for the largest v, and then works down to smaller values:
 dq = big(1e-18)
 if k2 <= 1
-  kc = convert(Float64,sqrt(1.-big(k2)))
+  kc = convert(Float64,sqrt(1.0-big(k2)))
   k = convert(Float64,sqrt(big(k2)))
-  kck = convert(Float64,sqrt((1.-big(k2))*big(k2)))
+  kck = convert(Float64,sqrt((1.0-big(k2))*big(k2)))
   kap = convert(Float64,2*asin(sqrt(big(k2))))
 else
-  kc = convert(Float64,sqrt(1.-inv(big(k2))))
+  kc = convert(Float64,sqrt(1.0-inv(big(k2))))
   k = convert(Float64,sqrt(big(k2)))
   kap = convert(typeof(r),pi); kck=zero(r)
 end
