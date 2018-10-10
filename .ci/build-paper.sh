@@ -11,7 +11,8 @@ then
     cd $TRAVIS_BUILD_DIR/tex/figures/julia
     for f in *.jl; do
         echo "Running $f..."
-        LD_PRELOAD=${HOME}/.julia/v0.7/Conda/deps/usr/lib/libz.so julia "$f"
+        #LD_PRELOAD=${HOME}/.julia/v0.7/Conda/deps/usr/lib/libz.so julia "$f"
+        julia "$f"
     done
 
     # Generate the Python figures
