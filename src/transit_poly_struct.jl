@@ -81,7 +81,7 @@ else
   k2 = onembmr2/fourbr
   if k2 > 1
     if k2 > 2.0
-      kc = sqrt(1.-inv(k2))
+      kc = sqrt(1.0-inv(k2))
     else
       kc2 = (1-r-b)*(1+b+r)/(1-b+r)/(1-r+b)
       kc = sqrt(kc2)
@@ -91,7 +91,7 @@ else
       kc2 = (r-1+b)*(b+r+1)/(4*b*r)
       kc = sqrt(kc2)
     else
-      kc = sqrt(1.-k2)
+      kc = sqrt(1.0-k2)
     end
   end
 end
@@ -276,7 +276,7 @@ else
   dkdb = (r^2-b^2-1)/(8*k*b^2*r)
   if k2 > 1
     if k2 > 2.0
-      kc = sqrt(1.-inv(k2))
+      kc = sqrt(1.0-inv(k2))
     else
       kc2 = (1-r-b)*(1+b+r)/(1+r-b)/(1-r+b)
       kc = sqrt(kc2)
@@ -413,7 +413,7 @@ den = inv(pi*(t.c_n[1]+2*t.c_n[2]/3))
 flux = zero(T)
 t.dfdrbc[1]=zero(T)  # Derivative with respect to r
 t.dfdrbc[2]=zero(T)  # Derivative with respect to b
-@inbounds for i=0:n
+@inbounds for i=0:t.n
   # derivatives with respect to the coefficients:
   t.dfdrbc[i+3]= t.sn[i+1]*den
   # total flux:
