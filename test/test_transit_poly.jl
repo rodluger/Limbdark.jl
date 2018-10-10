@@ -1,5 +1,5 @@
-#include("../src/compute_c_n_struct.jl")
 include("../src/transit_poly_struct.jl")
+using Test
 
 @testset "transit_poly" begin
 

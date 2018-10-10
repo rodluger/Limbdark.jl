@@ -1,7 +1,7 @@
 # Tests automatic differentiation on s2.jl:
 include("../src/s2.jl")
 
-
+using Test
 using ForwardDiff
 using DiffResults
 
@@ -18,7 +18,7 @@ function s2_grad_func(r::T,b::T) where {T <: Real}
   end
 
   # Set up a type to store s_n and it's Jacobian with respect to x:
-  out = DiffResults.GradientResult(x) 
+  out = DiffResults.GradientResult(x)
   # Compute the Jacobian (and value):
   out = ForwardDiff.gradient!(out,diff_s2,x)
   # Place the value in the s_2 vector:

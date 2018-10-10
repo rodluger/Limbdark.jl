@@ -1,6 +1,7 @@
 # Tests the vectorized version of cel:
 #include("cel_bulirsch.jl")
 include("../src/cel_bulirsch.jl")
+using Test
 
 function test_cel!(kc,p,a,b)
 k2 = 1.0-kc^2

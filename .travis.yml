@@ -11,14 +11,12 @@ julia:
 matrix:
     - PYTHON=Conda-python
 
-script:
-    - export LD_LIBRARY_PATH=$HOME/.julia/v0.7/Conda/deps/usr/lib
-
-before_install:
-    - julia .ci/install.jl
-
 install:
     - source .ci/travis.sh
+    - julia .ci/install.jl
+
+script:
+    - julia test/runtests.jl
 
 cache:
     directories:

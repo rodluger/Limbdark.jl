@@ -3,7 +3,11 @@
 include("../src/transit_poly_struct.jl")
 #include("../src/dJv_seriesdk.jl")
 using PyPlot
+using Test
 
+if !(@isdefined skip_plots)
+    skip_plots = false
+end
 
 # Now, carry out finite-difference derivative computation:
 function transit_poly_grad_num(r::T,b::T,u_n::Array{T,1},dq0::T) where {T <: Real}
@@ -106,10 +110,10 @@ if ~skip_plots
     ax[:plot](bgrid,fgrid3[i,1:nbgrid],label="Cubic")
     ax[:plot](bgrid,fgridn[i,1:nbgrid],label="N=10")
     if mod(i,3) == 0
-      ax[:set_xlabel]("b") 
+      ax[:set_xlabel]("b")
     end
     if i <= 3
-      ax[:set_ylabel]("F") 
+      ax[:set_ylabel]("F")
     end
     ax[:legend](loc="upper left",fontsize=6)
     ax[:set_title](string("r = ",r0[i]),fontsize=6)

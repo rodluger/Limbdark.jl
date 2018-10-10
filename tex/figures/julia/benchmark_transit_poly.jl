@@ -8,8 +8,6 @@ using PyPlot
 # Defines the function that computes the transit:
 include("../../../src/transit_poly_struct.jl")
 
-#function benchmark_transit_poly()
-
 nu = [1,2,3,5,8,13,21,34,55,89,144]; #233,377,610];
 nnu = length(nu)
 nb = [100,316,1000,3160,10000,31600,100000];
@@ -37,7 +35,6 @@ for j=1:length(nb)
     tmean[k] = (time_ns()-elapsed)*1e-9
   end
   timing[j] = median(tmean)
-#  println("nb = ",nb0," min(b): ",minimum(b)," max(b): ",maximum(b)," min(flux): ",minimum(flux)," max(flux): ",maximum(flux))
 end
 return timing
 end
@@ -51,7 +48,6 @@ for iu = 1:nnu
   u_n = ones(nu[iu])/float(nu[iu])
   trans = transit_init(r,b[1],u_n,true)
 # Transform from u_n to c_n coefficients:
-#compute_c_n_grad!(trans)  # Now included in transit_init function
   timing = zeros(nnb)
 # Call the function:
   @time timing =profile_transit_poly(trans,nb)
@@ -67,15 +63,6 @@ xlabel("Number of points")
 ylabel("Timing [sec]")
 legend(loc="upper left",fontsize=8,ncol=3)
 timing_ratio[:,1].=1.0
-#clf()
-#plot(b,flux-1,label="flux-1")
-#plot(b,trans.r*flux_grad[:,1],label="r*dfdr")
-#plot(b,trans.r*flux_grad[:,2],label="r*dfdb")
-#plot(b,flux_grad[:,3],label="dfdu1")
-#plot(b,flux_grad[:,4],label="dfdu2")
-#legend(loc="lower right")
-#println("b: ",minimum(b)," ",maximum(b))
-#println("f: ",minimum(flux)," ",maximum(flux))
 savefig("benchmark_transit_poly.pdf", bbox_inches="tight")
 
 clf()
@@ -85,9 +72,6 @@ plot(nu,tmed,label="Measured",linewidth=2, color="C0")
 alp = log(tmed[nnu])/log(nu[nnu])
 plot(nu,nu.^0.2,linestyle="--",label=L"$n^{0.2}$",color="C1")
 plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="-.",label=L"$n^1$",color="C1")
-#plot(nu,(nu).^(1./3.),linestyle="--",label=L"$n^{1/3}$",linewidth=2)
-#plot(nu,(nu).^(3./8.),linestyle="--",label=L"$n^{3/8}$",linewidth=2)
-#plot(nu,(nu).^(3./8.),linestyle="--",label=L"$n^{3/8}$",linewidth=2)
 xlabel("Number of limb-darkening coefficients")
 ylabel("Relative timing")
 legend(loc="upper left")

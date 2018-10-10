@@ -1,4 +1,5 @@
 ENV["PYTHON"]=""
+using Pkg
 Pkg.add("Conda")
 using Conda
 Conda.update()
@@ -10,3 +11,4 @@ Pkg.build("PyCall")
 Pkg.add("PyPlot")
 Pkg.add("SpecialFunctions")
 Pkg.add("ForwardDiff")
+Pkg.add("DiffResults")
