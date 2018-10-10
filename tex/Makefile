@@ -30,7 +30,7 @@ clean:
 	rm -rf $(JLFIGURES)
 
 figures/julia/%.pdf: figures/julia/%.jl
-	cd $(<D);/Applications/Julia-0.6.app/Contents/Resources/julia/bin/julia $(<F)
+	cd $(<D);julia $(<F)
 
 figures/python/%.pdf: figures/python/%.py
 	cd $(<D);python $(<F)

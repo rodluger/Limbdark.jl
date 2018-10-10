@@ -20,7 +20,7 @@ function occultquad(z0::Float64,u1::Float64,u2::Float64,p::Float64)
   z = abs(z0)
 # Go through the cases:
 # Case 1- No planet or no obscuration:
-  if (p <= 0.0) || (z >= 1.0+p) 
+  if (p <= 0.0) || (z >= 1.0+p)
     return 1.0
   end
 # Case 11- complete obscuration:
@@ -73,7 +73,7 @@ function occultquad(z0::Float64,u1::Float64,u2::Float64,p::Float64)
     lambdad = 2//3/pi*acos(1-2p)-4//9/pi*(3+2p-8p^2)*sqrt(p*(1-p))-2/3*(p > 0.5)
     etad = 0.5*p^2*(p^2+2z^2)
     lambdae = p^2
-    return 1.0 - ((1.-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
+    return 1.0 - ((1. - u1 - 2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
 #    println("Case 4")
   end
 # Case 5: edge of planet at center of star
@@ -94,7 +94,7 @@ function occultquad(z0::Float64,u1::Float64,u2::Float64,p::Float64)
     return 1.0 - ((1.0-u1-2u2)*lambdae + (u1+2u2)*(lambdad+2//3*(p > z)) + u2*etad)/omega
 #    println("Case 6")
   end
-# Cases 7/8 
+# Cases 7/8
   if p > 0.5
 #  Case 7: edge of planet at origin of star (and crossing limb of star)
     if z == p

@@ -20,9 +20,9 @@ area = r^2*kap0+kap1-akite
 
 kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
 # Angle of section for occultor:
-kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
+kap0  = atan(kite_area2,(r-1)*(r+1)+b^2)
 # Angle of section for source:
-kap1 = atan2(kite_area2,-((r-1)*(r+1)-b^2))
+kap1 = atan(kite_area2,-((r-1)*(r+1)-b^2))
 # Flux of visible uniform disk:
 sn = kap1 + r^2*kap0 - .5*kite_area2
 
@@ -30,9 +30,9 @@ sn = kap1 + r^2*kap0 - .5*kite_area2
 r_big = big(r); b_big=big(b)
 kite_area2_big = sqrt(sqarea_triangle(big(1.0),b_big,r_big))
 # Angle of section for occultor:
-kap0_big  = atan2(kite_area2,(r_big-1)*(r_big+1)+b_big^2)
+kap0_big  = atan(kite_area2,(r_big-1)*(r_big+1)+b_big^2)
 # Angle of section for source:
-kap1_big = atan2(kite_area2_big,-((r_big-1)*(r_big+1)-b_big^2))
+kap1_big = atan(kite_area2_big,-((r_big-1)*(r_big+1)-b_big^2))
 # Flux of visible uniform disk:
 sn_big = kap1_big + r_big^2*kap0_big - 0.5*kite_area2_big
 
@@ -46,17 +46,17 @@ fig[:subplots_adjust](wspace=0.25)
 
 r = 0.1
 nb = 1000
-db = logspace(-15,-2,nb)
-b = 1-r+db
+db = 10 .^ range(-15, stop=-2, length=nb)
+b = 1 - r .+ db
 area=zeros(nb); sn=zeros(nb); sn_big=zeros(BigFloat,nb)
 for i=1:nb
   area[i],sn[i],sn_big[i] = circle_overlap(r,b[i])
 end
 
 ax = axes[1]
-ax[:plot](db,abs.(pi*r^2-area),label=L"$r=0.1$, MA(2002)",lw=2)
-ax[:plot](db,abs.(pi*r^2-sn),label=L"$r=0.1$, AL(2018)",".")
-ax[:plot](db,abs.(convert(Array{Float64,1},pi*big(r)^2-sn_big)),label=L"$r=0.1$, BigFloat",linestyle="--",lw=2)
+ax[:plot](db,abs.(pi*r^2 .- area),label=L"$r=0.1$, MA(2002)",lw=2)
+ax[:plot](db,abs.(pi*r^2 .- sn),label=L"$r=0.1$, AL(2018)",".")
+ax[:plot](db,abs.(convert(Array{Float64,1},pi*big(r)^2 .- sn_big)),label=L"$r=0.1$, BigFloat",linestyle="--",lw=2)
 ax[:set_ylabel](L"$\pi r^2 - A_\mathrm{overlap}$", fontsize=14)
 ax[:legend](loc="lower right",fontsize=8)
 ax[:set_xscale]("log")
@@ -65,18 +65,17 @@ ax[:axis]([1e-15,1e-2,1e-25,1e-2])
 ax[:plot]([1e-16,1e-2],[1,1]*(pi*0.1^2/2^53),c="grey",linestyle="-.")
 
 ax = fig[:add_axes]((0.25, 0.925, 0.1, 0.1))
-t1 = linspace(0,2pi,100)
+t1 = range(0, stop=2pi, length=100)
 x1 = cos.(t1); y1 = sin.(t1)
-x2 = 0.8 + 0.2 * cos.(t1); y2 = 0.2 * sin.(t1)
+x2 = 0.8 .+ 0.2 * cos.(t1); y2 = 0.2 * sin.(t1)
 ax[:plot](x1,y1,"k-",lw=1.5)
 ax[:fill_between](x2,0,y2,facecolor="k")
 ax[:set_aspect](1)
 ax[:axis]("off")
 
 ax = fig[:add_axes]((0.685, 0.925, 0.1, 0.1))
-t1 = linspace(0,2pi,100)
 x1 = cos.(t1); y1 = sin.(t1)
-x2 = 1.2 + 0.2 * cos.(t1); y2 = 0.2 * sin.(t1)
+x2 = 1.2 .+ 0.2 * cos.(t1); y2 = 0.2 * sin.(t1)
 ax[:plot](x1,y1,"k-",lw=1.5)
 ax[:fill_between](x2,0,y2,facecolor="k")
 ax[:set_aspect](1)
@@ -93,7 +92,7 @@ ax[:set_yscale]("log")
 ax[:axis]([1e-15,1e-2,1e-25,1e-2])
 ax[:plot]([1e-16,1e-2],[1,1]*(pi*0.1^2/2^53),c="grey",linestyle="-.")
 
-b = 1+r-db
+b = 1 + r .- db
 area=zeros(nb); sn=zeros(nb); sn_big=zeros(BigFloat,nb)
 for i=1:nb
   area[i],sn[i],sn_big[i] = circle_overlap(r,b[i])
