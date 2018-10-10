@@ -8,7 +8,7 @@ include("../../../src/s2.jl")
 using PyPlot
 nb = 1001; nr = 1001
 b=range(0.0,stop=2,length=nr)
-r=linspace(0.0,stop=2,length=nr)
+r=range(0.0,stop=2,length=nr)
 fgrid = zeros(Float64,nr,nb)
 fgrid_old = zeros(Float64,nr,nb)
 fgrid_big = zeros(Float64,nr,nb)
