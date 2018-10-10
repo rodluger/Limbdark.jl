@@ -1,5 +1,6 @@
 #using Base.Test
 using Test
+include("loglinspace.jl")
 
 #include("test_IJv_derivative.jl")
 #include("test_sn_jacobian2.jl")

@@ -5,7 +5,6 @@ include("../src/s2.jl")
 using ForwardDiff
 using DiffResults
 
-
 function s2_grad_func(r::T,b::T) where {T <: Real}
   # Computes the derivative of s_n(r,b) with respect to r, b.
   # Create a vector for use with ForwardDiff
@@ -28,11 +27,6 @@ function s2_grad_func(r::T,b::T) where {T <: Real}
   s2_gradient= DiffResults.gradient(out)
 return s_2,s2_gradient
 end
-
-#r = 0.1; b= 0.95
-#r = 0.1; b= 1.0-r
-#r = 0.1; b= r
-#r = 100.0; b=100.5
 
 function s2_grad_num(r::T,b::T) where {T <: Real}
 # Now, carry out finite-difference:
@@ -94,14 +88,14 @@ runtest_s2(3.0,3.0,"r=3.0;b=3.0")
 # Now, try a random case with b+r < 1:
 b=r=2.0
 while b+r > 1
-  r = 2rand(); b= 2rand()
+  global r = 2rand(); global b= 2rand()
 end
 runtest_s2(r,b,"r+b < 1")
 
 # Now, try a random case with b+r > 1:
 b=r=0.
 while b+r < 1
-  r = 2rand(); b= 2rand()
+  global r = 2rand(); global b= 2rand()
 end
 runtest_s2(r,b,"r+b > 1")
 
@@ -117,52 +111,44 @@ using PyPlot
 fig,axes = subplots(1,length(r0))
 get_cmap("plasma")
 epsilon = 1e-12; delta = 1e-3
-i=1
 for i=1:length(r0)
-  r=r0[i]
+  global r=r0[i]
   if r < 1.0
-    b = [linspace(1e-15,epsilon,nb); linspace(epsilon,delta,nb); linspace(delta,r-delta,nb);
-     r-logspace(log10(delta),log10(epsilon),nb); linspace(r-epsilon,r+epsilon,nb); r+logspace(log10(epsilon),log10(delta),nb);
-     linspace(r+delta,1-r-delta,nb); 1-r-logspace(log10(delta),log10(epsilon),nb); linspace(1-r-epsilon,1-r+epsilon,nb);
-     1-r+logspace(log10(epsilon),log10(delta),nb); linspace(1-r+delta,1+r-delta,nb); 1+r-logspace(log10(delta),log10(epsilon),nb);linspace(1+r-epsilon,1+r-1e-15,nb)]
+    bgrid = [linearspace(1e-15,epsilon,nb); linearspace(epsilon,delta,nb); linearspace(delta,r-delta,nb);
+     -logarithmspace(log10(delta),log10(epsilon),nb) .+ r; linearspace(r-epsilon,r+epsilon,nb); logarithmspace(log10(epsilon),log10(delta),nb) .+ r;
+     linearspace(r+delta,1-r-delta,nb); -logarithmspace(log10(delta),log10(epsilon),nb) .+ (1-r); linearspace(1-r-epsilon,1-r+epsilon,nb);
+     logarithmspace(log10(epsilon),log10(delta),nb) .+ (1-r); linearspace(1-r+delta,1+r-delta,nb); - logarithmspace(log10(delta),log10(epsilon),nb) .+ (1+r);
+     linearspace(1+r-epsilon,1+r-1e-15,nb)]
   else
-    b = [linspace(r-1+1e-15,r-1+epsilon,nb); r-1+logspace(log10(epsilon),log10(delta),nb); linspace(r-1+delta,r-delta,nb);
-     r-logspace(log10(delta),log10(epsilon),nb); linspace(r-epsilon,r+epsilon,nb); r+logspace(log10(epsilon),log10(delta),nb);
-     linspace(r+delta,r+1-delta,nb); r+1-logspace(log10(delta),log10(epsilon),nb); linspace(r+1-epsilon,r+1-1e-15,nb)]
+    bgrid = [linearspace(r-1+1e-15,r-1+epsilon,nb); logarithmspace(log10(epsilon),log10(delta),nb) .+ (r-1); linearspace(r-1+delta,r-delta,nb);
+     -logarithmspace(log10(delta),log10(epsilon),nb) .+ r; linearspace(r-epsilon,r+epsilon,nb); logarithmspace(log10(epsilon),log10(delta),nb) .+ r;
+     linearspace(r+delta,r+1-delta,nb); -logarithmspace(log10(delta),log10(epsilon),nb) .+ (r+1); linearspace(r+1-epsilon,r+1-1e-15,nb)]
   end
-  igrid=linspace(1,length(b),length(b))-1
-  s2_jac_grid = zeros(length(b),2)
-  s2_grid = zeros(length(b))
-  s2_grid_big = zeros(length(b))
-  s2_jac_grid_num = zeros(length(b),2)
+  nbgrid = length(bgrid)
+  s2_jac_grid = zeros(nbgrid,2)
+  s2_grid = zeros(nbgrid)
+  s2_grid_big = zeros(nbgrid)
+  s2_jac_grid_num = zeros(nbgrid,2)
   s2_grad_ana = zeros(2)
-  for j=1:length(b)
-#    println("r: ",r," b: ",b[j])
-#    s_2,s2_gradient= s2_grad(r,b[j])
-    s_2,Eofk,Em1mKdm= s2!(r,b[j],s2_grad_ana)
+  for j=1:nbgrid
+    s_2,Eofk,Em1mKdm= s2!(r,bgrid[j],s2_grad_ana)
     s2_grid[j]=s_2
     s2_jac_grid[j,:]=s2_grad_ana
-    s2_big,s2_grad_numeric = s2_grad_num(r,b[j])
+    s2_big,s2_grad_numeric = s2_grad_num(r,bgrid[j])
     s2_grid_big[j]=s2_big
     s2_jac_grid_num[j,:]= s2_grad_numeric
-#    println("r: ",r," b: ",b[j]," s2: ",s_2," s2_big: ",s2_big)
     @test isapprox(s_2,s2_big,atol=1e-8)
     @test isapprox(s2_grad_ana[1],s2_grad_numeric[1],atol=1e-8)
     @test isapprox(s2_grad_ana[2],s2_grad_numeric[2],atol=1e-8)
-#  println("r: ",r," b: ",b[j]," ds2/dr: ",s2_jac_grid[j,1]," ",s2_jac_grid[j,1]-s2_jac_grid_num[j,1])
-#  println("r: ",r," b: ",b[j]," ds2/db: ",s2_jac_grid[j,2]," ",s2_jac_grid[j,2]-s2_jac_grid_num[j,2])
   end
 # Now, make plots:
   ax = axes[i]
-  ax[:semilogy](b,abs.(s2_grid[:,1]-s2_grid_big[:,1])+1e-18,lw=1,label="s 2 ")
-  ax[:semilogy](b,abs.(s2_jac_grid[:,1]-s2_jac_grid_num[:,1])+1e-18,lw=1,label="ds2/dr")
-  ax[:semilogy](b,abs.(s2_jac_grid[:,2]-s2_jac_grid_num[:,2])+1e-18,lw=1,label="ds2/db")
-#  ax[:semilogy](b,abs.(asinh.(s2_jac_grid[:,1])-asinh.(s2_jac_grid_num[:,1])),lw=1,label="ds2/dr")
-#  ax[:semilogy](b,abs.(asinh.(s2_jac_grid[:,2])-asinh.(s2_jac_grid_num[:,2])),lw=1,label="ds2/db")
+  ax[:semilogy](bgrid,abs.(s2_grid[:,1]-s2_grid_big[:,1]) .+1e-18,lw=1,label="s 2 ")
+  ax[:semilogy](bgrid,abs.(s2_jac_grid[:,1]-s2_jac_grid_num[:,1]) .+1e-18,lw=1,label="ds2/dr")
+  ax[:semilogy](bgrid,abs.(s2_jac_grid[:,2]-s2_jac_grid_num[:,2]) .+1e-18,lw=1,label="ds2/db")
   ax[:legend](loc="upper right",fontsize=6)
   ax[:set_xlabel]("b values")
   ax[:set_ylabel]("Derivative Error")
-#  ax[:axis]([0,length(b),1e-16,1])
 end
 
 savefig("test_s2_gradient.pdf", bbox_inches="tight")

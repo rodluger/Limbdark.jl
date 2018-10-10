@@ -8,18 +8,10 @@ ell1 = zeros(3)
 nphi = 100000
 if p < 0
   phi0 = asin(sqrt(1.0/(1.0-p)))
-  if version > v"0.7"
-    phi1 = reverse(phi0-10.^range(log10(1e-8),stop=log10(phi0),length=nphi+1))
-  else
-    phi1 = reverse(phi0-logspace(log10(1e-8),log10(phi0),nphi+1))
-  end
+  phi1 = reverse(phi0 .-logarithmspace(log10(1e-8),log10(phi0),nphi+1))
   dphi = phi1[2:nphi]-phi1[1:nphi-1]
   phi = .5*(phi1[2:nphi]+phi1[1:nphi-1])
-  if version > v"0.7"
-    phi1 = phi0+10.^range(log10(1e-8),stop=log10(pi/2-phi0),length=nphi+1)
-  else
-    phi1 = phi0+logspace(log10(1e-8),log10(pi/2-phi0),nphi+1)
-  end
+  phi1 = phi0 .+logarithmspace(log10(1e-8),log10(pi/2-phi0),nphi+1)
   dphi = [dphi;phi1[2:nphi]-phi1[1:nphi-1]]
   phi = [phi;.5*(phi1[2:nphi]+phi1[1:nphi-1])]
 # Finally, evaluate numerically:
@@ -36,11 +28,7 @@ if p < 0
   b[1] = b0*p0
 else
   dphi = .5*pi/nphi
-  if VERSION > v"0.7"
-    phi = range(0.5*dphi,stop=pi/2-.5*dphi,length=nphi)
-  else
-    phi = linspace(0.5*dphi,pi/2-.5*dphi,nphi)
-  end
+  phi = linearspace(0.5*dphi,pi/2-.5*dphi,nphi)
   ell3 = zeros(3); cphi2 = cos.(phi).^2; sphi2=sin.(phi).^2
   den = dphi./sqrt.(cphi2+kc*kc*sphi2)
   ell3[1] = sum((a[1]*cphi2+b[1]*sphi2)./(cphi2+p*sphi2).*den)
