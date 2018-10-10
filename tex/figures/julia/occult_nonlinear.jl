@@ -1,7 +1,10 @@
 include("occultquad.jl")
 include("../../../src/transit_poly_struct.jl")
+include("../../../tests/loglinspace.jl")
 
-using Statistics
+if VERSION >= v"0.7"
+  using Statistics
+end
 
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # How to compute (sixteen times the) area squared of triangle with
@@ -55,7 +58,11 @@ function occult_nonlinear(r::T,b::T,c1::T,c2::T,c3::T,c4::T) where {T <: Real}
   nint = 16; delta0 = one(T); delta1 = zero(T)
   tol = 1e-8; iter = 0; itmax = 20
   while abs(delta0-delta1) > tol*delta0 && iter <= itmax
-    xgrid = sin.(range(theta1,stop=theta2,length=nint))
+    if VERSION >= v"0.7"
+      xgrid = sin.(range(theta1,stop=theta2,length=nint))
+    else
+      xgrid = sin.(linspace(theta1,theta2,nint))
+    end
     delta0 = delta1
     delta1 = zero(T)
     for i=2:nint
@@ -70,24 +77,67 @@ function occult_nonlinear(r::T,b::T,c1::T,c2::T,c3::T,c4::T) where {T <: Real}
 return delta1
 end
 
-nx = 1024
-x = range(-1.2,stop=1.2,length=nx)
+function transit_poly_int(r,b,c,ns)
+if b < (1.0+r)
+  s_1 = maximum([0.0,b-r]); s_2=minimum([1.0,b+r])
+  ds=(s_2-s_1)/ns
+  s = linearspace(s_1+.5*ds,s_2-.5*ds,ns)
+  fobs = zero(r)
+  for j=1:ns
+    if s[j] < r-b
+      dphi = 2pi
+    else
+      dphi = 2*acos((s[j]^2+b^2-r^2)/(2*b*s[j]))
+    end
+    z = sqrt(sqrt(1-s[j]^2))
+    imu = 1.0-sum(c)
+#    one(T)-c1-c2-c3-c4+c1*muh+c2*mu+c3*muh*mu+c4*mu^2
+    for i=1:4
+      imu += c[i]*z^i
+    end
+    fobs += s[j]*ds*dphi*imu
+  end
+  norm = 1.-sum(c)
+ #omega = (1.0-c1-c2-c3-c4)+0.8*c1+2.0*c2/3.0+4.0*c3/7.0+c4/2.0
+  for i=1:4
+    norm += 4c[i]/(4.0+i)
+  end
+  fobs /= norm
+#  fobs = 1-fobs
+  return fobs
+else
+  return 1.0
+end
+end
+
+
+
+nx = 2048
+if VERSION >= v"0.7"
+ x = range(-1.2,stop=1.2,length=nx)
+else
+ x = linspace(-1.2,1.2,nx)
+end
 y = 0.0
 b = sqrt.(x.^2 .+ y.^2)
 c1 = 0.2; c2 = 0.2; c3 = 0.2; c4 = 0.2
-r=0.1; flux = zeros(nx)
+r=0.1; flux1 = zeros(nx); flux2 = zeros(nx)
 omega = (1.0-c1-c2-c3-c4)+0.8*c1+2.0*c2/3.0+4.0*c3/7.0+c4/2.0
+ns = 5000
 for i=1:nx
   if b[i] < 1.0+r
-    flux[i]=occult_nonlinear(r,b[i],c1,c2,c3,c4)/omega
+    flux1[i]=occult_nonlinear(r,b[i],c1,c2,c3,c4)/omega
+    flux2[i]=transit_poly_int(r,b[i],[c1,c2,c3,c4],ns)
 #    println(i," r: ",r," b: ",b[i]," flux: ",flux[i])
   end
 end
 
 using PyPlot
 clf()
-plot(x, 1.0 .- flux/pi)
-flux = 1.0 .- flux/pi
+plot(x, 1.0 .- flux1/pi)
+flux1 = 1.0 .- flux1/pi
+plot(x, 1.0 .- flux2/pi)
+flux2 = 1.0 .- flux2/pi
 # The following two lines are used to check occult_nonlinear
 # when c1 = c3 = 0, which yields the quadratic case:
 #u2 = -c4; u1 = c2-2*u2
@@ -97,7 +147,42 @@ savefig("occult_nonlinear.pdf", bbox_inches="tight")
 
 # Now, optimize a fit with polynomial limb-darkening:
 
-function optimize_fit!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n::Array{T,1}) where {T <: Real}
+function optimize_fit_linear!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n::Array{T,1}) where {T <: Real}
+  nb = length(b)   # Number of points in "light curve"
+  nu = length(u_n) # Number of limb-darkening coefficients
+  # Optimizes a polynomial limb-darkening model to "data":
+  # Compute a limb-darkening model with the impact parameter grid b
+  # Initialize:
+  trans = transit_init(r,b[1],u_n,true)
+  # Compute model & gradient at each point:
+  smat = zeros(T,nu+1,nu+1); fdots = zeros(T,nu+1)
+  for i=1:nb
+    trans.b = b[i]
+    fcur = transit_poly!(trans)
+    for j=1:nu+1
+      fdots[j] += fobs[i]*trans.sn[j]
+      for k=1:nu+1
+        smat[j,k] += trans.sn[j]*trans.sn[k]
+      end
+    end
+  end
+  # Now, invert to find coefficients of:  f_obs = \sum_j \alpha_j s_j:
+#  println("f.s: ",fdots," s^T s: ",smat)
+  alpha = \(smat,fdots)
+#  println("alpha: ",alpha)
+  fill!(fmod,zero(T))
+  for i=1:nb
+    trans.b = b[i]
+    fcur = transit_poly!(trans)
+    for j=1:nu+1
+      fmod[i] += alpha[j]*trans.sn[j]
+    end
+#    println("b: ",b[i]," fobs: ",fobs[i]," fmod: ",fmod[i])
+  end
+return fmod
+end
+
+function optimize_fit_linear!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n::Array{T,1}) where {T <: Real}
   nb = length(b)   # Number of points in "light curve"
   nu = length(u_n) # Number of limb-darkening coefficients
   # Optimizes a polynomial limb-darkening model to "data":
@@ -137,6 +222,7 @@ clf()
 fig,axes = subplots(2,1, figsize=(8,8))
 ax = axes[2]
 dev = zeros(6)
+flux = flux2
 fmod = copy(flux)
 #u_n = [.1]
 #fmod = optimize_fit!(r,b,flux,fmod,u_n)
@@ -166,7 +252,7 @@ u_n = [0.1,0.1,0.1,0.1,0.1,0.1,0.1]
 fmod = optimize_fit!(r,b,flux,fmod,u_n)
 ax[:plot](b,(flux-fmod)*1e6,linestyle="--",label="septic")
 println("septic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-u_n = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
+#u_n = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
 #fmod = optimize_fit!(r,b,flux,fmod,u_n)
 #plot(b,flux-fmod,linestyle="--",label="octic")
 #println("octic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))

@@ -1,3 +1,4 @@
-backend: agg
+#backend: agg
+backend: MacOSX
 text.usetex: True
 mathtext.fontset: stix
