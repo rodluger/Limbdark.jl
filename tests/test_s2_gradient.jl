@@ -1,7 +1,7 @@
 # Tests automatic differentiation on s2.jl:
 include("../src/s2.jl")
 
-
+using Test
 using ForwardDiff
 using DiffResults
 
@@ -19,7 +19,7 @@ function s2_grad_func(r::T,b::T) where {T <: Real}
   end
 
   # Set up a type to store s_n and it's Jacobian with respect to x:
-  out = DiffResults.GradientResult(x) 
+  out = DiffResults.GradientResult(x)
   # Compute the Jacobian (and value):
   out = ForwardDiff.gradient!(out,diff_s2,x)
   # Place the value in the s_2 vector:
@@ -92,18 +92,10 @@ runtest_s2(0.3,0.3,"r=0.3;b=0.3")
 runtest_s2(3.0,3.0,"r=3.0;b=3.0")
 
 # Now, try a random case with b+r < 1:
-b=r=2.0
-while b+r > 1
-  r = 2rand(); b= 2rand()
-end
-runtest_s2(r,b,"r+b < 1")
+runtest_s2(0.435,0.232,"r+b < 1")
 
 # Now, try a random case with b+r > 1:
-b=r=0.
-while b+r < 1
-  r = 2rand(); b= 2rand()
-end
-runtest_s2(r,b,"r+b > 1")
+runtest_s2(11.434,11.113,"r+b > 1")
 
 @testset "s2 grid" begin
 # Now, try out hard cases - ingress/egress of small planets:
@@ -121,16 +113,16 @@ i=1
 for i=1:length(r0)
   r=r0[i]
   if r < 1.0
-    b = [linspace(1e-15,epsilon,nb); linspace(epsilon,delta,nb); linspace(delta,r-delta,nb);
-     r-logspace(log10(delta),log10(epsilon),nb); linspace(r-epsilon,r+epsilon,nb); r+logspace(log10(epsilon),log10(delta),nb);
-     linspace(r+delta,1-r-delta,nb); 1-r-logspace(log10(delta),log10(epsilon),nb); linspace(1-r-epsilon,1-r+epsilon,nb);
-     1-r+logspace(log10(epsilon),log10(delta),nb); linspace(1-r+delta,1+r-delta,nb); 1+r-logspace(log10(delta),log10(epsilon),nb);linspace(1+r-epsilon,1+r-1e-15,nb)]
+    b = [range(1e-15,stop=epsilon,length=nb); range(epsilon,stop=delta,length=nb); range(delta,stop=r-delta,length=nb);
+     r .- 10 .^ range(log10(delta),stop=log10(epsilon),length=nb); range(r-epsilon,stop=r+epsilon,length=nb); r .+ 10 .^ range(log10(epsilon),stop=log10(delta),length=nb);
+     range(r+delta,stop=1-r-delta,length=nb); (1 - r) .- 10 .^ range(log10(delta),stop=log10(epsilon),length=nb); range(1-r-epsilon,stop=1-r+epsilon,length=nb);
+     (1 - r) .+ 10 .^ range(log10(epsilon),stop=log10(delta),length=nb); range(1-r+delta,stop=1+r-delta,length=nb); (1 + r) .- 10 .^ range(log10(delta),stop=log10(epsilon),length=nb);range(1+r-epsilon,stop=1+r-1e-15,length=nb)]
   else
-    b = [linspace(r-1+1e-15,r-1+epsilon,nb); r-1+logspace(log10(epsilon),log10(delta),nb); linspace(r-1+delta,r-delta,nb);
-     r-logspace(log10(delta),log10(epsilon),nb); linspace(r-epsilon,r+epsilon,nb); r+logspace(log10(epsilon),log10(delta),nb);
-     linspace(r+delta,r+1-delta,nb); r+1-logspace(log10(delta),log10(epsilon),nb); linspace(r+1-epsilon,r+1-1e-15,nb)]
+    b = [range(r-1+1e-15,stop=r-1+epsilon,length=nb); (r - 1) .+ 10 .^ range(log10(epsilon),stop=log10(delta),length=nb); range(r-1+delta,stop=r-delta,length=nb);
+     r .- 10 .^ range(log10(delta),stop=log10(epsilon),length=nb); range(r-epsilon,stop=r+epsilon,length=nb); r .+ 10 .^ range(log10(epsilon),stop=log10(delta),length=nb);
+     range(r+delta,stop=r+1-delta,length=nb); (r + 1) .- 10 .^ range(log10(delta),stop=log10(epsilon),length=nb); range(r+1-epsilon,stop=r+1-1e-15,length=nb)]
   end
-  igrid=linspace(1,length(b),length(b))-1
+  igrid=range(1,stop=length(b),length=length(b)) .- 1
   s2_jac_grid = zeros(length(b),2)
   s2_grid = zeros(length(b))
   s2_grid_big = zeros(length(b))
@@ -154,9 +146,9 @@ for i=1:length(r0)
   end
 # Now, make plots:
   ax = axes[i]
-  ax[:semilogy](b,abs.(s2_grid[:,1]-s2_grid_big[:,1])+1e-18,lw=1,label="s 2 ")
-  ax[:semilogy](b,abs.(s2_jac_grid[:,1]-s2_jac_grid_num[:,1])+1e-18,lw=1,label="ds2/dr")
-  ax[:semilogy](b,abs.(s2_jac_grid[:,2]-s2_jac_grid_num[:,2])+1e-18,lw=1,label="ds2/db")
+  ax[:semilogy](b,abs.(s2_grid[:,1]-s2_grid_big[:,1]) .+ 1e-18,lw=1,label="s 2 ")
+  ax[:semilogy](b,abs.(s2_jac_grid[:,1]-s2_jac_grid_num[:,1]) .+ 1e-18,lw=1,label="ds2/dr")
+  ax[:semilogy](b,abs.(s2_jac_grid[:,2]-s2_jac_grid_num[:,2]) .+ 1e-18,lw=1,label="ds2/db")
 #  ax[:semilogy](b,abs.(asinh.(s2_jac_grid[:,1])-asinh.(s2_jac_grid_num[:,1])),lw=1,label="ds2/dr")
 #  ax[:semilogy](b,abs.(asinh.(s2_jac_grid[:,2])-asinh.(s2_jac_grid_num[:,2])),lw=1,label="ds2/db")
   ax[:legend](loc="upper right",fontsize=6)

@@ -5,6 +5,7 @@ include("../src/transit_poly_struct.jl")
 #r=rand(); b=rand()*(1+r); u = [0.,0.,0.,0.,1.0]; n=length(u)
 
 #@testset "transit_poly" begin
+using Test
 
 # Now, integrate by hand:
 function transit_poly_int(r,b,u,ns)
@@ -12,7 +13,7 @@ if b < (1.0+r)
   s_1 = maximum([0.0,b-r]); s_2=minimum([1.0,b+r])
 #  ns = 20000; ds=(s_2-s_1)/ns
   ds=(s_2-s_1)/ns
-  s = linspace(s_1+.5*ds,s_2-.5*ds,ns)
+  s = range(s_1+.5*ds,stop=s_2-.5*ds,length=ns)
   fobs = zero(r)
   for j=1:ns
     if s[j] < r-b
