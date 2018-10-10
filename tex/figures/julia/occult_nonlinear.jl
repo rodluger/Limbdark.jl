@@ -97,7 +97,7 @@ if b < (1.0+r)
     end
     fobs += s[j]*ds*dphi*imu
   end
-  norm = 1.-sum(c)
+  norm = 1.0-sum(c)
  #omega = (1.0-c1-c2-c3-c4)+0.8*c1+2.0*c2/3.0+4.0*c3/7.0+c4/2.0
   for i=1:4
     norm += 4c[i]/(4.0+i)
@@ -156,7 +156,7 @@ function optimize_fit!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n:
 
   # Compute model:
   function transit_model(u)
-    fmodel = zeros(b)
+    fmodel = zeros(length(b))
     trans = transit_init(r,b[1],u,true)
     for i=1:nb
       trans.b = b[i]
@@ -184,7 +184,7 @@ function optimize_fit!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n:
       trans.b = b[i]
       fmodel = transit_poly!(trans)
       for j = 1:trans.n
-        G[j] -= 2.*(fobs[i]-fmodel)*trans.dfdrbu[j+2]
+        G[j] -= 2*(fobs[i]-fmodel)*trans.dfdrbu[j+2]
       end
     end
     return

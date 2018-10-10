@@ -1142,16 +1142,10 @@ is the approach taken in the numerical model used to compute the
 non-linear limb-darkening light curves in the code of \citet{MandelAgol2002},
 and it is also the approach taken by \citet{Kreidberg2015} for
 computing models with arbitrary limb-darkening profiles.
-We note that the fit of the polynomial light curve is simply a linear
-problem:  if we express the light curve as linear combinations
-of $S_n$, then we can optimize the fit with linear regression.
 
 We find that the fit improves steadily up until $N=6$ (a sextic
-polynomial), while beyond sextic, the RMS improves, while the
-maximum deviation remains about constant, at a level of $1.5 \times 10^{-6}$
-in this example, and does not improve for higher order polynomial
-limb-darkening fits.  This deviation is fairly small and localized;
-the RMS of the sextic fit for this example is $5 \times 10^{-7}$
+polynomial), while beyond sextic, the RMS improves impercetibly.
+The RMS of the sextic fit for this example is $<5 \times 10^{-7}$
 relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
 
 \begin{figure}
