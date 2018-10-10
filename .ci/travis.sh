@@ -14,3 +14,6 @@ fi
 
 # Display some info
 conda info -a
+
+# Install some dependencies
+pip install batman
