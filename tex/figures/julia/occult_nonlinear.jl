@@ -1,6 +1,6 @@
 include("occultquad.jl")
 include("../../../src/transit_poly_struct.jl")
-include("../../../tests/loglinspace.jl")
+include("../../../test/loglinspace.jl")
 
 if VERSION >= v"0.7"
   using Statistics
