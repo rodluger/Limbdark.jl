@@ -1,6 +1,8 @@
 include("occultquad.jl")
 include("../../../src/transit_poly_struct.jl")
 
+using Statistics
+
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # How to compute (sixteen times the) area squared of triangle with
 # high precision (Goldberg 1991).
@@ -26,13 +28,13 @@ else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
   kite_area2 = sqrt(abs(sqarea_triangle(R,b,r)))
   # Angle of section for occultor:
-  kap0  = atan2(kite_area2,(r-R)*(r+R)+b^2)
+  kap0  = atan(kite_area2,(r-R)*(r+R)+b^2)
   # Angle of section for source:
-  kap1 = atan2(kite_area2,(R-r)*(r+R)+b^2)
+  kap1 = atan(kite_area2,(R-r)*(r+R)+b^2)
   # Flux of visible uniform disk:
   area = R^2*kap1 + r^2*kap0 - 0.5*kite_area2
 end
-return area 
+return area
 end
 
 # Compute non-linear limb-darkened light curve as a sum over uniform
@@ -47,13 +49,13 @@ function occult_nonlinear(r::T,b::T,c1::T,c2::T,c3::T,c4::T) where {T <: Real}
   muh = sqrt(mu)
   return one(T)-c1-c2-c3-c4+c1*muh+c2*mu+c3*muh*mu+c4*mu^2
   end
-  
+
   x0 = maximum([b-r,zero(T)]); xn = minimum([b+r,one(T)])
   theta1 = asin(x0); theta2 = asin(xn);
   nint = 16; delta0 = one(T); delta1 = zero(T)
   tol = 1e-8; iter = 0; itmax = 20
   while abs(delta0-delta1) > tol*delta0 && iter <= itmax
-    xgrid = sin.(linspace(theta1,theta2,nint))
+    xgrid = sin.(range(theta1,stop=theta2,length=nint))
     delta0 = delta1
     delta1 = zero(T)
     for i=2:nint
@@ -69,9 +71,9 @@ return delta1
 end
 
 nx = 1024
-x = linspace(-1.2,1.2,nx)
+x = range(-1.2,stop=1.2,length=nx)
 y = 0.0
-b = sqrt.(x.^2+y.^2)
+b = sqrt.(x.^2 .+ y.^2)
 c1 = 0.2; c2 = 0.2; c3 = 0.2; c4 = 0.2
 r=0.1; flux = zeros(nx)
 omega = (1.0-c1-c2-c3-c4)+0.8*c1+2.0*c2/3.0+4.0*c3/7.0+c4/2.0
@@ -84,8 +86,8 @@ end
 
 using PyPlot
 clf()
-plot(x,1.0-flux/pi)
-flux = 1.0-flux/pi
+plot(x, 1.0 .- flux/pi)
+flux = 1.0 .- flux/pi
 # The following two lines are used to check occult_nonlinear
 # when c1 = c3 = 0, which yields the quadratic case:
 #u2 = -c4; u1 = c2-2*u2
@@ -132,7 +134,7 @@ end
 
 clf()
 #plot(b,flux)
-fig,axes = subplots(2,1)
+fig,axes = subplots(2,1, figsize=(8,8))
 ax = axes[2]
 dev = zeros(6)
 fmod = copy(flux)
@@ -172,16 +174,19 @@ u_n = [0.1,0.1,0.1,0.1,0.1,0.1,0.1,0.1]
 #fmod = optimize_fit!(r,b,flux,fmod,u_n)
 #plot(b,flux-fmod,linestyle="--",label="nonic")
 #println("nonic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-ax[:legend](loc = "upper left",fontsize=6)
+ax[:legend](loc = "upper left",fontsize=8)
 ax[:set_ylabel]("Deviation of fit [ppm]")
-ax[:set_xlabel]("Impact parameter, b")
+ax[:set_xlabel](L"$b$", fontsize=18)
 ax[:axis]([0,1.2,-10,10])
 ax = axes[1]
 
 ax[:plot](b,flux,linewidth=2,label="non-linear")
 ax[:plot](b,fmod,linestyle="--",label="septic",linewidth=2)
 ax[:set_title](L"$c_1 = c_2=c_3=c_4=0.2$")
-ax[:legend](loc="upper left")
+ax[:legend](loc="upper left", fontsize=8)
 ax[:axis]([0,1.2,0.984,1.001])
 ax[:set_ylabel]("Relative flux")
+
+show()
+
 savefig("occult_nonlinear_poly.pdf",bbox_inches="tight")

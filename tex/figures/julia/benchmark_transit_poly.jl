@@ -48,7 +48,7 @@ r = 0.1; b = 0.5
 clf()
 cmap = get_cmap("plasma")
 for iu = 1:nnu
-  u_n .= ones(nu[iu])/nu[iu]
+  u_n = ones(nu[iu])/float(nu[iu])
   trans = transit_init(r,b[1],u_n,true)
 # Transform from u_n to c_n coefficients:
 #compute_c_n_grad!(trans)  # Now included in transit_init function
@@ -60,13 +60,13 @@ for iu = 1:nnu
   else
     timing_ratio[:,iu] = timing./timing_ratio[:,1]
   end
-  loglog(nb,timing,color=cmap(float(iu)/nnu))
-  loglog(nb,timing,"o",color=cmap(float(iu)/nnu),label=string("n: ",nu[iu]))
+  loglog(nb,timing,color=cmap(float(iu)/(1.25 * nnu)))
+  loglog(nb,timing,"o",color=cmap(float(iu)/(1.25 * nnu)),label=string("n: ",nu[iu]))
 end
 xlabel("Number of points")
 ylabel("Timing [sec]")
 legend(loc="upper left",fontsize=8,ncol=3)
-timing_ratio[:,1]=1.0
+timing_ratio[:,1].=1.0
 #clf()
 #plot(b,flux-1,label="flux-1")
 #plot(b,trans.r*flux_grad[:,1],label="r*dfdr")
@@ -80,11 +80,11 @@ savefig("benchmark_transit_poly.pdf", bbox_inches="tight")
 
 clf()
 tmed = vec(median(timing_ratio;dims=1))
-loglog(nu,tmed,"o")
-plot(nu,tmed,label="Measured",linewidth=2)
+loglog(nu,tmed,"o", color="C0")
+plot(nu,tmed,label="Measured",linewidth=2, color="C0")
 alp = log(tmed[nnu])/log(nu[nnu])
-plot(nu,nu.^0.2,linestyle="--",label=L"$n^{0.2}$")
-plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="--",label=L"$n^1$")
+plot(nu,nu.^0.2,linestyle="--",label=L"$n^{0.2}$",color="C1")
+plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="-.",label=L"$n^1$",color="C1")
 #plot(nu,(nu).^(1./3.),linestyle="--",label=L"$n^{1/3}$",linewidth=2)
 #plot(nu,(nu).^(3./8.),linestyle="--",label=L"$n^{3/8}$",linewidth=2)
 #plot(nu,(nu).^(3./8.),linestyle="--",label=L"$n^{3/8}$",linewidth=2)
