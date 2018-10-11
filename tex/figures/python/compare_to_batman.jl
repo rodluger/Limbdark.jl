@@ -15,9 +15,11 @@ function profile_transit_poly!(trans,flux,b)
 end
 
 b = readdlm("b.txt")
-u_n = zeros(2)
-u_n[1] = 0.4
-u_n[2] = 0.26
+u = readdlm("u.txt")
+u_n = zeros(length(u))
+for i = 1:length(u)
+    u_n[i] = u[i]
+end
 trans = transit_init(0.1, 0.0, u_n, false)
 flux = zeros(length(b))
 println(profile_transit_poly!(trans, flux, b))
