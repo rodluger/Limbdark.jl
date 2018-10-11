@@ -3,6 +3,10 @@
 include("../src/IJv_derivative_struct.jl")
 #include("../src/dJv_seriesdk.jl")
 
+# Randomizer seed
+using Random
+Random.seed!(42)
+
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # How to compute (twice) area squared of triangle with
 # high precision (Goldberg 1991):
@@ -36,7 +40,7 @@ end
 if k2 > 0
   if k2 < 0.5 || k2 > 2.0
     dIJv_lower_dk!(v_max,k2,kck,kc,kap,Iv,Jv,dIvdk,dJvdk)
-    if k2 <=1 
+    if k2 <=1
       k2_big = big(k2)+dq
       k_big = sqrt(k2_big)
       kc_big = sqrt(1-big(k2)-dq)
@@ -66,7 +70,7 @@ if k2 > 0
       dIvdk2_num[v+1] = convert(Float64,(Iv_bigp[v+1]-Iv_bigm[v+1])/(2dq))
       dJvdk2_num[v+1] = convert(Float64,(Jv_bigp[v+1]-Jv_bigm[v+1])/(2dq))
       test1 =  isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k,atol = 1e-20)
-      test2 = isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k,atol = 1e-20) 
+      test2 = isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k,atol = 1e-20)
       @test isapprox(dIvdk[v+1],dIvdk2_num[v+1]*2*k,atol = 1e-20)
       @test isapprox(dJvdk[v+1],dJvdk2_num[v+1]*2*k,atol = 1e-20)
       if ~test1 || ~test2
