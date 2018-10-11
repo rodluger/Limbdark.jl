@@ -6,20 +6,23 @@ os:
     - linux
 
 julia:
-    - 0.6
+    - nightly
+    - 0.7.0
 
 matrix:
     - PYTHON=Conda-python
 
-script:
-    - export LD_LIBRARY_PATH=$HOME/.julia/v0.6/Conda/deps/usr/lib
-
-before_install:
-    - julia -e 'ENV["PYTHON"]=""; Pkg.add("Conda"); using Conda; Conda.update(); Conda.add("matplotlib"); Pkg.add("PyCall"); Pkg.build("PyCall"); Pkg.add("PyPlot"); Pkg.add("SpecialFunctions")'
-
 install:
     - source .ci/travis.sh
-    - julia -e 'Pkg.build("PyCall")'
+    - julia .ci/install.jl
+
+script:
+    - julia test/runtests.jl
+
+cache:
+    directories:
+        - $HOME/miniconda
+        - $HOME/.cache/Tectonic
 
 after_success:
-    - source .ci/build-paper.sh
+    - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then source .ci/build-paper.sh; fi

@@ -68,7 +68,7 @@ else
 #             -(4-7r^2-b^2)*Eofk)/(9*pi)
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
-      Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(T,r>.5) -
+      Lambda1 = 2/(3pi)*acos(1.0-2.0*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(T,r>.5) -
           8/(3pi)*(r+b-1)*r*sqrt(r*(1-r)) # Adding in first derivatives
       Eofk = one(T)
       Em1mKdm = one(T)
@@ -118,7 +118,7 @@ else
       s2_grad[1] = -4*r*Eofk      # Adding in first derivative dLambda/dr
       s2_grad[2] = -4*r/3*(Eofk-2*Em1mKdm) # Adding in first derivative dLambda/db
     else
-      m = 4r^2; minv = inv(m); kc = sqrt(1.-minv)
+      m = 4r^2; minv = inv(m); kc = sqrt(1.0-minv)
       Eofk = cel_bulirsch(minv,one(T),one(T),1-minv)
       Em1mKdm = cel_bulirsch(minv,one(T),one(T),zero(T))
       Lambda1 = 1/3+1/(9pi*r)*(-m*Eofk + (2m-3)*Em1mKdm)  # Case 7
@@ -163,7 +163,7 @@ else
       s2_grad[2] = -4*r/3*sqrt(onembmr2)*(Eofk - 2*Em1mKdm)
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
-      Lambda1 = 2/(3pi)*acos(1.-2.*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(T,r>.5) 
+      Lambda1 = 2/(3pi)*acos(1.0-2.0*r)-4/(9pi)*(3+2r-8r^2)*sqrt(r*(1-r))-2/3*convert(T,r>0.5) 
       s2_grad[1] = -8*r*sqrt(r*(1-r))
       s2_grad[2] = -s2_grad[1]/3
       Eofk = one(T)

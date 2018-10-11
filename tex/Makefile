@@ -8,14 +8,20 @@ RM_TMP      = $(foreach d, ${TEX_FILES}, rm -rf $(foreach suff, ${TMP_SUFFS}, ${
 CHECK_RERUN = grep Rerun limbdark.log
 PYFIGURES   = $(patsubst %.py,%.pdf,$(wildcard figures/python/*.py))
 JLFIGURES   = $(patsubst %.jl,%.pdf,$(wildcard figures/julia/*.jl))
+TECTONIC    = $(shell command -v tectonic >/dev/null && echo true || echo false )
 
 default: limbdark.pdf
 
 limbdark.pdf: limbdark.tex stylez.tex $(JLFIGURES) $(PYFIGURES)
-	${LATEX} limbdark.tex
-	bibtex limbdark
-	( ${CHECK_RERUN} && ${LATEX} limbdark.tex ) || echo "Done."
-	( ${CHECK_RERUN} && ${LATEX} limbdark.tex ) || echo "Done."
+	if [ "${TECTONIC}" = "true" ]; then\
+		tectonic limbdark.tex --print --keep-logs;\
+	else\
+		${LATEX} ${TEXFILE};\
+		bibtex limbdark;\
+		( ${CHECK_RERUN} && ${LATEX} ${TEXFILE} ) || echo "Done.";\
+		( ${CHECK_RERUN} && ${LATEX} ${TEXFILE} ) || echo "Done.";\
+		( ${CHECK_RERUN} && ${LATEX} ${TEXFILE} ) || echo "Done.";\
+	fi
 
 clean:
 	$(RM_TMP)
@@ -28,6 +34,3 @@ figures/julia/%.pdf: figures/julia/%.jl
 
 figures/python/%.pdf: figures/python/%.py
 	cd $(<D);python $(<F)
-
-publish:
-	cd ..; ./publish.sh

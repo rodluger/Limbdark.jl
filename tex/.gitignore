@@ -3,3 +3,5 @@
 *.log
 *.dvi
 *.bbl
+figures/python/b.txt
+figures/python/flux.txt

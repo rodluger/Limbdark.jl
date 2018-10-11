@@ -1,8 +1,8 @@
 #!/bin/bash -x
 set -e
 
-# Are there changes in the tex directory?
-if git diff --name-only $TRAVIS_COMMIT_RANGE | grep 'tex/'
+# Only build the paper with Julia 0.7
+if [ $TRAVIS_JULIA_VERSION == "0.7.0" ]
 then
 
     # Generate the Julia figures
@@ -11,7 +11,7 @@ then
     cd $TRAVIS_BUILD_DIR/tex/figures/julia
     for f in *.jl; do
         echo "Running $f..."
-        LD_PRELOAD=${HOME}/.julia/v0.6/Conda/deps/usr/lib/libz.so julia "$f"
+        julia "$f"
     done
 
     # Generate the Python figures
@@ -22,16 +22,11 @@ then
         python "$f"
     done
 
-    # Build the paper
+    # Build the paper with tectonic
     cd $TRAVIS_BUILD_DIR/tex
-	pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex
-	bibtex limbdark
-	pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex
-	pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex
-    pdflatex -interaction=nonstopmode -halt-on-error limbdark.tex
+	tectonic limbdark.tex
 
     # Force push the paper to GitHub
-    # NOTE: This is hacky. I couldn't get the old aproach to work for some reason.
     cd $HOME
     mkdir tmp && cd tmp
     git init

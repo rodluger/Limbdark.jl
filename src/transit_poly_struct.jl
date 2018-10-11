@@ -26,15 +26,6 @@ area = (a+(b+c))*(c-(a-b))*(c+(a-b))*(a+(b-c))
 return area
 end
 
-# This version is less efficient:
-function sqarea_triangle(x::Array{T,1}) where {T <: Real}
-# How to compute (twice) area squared of triangle with 
-# high precision (Goldberg 1991):
-a=maximum(x); b=median(x); c=minimum(x)
-area = (a+(b+c))*(c-(a-b))*(c+(a-b))*(a+(b-c))
-return area
-end
-
 # Computes a limb-darkened transit light curve with the dependence:
 # I(\mu) = 1-\sum_{n=1}^N u_n (1-\mu)^n
 # where \mu = \cos{\theta} = z is the cosine of the angle
@@ -81,7 +72,7 @@ else
   k2 = onembmr2/fourbr
   if k2 > 1
     if k2 > 2.0
-      kc = sqrt(1.-inv(k2))
+      kc = sqrt(1.0-inv(k2))
     else
       kc2 = (1-r-b)*(1+b+r)/(1-b+r)/(1-r+b)
       kc = sqrt(kc2)
@@ -91,7 +82,7 @@ else
       kc2 = (r-1+b)*(b+r+1)/(4*b*r)
       kc = sqrt(kc2)
     else
-      kc = sqrt(1.-k2)
+      kc = sqrt(1.0-k2)
     end
   end
 end
@@ -107,9 +98,9 @@ else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
   kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
   # Angle of section for occultor:
-  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
+  kap0  = atan(kite_area2,(r-1)*(r+1)+b^2)
   # Angle of section for source:
-  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
+  pimkap1 = atan(kite_area2,(r-1)*(r+1)-b^2)
   # Flux of visible uniform disk:
   t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
   kck = kite_area2/(4*b*r)
@@ -167,7 +158,6 @@ end
 
 function transit_poly!(r::T,b::T,u_n::Array{T,1},dfdrbu::Array{T,1}) where {T <: Real}
 t = transit_init(r,b,u_n,true)
-#compute_c_n_grad!(t) #This is now included in transit_init function
 # Pass c_n (without last two dummy values):
 flux = transit_poly_c!(t)
 # Now, transform derivaties from c to u:
@@ -183,9 +173,8 @@ end
 
 function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
 t = transit_init(r,b,u_n,false)
-#t.c_n = compute_c_n(t) #This is now included in transit_init function
 # Pass c_n (without last two dummy values):
-return transit_poly_c!(t) 
+return transit_poly_c(t) 
 end
 
 function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
@@ -193,29 +182,20 @@ function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
 # (this can be used to save compute time when limb-darkening is fixed for
 # a range of radii/impact parameters).
 # Pass transit structure, and compute flux:
-flux = transit_poly_c!(t)
-# Now, transform derivaties from c to u:
-#fill!(t.dfdrbu,zero(T))
-#t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
-#t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
-# u_n derivatives:
-#t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
-#t.dfdrbu[3:t.n+2] = t.dcdu' * t.dfdrbc[3:t.n+3]
-#println("Mult: ",t.dfdrbu)
-fill!(t.dfdrbu,zero(T))
-t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
-t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
-@inbounds for i=1:t.n, j=0:t.n
-  t.dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
+if t.grad
+  flux = transit_poly_c!(t)
+  # Now, transform derivaties from c to u:
+  fill!(t.dfdrbu,zero(T))
+  t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
+  t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
+  @inbounds for i=1:t.n, j=0:t.n
+    t.dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
+  end
+  return flux
+else
+  return transit_poly_c(t)
 end
-#for j=0:t.n
-#  t.dfdrbu[3:t.n+2] += t.dfdrbc[j+3]*t.dcdu[j+1,1:t.n]
-#end
-#for i=1:t.n
-#  t.dfdrbu[i+2] += dot(t.dfdrbc[3:t.n+3],t.dcdu[:,i])
-#end
-#println("Loop: ",t.dfdrbu)
-return flux
+return
 end
 
 function transit_poly_c!(t::Transit_Struct{T}) where {T <: Real}
@@ -278,7 +258,7 @@ else
   dkdb = (r^2-b^2-1)/(8*k*b^2*r)
   if k2 > 1
     if k2 > 2.0
-      kc = sqrt(1.-inv(k2))
+      kc = sqrt(1.0-inv(k2))
     else
       kc2 = (1-r-b)*(1+b+r)/(1+r-b)/(1-r+b)
       kc = sqrt(kc2)
@@ -306,9 +286,9 @@ else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
   kite_area2 = sqrt(sqarea_triangle(one(r),b,r)) 
   # Angle of section for occultor:
-  kap0  = atan2(kite_area2,(r-1)*(r+1)+b^2)
+  kap0  = atan(kite_area2,(r-1)*(r+1)+b^2)
   # Angle of section for source:
-  pimkap1 = atan2(kite_area2,(r-1)*(r+1)-b^2)
+  pimkap1 = atan(kite_area2,(r-1)*(r+1)-b^2)
   # Flux of visible uniform disk:
   t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
   t.dsndr[1]= -2*r*kap0
@@ -406,16 +386,13 @@ nmi = zero(Int64); fac1 = zero(T)
   t.dsndr[n+1] = -(dpdr+dpdk*dkdr)
   t.dsndb[n+1] = -(dpdb+dpdk*dkdb)
 end
-#if typeof(r) == Float64
-#  println("r: ",r," b: ",b," s2 error: ",convert(Float64,s2(big(r),big(b)))-sn[2])
-#end
 # That's it!
 # Compute derivatives with respect to the coefficients:
 den = inv(pi*(t.c_n[1]+2*t.c_n[2]/3))
 flux = zero(T)
 t.dfdrbc[1]=zero(T)  # Derivative with respect to r
 t.dfdrbc[2]=zero(T)  # Derivative with respect to b
-@inbounds for i=0:n
+@inbounds for i=0:t.n
   # derivatives with respect to the coefficients:
   t.dfdrbc[i+3]= t.sn[i+1]*den
   # total flux:

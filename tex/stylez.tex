@@ -1,5 +1,6 @@
 % All the packages
 %\usepackage[letterpaper]{geometry}
+\usepackage{fontspec}
 \usepackage{microtype}
 \usepackage{url}
 \usepackage{amsmath}
@@ -37,7 +38,6 @@
 \newcommand{\Python}{\textsf{Python}\xspace}
 \newcommand{\cpp}{\textsf{C}++\xspace}
 \newcommand{\Mathematica}{\textsf{Mathematica}\xspace}
-\newcommand{\docs}{\href{https://rodluger.github.io/starry/starry.html\#starry.Planet}{documentation}}
 
 % References to text content
 \newcommand{\documentname}{\textsl{article}}
@@ -49,20 +49,6 @@
 \newcommand{\eq}[1]{\Eq{#1}}
 \newcommand{\eqalt}[1]{Equation~\eqref{#1}}
 \newcommand{\eqlabel}[1]{\label{eq:#1}}
-
-% Add script hyperlinks as margin notes
-\definecolor{proofcolor}{rgb}{0.1216,0.4667,0.7059}
-\newcommand{\python}[1]{\marginnote{\href{https://github.com/rodluger/limbdark/tree/master/tex/figures/#1.py}{\includegraphics[width=0.9cm]{figures/plot.png}}}}
-\newcommand{\mathematica}[1]{\marginnote{\href{https://docs.google.com/viewer?url=https://github.com/rodluger/limbdark/raw/master/tex/notebooks/#1.pdf}{\includegraphics[width=0.9cm]{figures/pen.png}}}}
-\newcommand{\pdf}[1]{\marginnote{\href{https://docs.google.com/viewer?url=https://github.com/rodluger/limbdark/raw/master/tex/notebooks/#1.pdf}{\includegraphics[width=0.9cm]{figures/pen.png}}}}
-\newcommand{\animation}[1]{\marginnote{\href{https://github.com/rodluger/limbdark/tree/master/tex/figures/#1.gif}{\includegraphics[width=0.9cm]{figures/play.png}}}}
-\newcommand{\todo}[1]{\marginnote{\includegraphics[width=0.9cm]{figures/todo.png}\\[-1ex]{\color{red}\scriptsize#1}}}
-\newcommand{\pythonlogo}{%
-  \hspace*{0.25em}\raisebox{-1.25ex}{\includegraphics[width=0.8cm]{figures/plot.png}}
-}
-\newcommand{\penlogo}{%
-  \hspace*{0.25em}\raisebox{-1ex}{\includegraphics[width=0.6cm]{figures/pen.png}}
-}
 
 % Force margin notes to always be on the right side
 % https://tex.stackexchange.com/a/69624

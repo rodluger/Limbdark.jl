@@ -56,7 +56,8 @@ n = 2; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
 # Computing leading coefficient (n=0):
 #coeff = 3pi/(2^(2+v)*factorial(v+2))
 if k2 < 1
-  coeff = 0.75*pi/exp(lfact(v+2))
+#  coeff = 0.75*pi/exp(lfact(v+2))
+  coeff = 0.75*pi/exp(lfactorial(v+2))
 # multiply by (2v-1)!!
   for i=2:2:2v
     coeff *= (i-1)/2
@@ -103,7 +104,8 @@ n = 2; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
 #coeff = 3pi/(2^(2+v)*factorial(v+2))
 coeff = zero(k2)
 if k2 < 1
-  coeff = 3pi/(2^(2+v)*exp(lfact(v+2)))
+#  coeff = 3pi/(2^(2+v)*exp(lfact(v+2)))
+  coeff = 3pi/(2^(2+v)*exp(lfactorial(v+2)))
 #  println("coefficient: ",coeff)
 # multiply by (2v-1)!!
   for i=2:2:2v
