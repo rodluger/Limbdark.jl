@@ -40,7 +40,7 @@ def GetPolynomialCoeffs(c, order):
     N = 1000
     mu = np.linspace(0, 1, N)
     I = NonLinear(mu, *c)
-    X = np.vander((1 - mu), N=order, increasing=True)
+    X = np.vander((1 - mu), N=order + 1, increasing=True)
     guess = -np.linalg.solve(np.dot(X.transpose(), X), np.dot(X.transpose(), I))[1:]
     u, _ = curve_fit(Polynomial, mu, I, guess, jac=PolynomialJac)
     IPoly = Polynomial(mu, *u)
