@@ -5,6 +5,10 @@ else
   using Base.Test
 end
 
+# Randomizer seed
+using Random
+Random.seed!(42)
+
 @testset "transit_poly" begin
 
 # Now, integrate by hand:

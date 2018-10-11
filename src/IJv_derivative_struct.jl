@@ -286,7 +286,9 @@ end
 v=2
 while v <= t.v_max
   t.Jv[v+1] = (2*(v+1+(v-1)*k2)*t.Jv[v]-k2*(2v-3)*t.Jv[v-1])/(2v+3)
-  t.dJvdk[v+1] = -3*t.Jv[v+1]/k+k2*t.dJvdk[v]
+  if t.grad
+    t.dJvdk[v+1] = -3*t.Jv[v+1]/k+k2*t.dJvdk[v]
+  end
   v += 1
 end
 return
@@ -359,9 +361,11 @@ if k2 < 1
   end
   t.Iv[1] = kap
   # Now compute compute derivatives:
-  t.dIvdk[1] = 2/kc
-  for v=1:t.v_max
-    t.dIvdk[v+1] = k2*t.dIvdk[v]
+  if t.grad
+    t.dIvdk[1] = 2/kc
+    for v=1:t.v_max
+      t.dIvdk[v+1] = k2*t.dIvdk[v]
+    end
   end
 else # k^2 >= 1
   # Compute v=0 (no need to iterate downwards in this case):
@@ -370,7 +374,9 @@ else # k^2 >= 1
     t.Iv[v+1]=t.Iv[v]*(1-.5/v)
   end
   # Derivatives of I_v are zero:
-  fill!(t.dIvdk,zero(k2))
+  if t.grad
+    fill!(t.dIvdk,zero(k2))
+  end
 end
 v= t.v_max
 # Need to compute top two for J_v:
@@ -379,7 +385,9 @@ t.Jv[v+1] = zero(k2)
 while t.Jv[v+1] == 0.0 && v >= 2 # Loop downward in v until we get a non-zero Jv[v]
   dJvdk0 = zero(T); dJvdk1 = zero(T)
   t.Jv[v],dJvdk0 = dJv_seriesdk(k2,v-1); t.Jv[v+1],dJvdk1=dJv_seriesdk(k2,v)
-  t.dJvdk[v] = dJvdk0; t.dJvdk[v+1] = dJvdk1
+  if t.grad
+    t.dJvdk[v] = dJvdk0; t.dJvdk[v+1] = dJvdk1
+  end
   v -=1
 end
 v +=1
@@ -387,7 +395,9 @@ v +=1
 while v >= 2
   f2 = k2*(2v-3); f1 = 2*(v+1+(v-1)*k2)/f2; f3 = (2v+3)/f2
   t.Jv[v-1] = f1*t.Jv[v]-f3*t.Jv[v+1]
-  t.dJvdk[v-1] = (t.dJvdk[v]+3/k*t.Jv[v])/k2
+  if t.grad
+    t.dJvdk[v-1] = (t.dJvdk[v]+3/k*t.Jv[v])/k2
+  end
   v -= 1
 end
 # Compute first two exactly:

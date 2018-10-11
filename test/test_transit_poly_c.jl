@@ -1,4 +1,9 @@
 include("transit_poly.jl")
+
+# Randomizer seed
+using Random
+Random.seed!(42)
+
 nc = 2+ceil(Int64,rand()*20)
 r=rand(); b=rand()*(1+r); c = rand(nc)
 #r=1.2*rand(); b=0.0; c = rand(nc)

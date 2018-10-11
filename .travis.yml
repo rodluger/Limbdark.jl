@@ -6,6 +6,7 @@ os:
     - linux
 
 julia:
+    - nightly
     - 0.7.0
 
 matrix:
@@ -24,4 +25,4 @@ cache:
         - $HOME/.cache/Tectonic
 
 after_success:
-    - source .ci/build-paper.sh
+    - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then source .ci/build-paper.sh; fi

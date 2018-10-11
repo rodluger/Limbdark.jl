@@ -16,4 +16,4 @@ fi
 conda info -a
 
 # Install some dependencies
-pip install batman
+pip install batman-package

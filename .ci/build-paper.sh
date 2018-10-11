@@ -1,8 +1,8 @@
 #!/bin/bash -x
 set -e
 
-# Are there changes in the tex directory?
-if git diff --name-only $TRAVIS_COMMIT_RANGE | grep 'tex/'
+# Only build the paper with Julia 0.7
+if [ $TRAVIS_JULIA_VERSION == "0.7.0" ]
 then
 
     # Generate the Julia figures

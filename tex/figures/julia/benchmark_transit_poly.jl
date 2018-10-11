@@ -12,6 +12,7 @@ nu = [1,2,3,5,8,13,21,34,55,89,144]; #233,377,610];
 nnu = length(nu)
 nb = [100,316,1000,3160,10000,31600,100000];
 nnb = length(nb)
+
 timing_ratio = zeros(nnb,nnu)
 
 # Define a function that loops over impact parameter
@@ -33,6 +34,8 @@ for j=1:length(nb)
       flux[i] = transit_poly!(trans)
     end
     tmean[k] = (time_ns()-elapsed)*1e-9
+
+    #plot(b,flux)
   end
   timing[j] = median(tmean)
 end

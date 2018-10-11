@@ -3,9 +3,13 @@
 include("../src/cel_bulirsch.jl")
 if VERSION >= v"0.7"
   using Test
-else 
+else
   using Base.Test
 end
+
+# Randomizer seed
+using Random
+Random.seed!(42)
 
 function test_cel!(kc,p,a,b)
 k2 = 1.0-kc^2

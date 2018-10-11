@@ -2,12 +2,16 @@
 include("../src/s2.jl")
 if VERSION >= v"0.7"
   using Test
-else 
+else
   using Base.Test
 end
 
 using ForwardDiff
 using DiffResults
+
+# Randomizer seed
+using Random
+Random.seed!(42)
 
 function s2_grad_func(r::T,b::T) where {T <: Real}
   # Computes the derivative of s_n(r,b) with respect to r, b.
