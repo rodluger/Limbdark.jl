@@ -18,7 +18,6 @@ b = readdlm("b.txt")
 u_n = zeros(2)
 u_n[1] = 0.4
 u_n[2] = 0.26
-trans = transit_init(0.1, 0.0, u_n, false)
+trans = transit_init(0.1, 0.0, u_n, true)
 flux = zeros(length(b))
 println(profile_transit_poly!(trans, flux, b))
-writedlm("flux.txt", flux)

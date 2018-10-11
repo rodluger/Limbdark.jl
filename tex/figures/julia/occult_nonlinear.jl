@@ -3,6 +3,7 @@ include("../../../src/transit_poly_struct.jl")
 include("../../../test/loglinspace.jl")
 
 using Optim
+using Printf
 
 if VERSION >= v"0.7"
   using Statistics
@@ -194,7 +195,11 @@ function optimize_fit!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n:
   result = optimize(transit_fit, transit_gradient! , u_n, LBFGS())
   # Then, compute the model again:
   u_n .= result.minimizer
-  println("optimized limb-darkening params: ",u_n)
+  println("optimized limb-darkening params: ")
+  for i = 1:length(u_n)
+    @printf("%.10f, ", u_n[i])
+  end
+  println("")
 return transit_model(u_n)
 end
 
