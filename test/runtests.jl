@@ -1,4 +1,8 @@
-using Test
+if VERSION >= v"0.7"
+  using Test
+else
+  using Base.Test
+end
 include("loglinspace.jl")
 include("test_cel_vec.jl")
 include("test_s2_gradient.jl")

@@ -1,5 +1,9 @@
 include("../src/transit_poly_struct.jl")
-using Test
+if VERSION >= v"0.7"
+  using Test
+else
+  using Base.Test
+end
 
 @testset "transit_poly" begin
 

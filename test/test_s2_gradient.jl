@@ -1,7 +1,11 @@
 # Tests automatic differentiation on s2.jl:
 include("../src/s2.jl")
+if VERSION >= v"0.7"
+  using Test
+else 
+  using Base.Test
+end
 
-using Test
 using ForwardDiff
 using DiffResults
 

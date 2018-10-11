@@ -3,11 +3,18 @@
 include("../src/transit_poly_struct.jl")
 #include("../src/dJv_seriesdk.jl")
 using PyPlot
-using Test
-
-if !(@isdefined skip_plots)
+if VERSION >= v"0.7"
+  using Test
+  if !(eval(:(@isdefined skip_plots)))
     skip_plots = false
+  end
+else
+  using Base.Test
+  if !(isdefined(:skip_plots))
+    skip_plots = false
+  end
 end
+
 
 # Now, carry out finite-difference derivative computation:
 function transit_poly_grad_num(r::T,b::T,u_n::Array{T,1},dq0::T) where {T <: Real}

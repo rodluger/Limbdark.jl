@@ -1,7 +1,11 @@
 # Tests the vectorized version of cel:
 #include("cel_bulirsch.jl")
 include("../src/cel_bulirsch.jl")
-using Test
+if VERSION >= v"0.7"
+  using Test
+else 
+  using Base.Test
+end
 
 function test_cel!(kc,p,a,b)
 k2 = 1.0-kc^2
