@@ -26,13 +26,12 @@ def NonLinear(mu, *c):
 
 def Polynomial(mu, *u):
     """The polynomial limb darkening model."""
-    return 1 - np.sum([u[l] * (1 - mu) ** l for l in range(1, len(u))], axis=0)
+    return 1 - np.sum([u[l] * (1 - mu) ** (l + 1) for l in range(len(u))], axis=0)
 
 
 def PolynomialJac(mu, *u):
     """The derivative matrix of the polynomial model."""
-    jac = -np.array([(1 - mu) ** l for l in range(len(u))]).transpose()
-    jac[:, 0] = 0
+    jac = -np.array([(1 - mu) ** (l + 1) for l in range(len(u))]).transpose()
     return jac
 
 
@@ -41,11 +40,12 @@ def GetPolynomialCoeffs(c, order):
     N = 1000
     mu = np.linspace(0, 1, N)
     I = NonLinear(mu, *c)
-    guess = np.ones(order + 1) * 0.1
+    X = np.vander((1 - mu), N=order, increasing=True)
+    guess = -np.linalg.solve(np.dot(X.transpose(), X), np.dot(X.transpose(), I))[1:]
     u, _ = curve_fit(Polynomial, mu, I, guess, jac=PolynomialJac)
     IPoly = Polynomial(mu, *u)
     err = np.sum((I - IPoly) ** 2) / N
-    return u[1:], err
+    return u, err
 
 
 def NumericalFlux(b, r, c):
@@ -136,7 +136,7 @@ a = ((P * 86400) ** 2 * (1.32712440018e20 * mstar) /
 # Get the inclination in degrees
 inc = np.arccos(b0 / a) * 180 / np.pi
 
-# Get the polynomial coeffs for l = 16
+# Get the polynomial coeffs for l = 6
 order = 6
 u, err = GetPolynomialCoeffs(c, order)
 print("Polynomial fit error: %.3e" % err)
