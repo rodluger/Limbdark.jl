@@ -74,7 +74,7 @@ else
     if k2 > 2.0
       kc = sqrt(1.0-inv(k2))
     else
-      kc2 = (1-r-b)*(1+b+r)/(1-b+r)/(1-r+b)
+      kc2 = (1-r-b)*(1+b+r)/((1-b+r)*(1-r+b))
       kc = sqrt(kc2)
     end
   else
