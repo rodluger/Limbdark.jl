@@ -108,7 +108,7 @@ end
 t.sn[2],Eofk,Em1mKdm = s2_ell(r,b)
 # Compute the J_v and I_v functions:
 if k2 > 0
-  if k2 < 0.5 || k2 > 2.0
+  if (k2 < 0.5 || k2 > 2.0) && t.v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
     IJv_lower!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
   else
@@ -117,6 +117,8 @@ if k2 > 0
   end
 end
 
+# Add up first two terms in flux numerator:
+flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
 # Next, loop over the Green's function components:
 @inbounds for n=2:t.n
   pofgn = zero(T)
@@ -149,9 +151,12 @@ end
 # boundary for n > 0.
 # Compute sn[n]:
   t.sn[n+1] = -pofgn
+  flux += t.c_n[n+1]*t.sn[n+1]
 end
 # That's it!
-flux = sum(t.c_n.*t.sn)/(pi*(t.c_n[1]+2*t.c_n[2]/3))  # for c_2 and above, the flux is zero.
+# flux = 3*sum(t.c_n.*t.sn)/(pi*(3t.c_n[1]+2*t.c_n[2]))  # for c_2 and above, the flux is zero.
+# Divide by denominator:
+flux *= 3/(pi*(3*t.c_n[1]+2*t.c_n[2]))  # for c_2 and above, the flux is zero.
 return flux
 end
 # That's it!
@@ -302,7 +307,7 @@ t.dsndb[2] = t.s2_grad[2]
 
 # Compute the J_v and I_v functions:
 if k2 > 0
-  if (k2 < 0.5 || k2 > 2.0) # && v_max > 3
+  if (k2 < 0.5 || k2 > 2.0) && t.v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
     dIJv_lower_dk!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
   else

@@ -63,7 +63,7 @@ for i=1:length(r0)
     tp_big = transit_poly!(big(r),big(bgrid[j]),big.(u_n),dfdrbu_big)
     tp_grad_grid_big[j,:] .=dfdrbu_big
     @test isapprox(dfdrbu,tp_grad_array,atol=1e-6)
-    @test isapprox(dfdrbu,dfdrbu_big,atol=1e-11)
+    @test isapprox(dfdrbu,dfdrbu_big,atol=1e-8)
   end
   if ~skip_plots
 # Now, make plots:

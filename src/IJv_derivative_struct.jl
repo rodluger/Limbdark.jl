@@ -38,7 +38,7 @@ end
 function Jv_hyp(k2::T,v::Int64) where {T <: Real}
 if k2 < 1
   a = 0.5; b=v+0.5; c=v+3.0;  fac = 3pi/(4*(v+1)*(v+2))
-  for i=2:2:2v
+  @inbounds for i=2:2:2v
     fac *= (i-1)/i
   end
   return sqrt(k2)*k2^v*fac*hypergeom([a,b],c,k2)
@@ -59,7 +59,7 @@ if k2 < 1
 #  coeff = 0.75*pi/exp(lfact(v+2))
   coeff = 0.75*pi/exp(lfactorial(v+2))
 # multiply by (2v-1)!!
-  for i=2:2:2v
+  @inbounds for i=2:2:2v
     coeff *= (i-1)/2
   end
 # Add leading term to J_v:
@@ -70,14 +70,14 @@ if k2 < 1
     coeff /= n*(n+2v+4)
     coeff *= k2
     Jv += coeff
-    error = coeff/Jv
+    error = coeff
     n += 2
   end
   return Jv*k2^v*sqrt(k2)
 else # k^2 >= 1
   coeff = convert(typeof(k2),pi)
   # Compute (2v-1)!!/(2^v v!):
-  for i=2:2:2v
+  @inbounds for i=2:2:2v
     coeff *= (i-1)/i
   end
   Jv = convert(typeof(k2),coeff)
@@ -89,7 +89,7 @@ else # k^2 >= 1
     coeff /= (n*(n+2v))
     coeff *= k2inv
     Jv += coeff
-    error = coeff/Jv
+    error = coeff
     n += 2
   end
   return Jv
@@ -108,7 +108,7 @@ if k2 < 1
   coeff = 3pi/(2^(2+v)*exp(lfactorial(v+2)))
 #  println("coefficient: ",coeff)
 # multiply by (2v-1)!!
-  for i=2:2:2v
+  @inbounds for i=2:2:2v
     coeff *= i-1
   end
 # Add leading term to J_v:
@@ -132,7 +132,7 @@ if k2 < 1
 else # k^2 >= 1
   coeff = convert(typeof(k2),pi)
   # Compute (2v-1)!!/(2^v v!):
-  for i=2:2:2v
+  @inbounds for i=2:2:2v
     coeff *= (i-1)/i
   end
   Jv = one(k2)*coeff
@@ -178,7 +178,7 @@ if k2 < 1
 else # k^2 >= 1
   # Compute v=0
   t.Iv[1] = pi
-  for v=1:t.v_max
+  @inbounds for v=1:t.v_max
     t.Iv[v+1]=t.Iv[v]*(1-1/(2v))
   end
 end
@@ -233,14 +233,14 @@ if k2 < 1
   if t.grad
     # Now compute compute derivatives:
     t.dIvdk[1] = 2/kc
-    for v=1:t.v_max
+    @inbounds for v=1:t.v_max
       t.dIvdk[v+1] = k2*t.dIvdk[v]
     end
   end
 else # k^2 >= 1
   # Compute v=0
   t.Iv[1] = pi
-  for v=1:t.v_max
+  @inbounds for v=1:t.v_max
     t.Iv[v+1]=t.Iv[v]*(1-1/(2v))
   end
   if t.grad
@@ -316,7 +316,7 @@ if k2 < 1
 else # k^2 >= 1
   # Compute v=0 (no need to iterate downwards in this case):
   t.Iv[1] = pi
-  for v=1:t.v_max
+  @inbounds for v=1:t.v_max
     t.Iv[v+1]=t.Iv[v]*(1-.5/v)
   end
 end
@@ -363,14 +363,14 @@ if k2 < 1
   # Now compute compute derivatives:
   if t.grad
     t.dIvdk[1] = 2/kc
-    for v=1:t.v_max
+    @inbounds for v=1:t.v_max
       t.dIvdk[v+1] = k2*t.dIvdk[v]
     end
   end
 else # k^2 >= 1
   # Compute v=0 (no need to iterate downwards in this case):
   t.Iv[1] = pi
-  for v=1:t.v_max
+  @inbounds for v=1:t.v_max
     t.Iv[v+1]=t.Iv[v]*(1-.5/v)
   end
   # Derivatives of I_v are zero:
