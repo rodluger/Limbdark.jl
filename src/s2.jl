@@ -91,10 +91,26 @@ flux = 1.0-1.5*Lambda1-convert(T,r>b)
 return flux*2pi/3,Eofk,Em1mKdm
 end
 
+"""
+    s2!(r,b,s2_grad)
+ 
+Computes the linear limb-darkening case, as well as the gradient,
+s2_grad=[ds_2/dr,ds_2/db] is a pre-allocated two-element array.
+Returns s2 and complete elliptic integrals, E(k) and 
+(E(m)-(1-m)K(m))/m, where m = k^2.
+
+# Example
+```julia-repl
+julia> s2_grad=[0.0,0.0]
+julia> s2!(0.1,0.5,s2_grad)
+(2.067294367278038, 1.4726447391114554, 0.8111640472029077)
+julia> s2_grad
+2-element Array{Float64,1}:
+ -0.53988  
+  0.0182916
+```
+"""
 function s2!(r::T,b::T,s2_grad::Array{T,1}) where {T <: Real}
-# Computes the linear limb-darkening case, as well as the gradient,
-# s2_grad=[ds_2/dr,ds_2/db] is a pre-allocated two-element array.
-# For now, just compute linear component:
 Eofk = zero(T)
 Em1mKdm = zero(T)
 Lambda1 = zero(T)

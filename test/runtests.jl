@@ -2,6 +2,7 @@ if VERSION >= v"0.7"
   using Test
 else
   using Base.Test
+  include("random.jl")
 end
 include("loglinspace.jl")
 include("test_cel_vec.jl")
