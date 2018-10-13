@@ -1,3 +1,5 @@
+# Define constants for speed:
+include("define_constants.jl")
 # Include definition of Transit structure type:
 include("transit_structure.jl")
 # Include code which transforms from u_n to c_n:
@@ -6,6 +8,7 @@ include("compute_c_n_struct.jl")
 include("s2.jl")
 # Include code which computes I_v, J_v, and derivatives wrt k:
 include("IJv_derivative_struct.jl")
+
 
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # Function which computes sixteen times the square of the area
@@ -59,17 +62,17 @@ end
 if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
   flux = zero(T); sqrt1mr2 = sqrt(1-r^2)
-  flux = (t.c_n[1]*(1-r^2)+2/3*t.c_n[2]*sqrt1mr2^3)
+  flux = (t.c_n[1]*(1-r^2)+twothird*t.c_n[2]*sqrt1mr2^3)
   fac= 2r^2*(1-r^2)
   @inbounds for i=2:t.n
     flux += -t.c_n[i+1]*fac
     fac *= sqrt1mr2
   end
-  return flux/(t.c_n[1]+2*t.c_n[2]/3)
+  return flux/(t.c_n[1]+t.c_n[2]*twothird)
 else
 # Next, compute k^2 = m:
-  onembmr2=(r+1-b)*(1-r+b); fourbr = 4b*r
-  k2 = onembmr2/fourbr
+  onembmr2=(r+1-b)*(1-r+b); fourbr = 4b*r; fourbrinv = inv(fourbr)
+  k2 = onembmr2*fourbrinv
   if k2 > 1
     if k2 > 2.0
       kc = sqrt(1.0-inv(k2))
@@ -79,7 +82,7 @@ else
     end
   else
     if k2 > 0.5
-      kc2 = (r-1+b)*(b+r+1)/(4*b*r)
+      kc2 = (r-1+b)*(b+r+1)*fourbrinv
       kc = sqrt(kc2)
     else
       kc = sqrt(1.0-k2)
@@ -103,7 +106,7 @@ else
   pimkap1 = atan(kite_area2,(r-1)*(r+1)-b^2)
   # Flux of visible uniform disk:
   t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
-  kck = kite_area2/(4*b*r)
+  kck = kite_area2*fourbrinv
 end
 t.sn[2],Eofk,Em1mKdm = s2_ell(r,b)
 # Compute the J_v and I_v functions:
@@ -154,7 +157,7 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
   flux += t.c_n[n+1]*t.sn[n+1]
 end
 # That's it!
-# flux = 3*sum(t.c_n.*t.sn)/(pi*(3t.c_n[1]+2*t.c_n[2]))  # for c_2 and above, the flux is zero.
+# flux = sum(t.c_n.*t.sn)/(pi*(t.c_n[1]+twothird*t.c_n[2]))  # for c_2 and above, the flux is zero.
 # Divide by denominator:
 flux *= 3/(pi*(3*t.c_n[1]+2*t.c_n[2]))  # for c_2 and above, the flux is zero.
 return flux
@@ -233,8 +236,8 @@ if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
   flux = zero(T); onemr2 = 1-r^2; sqrt1mr2 = sqrt(onemr2)
   fill!(t.dfdrbc,zero(T))
-  den = inv(t.c_n[1]+2*t.c_n[2]/3)
-  flux = (t.c_n[1]*onemr2+2/3*t.c_n[2]*sqrt1mr2^3)*den
+  den = inv(t.c_n[1]+t.c_n[2]*twothird)
+  flux = (t.c_n[1]*onemr2+twothird*t.c_n[2]*sqrt1mr2^3)*den
   fac  = 2r^2*onemr2*den
   facd = -2r*den
   t.dfdrbc[1] = t.c_n[1]*facd + t.c_n[2]*facd*sqrt1mr2
@@ -247,13 +250,13 @@ if b == 0.0
   end
   #  dfdrbc[2]=0 since the derivative with respect to b is zero.
   t.dfdrbc[3] = (onemr2-flux)*den
-  t.dfdrbc[4] = 2/3*(sqrt1mr2^3-flux)*den
+  t.dfdrbc[4] = twothird*(sqrt1mr2^3-flux)*den
   # Also need to compute derivatives [ ]
   return flux
 else
 # Next, compute k^2 = m:
-  onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r
-  k2 = onembmr2/fourbr; 
+  onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r; fourbrinv = inv(fourbr)
+  k2 = onembmr2*fourbrinv; 
   if k2 > 0
     k = sqrt(k2)
   else
@@ -265,15 +268,15 @@ else
     if k2 > 2.0
       kc = sqrt(1.0-inv(k2))
     else
-      kc2 = (1-r-b)*(1+b+r)/(1+r-b)/(1-r+b)
+      kc2 = (1-r-b)*(1+b+r)/((1+r-b)*(1-r+b))
       kc = sqrt(kc2)
     end
   else
     if k2 > 0.5
-      kc2 = (r-1+b)*(b+r+1)/(4*b*r)
+      kc2 = (r-1+b)*(b+r+1)*fourbrinv
       kc = sqrt(kc2)
     else
-      kc2 = (r-1+b)*(b+r+1)/(4*b*r)
+      kc2 = (r-1+b)*(b+r+1)*fourbrinv
       kc = sqrt(kc2)
     end
   end
@@ -298,7 +301,7 @@ else
   t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
   t.dsndr[1]= -2*r*kap0
   t.dsndb[1]= kite_area2/b
-  kck = kite_area2/(4*b*r)
+  kck = kite_area2*fourbrinv
 end
 # Compute sn[2] and its derivatives:
 t.sn[2],Eofk,Em1mKdm = s2!(r,b,t.s2_grad)
@@ -393,7 +396,7 @@ nmi = zero(Int64); fac1 = zero(T)
 end
 # That's it!
 # Compute derivatives with respect to the coefficients:
-den = inv(pi*(t.c_n[1]+2*t.c_n[2]/3))
+den = inv(pi*(t.c_n[1]+t.c_n[2]*twothird))
 flux = zero(T)
 t.dfdrbc[1]=zero(T)  # Derivative with respect to r
 t.dfdrbc[2]=zero(T)  # Derivative with respect to b
@@ -408,6 +411,6 @@ t.dfdrbc[2]=zero(T)  # Derivative with respect to b
 end
 # Include derivatives with respect to first two c_n parameters:
 t.dfdrbc[3] -= flux*den*pi
-t.dfdrbc[4] -= flux*den*2pi/3
+t.dfdrbc[4] -= flux*den*pi*twothird
 return flux
 end

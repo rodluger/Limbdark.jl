@@ -4,6 +4,7 @@ else
   using Base.Test
   include("random.jl")
 end
+include("../src/define_constants.jl")
 include("loglinspace.jl")
 include("test_cel_vec.jl")
 include("test_s2_gradient.jl")
