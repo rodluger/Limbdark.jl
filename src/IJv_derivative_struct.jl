@@ -226,7 +226,7 @@ if k2 < 1
   v = 1
 # Loop over v, computing I_v and J_v from higher v:
   while v <= t.v_max
-    t.Iv[v+1]=((2v-1)*t.Iv[v]/2-f0)/v
+    t.Iv[v+1]=((2v-1)*t.Iv[v]*0.5-f0)/v
     f0 *= k2
     v += 1
   end
