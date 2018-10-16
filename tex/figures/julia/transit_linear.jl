@@ -1,6 +1,7 @@
 # Uses new formulation from limbdark paper.
 
 include("../../../src/s2.jl")
+include("../../../src/define_constants.jl")
 
 # Run some tests:
 
