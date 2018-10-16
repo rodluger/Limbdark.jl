@@ -47,6 +47,13 @@ function transit_poly_c(t::Transit_Struct{T}) where {T <: Real}
 # The variable "t" is a structure which contains transit parameters
 # and intermediate quantities computed from these:
 r=t.r; b=t.b; n = t.n
+if T == Float64
+  twothird = twothird_float
+elseif T == BigFloat
+  twothird = twothird_big
+else
+  twothird = convert(T,2)/convert(T,3)
+end
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
 
@@ -208,6 +215,13 @@ end
 
 function transit_poly_c!(t::Transit_Struct{T}) where {T <: Real}
 r = t.r; b=t.b; n = t.n
+if T == Float64
+  twothird = twothird_float
+elseif T == BigFloat
+  twothird = twothird_big
+else
+  twothird = convert(T,2)/convert(T,3)
+end
 @assert((length(t.c_n)+2) == length(t.dfdrbc))
 @assert(r > 0)
 # Number of limb-darkening components to include (beyond 0 and 1):

@@ -173,7 +173,6 @@ if k2 < 1
   @inbounds for v=1:t.v_max
     t.Iv[v+1]=((2v-1)*t.Iv[v]/2-f0)/v
     f0 *= k2
-    v += 1
   end
 #  v = 1
 # Loop over v, computing I_v and J_v from higher v:
@@ -211,7 +210,6 @@ else # k^2 >=1
 end
 @inbounds for v = 2:t.v_max
   t.Jv[v+1] = (2*(v+1+(v-1)*k2)*t.Jv[v]-k2*(2v-3)*t.Jv[v-1])/(2v+3)
-  v += 1
 end
 #v=2
 #while v <= t.v_max
@@ -239,7 +237,6 @@ if k2 < 1
   @inbounds for v=1:t.v_max
     t.Iv[v+1]=((2v-1)*t.Iv[v]*0.5-f0)/v
     f0 *= k2
-    v += 1
   end
 #  v = 1
 # Loop over v, computing I_v and J_v from higher v:
@@ -314,7 +311,6 @@ end
   if t.grad
     t.dJvdk[v+1] = -3*t.Jv[v+1]/k+k2*t.dJvdk[v]
   end
-  v += 1
 end
 return
 end
