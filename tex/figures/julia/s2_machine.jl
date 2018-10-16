@@ -2,6 +2,7 @@
 
 #include("s2_stable.jl")
 include("../../../src/s2.jl")
+include("../../../src/define_constants.jl")
 
 s2diff(b,r) = s2(r,b)-convert(Float64,s2(big(r),big(b)))
 

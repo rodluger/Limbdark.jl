@@ -2,6 +2,7 @@
 
 #include("s2_stable.jl")
 include("../../../src/s2.jl")
+include("../../../src/define_constants.jl")
 
 # Run some tests:
 
