@@ -41,6 +41,7 @@ mutable struct Transit_Struct{T}
   den     :: T           # 1/(c_1 + c_2*2/3)
   third   :: T           # 1/3
   twothird:: T           # 2/3
+  sqr1mr  :: T           # sqrt(r*(1-r)) if r < 1
 end
 
 include("IJv_coeff.jl")
@@ -90,7 +91,8 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zero(T),         # sqrt(1-r^2)
   zero(T),         # den = 1/(pi*(c[1] + c[2]*2/3))
   one(T)/3,        # 1/3
-  convert(T,2)/3   # 2/3
+  convert(T,2)/3,  # 2/3
+  zero(T)         # sqrt(r*(1-r))
 )
 # Initialize the series coefficients for I_{v_max}:
 Iv_series_coeff!(trans)

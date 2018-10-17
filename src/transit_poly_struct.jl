@@ -103,13 +103,15 @@ if b == 0.0
 else
 # Next, compute k^2 = m:
   t.onembmr2=(r+1-b)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
+  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
+  t.onembpr2 = (1-r-b)*(1+b+r)
   t.k2 = t.onembmr2*t.fourbrinv
   if t.k2 > 1
     if t.k2 > 2.0
-      t.kc = sqrt(1.0-inv(t.k2))
+      t.kc2 = 1.0-inv(t.k2)
+      t.kc = sqrt(t.kc2)
     else
-      t.onembpr2= (1-r-b)*(1+b+r)
       t.kc2 = t.onembpr2/((1-b+r)*(1-r+b))
       t.kc = sqrt(t.kc2)
     end
@@ -118,7 +120,8 @@ else
       t.kc2 = (r-1+b)*(b+r+1)*t.fourbrinv
       t.kc = sqrt(t.kc2)
     else
-      t.kc = sqrt(1.0-t.k2)
+      t.kc2 = 1.0-t.k2
+      t.kc = sqrt(t.kc2)
     end
   end
 end
@@ -127,7 +130,8 @@ end
 compute_uniform!(t)
 
 # Compute linear case, sn[2]:
-t.sn[2],t.Eofk,t.Em1mKdm = s2_ell(r,b)
+s2!(t)
+# t.sn[2],t.Eofk,t.Em1mKdm = s2_ell(r,b)
 
 # Compute the J_v and I_v functions:
 if t.k2 > 0
@@ -275,7 +279,9 @@ if b == 0.0
 else
 # Next, compute k^2 = m:
   t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
+  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
+  t.onembpr2 = (1-r-b)*(1+b+r)
   t.k2 = t.onembmr2*t.fourbrinv; 
   if t.k2 > 0
     t.k = sqrt(t.k2)
@@ -286,9 +292,9 @@ else
   dkdb = (r^2-b^2-1)/(8*t.k*b^2*r)
   if t.k2 > 1
     if t.k2 > 2.0
-      t.kc = sqrt(1.0-inv(t.k2))
+      t.kc2 = 1.0-inv(t.k2)
+      t.kc = sqrt(t.kc2)
     else
-      t.onembpr2 = (1-r-b)*(1+b+r)
       t.kc2 = t.onembpr2/((1+r-b)*(1-r+b))
       t.kc = sqrt(t.kc2)
     end
@@ -308,9 +314,10 @@ compute_uniform!(t)
 
 # Compute the highest value of v in J_v or I_v that we need:
 # Compute sn[2] and its derivatives:
-t.sn[2],t.Eofk,t.Em1mKdm = s2!(r,b,t.s2_grad)
-t.dsndr[2] = t.s2_grad[1]
-t.dsndb[2] = t.s2_grad[2]
+s2!(t)
+# t.sn[2],t.Eofk,t.Em1mKdm = s2!(r,b,t.s2_grad)
+# t.dsndr[2] = t.s2_grad[1]
+# t.dsndb[2] = t.s2_grad[2]
 
 # Compute the J_v and I_v functions:
 if t.k2 > 0
