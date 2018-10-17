@@ -36,7 +36,7 @@ mutable struct Transit_Struct{T}
   sqbrinv :: T           # 1/sqrt(b*r)
   fourbrinv  :: T           # 1/(4*b*r)
   k2inv   :: T           # 1/k^2
-  k2c     :: T           # 1-k^2 (or 1-1/k^2 if k > 1)
+  kc2     :: T           # 1-k^2 (or 1-1/k^2 if k > 1)
   sqrt1mr2:: T           # sqrt(1-r^2)
   den     :: T           # 1/(c_1 + c_2*2/3)
   third   :: T           # 1/3

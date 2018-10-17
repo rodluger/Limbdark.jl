@@ -78,16 +78,16 @@ else
     onembpr2 = (1-b-r)*(1+b+r); onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r; fourbrinv = inv(fourbr)
     k2 = onembpr2*fourbrinv+1
     if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
-      k2c = -onembpr2*fourbrinv; kc = sqrt(k2c)
-      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(T),one(T),one(T),3*k2c*(b-r)*(b+r),k2c,zero(T))
+      kc2 = -onembpr2*fourbrinv; kc = sqrt(kc2)
+      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2,kc,(b-r)^2*kc2,zero(T),one(T),one(T),3*kc2*(b-r)*(b+r),kc2,zero(T))
 #      Lambda1 = onembmr2*(Piofk+ (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)/(3*sqrt(b*r))
       Lambda1 = onembmr2*(Piofk+ (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)*third/sqrt(b*r)
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
-      onembmr2inv=inv(onembmr2); k2inv = inv(k2); k2c =onembpr2*onembmr2inv; kc = sqrt(k2c)
+      onembmr2inv=inv(onembmr2); k2inv = inv(k2); kc2 =onembpr2*onembmr2inv; kc = sqrt(kc2)
       bmrdbpr = (b-r)/(b+r)
       mu = 3bmrdbpr*onembmr2inv
       p = bmrdbpr^2*onembpr2*onembmr2inv
-      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2inv,kc,p,1+mu,one(T),one(T),p+mu,k2c,zero(T))
+      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2inv,kc,p,1+mu,one(T),one(T),p+mu,kc2,zero(T))
 #      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)/3
       Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)*third
     else
@@ -181,19 +181,19 @@ else
     onembpr2 = (1-r-b)*(1+r+b); onembmr2=(r+1-b)*(1-r+b); fourbr = 4b*r; fourbrinv=inv(fourbr)
     k2 = onembpr2*fourbrinv+1
     if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
-      k2c = -onembpr2*fourbrinv; kc = sqrt(k2c); sqbr=sqrt(b*r); sqbrinv = inv(sqbr)
-      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2,kc,(b-r)^2*k2c,zero(T),one(T),one(T),3*k2c*(b-r)*(b+r),k2c,zero(T))
+      kc2 = -onembpr2*fourbrinv; kc = sqrt(kc2); sqbr=sqrt(b*r); sqbrinv = inv(sqbr)
+      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2,kc,(b-r)^2*kc2,zero(T),one(T),one(T),3*kc2*(b-r)*(b+r),kc2,zero(T))
 #      Lambda1 = onembmr2*(Piofk+ (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)*sqbrinv/3
       Lambda1 = onembmr2*(Piofk+ (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)*sqbrinv*third
       s2_grad[1] = -2r*onembmr2*Em1mKdm*sqbrinv
 #      s2_grad[2] = 2r*onembmr2*(-Em1mKdm+2*Eofk)*sqbrinv/3
       s2_grad[2] = 2r*onembmr2*(-Em1mKdm+2*Eofk)*sqbrinv*third
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
-      onembmr2inv = inv(onembmr2); k2inv = inv(k2); k2c =onembpr2*onembmr2inv; kc = sqrt(k2c)
+      onembmr2inv = inv(onembmr2); k2inv = inv(k2); kc2 =onembpr2*onembmr2inv; kc = sqrt(kc2)
       bmrdbpr = (b-r)/(b+r); 
       mu = 3bmrdbpr*onembmr2inv
       p = bmrdbpr^2*onembpr2*onembmr2inv
-      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2inv,kc,p,1+mu,one(T),one(T),p+mu,k2c,zero(T))
+      Piofk,Eofk,Em1mKdm = cel_bulirsch(k2inv,kc,p,1+mu,one(T),one(T),p+mu,kc2,zero(T))
       sqonembmr2 = sqrt(onembmr2)
 #      Lambda1 = 2*sqonembmr2*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)/3
       Lambda1 = 2*sqonembmr2*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)*third

@@ -10,7 +10,7 @@ include("s2.jl")
 include("IJv_derivative_struct.jl")
 
 # Computes the coefficient for the uniform disk case, S_0:
-function compute_uniform!(trans::Transit_Struct{T}) where {T <: Real}
+function compute_uniform!(t::Transit_Struct{T}) where {T <: Real}
 r=t.r; b=t.b
 # Uniform disk case:
 # Compute sn[1] and its derivatives:
@@ -102,7 +102,7 @@ if b == 0.0
   return flux*pi*t.den
 else
 # Next, compute k^2 = m:
-  t.onembmr2=(r+1-b)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(fourbr)
+  t.onembmr2=(r+1-b)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
   t.k2 = t.onembmr2*t.fourbrinv
   if t.k2 > 1
@@ -274,7 +274,7 @@ if b == 0.0
   return flux
 else
 # Next, compute k^2 = m:
-  t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(fourbr)
+  t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
   t.k2 = t.onembmr2*t.fourbrinv; 
   if t.k2 > 0
@@ -362,7 +362,7 @@ nmi = zero(Int64); fac1 = zero(T)
   else
 # Now do the same for odd N_c in sum over J_v:
     n0 = convert(Int64,(n-3)/2)
-    coeff = (-fourbr)^n0
+    coeff = (-t.fourbr)^n0
     # Compute i=0 term
     Jv1 = t.Jv[n0+1]; Jv2 = t.Jv[n0+2]
     pofgn = coeff*((r-b)*Jv1+2b*Jv2)
