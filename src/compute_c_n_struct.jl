@@ -1,4 +1,4 @@
-function compute_c_n(t::Transit_Struct{T}) where {T <: Real}
+function compute_c_n!(t::Transit_Struct{T}) where {T <: Real}
 # Transform the u_n coefficients to c_n, which are coefficients
 # of the basis in which the P(G_n) functions are computed.
 a_n = zeros(T,t.n+1)
@@ -32,7 +32,7 @@ if t.n >= 2
 else
   t.c_n[1] = a_n[1]
 end
-return t.c_n
+return
 end
 
 function compute_c_n_grad!(t::Transit_Struct{T}) where {T <: Real}

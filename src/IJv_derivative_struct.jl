@@ -6,6 +6,32 @@ include("cel_bulirsch.jl")
 #using GSL
 using SpecialFunctions
 
+function Iv_series(trans::Transit_Struct{T}) where {T <: Real}
+# Use series expansion to compute I_v with pre-computed
+# coefficients for v.max:
+n = 2; error = Inf
+if k2 < 1
+  tol = eps(k2)
+else
+  println("k2 > 1 in Iv_series: error")
+  return zero(T)
+end
+# Computing leading coefficient (n=0):
+coeff = 2/(2v+1)
+# Add leading term to I_v:
+Iv = t.Iv_coeff[1]
+# Now, compute higher order terms until desired precision is reached:
+kn = one(T)
+for n =1:t.nmax-1
+  kn *= k2
+  Iv = kn*t.Iv_coeff[n]
+  if abs(t.Iv_coeff) < tol
+    break
+  end 
+end
+return Iv*k2^t.vmax*sqrt(k2)
+end
+
 function Iv_series(k2::T,v::Int64) where {T <: Real}
 # Use series expansion to compute I_v:
 nmax = 100
@@ -94,9 +120,11 @@ else # k^2 >= 1
   @inbounds for n =2:2:nmax
 #    coeff *= (1.-2.5/n)*(1.-.5/(n+v))/k2
 #    coeff *= (1-5/(n))*(1-1/(n+2v))/k2
+#    coeff *= (1.0-5.0/float(n))*(1.0-1.0/float(n+2v))/k2
     coeff *= (n-5)*(n+2v-1)
-    coeff /= n*(n+2v)  # This line takes about 27% of run time!
-    coeff *= k2inv
+    coeff /= k2*(n*(n+2v))  # This line takes about 27% of run time!
+#    coeff /= (n*(n+2v))  # This line takes about 27% of run time!
+#    coeff *= k2inv
     Jv += coeff
     if abs(coeff) < tol
       break
