@@ -77,13 +77,6 @@ function transit_poly_c(t::Transit_Struct{T}) where {T <: Real}
 # The variable "t" is a structure which contains transit parameters
 # and intermediate quantities computed from these:
 r=t.r; b=t.b; n = t.n
-if T == Float64
-  twothird = twothird_float
-elseif T == BigFloat
-  twothird = twothird_big
-else
-  twothird = convert(T,2)/convert(T,3)
-end
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
 
@@ -98,17 +91,19 @@ if r >= 1+b
 end
 if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
-  flux = zero(T); t.sqrt1mr2 = sqrt(1-r^2)
-  flux = (t.c_n[1]*(1-r^2)+twothird*t.c_n[2]*t.sqrt1mr2^3)
-  fac= 2r^2*(1-r^2)
+  onemr2 = 1-r^2
+  flux = zero(T); t.sqrt1mr2 = sqrt(onemr2)
+  flux = (t.c_n[1]*onemr2+t.twothird*t.c_n[2]*t.sqrt1mr2^3)
+  fac= 2r^2*onemr2
   @inbounds for i=2:t.n
     flux += -t.c_n[i+1]*fac
     fac *= t.sqrt1mr2
   end
-  return flux/(t.c_n[1]+t.c_n[2]*twothird)
+  return flux*pi*t.den
 else
 # Next, compute k^2 = m:
   t.onembmr2=(r+1-b)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(fourbr)
+  t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
   t.k2 = t.onembmr2*t.fourbrinv
   if t.k2 > 1
     if t.k2 > 2.0
@@ -119,7 +114,7 @@ else
       t.kc = sqrt(t.kc2)
     end
   else
-    if k2 > 0.5
+    if t.k2 > 0.5
       t.kc2 = (r-1+b)*(b+r+1)*t.fourbrinv
       t.kc = sqrt(t.kc2)
     else
@@ -128,21 +123,20 @@ else
   end
 end
 
-# Compute the highest value of v in J_v or I_v that we need:
-# Compute sn[1] and sn[2]:
-# Uniform disk case:
+# Compute uniform case, sn[1]:
 compute_uniform!(t)
 
-# Compute linear case:
-t.sn[2],Eofk,Em1mKdm = s2_ell(r,b)
+# Compute linear case, sn[2]:
+t.sn[2],t.Eofk,t.Em1mKdm = s2_ell(r,b)
+
 # Compute the J_v and I_v functions:
-if k2 > 0
-  if (k2 < 0.5 || k2 > 2.0) && t.v_max > 3
+if t.k2 > 0
+  if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    IJv_lower!(k2,kck,kc,t.kap,Eofk,Em1mKdm,t)
+    IJv_lower!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    IJv_raise!(k2,kck,kc,t.kap,Eofk,Em1mKdm,t)
+    IJv_raise!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
   end
 end
 
@@ -154,27 +148,27 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
   if iseven(n)
 # For even values of n, sum over I_v:
     n0 = convert(Int64,n/2)
-    coeff = (-fourbr)^n0
+    coeff = (-t.fourbr)^n0
     # Compute i=0 term
     pofgn = coeff*((r-b)*t.Iv[n0+1]+2b*t.Iv[n0+2])
 # For even n, compute coefficients for the sum over I_v:
     @inbounds for i=1:n0
-      coeff *= -(n0-i+1)/i*k2
+      coeff *= -(n0-i+1)/i*t.k2
       pofgn += coeff*((r-b)*t.Iv[n0-i+1]+2b*t.Iv[n0-i+2])
     end
     pofgn *= 2r
   else
 # Now do the same for odd N_c in sum over J_v:
     n0 = convert(Int64,(n-3)/2)
-    coeff = (-fourbr)^n0
+    coeff = (-t.fourbr)^n0
     # Compute i=0 term
     pofgn = coeff*((r-b)*t.Jv[n0+1]+2b*t.Jv[n0+2])
 # For even n, compute coefficients for the sum over I_v:
     @inbounds for i=1:n0
-      coeff *= -(n0-i+1)/i*k2
+      coeff *= -(n0-i+1)/i*t.k2
       pofgn += coeff*((r-b)*t.Jv[n0-i+1]+2b*t.Jv[n0-i+2])
     end
-    pofgn *= 2r*onembmr2*sqrt(onembmr2)
+    pofgn *= 2r*t.onembmr2*t.sqonembmr2
   end
 # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
 # boundary for n > 0.
@@ -183,9 +177,9 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
   flux += t.c_n[n+1]*t.sn[n+1]
 end
 # That's it!
-# flux = sum(t.c_n.*t.sn)/(pi*(t.c_n[1]+twothird*t.c_n[2]))  # for c_2 and above, the flux is zero.
+# flux = sum(t.c_n.*t.sn)/(pi*(t.c_n[1]+t.twothird*t.c_n[2]))  # for c_2 and above, the flux is zero.
 # Divide by denominator:
-flux *= 3/(pi*(3*t.c_n[1]+2*t.c_n[2]))  # for c_2 and above, the flux is zero.
+flux *= t.den  # for c_2 and above, the flux is zero.
 return flux
 end
 # That's it!
@@ -234,13 +228,6 @@ end
 
 function transit_poly_c!(t::Transit_Struct{T}) where {T <: Real}
 r = t.r; b=t.b; n = t.n
-if T == Float64
-  twothird = twothird_float
-elseif T == BigFloat
-  twothird = twothird_big
-else
-  twothird = convert(T,2)/convert(T,3)
-end
 @assert((length(t.c_n)+2) == length(t.dfdrbc))
 @assert(r > 0)
 # Number of limb-darkening components to include (beyond 0 and 1):
@@ -269,10 +256,9 @@ if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
   flux = zero(T); onemr2 = 1-r^2; t.sqrt1mr2 = sqrt(onemr2)
   fill!(t.dfdrbc,zero(T))
-  den = inv(t.c_n[1]+t.c_n[2]*twothird)
-  flux = (t.c_n[1]*onemr2+twothird*t.c_n[2]*t.sqrt1mr2^3)*den
-  fac  = 2r^2*onemr2*den
-  facd = -2r*den
+  flux = (t.c_n[1]*onemr2+t.twothird*t.c_n[2]*t.sqrt1mr2^3)*pi*t.den
+  fac  = 2r^2*onemr2*pi*t.den
+  facd = -2r*pi*t.den
   t.dfdrbc[1] = t.c_n[1]*facd + t.c_n[2]*facd*t.sqrt1mr2
   @inbounds for i=2:t.n
     flux -= t.c_n[i+1]*fac
@@ -282,35 +268,37 @@ if b == 0.0
     facd *= t.sqrt1mr2
   end
   #  dfdrbc[2]=0 since the derivative with respect to b is zero.
-  t.dfdrbc[3] = (onemr2-flux)*den
-  t.dfdrbc[4] = twothird*(t.sqrt1mr2^3-flux)*den
+  t.dfdrbc[3] = (onemr2-flux)*pi*t.den
+  t.dfdrbc[4] = t.twothird*(t.sqrt1mr2^3-flux)*pi*t.den
   # Also need to compute derivatives [ ]
   return flux
 else
 # Next, compute k^2 = m:
-  onembmr2=(r-b+1)*(1-r+b); fourbr = 4b*r; fourbrinv = inv(fourbr)
-  k2 = onembmr2*fourbrinv; 
-  if k2 > 0
-    k = sqrt(k2)
+  t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(fourbr)
+  t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
+  t.k2 = t.onembmr2*t.fourbrinv; 
+  if t.k2 > 0
+    t.k = sqrt(t.k2)
   else
-    println("negative k2: ",k2," r: ",r," b: ",b)
+    println("negative k2: ",t.k2," r: ",r," b: ",b)
   end
-  dkdr = (b^2-r^2-1)/(8*k*b*r^2)
-  dkdb = (r^2-b^2-1)/(8*k*b^2*r)
-  if k2 > 1
-    if k2 > 2.0
-      kc = sqrt(1.0-inv(k2))
+  dkdr = (b^2-r^2-1)/(8*t.k*b*r^2)
+  dkdb = (r^2-b^2-1)/(8*t.k*b^2*r)
+  if t.k2 > 1
+    if t.k2 > 2.0
+      t.kc = sqrt(1.0-inv(t.k2))
     else
-      kc2 = (1-r-b)*(1+b+r)/((1+r-b)*(1-r+b))
-      kc = sqrt(kc2)
+      t.onembpr2 = (1-r-b)*(1+b+r)
+      t.kc2 = t.onembpr2/((1+r-b)*(1-r+b))
+      t.kc = sqrt(t.kc2)
     end
   else
-    if k2 > 0.5
-      kc2 = (r-1+b)*(b+r+1)*fourbrinv
-      kc = sqrt(kc2)
+    if t.k2 > 0.5
+      t.kc2 = (r-1+b)*(b+r+1)*t.fourbrinv
+      t.kc = sqrt(t.kc2)
     else
-      kc2 = (r-1+b)*(b+r+1)*fourbrinv
-      kc = sqrt(kc2)
+      t.kc2 = (r-1+b)*(b+r+1)*t.fourbrinv
+      t.kc = sqrt(t.kc2)
     end
   end
 end
@@ -320,22 +308,22 @@ compute_uniform!(t)
 
 # Compute the highest value of v in J_v or I_v that we need:
 # Compute sn[2] and its derivatives:
-t.sn[2],Eofk,Em1mKdm = s2!(r,b,t.s2_grad)
+t.sn[2],t.Eofk,t.Em1mKdm = s2!(r,b,t.s2_grad)
 t.dsndr[2] = t.s2_grad[1]
 t.dsndb[2] = t.s2_grad[2]
 
 # Compute the J_v and I_v functions:
-if k2 > 0
-  if (k2 < 0.5 || k2 > 2.0) && t.v_max > 3
+if t.k2 > 0
+  if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    dIJv_lower_dk!(k2,kck,kc,t.kap,Eofk,Em1mKdm,t)
+    dIJv_lower_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    dIJv_raise_dk!(k2,kck,kc,t.kap,Eofk,Em1mKdm,t)
+    dIJv_raise_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
   end
 end
 
-rinv = inv(r); binv = inv(b); rmb_on_onembmr2=(r-b)*inv(onembmr2)
+rinv = inv(r); binv = inv(b); rmb_on_onembmr2=(r-b)*t.onembmr2inv
 # Next, loop over the Green's function components:
 Iv1 = zero(T); Iv2=zero(T); Jv1=zero(T); Jv2=zero(T)
 nmi = zero(Int64); fac1 = zero(T)
@@ -347,7 +335,7 @@ nmi = zero(Int64); fac1 = zero(T)
   if iseven(n)
 # For even values of n, sum over I_v:
     n0 = convert(Int64,n/2)
-    coeff = (-fourbr)^n0
+    coeff = (-t.fourbr)^n0
     # Compute i=0 term
     Iv1 = t.Iv[n0+1]; Iv2 = t.Iv[n0+2]
     pofgn = coeff*((r-b)*Iv1+2b*Iv2)
@@ -359,7 +347,7 @@ nmi = zero(Int64); fac1 = zero(T)
     @inbounds for i=1:n0
       nmi = n0-i+1
       Iv2 = Iv1; Iv1 = t.Iv[nmi]
-      coeff *= -nmi/i*k2
+      coeff *= -nmi/i*t.k2
       term =  coeff*((r-b)*Iv1+2b*Iv2)
       pofgn += term
       dpdr += coeff*Iv1
@@ -386,7 +374,7 @@ nmi = zero(Int64); fac1 = zero(T)
 # For even n, compute coefficients for the sum over I_v:
     @inbounds for i=1:n0
       nmi = n0-i+1
-      coeff *= -nmi/i*k2
+      coeff *= -nmi/i*t.k2
       Jv2 = Jv1; Jv1 = t.Jv[nmi]
       term = coeff*((r-b)*Jv1+2b*Jv2)
       pofgn += term
@@ -397,7 +385,7 @@ nmi = zero(Int64); fac1 = zero(T)
       dpdb  += term*( fac1+(nmi-1.0)*binv)
       dpdk  += coeff*((r-b)*t.dJvdk[nmi]+2b*t.dJvdk[nmi+1])
     end
-    norm = 2r*onembmr2*sqrt(onembmr2)
+    norm = 2r*t.onembmr2*t.sqonembmr2
     pofgn *= norm
     dpdr  *= norm
     dpdb  *= norm
@@ -412,21 +400,20 @@ nmi = zero(Int64); fac1 = zero(T)
 end
 # That's it!
 # Compute derivatives with respect to the coefficients:
-den = inv(pi*(t.c_n[1]+t.c_n[2]*twothird))
 flux = zero(T)
 t.dfdrbc[1]=zero(T)  # Derivative with respect to r
 t.dfdrbc[2]=zero(T)  # Derivative with respect to b
 @inbounds for i=0:t.n
   # derivatives with respect to the coefficients:
-  t.dfdrbc[i+3]= t.sn[i+1]*den
+  t.dfdrbc[i+3]= t.sn[i+1]*t.den
   # total flux:
   flux += t.c_n[i+1]*t.dfdrbc[i+3]
   # derivatives with respect to r and b:
-  t.dfdrbc[1] += t.c_n[i+1]*t.dsndr[i+1]*den
-  t.dfdrbc[2] += t.c_n[i+1]*t.dsndb[i+1]*den
+  t.dfdrbc[1] += t.c_n[i+1]*t.dsndr[i+1]*t.den
+  t.dfdrbc[2] += t.c_n[i+1]*t.dsndb[i+1]*t.den
 end
 # Include derivatives with respect to first two c_n parameters:
-t.dfdrbc[3] -= flux*den*pi
-t.dfdrbc[4] -= flux*den*pi*twothird
+t.dfdrbc[3] -= flux*t.den*pi
+t.dfdrbc[4] -= flux*t.den*pi*t.twothird
 return flux
 end

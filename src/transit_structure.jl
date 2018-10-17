@@ -38,6 +38,9 @@ mutable struct Transit_Struct{T}
   k2inv   :: T           # 1/k^2
   k2c     :: T           # 1-k^2 (or 1-1/k^2 if k > 1)
   sqrt1mr2:: T           # sqrt(1-r^2)
+  den     :: T           # 1/(c_1 + c_2*2/3)
+  third   :: T           # 1/3
+  twothird:: T           # 2/3
 end
 
 include("IJv_coeff.jl")
@@ -84,7 +87,10 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zero(T),         # 1/(4*b*r)
   zero(T),         # 1/k^2
   zero(T),	   # 1-k^2 (or 1-1/k^2 if k > 1)
-  zero(T)	   # sqrt(1-r^2)
+  zero(T),         # sqrt(1-r^2)
+  zero(T),         # den = 1/(pi*(c[1] + c[2]*2/3))
+  one(T)/3,        # 1/3
+  convert(T,2)/3   # 2/3
 )
 # Initialize the series coefficients for I_{v_max}:
 Iv_series_coeff!(trans)
@@ -93,5 +99,6 @@ if grad
 else
   compute_c_n!(trans)
 end
+trans.den = inv(pi*(trans.c_n[1]+trans.twothird*trans.c_n[2]))  # for c_2 and above, the flux is zero.
 return trans
 end
