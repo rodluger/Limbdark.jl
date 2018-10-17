@@ -5,7 +5,7 @@ function Iv_series_coeff!(t::Transit_Struct{T}) where {T <: Real}
 # series solution of I_{v_max}, needed for k^2 < 1:
 v = t.v_max
 # Computing leading coefficient (n=0):
-coeff = 2.0/(2v+1.0)
+coeff = 2/(2v+one(T))
 # Compute leading coefficient in I_v series:
 t.Iv_coeff[1] = coeff
 # Now, compute higher order terms until desired precision is reached:

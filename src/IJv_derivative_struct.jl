@@ -9,27 +9,26 @@ using SpecialFunctions
 function Iv_series(trans::Transit_Struct{T}) where {T <: Real}
 # Use series expansion to compute I_v with pre-computed
 # coefficients for v.max:
-n = 2; error = Inf
-if k2 < 1
-  tol = eps(k2)
+if t.k2 < 1
+  tol = eps(t.k2)
 else
   println("k2 > 1 in Iv_series: error")
   return zero(T)
 end
-# Computing leading coefficient (n=0):
-coeff = 2/(2v+1)
 # Add leading term to I_v:
 Iv = t.Iv_coeff[1]
 # Now, compute higher order terms until desired precision is reached:
-kn = one(T)
+k2n = one(T)   # k^{2n}
+term = zero(T)
 for n =1:t.nmax-1
-  kn *= k2
-  Iv = kn*t.Iv_coeff[n]
-  if abs(t.Iv_coeff) < tol
+  k2n *= t.k2
+  term = k2n*t.Iv_coeff[n]
+  Iv += term
+  if abs(term) < tol
     break
   end 
 end
-return Iv*k2^t.vmax*sqrt(k2)
+return Iv*t.k2^t.vmax*t.k
 end
 
 function Iv_series(k2::T,v::Int64) where {T <: Real}

@@ -22,6 +22,7 @@ mutable struct Transit_Struct{T}
   nmax    :: Int64       # maximum number of terms in series expansions of I_v and J_v
   Iv_coeff :: Array{T,1} # coefficients for series expansion of I_v
   k2      :: T           # k^2 = (1-(r-b)^2)/(4br)
+  k       :: T           # k = sqrt(k^2)
   kc      :: T           # k_c = sqrt(1-k^2) (unless k > 1, then it is sqrt(1-1/k^2))
   kck     :: T           # k_c * k
   kap     :: T           # kappa = sin^{-1}(k)
@@ -57,6 +58,7 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   nmax,		   # nmax
   zeros(T,nmax),   # Iv_coeff
   zero(T),         # k^2
+  zero(T),         # k
   zero(T),         # k_c
   zero(T),         # k_c*k
   zero(T),         # kappa
