@@ -67,7 +67,7 @@ if k2 < 1
     coeff *= (i-1)/2
   end
 # Add leading term to J_v:
-  Jv = convert(typeof(k2),coeff)
+  Jv = convert(T,coeff)
 # Now, compute higher order terms until desired precision is reached:
 #  while n < nmax && abs(error) > tol
   for n=2:2:nmax
@@ -91,11 +91,11 @@ else # k^2 >= 1
   Jv = convert(typeof(k2),coeff)
   k2inv = inv(k2)
 #  while n < nmax && abs(error) > tol
-  for n =2:2:nmax
+  @inbounds for n =2:2:nmax
 #    coeff *= (1.-2.5/n)*(1.-.5/(n+v))/k2
 #    coeff *= (1-5/(n))*(1-1/(n+2v))/k2
     coeff *= (n-5)*(n+2v-1)
-    coeff /= (n*(n+2v))
+    coeff /= n*(n+2v)  # This line takes about 27% of run time!
     coeff *= k2inv
     Jv += coeff
     if abs(coeff) < tol
