@@ -1,0 +1,2 @@
+ca = sqrt(eps(k2))  # maybe this should be passed to cel?
+sqrt(r*(1-r)) # Adding in first derivatives

@@ -9,6 +9,36 @@ include("s2.jl")
 # Include code which computes I_v, J_v, and derivatives wrt k:
 include("IJv_derivative_struct.jl")
 
+# Computes the coefficient for the uniform disk case, S_0:
+function compute_uniform!(trans::Transit_Struct{T}) where {T <: Real}
+r=t.r; b=t.b
+# Uniform disk case:
+# Compute sn[1] and its derivatives:
+if b <= 1-r  # k^2 > 1
+  lam = pi*r^2
+  t.sn[1] = pi-lam
+  if t.grad
+    t.dsndr[1] = -2*pi*r
+    t.dsndb[1] = 0.
+  end
+  t.kap = convert(T,pi); t.kck = zero(T)
+else
+  # Twice area of kite-shaped region connecting centers of circles & intersection points:
+  kite_area2 = sqrt(sqarea_triangle(one(T),b,r)) 
+  # Angle of section for occultor:
+  t.kap  = atan(kite_area2,(r-1)*(r+1)+b^2)
+  # Angle of section for source:
+  pimkap1 = atan(kite_area2,(r-1)*(r+1)-b^2)
+  # Flux of visible uniform disk:
+  t.sn[1] = pimkap1 - r^2*t.kap + .5*kite_area2
+  if t.grad
+    t.dsndr[1]= -2*r*t.kap
+    t.dsndb[1]= kite_area2/b
+  end
+  t.kck = kite_area2*t.fourbrinv
+end
+return
+end
 
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
 # Function which computes sixteen times the square of the area
@@ -68,31 +98,32 @@ if r >= 1+b
 end
 if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
-  flux = zero(T); sqrt1mr2 = sqrt(1-r^2)
-  flux = (t.c_n[1]*(1-r^2)+twothird*t.c_n[2]*sqrt1mr2^3)
+  flux = zero(T); t.sqrt1mr2 = sqrt(1-r^2)
+  flux = (t.c_n[1]*(1-r^2)+twothird*t.c_n[2]*t.sqrt1mr2^3)
   fac= 2r^2*(1-r^2)
   @inbounds for i=2:t.n
     flux += -t.c_n[i+1]*fac
-    fac *= sqrt1mr2
+    fac *= t.sqrt1mr2
   end
   return flux/(t.c_n[1]+t.c_n[2]*twothird)
 else
 # Next, compute k^2 = m:
-  onembmr2=(r+1-b)*(1-r+b); fourbr = 4b*r; fourbrinv = inv(fourbr)
-  k2 = onembmr2*fourbrinv
-  if k2 > 1
-    if k2 > 2.0
-      kc = sqrt(1.0-inv(k2))
+  t.onembmr2=(r+1-b)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(fourbr)
+  t.k2 = t.onembmr2*t.fourbrinv
+  if t.k2 > 1
+    if t.k2 > 2.0
+      t.kc = sqrt(1.0-inv(t.k2))
     else
-      kc2 = (1-r-b)*(1+b+r)/((1-b+r)*(1-r+b))
-      kc = sqrt(kc2)
+      t.onembpr2= (1-r-b)*(1+b+r)
+      t.kc2 = t.onembpr2/((1-b+r)*(1-r+b))
+      t.kc = sqrt(t.kc2)
     end
   else
     if k2 > 0.5
-      kc2 = (r-1+b)*(b+r+1)*fourbrinv
-      kc = sqrt(kc2)
+      t.kc2 = (r-1+b)*(b+r+1)*t.fourbrinv
+      t.kc = sqrt(t.kc2)
     else
-      kc = sqrt(1.0-k2)
+      t.kc = sqrt(1.0-t.k2)
     end
   end
 end
@@ -100,30 +131,18 @@ end
 # Compute the highest value of v in J_v or I_v that we need:
 # Compute sn[1] and sn[2]:
 # Uniform disk case:
-if b <= 1-r
-  lam = pi*r^2
-  t.sn[1] = pi-lam
-  kap0 = convert(T,pi); kck = zero(T)
-else
-  # Twice area of kite-shaped region connecting centers of circles & intersection points:
-  kite_area2 = sqrt(sqarea_triangle(one(r),b,r))
-  # Angle of section for occultor:
-  kap0  = atan(kite_area2,(r-1)*(r+1)+b^2)
-  # Angle of section for source:
-  pimkap1 = atan(kite_area2,(r-1)*(r+1)-b^2)
-  # Flux of visible uniform disk:
-  t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
-  kck = kite_area2*fourbrinv
-end
+compute_uniform!(t)
+
+# Compute linear case:
 t.sn[2],Eofk,Em1mKdm = s2_ell(r,b)
 # Compute the J_v and I_v functions:
 if k2 > 0
   if (k2 < 0.5 || k2 > 2.0) && t.v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    IJv_lower!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
+    IJv_lower!(k2,kck,kc,t.kap,Eofk,Em1mKdm,t)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    IJv_raise!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
+    IJv_raise!(k2,kck,kc,t.kap,Eofk,Em1mKdm,t)
   end
 end
 
@@ -248,23 +267,23 @@ if r >= 1+b
 end
 if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
-  flux = zero(T); onemr2 = 1-r^2; sqrt1mr2 = sqrt(onemr2)
+  flux = zero(T); onemr2 = 1-r^2; t.sqrt1mr2 = sqrt(onemr2)
   fill!(t.dfdrbc,zero(T))
   den = inv(t.c_n[1]+t.c_n[2]*twothird)
-  flux = (t.c_n[1]*onemr2+twothird*t.c_n[2]*sqrt1mr2^3)*den
+  flux = (t.c_n[1]*onemr2+twothird*t.c_n[2]*t.sqrt1mr2^3)*den
   fac  = 2r^2*onemr2*den
   facd = -2r*den
-  t.dfdrbc[1] = t.c_n[1]*facd + t.c_n[2]*facd*sqrt1mr2
+  t.dfdrbc[1] = t.c_n[1]*facd + t.c_n[2]*facd*t.sqrt1mr2
   @inbounds for i=2:t.n
     flux -= t.c_n[i+1]*fac
     t.dfdrbc[1] += t.c_n[i+1]*facd*(2*onemr2-i*r^2)
     t.dfdrbc[i+3] -= fac
-    fac *= sqrt1mr2
-    facd *= sqrt1mr2
+    fac *= t.sqrt1mr2
+    facd *= t.sqrt1mr2
   end
   #  dfdrbc[2]=0 since the derivative with respect to b is zero.
   t.dfdrbc[3] = (onemr2-flux)*den
-  t.dfdrbc[4] = twothird*(sqrt1mr2^3-flux)*den
+  t.dfdrbc[4] = twothird*(t.sqrt1mr2^3-flux)*den
   # Also need to compute derivatives [ ]
   return flux
 else
@@ -296,27 +315,10 @@ else
   end
 end
 
+# Compute uniform case:
+compute_uniform!(t)
+
 # Compute the highest value of v in J_v or I_v that we need:
-# Compute sn[1] and its derivatives:
-if b <= 1-r  # k^2 > 1
-  lam = pi*r^2
-  t.sn[1] = pi-lam
-  t.dsndr[1] = -2*pi*r
-  t.dsndb[1] = 0.
-  kap0 = convert(T,pi); kck = zero(T)
-else
-  # Twice area of kite-shaped region connecting centers of circles & intersection points:
-  kite_area2 = sqrt(sqarea_triangle(one(r),b,r)) 
-  # Angle of section for occultor:
-  kap0  = atan(kite_area2,(r-1)*(r+1)+b^2)
-  # Angle of section for source:
-  pimkap1 = atan(kite_area2,(r-1)*(r+1)-b^2)
-  # Flux of visible uniform disk:
-  t.sn[1] = pimkap1 - r^2*kap0 + .5*kite_area2
-  t.dsndr[1]= -2*r*kap0
-  t.dsndb[1]= kite_area2/b
-  kck = kite_area2*fourbrinv
-end
 # Compute sn[2] and its derivatives:
 t.sn[2],Eofk,Em1mKdm = s2!(r,b,t.s2_grad)
 t.dsndr[2] = t.s2_grad[1]
@@ -326,10 +328,10 @@ t.dsndb[2] = t.s2_grad[2]
 if k2 > 0
   if (k2 < 0.5 || k2 > 2.0) && t.v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    dIJv_lower_dk!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
+    dIJv_lower_dk!(k2,kck,kc,t.kap,Eofk,Em1mKdm,t)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    dIJv_raise_dk!(k2,kck,kc,kap0,Eofk,Em1mKdm,t)
+    dIJv_raise_dk!(k2,kck,kc,t.kap,Eofk,Em1mKdm,t)
   end
 end
 

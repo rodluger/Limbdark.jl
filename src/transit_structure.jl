@@ -1,4 +1,3 @@
-
 mutable struct Transit_Struct{T}
   # Structure to hold arrays and other quantities for computing transit:
   r       :: T           # radius ratio
@@ -28,6 +27,17 @@ mutable struct Transit_Struct{T}
   kap     :: T           # kappa = sin^{-1}(k)
   Eofk    :: T           # E(k^2) is complete elliptic integral of first kind
   Em1mKdm :: T           # (E(m)-(1-m)K(m))/m is complete elliptic integral with m=k^2
+  onembmr2:: T           # 1-(b-r)^2
+  onembpr2:: T           # 1-(b+r)^2
+  onembmr2inv :: T       # 1/(1-(b-r)^2)
+  sqonembmr2  :: T       # sqrt(1-(b-r)^2)
+  fourbr  :: T           # 4*b*r
+  sqbr    :: T           # sqrt(b*r)
+  sqbrinv :: T           # 1/sqrt(b*r)
+  fourbrinv  :: T           # 1/(4*b*r)
+  k2inv   :: T           # 1/k^2
+  k2c     :: T           # 1-k^2 (or 1-1/k^2 if k > 1)
+  sqrt1mr2:: T           # sqrt(1-r^2)
 end
 
 include("IJv_coeff.jl")
@@ -63,7 +73,18 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zero(T),         # k_c*k
   zero(T),         # kappa
   zero(T),         # E(k^2)
-  zero(T)          # (E(m)-(1-m)K(m))/m
+  zero(T),         # (E(m)-(1-m)K(m))/m
+  zero(T),         # 1-(b-r)^2
+  zero(T),         # 1-(b+r)^2
+  zero(T),         # 1/(1-(b-r)^2)
+  zero(T),         # sqrt(1-(b-r)^2)
+  zero(T),         # 4*b*r
+  zero(T),	   # sqrt(b*r)
+  zero(T),         # 1/sqrt(b*r)
+  zero(T),         # 1/(4*b*r)
+  zero(T),         # 1/k^2
+  zero(T),	   # 1-k^2 (or 1-1/k^2 if k > 1)
+  zero(T)	   # sqrt(1-r^2)
 )
 # Initialize the series coefficients for I_{v_max}:
 Iv_series_coeff!(trans)
