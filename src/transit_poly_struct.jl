@@ -130,8 +130,8 @@ end
 compute_uniform!(t)
 
 # Compute linear case, sn[2]:
-s2!(t)
-# t.sn[2],t.Eofk,t.Em1mKdm = s2_ell(r,b)
+# s2!(t)
+t.sn[2],t.Eofk,t.Em1mKdm = s2_ell(r,b)
 
 # Compute the J_v and I_v functions:
 if t.k2 > 0
@@ -314,10 +314,10 @@ compute_uniform!(t)
 
 # Compute the highest value of v in J_v or I_v that we need:
 # Compute sn[2] and its derivatives:
-s2!(t)
-# t.sn[2],t.Eofk,t.Em1mKdm = s2!(r,b,t.s2_grad)
-# t.dsndr[2] = t.s2_grad[1]
-# t.dsndb[2] = t.s2_grad[2]
+#s2!(t)
+t.sn[2],t.Eofk,t.Em1mKdm = s2!(r,b,t.s2_grad)
+t.dsndr[2] = t.s2_grad[1]
+t.dsndb[2] = t.s2_grad[2]
 
 # Compute the J_v and I_v functions:
 if t.k2 > 0

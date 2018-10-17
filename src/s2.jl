@@ -297,8 +297,8 @@ else
       Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(t.k2,t.kc,(b-r)^2*t.kc2,zero(T),one(T),one(T),3*t.kc2*(b-r)*(b+r),t.kc2,zero(T))
       Lambda1 = t.onembmr2*(Piofk+ (-3+6r^2+2*b*r)*t.Em1mKdm-t.fourbr*t.Eofk)*t.sqbrinv*t.third
       if t.grad
-        t.s2_grad[1] = -2r*onembmr2*t.Em1mKdm*t.sqbrinv
-        t.s2_grad[2] = 2r*onembmr2*(-t.Em1mKdm+2*t.Eofk)*t.sqbrinv*t.third
+        t.s2_grad[1] = -2r*t.onembmr2*t.Em1mKdm*t.sqbrinv
+        t.s2_grad[2] = 2r*t.onembmr2*(-t.Em1mKdm+2*t.Eofk)*t.sqbrinv*t.third
       end
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
       bmrdbpr = (b-r)/(b+r); 

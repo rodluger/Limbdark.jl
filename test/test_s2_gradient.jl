@@ -1,4 +1,5 @@
 # Tests automatic differentiation on s2.jl:
+include("../src/transit_structure.jl")
 include("../src/s2.jl")
 if VERSION >= v"0.7"
   using Test
