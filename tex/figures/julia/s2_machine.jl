@@ -1,6 +1,8 @@
 # Uses new formulation from limbdark paper.
 
 #include("s2_stable.jl")
+include("../../../src/transit_structure.jl")
+include("../../../test/loglinspace.jl")
 include("../../../src/s2.jl")
 include("../../../src/define_constants.jl")
 
@@ -19,7 +21,8 @@ fepsp= zeros(Float64,nb)
 fepsbigp= zeros(Float64,nb)
 fepsm= zeros(Float64,nb)
 fepsbigm= zeros(Float64,nb)
-b=range(epsilon,stop=2.0,length=nr)
+#b=range(epsilon,stop=2.0,length=nr)
+b=linearspace(epsilon,2.0,nr)
 for ib=1:nb
   fepsbigp[ib] = float(s2(big(b[ib]+epsilon),big(b[ib])))
   fepsp[ib] = float(s2(b[ib]+epsilon,b[ib]))
@@ -57,7 +60,8 @@ ax[:set_xlabel](L"$b$", fontsize=14)
 
 # Compute b+r = 1+-\epsilon
 epsilon = 1e-8
-b=range(0.0,stop=2.0,length=nr)
+#b=range(0.0,stop=2.0,length=nr)
+b=linearspace(0.0,2.0,nr)
 for ib=1:nr
   fepsbigp[ib] = float(s2(big(1.0 .- b[ib] .+ epsilon),big(b[ib])))
   fepsp[ib] = float(s2(1.0 .- b[ib] .+ epsilon,b[ib]))
