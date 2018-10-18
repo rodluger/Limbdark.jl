@@ -110,7 +110,7 @@ while abs(g-kc) > g*ca  && iter < itmax
   iter +=1
 end
 if iter == itmax
-  println("k2 ",k2," kc ",kc," abs(g-kc) ",abs(g-kc)," g*ca ",g*ca," cel ",0.5*pi*(a*m+b)/(m*(m+p)))
+  println("k2 ",k2," kc ",kc," abs(g-kc) ",abs(g-kc)," g*ca ",g*ca," cel ",0.5*pi*(a1*m+b1)/(m*(m+p)))
 end
 f1 = 0.5*pi*(a1*m+b1)/(m*(m+p))
 f2 = 0.5*pi*(a2*m+b2)/(m*(m+p1))
@@ -172,7 +172,7 @@ while abs(g-kc) > g*ca  && iter < itmax
   iter +=1
 end
 if iter == itmax
-  println("k2 ",k2," kc ",kc," abs(g-kc) ",abs(g-kc)," g*ca ",g*ca," cel ",0.5*pi*(a*m+b)/(m*(m+p)))
+  println("k2 ",k2," kc ",kc," abs(g-kc) ",abs(g-kc)," g*ca ",g*ca," cel ",0.5*pi*(a1*m+b1)/(m*(m+p)))
 end
 println("a1: ",a1," m: ",m," b1: ",b1," d: ",d," p: ",p)
 f1 = 0.5*pi*(a1*m+b1)/(m*(d*m+p))
