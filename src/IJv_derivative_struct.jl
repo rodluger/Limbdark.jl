@@ -6,7 +6,7 @@ include("cel_bulirsch.jl")
 #using GSL
 using SpecialFunctions
 
-function Iv_series(trans::Transit_Struct{T}) where {T <: Real}
+function Iv_series!(t::Transit_Struct{T}) where {T <: Real}
 # Use series expansion to compute I_v with pre-computed
 # coefficients for v.max:
 if t.k2 < 1
@@ -22,13 +22,13 @@ k2n = one(T)   # k^{2n}
 term = zero(T)
 for n =1:t.nmax-1
   k2n *= t.k2
-  term = k2n*t.Iv_coeff[n]
+  term = k2n*t.Iv_coeff[n+1]
   Iv += term
   if abs(term) < tol
     break
   end 
 end
-return Iv*t.k2^t.vmax*t.k
+return Iv*t.k2^t.v_max*t.k
 end
 
 function Iv_series(k2::T,v::Int64) where {T <: Real}
@@ -371,7 +371,8 @@ v = t.v_max
 # Add in k2 > 1 cases [ ]
 # First, compute approximation for large v:
 if k2 < 1
-  t.Iv[v+1]=Iv_series(k2,v)
+#  t.Iv[v+1]=Iv_series(k2,v)
+  t.Iv[v+1]=Iv_series!(t)
 # Next, iterate downwards in v:
   f0 = k2^(v-1)*kck
 # Loop over v, computing I_v and J_v from higher v:
@@ -420,7 +421,8 @@ v = t.v_max
 # Add in k2 > 1 cases [ ]
 # First, compute approximation for large v:
 if k2 < 1
-  t.Iv[v+1]=Iv_series(k2,v)
+#  t.Iv[v+1]=Iv_series(k2,v)
+  t.Iv[v+1]=Iv_series!(t)
 # Next, iterate downwards in v:
   f0 = k2^(v-1)*kck
 # Loop over v, computing I_v and J_v from higher v:
