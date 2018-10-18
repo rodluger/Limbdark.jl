@@ -293,7 +293,10 @@ else
       end
     end
   else
+    t.onembpr2 = (1-b-r)*(1+b+r); t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
+    t.k2 = t.onembpr2*t.fourbrinv+1
     if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
+      t.kc2 = -t.onembpr2*t.fourbrinv; t.kc = sqrt(t.kc2); t.sqbr=sqrt(b*r); t.sqbrinv = inv(t.sqbr)
       Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(t.k2,t.kc,(b-r)^2*t.kc2,zero(T),one(T),one(T),3*t.kc2*(b-r)*(b+r),t.kc2,zero(T))
       Lambda1 = t.onembmr2*(Piofk+ (-3+6r^2+2*b*r)*t.Em1mKdm-t.fourbr*t.Eofk)*t.sqbrinv*t.third
       if t.grad
@@ -301,12 +304,14 @@ else
         t.s2_grad[2] = 2r*t.onembmr2*(-t.Em1mKdm+2*t.Eofk)*t.sqbrinv*t.third
       end
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
+      t.onembmr2inv=inv(t.onembmr2); t.k2inv = inv(t.k2); t.kc2 = t.onembpr2*t.onembmr2inv; t.kc = sqrt(t.kc2)
       bmrdbpr = (b-r)/(b+r); 
       mu = 3bmrdbpr*t.onembmr2inv
       p = bmrdbpr^2*t.onembpr2*t.onembmr2inv
       t.k2inv = inv(t.k2)
 #      println("calling cel with: ",t.k2inv,t.kc,p,1+mu,one(T),one(T),p+mu,t.kc2,zero(T))
       Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(t.k2inv,t.kc,p,1+mu,one(T),one(T),p+mu,t.kc2,zero(T))
+      t.sqonembmr2 = sqrt(t.onembmr2)
       Lambda1 = 2*t.sqonembmr2*(t.onembpr2*Piofk -(4-7r^2-b^2)*t.Eofk)*t.third
       if t.grad
         t.s2_grad[1] = -4*r*t.sqonembmr2*t.Eofk

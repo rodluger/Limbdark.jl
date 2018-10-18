@@ -2,8 +2,6 @@
 include("define_constants.jl")
 # Include definition of Transit structure type:
 include("transit_structure.jl")
-# Include code which transforms from u_n to c_n:
-include("compute_c_n_struct.jl")
 # Include code which computes linear limb-darkening term:
 include("s2.jl")
 # Include code which computes I_v, J_v, and derivatives wrt k:
@@ -103,10 +101,17 @@ if b == 0.0
 else
 # Next, compute k^2 = m:
   t.onembmr2=(r+1-b)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
-  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
+#  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
   t.onembpr2 = (1-r-b)*(1+b+r)
-  t.k2 = t.onembmr2*t.fourbrinv
+#  t.k2 = t.onembmr2*t.fourbrinv
+  t.k2 = t.onembpr2*t.fourbrinv+1
+  if t.k2 > 0
+    t.k = sqrt(t.k2)
+  else
+    println("negative k2: ",t.k2," r: ",r," b: ",b)
+    t.k2 = 0.0; t.k = 0.0
+  end
   if t.k2 > 1
     if t.k2 > 2.0
       t.kc2 = 1.0-inv(t.k2)
@@ -130,8 +135,13 @@ end
 compute_uniform!(t)
 
 # Compute linear case, sn[2]:
-# s2!(t)
+#s2!(t)
 t.sn[2],t.Eofk,t.Em1mKdm = s2_ell(r,b)
+#sn2,Eofk,Em1mKdm = s2_ell(r,b)
+# Now, compare results:
+#if abs(t.sn[2]-sn2) > 1e-8*abs(sn2)
+#  println("r: ",r," b: ",b," sn[2]: ",t.sn[2]," sn2: ",sn2)
+#end
 
 # Compute the J_v and I_v functions:
 if t.k2 > 0
@@ -279,7 +289,7 @@ if b == 0.0
 else
 # Next, compute k^2 = m:
   t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
-  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
+#  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
   t.onembpr2 = (1-r-b)*(1+b+r)
   t.k2 = t.onembmr2*t.fourbrinv; 
@@ -287,6 +297,7 @@ else
     t.k = sqrt(t.k2)
   else
     println("negative k2: ",t.k2," r: ",r," b: ",b)
+    t.k2 = 0.0; t.k = 0.0
   end
   dkdr = (b^2-r^2-1)/(8*t.k*b*r^2)
   dkdb = (r^2-b^2-1)/(8*t.k*b^2*r)
@@ -318,6 +329,18 @@ compute_uniform!(t)
 t.sn[2],t.Eofk,t.Em1mKdm = s2!(r,b,t.s2_grad)
 t.dsndr[2] = t.s2_grad[1]
 t.dsndb[2] = t.s2_grad[2]
+#s2_grad = zeros(T,2)
+#sn2,Eofk,Em1mKdm = s2!(r,b,s2_grad)
+# compare results:
+#if abs(t.sn[2]-sn2) > 1e-8*abs(sn2)
+#  println("r: ",r," b: ",b," sn[2]: ",t.sn[2]," sn2: ",sn2)
+#end
+#if abs(t.s2_grad[1]-s2_grad[1]) > 1e-8*abs(s2_grad[1])
+#  println("r: ",r," b: ",b," s2_grad[1]: ",s2_grad[1]," s2_grad[1]: ",s2_grad[1])
+#end
+#if abs(t.s2_grad[2]-s2_grad[2]) > 1e-8*abs(s2_grad[2])
+#  println("r: ",r," b: ",b," s2_grad[2]: ",t.s2_grad[2]," s2_grad[2]: ",s2_grad[2])
+#end
 
 # Compute the J_v and I_v functions:
 if t.k2 > 0
