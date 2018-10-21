@@ -113,7 +113,7 @@ else # k^2 >= 1
   @inbounds for i=2:2:2v
     coeff *= (i-1)/i
   end
-  Jv = convert(typeof(k2),coeff)
+  Jv = convert(T,coeff)
   k2inv = inv(k2)
 #  while n < nmax && abs(error) > tol
   @inbounds for n =2:2:nmax
@@ -144,15 +144,14 @@ n = 2; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
 coeff = zero(k2)
 if k2 < 1
 #  coeff = 3pi/(2^(2+v)*exp(lfact(v+2)))
-  coeff = 3pi/(2^(2+v)*exp(lfactorial(v+2)))
-#  println("coefficient: ",coeff)
+  coeff = 0.75*pi/exp(lfactorial(v+2))
 # multiply by (2v-1)!!
   @inbounds for i=2:2:2v
-    coeff *= i-1
+    coeff *= (i-1)/2
   end
 # Add leading term to J_v:
-  Jv = one(k2)*coeff
-  dJvdk = one(k2)*coeff*(2v+1)
+  Jv = convert(T,coeff)
+  dJvdk = Jv*(2v+1)
 # Now, compute higher order terms until desired precision is reached:
 #  while n < nmax && abs(error) > tol
   @inbounds for n=2:2:nmax
@@ -173,13 +172,13 @@ if k2 < 1
 #  println("Jv: ",Jv," dJv/dk: ",dJvdk)
   return Jv,dJvdk
 else # k^2 >= 1
-  coeff = convert(typeof(k2),pi)
+  coeff = convert(T,pi)
   # Compute (2v-1)!!/(2^v v!):
   @inbounds for i=2:2:2v
     coeff *= (i-1)/i
   end
-  Jv = one(k2)*coeff
-  dJvdk = zero(k2)
+  Jv = convert(T,coeff)
+  dJvdk = zero(T)
   k2inv = inv(k2)
 #  while n < nmax && abs(error) > tol
   for n = 2:2:nmax
