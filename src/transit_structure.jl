@@ -9,9 +9,13 @@ mutable struct Transit_Struct{T}
   sn      :: Array{T,1}  # Green's basis terms
   Iv      ::  Array{T,1} # integral over sin(phi)^{2v}
   Jv      ::  Array{T,1} # integral over sin(phi)^{2v} (1-sin(phi)^2/k^2)^{3/2}
+  Kv      ::  Array{T,1} # integral over cos(phi)^{2v}
+  Lv      ::  Array{T,1} # integral over cos(phi)^{2v} (1-sin(phi)^2/k^2)^{3/2}
   grad    :: Bool        # true for gradient; false for no gradient
   dIvdk   ::  Array{T,1} # derivative of I_v with respect to k
   dJvdk   ::  Array{T,1} # derivative of J_v with respect to k
+  dKvdk   ::  Array{T,1} # derivative of K_v with respect to k
+  dLvdk   ::  Array{T,1} # derivative of L_v with respect to k
   s2_grad :: Array{T,1}  # gradient of s2 with respect to (r,b) - this is S_1 = s_2 from starry
   dsndr   ::  Array{T,1} # derivatives of Green's basis with respect to r
   dsndb   ::  Array{T,1} # derivatives of Green's basis with respect to b
@@ -61,9 +65,13 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zeros(T,n+1),    # sn
   zeros(T,v_max+1),# Iv
   zeros(T,v_max+1),# Jv
+  zeros(T,v_max+1),# Kv
+  zeros(T,v_max+1),# Lv
   grad,            # grad
   zeros(T,v_max+1),# dIvdk
   zeros(T,v_max+1),# dJvdk
+  zeros(T,v_max+1),# dKvdk
+  zeros(T,v_max+1),# dLvdk
   zeros(T,2),      # s2_grad
   zeros(T,n+1),    # dsndr
   zeros(T,n+1),    # dsndb
