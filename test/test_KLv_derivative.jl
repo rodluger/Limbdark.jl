@@ -96,22 +96,20 @@ r = convert(Float64,r_big); b=r; u = ones((v_max-2)*2); u_big = big.(u)
 # Initialize the transit structure to pass to routines:
 t = transit_init(r,b,u,true)  # Float64
 t_bigm = transit_init(r_big,b_big,u_big,false) # BigFloat
-t_big = transit_init(r_big,b_big,u_big,false) # BigFloat
 t_bigp = transit_init(r_big,b_big,u_big,false) # BigFloat
 t.k2 = k2
 # Initialize variables needed for computing Kv/Lv:
 initialize_big(t)
 # Compute the derivatives in Float64 precision:
 dKLv_raise_dk!(t)
-dKLv_raise_dk!(t_big)
 # Compare with numerical integration:
 for v=0:t.v_max
   Kvn = Kv_num(k2,v)
-  println("v: ",v," k2: ",k2," Kv_num: ",Kvn," Kv: ",convert(Float64,t_big.Kv[v+1]))
-  @test isapprox(Kvn,convert(Float64,t_big.Kv[v+1]))
+  println("v: ",v," k2: ",k2," Kv_num: ",Kvn," Kv: ",t.Kv[v+1]," Eofk: ",t.Eofk," Em1mKdm: ",t.Em1mKdm)
+  @test isapprox(Kvn,t.Kv[v+1])
   Lvn = Lv_num(k2,v)
-  println("v: ",v," k2: ",k2," Lv_num: ",Lvn," Lv: ",convert(Float64,t_big.Lv[v+1]))
-  @test isapprox(Lvn,convert(Float64,t_big.Lv[v+1]))
+  println("v: ",v," k2: ",k2," Lv_num: ",Lvn," Lv: ",t.Lv[v+1])
+  @test isapprox(Lvn,t.Lv[v+1])
 end
 return
 # Now, compute finite differences in BigFloat precision:
