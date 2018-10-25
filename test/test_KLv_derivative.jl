@@ -16,10 +16,10 @@ function Kv_num(k2::T,v::Int64) where {T <: Real}
 f(x) = cos(x)^(2v)
 if k2 < 1.0
   kap2 = convert(Float64,asin(sqrt(big(k2))))
-  Kv,error = quadgk(f,-kap2,kap2,rtol=1e-8)
+  Kv,error = quadgk(f,-kap2,kap2,rtol=1e-13)
 else
   pi2 = 0.5*pi
-  Kv,error = quadgk(f,-pi2,pi2,rtol=1e-8)
+  Kv,error = quadgk(f,-pi2,pi2,rtol=1e-13)
 end
 return Kv
 end
@@ -38,9 +38,33 @@ return Lv
 end
 
 # Initialize all the variables needed for computing Kv, Lv:
+function initialize_big(t::Transit_Struct{T}) where {T <: Real}
+k2 = t.k2
+if k2 < 1
+  t.kc2 = convert(T,1.0-big(k2))
+  t.kc = convert(T,sqrt(1.0-big(k2)))
+  t.k = convert(T,sqrt(big(k2)))
+  t.kck = convert(T,sqrt((1.0-big(k2))*big(k2)))
+  t.kap = convert(T,2*asin(sqrt(big(k2))))
+  Piofk,Eofk_big,Em1mKdm_big = cel_bulirsch(big(k2),sqrt(1-big(k2)),zero(BigFloat), one(BigFloat),one(BigFloat),one(BigFloat), one(BigFloat),1-big(k2),zero(BigFloat))
+  t.Eofk = convert(T,Eofk_big)
+  t.Em1mKdm = convert(T,Em1mKdm_big)
+else
+  t.kc2 = convert(T,1.0-inv(big(k2)))
+  t.kc = convert(T,sqrt(1.0-inv(big(k2))))
+  t.k = convert(T,sqrt(big(k2)))
+  t.kap = convert(T,pi); kck=zero(T)
+  Piofk,Eofk_big,Em1mKdm_big = cel_bulirsch(inv(big(k2)),sqrt(1-inv(big(k2))),zero(BigFloat), one(BigFloat),one(BigFloat),one(BigFloat), one(BigFloat),1-inv(big(k2)),zero(BigFloat))
+  t.Eofk = convert(T,Eofk_big)
+  t.Em1mKdm = convert(T,Em1mKdm_big)
+end
+return
+end
+
+# Initialize all the variables needed for computing Kv, Lv:
 function initialize(t::Transit_Struct{T}) where {T <: Real}
 k2 = t.k2
-if k2 <= 1
+if k2 < 1
   t.kc2 = convert(T,1.0-big(k2))
   t.kc = convert(T,sqrt(1.0-big(k2)))
   t.k = convert(T,sqrt(big(k2)))
@@ -52,7 +76,7 @@ else
   t.kc = convert(T,sqrt(1.0-inv(big(k2))))
   t.k = convert(T,sqrt(big(k2)))
   t.kap = convert(T,pi); kck=zero(T)
-  Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(inv(t.k2),t.kc,zero(T), one(T),one(T),one(T), one(T),t.kc2,one(T))
+  Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(inv(t.k2),t.kc,zero(T), one(T),one(T),one(T), one(T),t.kc2,zero(T))
 end
 return
 end
@@ -60,7 +84,7 @@ end
 # Carries out a test of K_v and L_v for k^2 and v_max:
 function test_KLv_derivative(k2::Float64)
 @assert (k2 > 0)
-v_max = 20
+v_max = 50
 # Set up arrays to hold finite-difference derivatives:
 dKvdk2_num = zeros(Float64,v_max+1); dLvdk2_num = zeros(Float64,v_max+1)
 # Finite difference step:
@@ -72,17 +96,24 @@ r = convert(Float64,r_big); b=r; u = ones((v_max-2)*2); u_big = big.(u)
 # Initialize the transit structure to pass to routines:
 t = transit_init(r,b,u,true)  # Float64
 t_bigm = transit_init(r_big,b_big,u_big,false) # BigFloat
+t_big = transit_init(r_big,b_big,u_big,false) # BigFloat
 t_bigp = transit_init(r_big,b_big,u_big,false) # BigFloat
 t.k2 = k2
 # Initialize variables needed for computing Kv/Lv:
-initialize(t)
+initialize_big(t)
 # Compute the derivatives in Float64 precision:
 dKLv_raise_dk!(t)
+dKLv_raise_dk!(t_big)
 # Compare with numerical integration:
 for v=0:t.v_max
-  @test isapprox(Kv_num(k2,v),t.Kv[v+1])
-  @test isapprox(Lv_num(k2,v),t.Lv[v+1])
+  Kvn = Kv_num(k2,v)
+  println("v: ",v," k2: ",k2," Kv_num: ",Kvn," Kv: ",convert(Float64,t_big.Kv[v+1]))
+  @test isapprox(Kvn,convert(Float64,t_big.Kv[v+1]))
+  Lvn = Lv_num(k2,v)
+  println("v: ",v," k2: ",k2," Lv_num: ",Lvn," Lv: ",convert(Float64,t_big.Lv[v+1]))
+  @test isapprox(Lvn,convert(Float64,t_big.Lv[v+1]))
 end
+return
 # Now, compute finite differences in BigFloat precision:
 t_bigp.k2 = big(k2)+dq
 initialize(t_bigp)
@@ -107,7 +138,8 @@ end
 return
 end
 
-r=100.0; b0=[r-1+1e-10,r,r+1-1e-10]
+eps = 1e-8
+r=100.0; b0=[r-1+eps,r,r+1-eps]
 for i=1:length(b0)
   b=b0[i]
   k2 = (1-b+r)*(1+b-r)/(4*b*r)
@@ -115,7 +147,7 @@ for i=1:length(b0)
     test_KLv_derivative(k2)
   end
 end
-r=0.01; b0=[1e-10,r,1-r-1e-10,1-r+1e-10,1.0,r+1-1e-10]
+r=0.01; b0=[eps,r,1-r-eps,1-r+eps,1.0,r+1-eps]
 for i=1:length(b0)
   b=b0[i]
   k2 = (1-b+r)*(1+b-r)/(4*b*r)
