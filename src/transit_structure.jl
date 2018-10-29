@@ -105,6 +105,9 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
 )
 # Initialize the series coefficients for I_{v_max}:
 Iv_series_coeff!(trans)
+# Initialize the series coefficients for J_{v_max} and J_{v_max-1}, and if
+# t.grad is true, will also compute coefficients for dJ/dk_{v_max} and _{v_max-1}:
+dJvdk_series_coeff!(trans)
 if grad
   compute_c_n_grad!(trans)
 else
