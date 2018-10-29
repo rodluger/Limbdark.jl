@@ -24,6 +24,8 @@ mutable struct Transit_Struct{T}
   dfdrbu  :: Array{T,1}  # derivative of flux with respect to u_n
   nmax    :: Int64       # maximum number of terms in series expansions of I_v and J_v
   Iv_coeff :: Array{T,1} # coefficients for series expansion of I_v
+  Jv_coeff :: Array{T,3} # coefficients for series expansion of J_v
+  dJvdk_coeff :: Array{T,3} # coefficients for series expansion of dJ_v/dk
   k2      :: T           # k^2 = (1-(r-b)^2)/(4br)
   k       :: T           # k = sqrt(k^2)
   kc      :: T           # k_c = sqrt(1-k^2) (unless k > 1, then it is sqrt(1-1/k^2))
@@ -80,6 +82,8 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zeros(T,n+2),    # dfdrbu
   nmax,		   # nmax
   zeros(T,nmax),   # Iv_coeff
+  zeros(T,2,2,nmax),   # Jv_coeff for k^2 < 1 & k^2 > 1; v_max & v_max-1; series coefficients
+  zeros(T,2,2,nmax),   # dJvdk_coeff for k^2 < 1 & k^2 > 1; v_max & v_max-1; series coefficients
   zero(T),         # k^2
   zero(T),         # k
   zero(T),         # k_c

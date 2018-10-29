@@ -18,7 +18,7 @@ end
 return
 end
 
-function dJv_seriesdk_coeff(t::Transit_Struct{T}) where {T <: Real}
+function dJvdk_series_coeff!(t::Transit_Struct{T}) where {T <: Real}
 # Use series expansion to compute J_v and its derivative, dJ_v/dk.
 # Computing leading coefficient (n=0).  Need to compute for
 # both v_max and v_max-1.  Also, need to keep track of k^2 < 1
@@ -27,6 +27,7 @@ function dJv_seriesdk_coeff(t::Transit_Struct{T}) where {T <: Real}
 # and k^2 >= 1 (2); second dimension is for v_max (1) and v_max-1 (2),
 # while third dimension is for the series coefficients.
 # Computing leading coefficient (n=0):
+k2 = t.k2
 coeff = zero(T)
 # Loop over v_max and v_max-1:
 for j=1:2
