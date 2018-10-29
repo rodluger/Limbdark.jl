@@ -7,7 +7,7 @@ v = t.v_max
 # Computing leading coefficient (n=0):
 coeff = 2/(2v+one(T))
 # Compute leading coefficient in I_v series:
-t.Iv_coeff[1] = coeff
+t.Iv_coeff[1] = convert(T,coeff)
 # Now, compute higher order terms until desired precision is reached:
 for i = 1:t.nmax-1
   n = 2i
@@ -18,126 +18,62 @@ end
 return
 end
 
-function Jv_series_coeff(k2::T,v::Int64) where {T <: Real}
-# Use series expansion to compute J_v:
-nmax = 100
-n = 2; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
+function dJv_seriesdk_coeff(t::Transit_Struct{T}) where {T <: Real}
+# Use series expansion to compute J_v and its derivative, dJ_v/dk.
+# Computing leading coefficient (n=0).  Need to compute for
+# both v_max and v_max-1.  Also, need to keep track of k^2 < 1
+# and k^2 >= 1.  So, Jv_coeff is 3-dimensional array:
+# Jv_coeff[2,2,nmax], where first dimension is for k^2 <1 (1)
+# and k^2 >= 1 (2); second dimension is for v_max (1) and v_max-1 (2),
+# while third dimension is for the series coefficients.
 # Computing leading coefficient (n=0):
-#coeff = 3pi/(2^(2+v)*factorial(v+2))
-if k2 < 1
-#  coeff = 0.75*pi/exp(lfact(v+2))
-  coeff = 0.75*pi/exp(lfactorial(v+2))
-# multiply by (2v-1)!!
-  @inbounds for i=2:2:2v
-    coeff *= (i-1)/2
-  end
-# Add leading term to J_v:
-  Jv = convert(T,coeff)
-# Now, compute higher order terms until desired precision is reached:
-#  while n < nmax && abs(error) > tol
-  for n=2:2:nmax
-    coeff *= (n-1)*(n+2v-1)
-    coeff /= n*(n+2v+4)
-    coeff *= k2
-    Jv += coeff
-#    error = coeff
-    if abs(coeff) < tol
-      break
+coeff = zero(T)
+# Loop over v_max and v_max-1:
+for j=1:2
+  # v is v_max or v_max-1 (we need both since downward recursion requires two):
+  v = t.v_max-(j-1)
+  if k2 < 1
+    coeff = 0.75*convert(T,pi)/exp(lfactorial(v+2))
+    # multiply by (2v-1)!!
+    @inbounds for i=2:2:2v
+      coeff *= 0.5*(i-1)
     end
-#    n += 2
-  end
-  return Jv*k2^v*sqrt(k2)
-else # k^2 >= 1
-  coeff = convert(typeof(k2),pi)
-  # Compute (2v-1)!!/(2^v v!):
-  @inbounds for i=2:2:2v
-    coeff *= (i-1)/i
-  end
-  Jv = convert(typeof(k2),coeff)
-  k2inv = inv(k2)
-#  while n < nmax && abs(error) > tol
-  @inbounds for n =2:2:nmax
-#    coeff *= (1.-2.5/n)*(1.-.5/(n+v))/k2
-#    coeff *= (1-5/(n))*(1-1/(n+2v))/k2
-#    coeff *= (1.0-5.0/float(n))*(1.0-1.0/float(n+2v))/k2
-    coeff *= (n-5)*(n+2v-1)
-    coeff /= k2*(n*(n+2v))  # This line takes about 27% of run time!
-#    coeff /= (n*(n+2v))  # This line takes about 27% of run time!
-#    coeff *= k2inv
-    Jv += coeff
-    if abs(coeff) < tol
-      break
+    # Add leading term to J_v:
+    t.Jv_coeff[1,j,1] = coeff
+    if t.grad
+      t.dJvdk_coeff[1,j,1] = coeff*(2v+1)
     end
-#    error = coeff
-#    n += 2
-  end
-  return Jv
-end
-end
-
-function dJv_seriesdk_coeff(k2::T,v::Int64) where {T <: Real}
-# Use series expansion to compute J_v:
-nmax = 100
-n = 2; error = Inf; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
-# Computing leading coefficient (n=0):
-#coeff = 3pi/(2^(2+v)*factorial(v+2))
-coeff = zero(k2)
-if k2 < 1
-#  coeff = 3pi/(2^(2+v)*exp(lfact(v+2)))
-  coeff = 3pi/(2^(2+v)*exp(lfactorial(v+2)))
-#  println("coefficient: ",coeff)
-# multiply by (2v-1)!!
-  @inbounds for i=2:2:2v
-    coeff *= i-1
-  end
-# Add leading term to J_v:
-  Jv = one(k2)*coeff
-  dJvdk = one(k2)*coeff*(2v+1)
-# Now, compute higher order terms until desired precision is reached:
-#  while n < nmax && abs(error) > tol
-  @inbounds for n=2:2:nmax
-    coeff *= (n-1)*(n+2v-1)
-    coeff /= n*(n+2v+4)
-    coeff *= k2
-    Jv += coeff
-    dJvdk += coeff*(n+2v+1)
-#    error = coeff/Jv
-#    error = coeff
-    if abs(coeff) < tol
-      break
+    # Now, compute higher order terms until desired precision is reached:
+    @inbounds for i=1:t.nmax-1
+      n = 2i
+      coeff *= (n-1)*(n+2v-1)
+      coeff /= n*(n+2v+4)
+      t.Jv_coeff[1,j,i+1] = coeff
+      if t.grad
+        t.dJvdk_coeff[1,j,i+1] = coeff*(n+2v+1)
+      end
     end
-#    n += 2
-  end
-  dJvdk *= k2^v
-  Jv *= k2^v*sqrt(k2)
-#  println("Jv: ",Jv," dJv/dk: ",dJvdk)
-  return Jv,dJvdk
-else # k^2 >= 1
-  coeff = convert(typeof(k2),pi)
-  # Compute (2v-1)!!/(2^v v!):
-  @inbounds for i=2:2:2v
-    coeff *= (i-1)/i
-  end
-  Jv = one(k2)*coeff
-  dJvdk = zero(k2)
-  k2inv = inv(k2)
-#  while n < nmax && abs(error) > tol
-  for n = 2:2:nmax
-#    coeff *= (1-5/n)*(1-1/(n+2v))*k2inv
-    coeff *= (n-5)*(n+2v-1)
-    coeff /= (n*(n+2v))
-    coeff *= k2inv
-
-    Jv += coeff
-    dJvdk -= n*coeff
-#    error = coeff/Jv
-#    error = coeff
-    if abs(coeff) < tol
-      break
+  else # k^2 >= 1
+    coeff = convert(T,pi)
+    # Compute (2v-1)!!/(2^v v!):
+    @inbounds for i=2:2:2v
+      coeff *= (i-1)/i
     end
-#    n += 2
+    # Store leading terms:
+    t.Jv_coeff[2,j,1] = coeff
+    if t.grad
+      t.dJvdk_coeff[2,j,1] = zero(T)
+    end
+    # Loop over higher order terms:
+    for i = 1:t.nmax-1
+      n = 2i
+      coeff *= (n-5)*(n+2v-1)
+      coeff /= (n*(n+2v))
+      t.Jv_coeff[2,j,i+1] = coeff
+      if t.grad
+        t.dJvdk_coeff[2,j,i+1] = -n*coeff
+      end
+    end
   end
-  dJvdk /= sqrt(k2)
-  return Jv,dJvdk
 end
 end
