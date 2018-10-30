@@ -3,11 +3,12 @@
 include("../src/IJv_derivative_struct.jl")
 include("../src/transit_structure.jl")
 include("../src/cel_bulirsch.jl")
-include("random.jl")
+# include("random.jl")
 
 # Randomizer seed
-using Random
+#using Random
 seed = Random.seed!(42)
+
 using QuadGK
 
 @testset "IJv_derivative" begin
