@@ -75,7 +75,7 @@ else # k^2 >=1
 end
 end
 
-function Jv_series(t::Transit_Struct{T},v::Int64) where {T <: Real}
+function Jv_series!(t::Transit_Struct{T},v::Int64) where {T <: Real}
 # Use series expansion to compute J_v:
 # Check which set of series coefficients to use:
 k2 = t.k2
@@ -166,7 +166,7 @@ end
 end
 
 # Use series expansion to compute J_v and dJ_v/dk, with pre-computed coefficients:
-function dJv_seriesdk(t::Transit_Struct{T},v::Int64) where {T <: Real}
+function dJv_seriesdk!(t::Transit_Struct{T},v::Int64) where {T <: Real}
 # Check which set of series coefficients to use:
 k2 = t.k2
 if v == t.v_max
@@ -435,7 +435,8 @@ else # k^2 >= 1
 end
 v= t.v_max
 # Need to compute top two for J_v:
-t.Jv[v]=Jv_series(k2,v-1); t.Jv[v+1]=Jv_series(k2,v)
+#t.Jv[v]=Jv_series(k2,v-1); t.Jv[v+1]=Jv_series(k2,v)
+t.Jv[v]=Jv_series!(t,v-1); t.Jv[v+1]=Jv_series!(t,v)
 # Iterate downwards in v (lower):
 #while v >= 2
 @inbounds for v=t.v_max:-1:2
@@ -468,14 +469,14 @@ v = t.v_max
 if k2 < 1
 #  t.Iv[v+1]=Iv_series(k2,v)
   t.Iv[v+1]=Iv_series!(t)
-  while t.Iv[v+1] == zero(T) && v > 0
+  @inbounds while t.Iv[v+1] == zero(T) && v > 0
     v -= 1
     t.Iv[v+1] = Iv_series(k2,v)
   end
 # Next, iterate downwards in v:
   f0 = k2^(v-1)*kck
 # Loop over v, computing I_v and J_v from higher v:
-  while v >= 2
+  @inbounds while v >= 2
 #  @inbounds for v=t.v_max:-1:2
     t.Iv[v] = 2/(2v-1)*(v*t.Iv[v+1]+f0)
     f0 /= k2
@@ -502,17 +503,15 @@ else # k^2 >= 1
 end
 v= t.v_max
 # Need to compute top two for J_v:
-t.Jv[v+1] = zero(k2)
-#if typeof(k2) == BigFloat
-@inbounds while t.Jv[v+1] == 0.0 && v >= 2 # Loop downward in v until we get a non-zero Jv[v]
-  dJvdk0 = zero(T); dJvdk1 = zero(T)
-  t.Jv[v],dJvdk0 = dJv_seriesdk(k2,v-1); t.Jv[v+1],dJvdk1=dJv_seriesdk(k2,v)
-  if t.grad
-    t.dJvdk[v] = dJvdk0; t.dJvdk[v+1] = dJvdk1
-  end
+dJvdk0 = zero(T); dJvdk1 = zero(T)
+t.Jv[v],dJvdk0 = dJv_seriesdk!(t,v-1); t.Jv[v+1],dJvdk1=dJv_seriesdk!(t,v)
+@inbounds while t.Jv[v+1] == 0.0 && v > 2 # Loop downward in v until we get a non-zero Jv[v]
   v -=1
+  t.Jv[v],dJvdk0 = dJv_seriesdk(k2,v-1); t.Jv[v+1],dJvdk1=dJv_seriesdk(k2,v)
 end
-v +=1
+if t.grad
+  t.dJvdk[v] = dJvdk0; t.dJvdk[v+1] = dJvdk1
+end
 # Iterate downwards in v (lower):
 @inbounds while v >= 2
   f2 = k2*(2v-3); f1 = 2*(v+1+(v-1)*k2)/f2; f3 = (2v+3)/f2
