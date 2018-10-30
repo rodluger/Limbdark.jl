@@ -9,8 +9,9 @@ using SpecialFunctions
 function Iv_series!(t::Transit_Struct{T}) where {T <: Real}
 # Use series expansion to compute I_v with pre-computed
 # coefficients for v.max:
-if t.k2 < 1
-  tol = eps(t.k2)
+k2 = t.k2
+if k2 < 1
+  tol = eps(k2)
 else
   println("k2 > 1 in Iv_series: error")
   return zero(T)
@@ -21,14 +22,14 @@ Iv = t.Iv_coeff[1]
 k2n = one(T)   # k^{2n}
 term = zero(T)
 for n =1:t.nmax-1
-  k2n *= t.k2
+  k2n *= k2
   term = k2n*t.Iv_coeff[n+1]
   Iv += term
   if abs(term) < tol
     break
   end 
 end
-return Iv*t.k2^t.v_max*t.k
+return Iv*k2^t.v_max*t.k
 end
 
 function Iv_series(k2::T,v::Int64) where {T <: Real}
@@ -38,7 +39,7 @@ n = 2; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
 # Computing leading coefficient (n=0):
 coeff = 2/(2v+1)
 # Add leading term to I_v:
-Iv = one(k2)*coeff
+Iv = convert(T,coeff)
 # Now, compute higher order terms until desired precision is reached:
 for n =2:2:nmax
   coeff *= (n-1)*(n+2v-1)
@@ -122,10 +123,16 @@ end
 
 # Use series expansion to compute J_v:
 function Jv_series(k2::T,v::Int64) where {T <: Real}
+nmax = 100
 n = 2; if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
 # Computing leading coefficient (n=0):
 if k2 < 1
 # Add leading term to J_v:
+  coeff = 0.75*convert(T,pi)/exp(lfactorial(v+2))
+# multiply by (2v-1)!!
+  @inbounds for i=2:2:2v
+    coeff *= (i-1)/2
+  end
   Jv = convert(T,coeff)
 # Now, compute higher order terms until desired precision is reached:
   for n=2:2:nmax
@@ -267,7 +274,9 @@ else # k^2 >= 1
 end
 end
 
-function IJv_raise!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
+#function IJv_raise!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
+function IJv_raise!(t::Transit_Struct{T})  where {T <: Real}
+kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
 # This function needs debugging. [ ]
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
@@ -315,7 +324,9 @@ end
 return
 end
 
-function dIJv_raise_dk!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
+#function dIJv_raise_dk!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
+function dIJv_raise_dk!(t::Transit_Struct{T})  where {T <: Real}
+kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -389,7 +400,9 @@ end
 return
 end
 
-function IJv_lower!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
+#function IJv_lower!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
+function IJv_lower!(t::Transit_Struct{T})  where {T <: Real}
+kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -400,14 +413,17 @@ v = t.v_max
 if k2 < 1
 #  t.Iv[v+1]=Iv_series(k2,v)
   t.Iv[v+1]=Iv_series!(t)
+  while t.Iv[v+1] == zero(T) && v > 0
+    v -= 1
+    t.Iv[v+1] = Iv_series(k2,v)
+  end
 # Next, iterate downwards in v:
   f0 = k2^(v-1)*kck
 # Loop over v, computing I_v and J_v from higher v:
-#  while v >= 2
-  @inbounds for v=t.v_max:-1:2
+  @inbounds while v >= 2
     t.Iv[v] = 2/(2v-1)*(v*t.Iv[v+1]+f0)
     f0 /= k2
-#    v -= 1
+    v -= 1
   end
   t.Iv[1] = kap
 else # k^2 >= 1
@@ -439,7 +455,9 @@ end
 return
 end
 
-function dIJv_lower_dk!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
+#function dIJv_lower_dk!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
+function dIJv_lower_dk!(t::Transit_Struct{T})  where {T <: Real}
+kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -450,14 +468,18 @@ v = t.v_max
 if k2 < 1
 #  t.Iv[v+1]=Iv_series(k2,v)
   t.Iv[v+1]=Iv_series!(t)
+  while t.Iv[v+1] == zero(T) && v > 0
+    v -= 1
+    t.Iv[v+1] = Iv_series(k2,v)
+  end
 # Next, iterate downwards in v:
   f0 = k2^(v-1)*kck
 # Loop over v, computing I_v and J_v from higher v:
-#  while v >= 2
-  @inbounds for v=t.v_max:-1:2
+  while v >= 2
+#  @inbounds for v=t.v_max:-1:2
     t.Iv[v] = 2/(2v-1)*(v*t.Iv[v+1]+f0)
     f0 /= k2
-#    v -= 1
+    v -= 1
   end
   t.Iv[1] = kap
   # Now compute compute derivatives:

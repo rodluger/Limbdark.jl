@@ -147,10 +147,12 @@ t.sn[2],t.Eofk,t.Em1mKdm = s2_ell(r,b)
 if t.k2 > 0
   if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    IJv_lower!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+#    IJv_lower!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+    IJv_lower!(t)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    IJv_raise!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+#    IJv_raise!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+    IJv_raise!(t)
   end
 end
 
@@ -346,10 +348,12 @@ t.dsndb[2] = t.s2_grad[2]
 if t.k2 > 0
   if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
-    dIJv_lower_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+#    dIJv_lower_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+    dIJv_lower_dk!(t)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
-    dIJv_raise_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+    #dIJv_raise_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+    dIJv_raise_dk!(t)
   end
 end
 
