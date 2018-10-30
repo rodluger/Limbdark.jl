@@ -50,6 +50,7 @@ mutable struct Transit_Struct{T}
   sqr1mr  :: T           # sqrt(r*(1-r)) if r < 1
 end
 
+using SpecialFunctions
 include("compute_c_n_struct.jl")
 include("IJv_coeff.jl")
 

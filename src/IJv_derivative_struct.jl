@@ -88,9 +88,9 @@ else
   # then we just call the series sum:
   return Jv_series(k2,v)
 end
-if k2 < 1; tol = eps(k2); else; tol = eps(inv(k2)); end
 # Computing leading coefficient (n=0):
 if k2 < 1
+  tol = eps(k2)
 # Add leading term to J_v:
   Jv = t.Jv_coeff[1,j,1]
 # Now, compute higher order terms until desired precision is reached:
@@ -106,6 +106,7 @@ if k2 < 1
   end
   return Jv*k2^v*sqrt(k2)
 else # k^2 >= 1
+  tol = eps(inv(k2))
   Jv = t.Jv_coeff[2,j,1]
   k2inv = inv(k2)
   k2n = one(T); term = zero(T)
@@ -307,19 +308,22 @@ v= 0
 if k2 < 1
   # Use cel_bulirsch:
   if k2 > 0
-    t.Jv[v+1]=2/(3k2*k)*(k2*(3k2-2)*Em1mKdm+k2*Eofk)
-    t.Jv[v+2]= 2/(15k2*k)*(k2*(4-3k2)*Eofk+k2*(9k2-8)*Em1mKdm)
+    t.Jv[v+1]=2/(3k)*((3k2-2)*Em1mKdm+Eofk)
+    t.Jv[v+2]= 2/(15k)*((4-3k2)*Eofk+(9k2-8)*Em1mKdm)
   else
     t.Jv[v+1]= 0.0
     t.Jv[v+2]= 0.0
   end
 else # k^2 >=1
   k2inv = inv(k2)
-  t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
-  t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
+  t.Jv[v+1]=t.twothird*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
+  t.Jv[v+2]=0.4*t.third*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)
 end
+Jv1 = t.Jv[1]; Jv2 = zero(T)
 @inbounds for v = 2:t.v_max
-  t.Jv[v+1] = (2*(v+1+(v-1)*k2)*t.Jv[v]-k2*(2v-3)*t.Jv[v-1])/(2v+3)
+  Jv2 = t.Jv[v]
+  t.Jv[v+1] = (-k2*(2v-3)*Jv1+2*(v+1+(v-1)*k2)*Jv2)/(2v+3)
+  Jv1 = Jv2
 end
 return
 end
@@ -384,8 +388,8 @@ if k2 < 1
   end
 else # k^2 >=1
   k2inv = inv(k2)
-  t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
-  t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
+  t.Jv[v+1]=t.twothird*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
+  t.Jv[v+2]=0.4*t.third*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)
   if t.grad
     t.dJvdk[v+1] = 2/(k2*k)*(2*Eofk-Em1mKdm)
     t.dJvdk[v+2] = -3*t.Jv[v+2]/k+k2*t.dJvdk[v+1]
@@ -438,20 +442,16 @@ v= t.v_max
 #t.Jv[v]=Jv_series(k2,v-1); t.Jv[v+1]=Jv_series(k2,v)
 t.Jv[v]=Jv_series!(t,v-1); t.Jv[v+1]=Jv_series!(t,v)
 # Iterate downwards in v (lower):
-#while v >= 2
 @inbounds for v=t.v_max:-1:2
-  f2 = k2*(2v-3); f1 = 2*(v+1+(v-1)*k2)/f2; f3 = (2v+3)/f2
-  t.Jv[v-1] = f1*t.Jv[v]-f3*t.Jv[v+1]
-#  v -= 1
+  f2 = k2*(2v-3); f1 = 2*(v+1+(v-1)*k2); f3 = (2v+3)
+  t.Jv[v-1] = (f1*t.Jv[v]-f3*t.Jv[v+1])/f2
 end
 # Compute first two exactly:
 v= 0
 if k2 >= 1
   k2inv = inv(k2)
-#  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
-#  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
-  t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
-  t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
+  t.Jv[v+1]=t.twothird*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
+  t.Jv[v+2]=0.4*t.third*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)
 end
 return
 end
@@ -514,8 +514,8 @@ if t.grad
 end
 # Iterate downwards in v (lower):
 @inbounds while v >= 2
-  f2 = k2*(2v-3); f1 = 2*(v+1+(v-1)*k2)/f2; f3 = (2v+3)/f2
-  t.Jv[v-1] = f1*t.Jv[v]-f3*t.Jv[v+1]
+  f2 = k2*(2v-3); f1 = 2*(v+1+(v-1)*k2); f3 = (2v+3)
+  t.Jv[v-1] = (f1*t.Jv[v]-f3*t.Jv[v+1])/f2
   if t.grad
     t.dJvdk[v-1] = (t.dJvdk[v]+3/k*t.Jv[v])/k2
   end
@@ -527,8 +527,8 @@ if k2 >= 1
   k2inv = inv(k2)
 #  t.Jv[v+1]=2/3*cel_bulirsch(k2inv,kc,one(k2),3-k2inv,3-5k2inv+2k2inv^2)
 #  t.Jv[v+2]=cel_bulirsch(k2inv,kc,one(k2),12-8*k2inv,2*(9-8k2inv)*(1-k2inv))/15
-  t.Jv[v+1]=2/3*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
-  t.Jv[v+2]=2*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)/15
+  t.Jv[v+1]=t.twothird*((3-2*k2inv)*Eofk+k2inv*Em1mKdm)
+  t.Jv[v+2]=0.4*t.third*((-3+4*k2inv)*Em1mKdm+(9-8k2inv)*Eofk)
 end
 return
 end
