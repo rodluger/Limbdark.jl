@@ -122,7 +122,7 @@ for v=0:t.v_max
   @test isapprox(Ivn,t.Iv[v+1],atol=abstol,rtol = reltol)
   @test isapprox(t.Iv[v+1],convert(Float64,t_big.Iv[v+1]),atol=abstol,rtol=reltol)
   Jvn = Jv_num(k2,v)
-  println("v: ",v," k2: ",k2," Jv_num: ",Jvn," Jv: ",t.Jv[v+1]," Jv_big: ",convert(Float64,t_big.Jv[v+1]))
+#  println("v: ",v," k2: ",k2," Jv_num: ",Jvn," Jv: ",t.Jv[v+1]," Jv_big: ",convert(Float64,t_big.Jv[v+1]))
   @test isapprox(Jvn,t.Jv[v+1],atol=abstol,rtol=reltol)
   @test isapprox(t.Jv[v+1],convert(Float64,t_big.Jv[v+1]),atol=abstol,rtol=reltol)
 end

@@ -75,17 +75,17 @@ end
 # Compute recursion:
 f1=a1
 # First compute the first integral with p:
-a1 += b1*pinv; g=ee*pinv; b1 += f1*g; b1 *=2; p +=g; g=m;
+a1 += b1*pinv; g=ee*pinv; b1 += f1*g; b1 += b1; p +=g; g=m;
 # Next, compute the remainder with p = 1:
 p1 = one(T); g1=ee
 f2 = a2; f3 = a3
-a2 += b2; b2 += f2*g1; b2 *=2
-a3 += b3; b3 += f3*g1; b3 *=2
+a2 += b2; b2 += f2*g1; b2 += b2
+a3 += b3; b3 += f3*g1; b3 += b3
 p1 +=g1
 g1 = m
 m += kc
 iter = 0; itmax = 50
-while abs(g-kc) > g*ca  && iter < itmax
+while (abs(g-kc) > g*ca) || (abs(g1-kc) > g1*ca)  && iter < itmax
   kc = sqrt(ee)
   kc += kc
   ee = kc*m
@@ -100,9 +100,9 @@ while abs(g-kc) > g*ca  && iter < itmax
   b1 += f1*g
   b2 += f2*g1
   b3 += f3*g1
-  b1 *= 2
-  b2 *= 2
-  b3 *= 2
+  b1 += b1
+  b2 += b2
+  b3 += b3
   p  += g
   p1 += g1
   g  = m
