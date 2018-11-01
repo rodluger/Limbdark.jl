@@ -23,5 +23,5 @@ pip install batman-package
 mkdir -p $HOME/.config/Tectonic
 cat > $HOME/.config/Tectonic/config.toml << EOL
 [[default_bundles]]
-url = "https://dl.bintray.com/pkgw/tectonic/tl2016extras/2016.0r4/tlextras-2016.0r4.tar"
+url = "http://purl.org/net/pkgwpub/tectonic-default"
 EOL
