@@ -30,7 +30,9 @@ mutable struct Transit_Struct{T}
   k       :: T           # k = sqrt(k^2)
   kc      :: T           # k_c = sqrt(1-k^2) (unless k > 1, then it is sqrt(1-1/k^2))
   kck     :: T           # k_c * k
-  kap     :: T           # kappa = sin^{-1}(k)
+  kap0    :: T           # kappa = sin^{-1}(k) (=kappa_0 in M&A)
+  pimkap1 :: T           # pi-kappa_1
+  kite_area2 :: T        # 2*A_kite
   Eofk    :: T           # E(k^2) is complete elliptic integral of first kind
   Em1mKdm :: T           # (E(m)-(1-m)K(m))/m is complete elliptic integral with m=k^2
   onembmr2:: T           # 1-(b-r)^2
@@ -89,7 +91,9 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zero(T),         # k
   zero(T),         # k_c
   zero(T),         # k_c*k
-  zero(T),         # kappa
+  zero(T),         # kappa/kap0
+  zero(T),         # pimkap1/pi-kappa_1
+  zero(T),         # kite_area2/2*A_kite
   zero(T),         # E(k^2)
   zero(T),         # (E(m)-(1-m)K(m))/m
   zero(T),         # 1-(b-r)^2

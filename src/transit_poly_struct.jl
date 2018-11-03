@@ -19,21 +19,21 @@ if b <= 1-r  # k^2 > 1
     t.dsndr[1] = -2*pi*r
     t.dsndb[1] = 0.
   end
-  t.kap = convert(T,pi); t.kck = zero(T)
+  t.kap0 = convert(T,pi); t.kck = zero(T)
 else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
-  kite_area2 = sqrt(sqarea_triangle(one(T),b,r)) 
+  t.kite_area2 = sqrt(sqarea_triangle(one(T),b,r)) 
   # Angle of section for occultor:
-  t.kap  = atan(kite_area2,(r-1)*(r+1)+b^2)
+  t.kap0  = atan(t.kite_area2,(r-1)*(r+1)+b^2)
   # Angle of section for source:
-  pimkap1 = atan(kite_area2,(r-1)*(r+1)-b^2)
+  t.pimkap1 = atan(t.kite_area2,(r-1)*(r+1)-b^2)
   # Flux of visible uniform disk:
-  t.sn[1] = pimkap1 - r^2*t.kap + .5*kite_area2
+  t.sn[1] = t.pimkap1 - r^2*t.kap0 + .5*t.kite_area2
   if t.grad
-    t.dsndr[1]= -2*r*t.kap
-    t.dsndb[1]= kite_area2/b
+    t.dsndr[1]= -2*r*t.kap0
+    t.dsndb[1]= t.kite_area2/b
   end
-  t.kck = kite_area2*t.fourbrinv
+  t.kck = t.kite_area2*t.fourbrinv
 end
 return
 end
@@ -133,6 +133,9 @@ end
 
 # Compute uniform case, sn[1]:
 compute_uniform!(t)
+if t.n == 0
+  return t.c_n[1]*t.sn[1]*t.den
+end
 
 # Compute linear case, sn[2]:
 #s2!(t)
@@ -142,6 +145,26 @@ t.sn[2],t.Eofk,t.Em1mKdm = s2_ell(r,b)
 #if abs(t.sn[2]-sn2) > 1e-8*abs(sn2)
 #  println("r: ",r," b: ",b," sn[2]: ",t.sn[2]," sn2: ",sn2)
 #end
+if t.n == 1
+  flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
+  flux *= t.den  # for c_2 and above, the flux is zero.
+  return flux
+end
+
+# Special case of quadratic limb-darkening:
+if t.n == 2
+# Transformed expressions from Mandel & Agol:
+  eta2 = 0.5*r^2*(r^2+2*b^2)
+  if t.k2 > 1
+    four_pi_eta = 4pi*eta2
+  else
+    four_pi_eta = 2*(pi-t.pimkap1+2*eta2*t.kap0-0.25*t.kite_area2*(1.0+5r^2+b^2))
+  end
+  t.sn[3] = 2*(t.sn[1]-pi)+four_pi_eta
+  flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]+t.c_n[3]*t.sn[3]
+  flux *= t.den  # for c_2 and above, the flux is zero.
+  return flux
+end
 
 # Compute the J_v and I_v functions:
 if t.k2 > 0
@@ -331,18 +354,8 @@ compute_uniform!(t)
 t.sn[2],t.Eofk,t.Em1mKdm = s2!(r,b,t.s2_grad)
 t.dsndr[2] = t.s2_grad[1]
 t.dsndb[2] = t.s2_grad[2]
-#s2_grad = zeros(T,2)
-#sn2,Eofk,Em1mKdm = s2!(r,b,s2_grad)
-# compare results:
-#if abs(t.sn[2]-sn2) > 1e-8*abs(sn2)
-#  println("r: ",r," b: ",b," sn[2]: ",t.sn[2]," sn2: ",sn2)
-#end
-#if abs(t.s2_grad[1]-s2_grad[1]) > 1e-8*abs(s2_grad[1])
-#  println("r: ",r," b: ",b," s2_grad[1]: ",s2_grad[1]," s2_grad[1]: ",s2_grad[1])
-#end
-#if abs(t.s2_grad[2]-s2_grad[2]) > 1e-8*abs(s2_grad[2])
-#  println("r: ",r," b: ",b," s2_grad[2]: ",t.s2_grad[2]," s2_grad[2]: ",s2_grad[2])
-#end
+
+
 
 # Compute the J_v and I_v functions:
 if t.k2 > 0

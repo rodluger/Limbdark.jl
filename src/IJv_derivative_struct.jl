@@ -275,9 +275,8 @@ else # k^2 >= 1
 end
 end
 
-#function IJv_raise!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
 function IJv_raise!(t::Transit_Struct{T})  where {T <: Real}
-kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
+kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap0; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
 # This function needs debugging. [ ]
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
@@ -328,9 +327,8 @@ end
 return
 end
 
-#function dIJv_raise_dk!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
 function dIJv_raise_dk!(t::Transit_Struct{T})  where {T <: Real}
-kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
+kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap0; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -404,9 +402,8 @@ end
 return
 end
 
-#function IJv_lower!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
 function IJv_lower!(t::Transit_Struct{T})  where {T <: Real}
-kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
+kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap0; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)
@@ -456,9 +453,8 @@ end
 return
 end
 
-#function dIJv_lower_dk!(k2::T,kck::T,kc::T,kap::T,Eofk::T,Em1mKdm::T,t::Transit_Struct{T})  where {T <: Real}
 function dIJv_lower_dk!(t::Transit_Struct{T})  where {T <: Real}
-kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
+kc = t.kc; k=t.k; k2 = t.k2; kc2 = t.kc2; kck=t.kck; kap=t.kap0; Eofk=t.Eofk; Em1mKdm=t.Em1mKdm
 # Compute I_v, J_v for 0 <= v <= v_max = l_max+2
 # Define k:
 k = sqrt(k2)

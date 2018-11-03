@@ -35,7 +35,7 @@ for i=0:1000000
 end
 # Now, plot the flux and derivatives:
 toc()
-clf()
+#clf()
 plot(b,flux-1,label="flux-1")
 plot(b,trans.r*flux_grad[:,1],label="r*dfdr")
 plot(b,trans.r*flux_grad[:,2],label="r*dfdb")

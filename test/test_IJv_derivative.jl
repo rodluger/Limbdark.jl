@@ -47,7 +47,7 @@ if k2 < 1
   t.kc = convert(T,sqrt(1.0-big(k2)))
   t.k = convert(T,sqrt(big(k2)))
   t.kck = convert(T,sqrt((1.0-big(k2))*big(k2)))
-  t.kap = convert(T,2*asin(sqrt(big(k2))))
+  t.kap0 = convert(T,2*asin(sqrt(big(k2))))
   Piofk,Eofk_big,Em1mKdm_big = cel_bulirsch(big(k2),sqrt(1-big(k2)),zero(BigFloat), one(BigFloat),one(BigFloat),one(BigFloat), one(BigFloat),1-big(k2),zero(BigFloat))
   t.Eofk = convert(T,Eofk_big)
   t.Em1mKdm = convert(T,Em1mKdm_big)
@@ -55,7 +55,7 @@ else
   t.kc2 = convert(T,1.0-inv(big(k2)))
   t.kc = convert(T,sqrt(1.0-inv(big(k2))))
   t.k = convert(T,sqrt(big(k2)))
-  t.kap = convert(T,pi); kck=zero(T)
+  t.kap0 = convert(T,pi); kck=zero(T)
   Piofk,Eofk_big,Em1mKdm_big = cel_bulirsch(inv(big(k2)),sqrt(1-inv(big(k2))),zero(BigFloat), one(BigFloat),one(BigFloat),one(BigFloat), one(BigFloat),1-inv(big(k2)),zero(BigFloat))
   t.Eofk = convert(T,Eofk_big)
   t.Em1mKdm = convert(T,Em1mKdm_big)
@@ -71,13 +71,13 @@ if k2 < 1
   t.kc = convert(T,sqrt(1.0-big(k2)))
   t.k = convert(T,sqrt(big(k2)))
   t.kck = convert(T,sqrt((1.0-big(k2))*big(k2)))
-  t.kap = convert(T,2*asin(sqrt(big(k2))))
+  t.kap0 = convert(T,2*asin(sqrt(big(k2))))
   Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(t.k2,t.kc,zero(T), one(T),one(T),one(T), one(T),t.kc2,zero(T))
 else
   t.kc2 = convert(T,1.0-inv(big(k2)))
   t.kc = convert(T,sqrt(1.0-inv(big(k2))))
   t.k = convert(T,sqrt(big(k2)))
-  t.kap = convert(T,pi); kck=zero(T)
+  t.kap0 = convert(T,pi); kck=zero(T)
   Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(inv(t.k2),t.kc,zero(T), one(T),one(T),one(T), one(T),t.kc2,zero(T))
 end
 return

@@ -330,9 +330,10 @@ the higher order limb-darkened light curves.
     radius ratio $r$.  Plotted are the regions near $b=1-r$ (second and third
     points of contact) and $b=1+r$ (first and fourth points of contact) for
     the standard formula (equation \ref{eq:MAuniform}, blue) and our new formula
-    (equation \ref{eq:area_of_overlap}, green).
-    The high-precision calculation is shown in red for comparison. The
-    cyan and magenta circles indicate the positions of the circles at the left
+    (equation \ref{eq:area_of_overlap}, orange dots).
+    The high-precision calculation is shown in green dashed for comparison; this
+    is limited by the conversion of the result to double-precision. The
+    solid and empty circles (top) indicate the positions of the circles at the left
     hand side of the axes.  In the left panels the dash-dot grey line indicates the
     limiting precision for representing $\pi r^2$.}\label{fig:overlap_precision}
     \end{centering}
@@ -945,7 +946,7 @@ and then transforming from $a_n$ to $d_n$.
 
 We rewrite $I(\upmu)$ in terms of these three expansions
 \begin{eqnarray}
-I(\upmu) &=& 1 - \sum_{i=1}^N u_i \sum_{j=0}^i \binom{i}{j} (-1)^j \upmu^j,\\
+\frac{I(\upmu)}{I(1)} &=& 1 - \sum_{i=1}^N u_i \sum_{j=0}^i \binom{i}{j} (-1)^j \upmu^j,\\
 &=& \sum_{n=0}^N a_n \upmu^n,\\
 &=& d_0 + d_1 \upmu + \sum_{n=2}^N d_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right].
 \end{eqnarray}
