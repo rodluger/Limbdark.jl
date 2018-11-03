@@ -17,3 +17,11 @@ conda info -a
 
 # Install some dependencies
 pip install batman-package
+
+# Attempt to resolve issues with SSL certificate expiring for purl.org:
+# https://tectonic.newton.cx/t/how-to-use-tectonic-if-you-can-t-access-purl-org/44
+mkdir -p $HOME/.config/Tectonic
+cat > $HOME/.config/Tectonic/config.toml << EOL
+[[default_bundles]]
+url = "http://purl.org/net/pkgwpub/tectonic-default"
+EOL

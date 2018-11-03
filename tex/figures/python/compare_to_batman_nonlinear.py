@@ -137,7 +137,7 @@ a = ((P * 86400) ** 2 * (1.32712440018e20 * mstar) /
 inc = np.arccos(b0 / a) * 180 / np.pi
 
 # Get the polynomial coeffs for l = 6
-order = 6
+order = 15
 u, err = GetPolynomialCoeffs(c, order)
 print("Polynomial fit error: %.3e" % err)
 
@@ -258,6 +258,7 @@ axleg2.set_xlim(2, 3)
 leg = axleg2.legend(loc='center', labelspacing=1, frameon=False)
 leg.set_title('log error', prop={'weight': 'bold'})
 
-# Print average ratio
+# Print average time and error ratios
 print(np.nanmedian(agol_time / batman_time))
+print(err_agol / err_batman)
 fig.savefig("compare_to_batman_nonlinear.pdf", bbox_inches='tight')
