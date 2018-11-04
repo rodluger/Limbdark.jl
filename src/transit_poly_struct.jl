@@ -420,7 +420,7 @@ if t.n >= 2
           nmi = n0-i+1
           Iv2 = Iv1; Iv1 = t.Iv[nmi]
           k2n *= -t.k2
-          coeff = t.bincoeff[n0,i+1]*k2n
+          coeff = t.bincoeff[i+1,n0]*k2n
           term =  coeff*((r-b)*Iv1+2b*Iv2)
           pofgn += term
           dpdr += coeff*Iv1
@@ -450,7 +450,7 @@ if t.n >= 2
           nmi = n0-i+1
           #coeff *= -nmi/i*t.k2
           k2n *= -t.k2
-          coeff = t.bincoeff[n0,i+1]*k2n
+          coeff = t.bincoeff[i+1,n0]*k2n
           Jv2 = Jv1; Jv1 = t.Jv[nmi]
           term = coeff*((r-b)*Jv1+2b*Jv2)
           pofgn += term

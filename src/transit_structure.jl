@@ -112,7 +112,7 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   one(T)/3,        # 1/3
   convert(T,2)/3,  # 2/3
   zero(T),         # sqrt(r*(1-r))
-  zeros(v_max,v_max+1) # binomial(n,i)
+  zeros(v_max+1,v_max) # binomial(n,i)
 )
 # Initialize the series coefficients for I_{v_max}:
 Iv_series_coeff!(trans)
@@ -121,13 +121,13 @@ Iv_series_coeff!(trans)
 dJvdk_series_coeff!(trans)
 # Compute binomial coefficients:
 for n=1:trans.v_max
-  trans.bincoeff[n,1]=one(T)
-  trans.bincoeff[n,n+1]=one(T)
+  trans.bincoeff[1,n]=one(T)
+  trans.bincoeff[n+1,n]=one(T)
   for i=1:n-1
     if n == 1
-      trans.bincoeff[n,i+1]=binomial(n,i)
+      trans.bincoeff[i+1,n]=binomial(n,i)
     else
-      trans.bincoeff[n,i+1]=trans.bincoeff[n-1,i]+trans.bincoeff[n-1,i+1]
+      trans.bincoeff[i+1,n]=trans.bincoeff[i,n-1]+trans.bincoeff[i+1,n-1]
     end
   end
 end  
