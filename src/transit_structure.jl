@@ -50,6 +50,7 @@ mutable struct Transit_Struct{T}
   third   :: T           # 1/3
   twothird:: T           # 2/3
   sqr1mr  :: T           # sqrt(r*(1-r)) if r < 1
+  bincoeff:: Array{T,2}  # binomial(n,i)
 end
 
 using SpecialFunctions
@@ -110,13 +111,20 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zero(T),         # den = 1/(pi*(c[1] + c[2]*2/3))
   one(T)/3,        # 1/3
   convert(T,2)/3,  # 2/3
-  zero(T)         # sqrt(r*(1-r))
+  zero(T),         # sqrt(r*(1-r))
+  zeros(v_max,v_max+1) # binomial(n,i)
 )
 # Initialize the series coefficients for I_{v_max}:
 Iv_series_coeff!(trans)
 # Initialize the series coefficients for J_{v_max} and J_{v_max-1}, and if
 # t.grad is true, will also compute coefficients for dJ/dk_{v_max} and _{v_max-1}:
 dJvdk_series_coeff!(trans)
+# Compute binomial coefficients:
+for n=1:trans.v_max
+  for i=0:n
+    trans.bincoeff[n,i+1]=binomial(n,i)
+  end
+end  
 if grad
   compute_c_n_grad!(trans)
 else

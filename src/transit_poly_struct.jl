@@ -9,12 +9,11 @@ include("IJv_derivative_struct.jl")
 
 # Computes the coefficient for the uniform disk case, S_0:
 function compute_uniform!(t::Transit_Struct{T}) where {T <: Real}
-r=t.r; b=t.b
+r=t.r; b=t.b; r2=r*r; b2=b*b
 # Uniform disk case:
 # Compute sn[1] and its derivatives:
 if b <= 1-r  # k^2 > 1
-  lam = pi*r^2
-  t.sn[1] = pi-lam
+  t.sn[1] = pi*(1-r2)
   if t.grad
     t.dsndr[1] = -2*pi*r
     t.dsndb[1] = 0.
@@ -24,11 +23,11 @@ else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
   t.kite_area2 = sqrt(sqarea_triangle(one(T),b,r)) 
   # Angle of section for occultor:
-  t.kap0  = atan(t.kite_area2,(r-1)*(r+1)+b^2)
+  t.kap0  = atan(t.kite_area2,(r-1)*(r+1)+b2)
   # Angle of section for source:
-  t.pimkap1 = atan(t.kite_area2,(r-1)*(r+1)-b^2)
+  t.pimkap1 = atan(t.kite_area2,(r-1)*(r+1)-b2)
   # Flux of visible uniform disk:
-  t.sn[1] = t.pimkap1 - r^2*t.kap0 + .5*t.kite_area2
+  t.sn[1] = t.pimkap1 - r2*t.kap0 + .5*t.kite_area2
   if t.grad
     t.dsndr[1]= -2*r*t.kap0
     t.dsndb[1]= t.kite_area2/b
@@ -74,7 +73,7 @@ function transit_poly_c(t::Transit_Struct{T}) where {T <: Real}
 # for which we have a solution in terms of I_v (for even n) and J_v (for odd n).
 # The variable "t" is a structure which contains transit parameters
 # and intermediate quantities computed from these:
-r=t.r; b=t.b; n = t.n
+r=t.r; b=t.b; n = t.n; r2=r*r
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
 
@@ -89,10 +88,10 @@ if r >= 1+b
 end
 if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
-  onemr2 = 1-r^2
+  onemr2 = 1-r2
   flux = zero(T); t.sqrt1mr2 = sqrt(onemr2)
   flux = (t.c_n[1]*onemr2+t.twothird*t.c_n[2]*t.sqrt1mr2^3)
-  fac= 2r^2*onemr2
+  fac= 2r2*onemr2
   @inbounds for i=2:t.n
     flux += -t.c_n[i+1]*fac
     fac *= t.sqrt1mr2
@@ -156,11 +155,12 @@ end
 # Special case of quadratic limb-darkening:
 if t.n == 2
 # Transformed expressions from Mandel & Agol:
-  eta2 = 0.5*r^2*(r^2+2*b^2)
+  r2=r*r; b2=b*b
+  eta2 = 0.5*r2*(r2+2*b2)
   if t.k2 > 1
     four_pi_eta = 4pi*eta2
   else
-    four_pi_eta = 2*(pi-t.pimkap1+2*eta2*t.kap0-0.25*t.kite_area2*(1.0+5r^2+b^2))
+    four_pi_eta = 2*(pi-t.pimkap1+2*eta2*t.kap0-0.25*t.kite_area2*(1.0+5r2+b2))
   end
   t.sn[3] = 2*(t.sn[1]-pi)+four_pi_eta
   flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]+t.c_n[3]*t.sn[3]
@@ -204,7 +204,7 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
     coeff = (-t.fourbr)^n0
     # Compute i=0 term
     pofgn = coeff*((r-b)*t.Jv[n0+1]+2b*t.Jv[n0+2])
-# For even n, compute coefficients for the sum over I_v:
+# For odd n, compute coefficients for the sum over J_v:
     @inbounds for i=1:n0
       coeff *= -(n0-i+1)/i*t.k2
       pofgn += coeff*((r-b)*t.Jv[n0-i+1]+2b*t.Jv[n0-i+2])
@@ -268,7 +268,7 @@ return
 end
 
 function transit_poly_c!(t::Transit_Struct{T}) where {T <: Real}
-r = t.r; b=t.b; n = t.n
+r = t.r; b=t.b; n = t.n; r2 =r*r; b2=b*b
 @assert((length(t.c_n)+2) == length(t.dfdrbc))
 @assert(r > 0)
 # Number of limb-darkening components to include (beyond 0 and 1):
@@ -295,15 +295,15 @@ if r >= 1+b
 end
 if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
-  flux = zero(T); onemr2 = 1-r^2; t.sqrt1mr2 = sqrt(onemr2)
+  flux = zero(T); onemr2 = 1-r2; t.sqrt1mr2 = sqrt(onemr2)
   fill!(t.dfdrbc,zero(T))
   flux = (t.c_n[1]*onemr2+t.twothird*t.c_n[2]*t.sqrt1mr2^3)*pi*t.den
-  fac  = 2r^2*onemr2*pi*t.den
+  fac  = 2r2*onemr2*pi*t.den
   facd = -2r*pi*t.den
   t.dfdrbc[1] = t.c_n[1]*facd + t.c_n[2]*facd*t.sqrt1mr2
   @inbounds for i=2:t.n
     flux -= t.c_n[i+1]*fac
-    t.dfdrbc[1] += t.c_n[i+1]*facd*(2*onemr2-i*r^2)
+    t.dfdrbc[1] += t.c_n[i+1]*facd*(2*onemr2-i*r2)
     t.dfdrbc[i+3] -= fac
     fac *= t.sqrt1mr2
     facd *= t.sqrt1mr2
@@ -326,8 +326,8 @@ else
     println("negative k2: ",t.k2," r: ",r," b: ",b)
     t.k2 = 0.0; t.k = 0.0
   end
-  dkdr = (b^2-r^2-1)/(8*t.k*b*r^2)
-  dkdb = (r^2-b^2-1)/(8*t.k*b^2*r)
+  dkdr = (b2-r2-1)/(8*t.k*b*r2)
+  dkdb = (r2-b2-1)/(8*t.k*b2*r)
   if t.k2 > 1
     if t.k2 > 2.0
       t.kc2 = 1.0-inv(t.k2)
@@ -364,18 +364,18 @@ end
 if t.n >= 2
   if t.n == 2
 # Transformed expressions from Mandel & Agol:
-    r2pb2 = (r^2+b^2)
-    eta2 = 0.5*r^2*(r2pb2+b^2)
+    r2pb2 = (r2+b2)
+    eta2 = 0.5*r2*(r2pb2+b2)
     deta2dr =  2*r*r2pb2
-    deta2db = 2*b*r^2
+    deta2db = 2*b*r2
     if t.k2 > 1
       four_pi_eta = 4pi*(eta2-0.5)
       detadr = 4pi*deta2dr
       detadb = 4pi*deta2db
     else
-      four_pi_eta = 2*(-t.pimkap1+2*eta2*t.kap0-0.25*t.kite_area2*(1.0+5r^2+b^2))
+      four_pi_eta = 2*(-t.pimkap1+2*eta2*t.kap0-0.25*t.kite_area2*(1.0+5r2+b2))
       detadr = 8r*(r2pb2*t.kap0-t.kite_area2)
-      detadb = 2/b*(4*(b*r)^2*t.kap0-(1+r2pb2)*t.kite_area2)
+      detadb = 2/b*(4*b2*r2*t.kap0-(1+r2pb2)*t.kite_area2)
     end
     t.sn[3] = 2*t.sn[1]+four_pi_eta
     t.dsndr[3] = 2*t.dsndr[1]+detadr
@@ -414,11 +414,13 @@ if t.n >= 2
         dpdb = coeff*(-Iv1+2*Iv2)
         dpdr += (n0+1)*pofgn*rinv
         dpdb += n0*pofgn*binv
+        k2n = coeff
     # For even n, compute coefficients for the sum over I_v:
         @inbounds for i=1:n0
           nmi = n0-i+1
           Iv2 = Iv1; Iv1 = t.Iv[nmi]
-          coeff *= -nmi/i*t.k2
+          k2n *= -t.k2
+          coeff = t.bincoeff[n0,i+1]*k2n
           term =  coeff*((r-b)*Iv1+2b*Iv2)
           pofgn += term
           dpdr += coeff*Iv1
@@ -443,9 +445,12 @@ if t.n >= 2
         dpdb  += pofgn*( 3*rmb_on_onembmr2+n0*binv)
         dpdk = coeff*((r-b)*t.dJvdk[n0+1]+2b*t.dJvdk[n0+2])
     # For even n, compute coefficients for the sum over I_v:
+        k2n = coeff
         @inbounds for i=1:n0
           nmi = n0-i+1
-          coeff *= -nmi/i*t.k2
+          #coeff *= -nmi/i*t.k2
+          k2n *= -t.k2
+          coeff = t.bincoeff[n0,i+1]*k2n
           Jv2 = Jv1; Jv1 = t.Jv[nmi]
           term = coeff*((r-b)*Jv1+2b*Jv2)
           pofgn += term
