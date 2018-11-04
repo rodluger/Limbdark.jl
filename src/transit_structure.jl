@@ -121,8 +121,14 @@ Iv_series_coeff!(trans)
 dJvdk_series_coeff!(trans)
 # Compute binomial coefficients:
 for n=1:trans.v_max
-  for i=0:n
-    trans.bincoeff[n,i+1]=binomial(n,i)
+  trans.bincoeff[n,1]=one(T)
+  trans.bincoeff[n,n+1]=one(T)
+  for i=1:n-1
+    if n == 1
+      trans.bincoeff[n,i+1]=binomial(n,i)
+    else
+      trans.bincoeff[n,i+1]=trans.bincoeff[n-1,i]+trans.bincoeff[n-1,i+1]
+    end
   end
 end  
 if grad
