@@ -16,7 +16,7 @@ using QuadGK
 function Mm_num(k2::T,m::T) where {T <: Real}
 # Numerically integrates M_m(k^2)/(4br)^m (note: m can be a half-integer).
 # See 11/10/2018 notes.
-f(x) = (k2-sin(x))^m
+f(x) = (k2-sin(x)^2)^m
 if k2 < 1.0
   kap2 = convert(T,asin(sqrt(big(k2))))
   Mm,error = quadgk(f,-kap2,kap2,rtol=1e-15)
