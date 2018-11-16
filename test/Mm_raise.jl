@@ -1,21 +1,54 @@
 include("../src/cel_bulirsch.jl")
 using QuadGK
 
-
 # Series evaluation of:
 #    M_m/(4*b*r)^{m/2} = \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2{x})^{m/2} dx
-function Mm_series(k2::T,m::Int64,Mm_coeff::Array{T,2}) where {T <: Real}
-nmax
-
-return Mm
+# for the top four values of m = m_max-3 to m_max.
+function Mm_series!(t::Transit_Struct{T}) where {T <: Real}
+# Use series expansion to compute M_m:
+k2 = t.k2
+# Computing leading coefficient (n=0):
+if k2 < 1
+  tol = eps(k2)
+# Add leading term to M_m:
+  Mm = t.Mm_coeff[1,:,1]
+# Now, compute higher order terms until desired precision is reached:
+  k2n = one(T)   # k^{2n}
+  term = zero(T,4)
+  for n =1:t.nmax-1
+    k2n *= k2
+    term = k2n*t.Mm_coeff[1,:,n+1]
+    Mm += term
+    if maximum(abs.(term)) < tol
+      break
+    end
+  end
+  fac = t.sqonembmr2^(t.m_max-3)
+  for j=4:-1:1
+    Mm[j] *= fac
+    fac *= t.sqonembmr2
+  end
+  return Mm*t.k
+else # k^2 >= 1
+  tol = eps(inv(k2))
+  Mm = t.Mm_coeff[2,:,1]
+  k2inv = inv(k2)
+  k2n = one(T); term = zero(T,4)
+  @inbounds for n = 1:t.nmax-1
+    k2n *= k2inv
+    term = k2n*t.Mm_coeff[2,:,n+1]
+    Mm += term
+    if maximum(abs.(term)) < tol
+      break
+    end
+  end
+  fac = t.sqonembmr2^(t.m_max-3)
+  for j=4:-1:1
+    Mm[j] *= fac
+    fac *= t.sqonembmr2
+  end
+  return Mm
 end
-
-# Coefficients for series expansion of M_{m_max},..., M_{m_max-3}
-function Mm_coeff(m_max::Int64,Mmc::Array{T,2},dMmcdk::Array{T,2},nmax::Int64) where {T <: Real}
-# First, compute m_max:
-for i=0:nmax
-  Mmc[4,i+1] = 
-return Mmc
 end
 
 function Mm_raise(r::T,b::T,m_max::Int64) where {T <: Real}
