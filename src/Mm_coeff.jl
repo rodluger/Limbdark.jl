@@ -22,8 +22,9 @@ for j=1:4
 #      t.dMmdk_coeff[1,j,1] = coeff*(m+1)
 #    end
     # Now, compute higher order terms until desired precision is reached:
-    @inbounds for j=1:t.nmax-1
-      coeff *= (1.5-j)^2/((mhalf+2.5-j)*j)
+    @inbounds for i=1:t.nmax-1
+#      coeff *= (1.5-i)^2/(mhalf+2.5-i)
+      coeff *= (2*i-1)^2/(2*i*(1+m+2*i))
       t.Mm_coeff[1,j,i+1] = coeff
 #      if t.grad
 #        t.dMmdk_coeff[1,j,i+1] = coeff*(2j+m+1)
@@ -43,8 +44,9 @@ for j=1:4
     else
       jmax = t.nmax-1
     end
-    for j = 1:jmax
-      coeff *= (1.5-j)*(-mhalf-j+1.0)/((2.0-j)*j)
+    for i = 1:jmax
+#      coeff *= (1.5-i)*(-mhalf-i+1.0)/(2.0-i)
+      coeff *= (2+m-2*i)*(2*i-1)/(4*i^2)
       t.Mm_coeff[2,j,i+1] = coeff
 #      if t.grad
 #        t.dMmdk_coeff[2,j,i+1] = -2j*coeff

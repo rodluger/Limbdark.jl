@@ -35,7 +35,7 @@ mutable struct Transit_Struct{T}
   kck     :: T           # k_c * k
   kap0    :: T           # kappa = sin^{-1}(k) (=kappa_0 in M&A)
   pimkap1 :: T           # pi-kappa_1
-  kite_area2 :: T        # 2*A_kite
+  kite_area2 :: T        # 2*A_kite = 
   Eofk    :: T           # E(k^2) is complete elliptic integral of first kind
   Em1mKdm :: T           # (E(m)-(1-m)K(m))/m is complete elliptic integral with m=k^2
   onembmr2:: T           # 1-(b-r)^2
@@ -59,6 +59,7 @@ end
 using SpecialFunctions
 include("compute_c_n_struct.jl")
 include("IJv_coeff.jl")
+include("Mm_coeff.jl")
 
 function transit_init(r::T,b::T,u_n::Array{T,1},grad::Bool) where {T <: Real}
 # Initializs a transit structure.
@@ -126,6 +127,7 @@ Iv_series_coeff!(trans)
 # Initialize the series coefficients for J_{v_max} and J_{v_max-1}, and if
 # t.grad is true, will also compute coefficients for dJ/dk_{v_max} and _{v_max-1}:
 dJvdk_series_coeff!(trans)
+# Initialize series coefficients for M_m:
 Mm_series_coeff!(trans)
 # Compute binomial coefficients:
 for n=1:trans.v_max
