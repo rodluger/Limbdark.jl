@@ -1,6 +1,23 @@
 include("../src/cel_bulirsch.jl")
 using QuadGK
 
+
+# Series evaluation of:
+#    M_m/(4*b*r)^{m/2} = \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2{x})^{m/2} dx
+function Mm_series(k2::T,m::Int64,Mm_coeff::Array{T,2}) where {T <: Real}
+nmax
+
+return Mm
+end
+
+# Coefficients for series expansion of M_{m_max},..., M_{m_max-3}
+function Mm_coeff(m_max::Int64,Mmc::Array{T,2},dMmcdk::Array{T,2},nmax::Int64) where {T <: Real}
+# First, compute m_max:
+for i=0:nmax
+  Mmc[4,i+1] = 
+return Mmc
+end
+
 function Mm_raise(r::T,b::T,m_max::Int64) where {T <: Real}
 # Computes the integrals:
 # M_m(r,b) = (4*b*r)^(m/2) \int_{-\kappa/2}^{\kappa/2} (k^2 - \sin^2{x})^{m/2} dx
@@ -50,8 +67,6 @@ fac *= sqfourbrinv
 Mm[m_max-2] = fac*Mm_num(k2,0.5*m_max-1.5)
 # Now iterate downwards:
 for m=m_max-4:-1:0
-#  Mm[m+1]=2*(1-1/m)*(1-r^2-b^2)*Mm[m-1]+(1-2/m)*(1-(b-r)^2)*((b+r)^2-1)*Mm[m-3]
-#  (m+4)*Mm[m+5]=2*(m+3)*(1-r^2-b^2)*Mm[m+3]+(m+2)*(1-(b-r)^2)*((b+r)^2-1)*Mm[m+1]
   Mm[m+1]=((m+4)*Mm[m+5]-2*(m+3)*(1-r^2-b^2)*Mm[m+3])/((1-(b-r)^2)*((b+r)^2-1)*(m+2))
 end
 return Mm
