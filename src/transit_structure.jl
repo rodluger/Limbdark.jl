@@ -5,12 +5,14 @@ mutable struct Transit_Struct{T}
   u_n     :: Array{T,1}  # limb-darkening coefficients
   n       :: Int64       # number of limb-darkening coefficients
   v_max   :: Int64       # maximum coefficient in I_v and J_v
+  m_max   :: Int64       # maximum number of terms in M_m
   c_n     :: Array{T,1}  # Green's basis coefficients
   sn      :: Array{T,1}  # Green's basis terms
   Iv      ::  Array{T,1} # integral over sin(phi)^{2v}
   Jv      ::  Array{T,1} # integral over sin(phi)^{2v} (1-sin(phi)^2/k^2)^{3/2}
   Kv      ::  Array{T,1} # integral over cos(phi)^{2v}
   Lv      ::  Array{T,1} # integral over cos(phi)^{2v} (1-sin(phi)^2/k^2)^{3/2}
+  Mm      ::  Array{T,1} # integral over (k^2-sin(phi)^2)^(m/2)
   grad    :: Bool        # true for gradient; false for no gradient
   dIvdk   ::  Array{T,1} # derivative of I_v with respect to k
   dJvdk   ::  Array{T,1} # derivative of J_v with respect to k
@@ -26,6 +28,7 @@ mutable struct Transit_Struct{T}
   Iv_coeff :: Array{T,1} # coefficients for series expansion of I_v
   Jv_coeff :: Array{T,3} # coefficients for series expansion of J_v
   dJvdk_coeff :: Array{T,3} # coefficients for series expansion of dJ_v/dk
+  Mm_coeff :: Array{T,3} # coefficients for series expansion of M_m
   k2      :: T           # k^2 = (1-(r-b)^2)/(4br)
   k       :: T           # k = sqrt(k^2)
   kc      :: T           # k_c = sqrt(1-k^2) (unless k > 1, then it is sqrt(1-1/k^2))
@@ -65,14 +68,17 @@ if iseven(n)
 else
   v_max = round(Int64,(n-1)/2)+2
 end
+# Maximum number of M_m integrals is n+2:
+m_max = n+2
 nmax = 50
-trans = Transit_Struct{T}(r,b,u_n,n,v_max,
+trans = Transit_Struct{T}(r,b,u_n,n,v_max,m_max,
   zeros(T,n+1),    # c_n
   zeros(T,n+1),    # sn
   zeros(T,v_max+1),# Iv
   zeros(T,v_max+1),# Jv
   zeros(T,v_max+1),# Kv
   zeros(T,v_max+1),# Lv
+  zeros(T,m_max+1),# M_m from m= 0 to m_max
   grad,            # grad
   zeros(T,v_max+1),# dIvdk
   zeros(T,v_max+1),# dJvdk
@@ -88,6 +94,7 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,
   zeros(T,nmax),   # Iv_coeff
   zeros(T,2,2,nmax),   # Jv_coeff for k^2 < 1 & k^2 > 1; v_max & v_max-1; series coefficients
   zeros(T,2,2,nmax),   # dJvdk_coeff for k^2 < 1 & k^2 > 1; v_max & v_max-1; series coefficients
+  zeros(T,2,4,nmax),   # Mm_coeff for k^2 < 1 & k^2 > 1; m_max-3 to m_max; series coefficients
   zero(T),         # k^2
   zero(T),         # k
   zero(T),         # k_c
@@ -119,6 +126,7 @@ Iv_series_coeff!(trans)
 # Initialize the series coefficients for J_{v_max} and J_{v_max-1}, and if
 # t.grad is true, will also compute coefficients for dJ/dk_{v_max} and _{v_max-1}:
 dJvdk_series_coeff!(trans)
+Mm_series_coeff!(trans)
 # Compute binomial coefficients:
 for n=1:trans.v_max
   trans.bincoeff[1,n]=one(T)
