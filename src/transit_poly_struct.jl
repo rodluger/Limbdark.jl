@@ -6,6 +6,8 @@ include("transit_structure.jl")
 include("s2.jl")
 # Include code which computes I_v, J_v, and derivatives wrt k:
 include("IJv_derivative_struct.jl")
+# Include code which computes M_m:
+include("Mm_compute.jl")
 
 # Computes the coefficient for the uniform disk case, S_0:
 function compute_uniform!(t::Transit_Struct{T}) where {T <: Real}
@@ -100,7 +102,7 @@ if b == 0.0
 else
 # Next, compute k^2 = m:
   t.onembmr2=(r+1-b)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
-#  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
+  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
   t.onembpr2 = (1-r-b)*(1+b+r)
 #  t.k2 = t.onembmr2*t.fourbrinv
@@ -168,16 +170,18 @@ if t.n == 2
   return flux
 end
 
-# Compute the J_v and I_v functions:
+# Compute the J_v, I_v, and M_m functions:
 if t.k2 > 0
   if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
 # This computes I_v,J_v for the largest v, and then works down to smaller values:
 #    IJv_lower!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
     IJv_lower!(t)
+    Mm_lower!(t)
   else
 # This computes I_0,J_0,J_1, and then works upward to larger v:
 #    IJv_raise!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
     IJv_raise!(t)
+    Mm_raise!(t)
   end
 end
 
@@ -198,6 +202,8 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
       pofgn += coeff*((r-b)*t.Iv[n0-i+1]+2b*t.Iv[n0-i+2])
     end
     pofgn *= 2r
+    # Compare with new formula in terms of M_m:
+    pofgn_M = (1+r^2-b^2)*t.Mm[n+1]-t.Mm[n+3]
   else
 # Now do the same for odd N_c in sum over J_v:
     n0 = convert(Int64,(n-3)/2)
@@ -210,6 +216,12 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
       pofgn += coeff*((r-b)*t.Jv[n0-i+1]+2b*t.Jv[n0-i+2])
     end
     pofgn *= 2r*t.onembmr2*t.sqonembmr2
+    # Compare with new formula in terms of M_m:
+    pofgn_M = (1+r^2-b^2)*t.Mm[n+1]-t.Mm[n+3]
+  end
+  if ~isapprox(convert(Float64,pofgn),convert(Float64,pofgn_M),rtol=1e-2)
+    println("r: ",convert(Float64,r)," b: ",convert(Float64,b)," k^2: ",convert(Float64,t.k2),
+            " P(G_n): ",convert(Float64,pofgn)," new: ",convert(Float64,pofgn_M))
   end
 # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
 # boundary for n > 0.
@@ -316,7 +328,7 @@ if b == 0.0
 else
 # Next, compute k^2 = m:
   t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
-#  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
+  t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
   t.onembpr2 = (1-r-b)*(1+b+r)
   t.k2 = t.onembmr2*t.fourbrinv; 
@@ -381,16 +393,18 @@ if t.n >= 2
     t.dsndr[3] = 2*t.dsndr[1]+detadr
     t.dsndb[3] = 2*t.dsndb[1]+detadb
   else
-    # Compute the J_v and I_v functions:
+    # Compute the J_v, I_v and M_m functions:
     if t.k2 > 0
       if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
     # This computes I_v,J_v for the largest v, and then works down to smaller values:
     #    dIJv_lower_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
         dIJv_lower_dk!(t)
+        Mm_lower!(t)
       else
     # This computes I_0,J_0,J_1, and then works upward to larger v:
       #dIJv_raise_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
         dIJv_raise_dk!(t)
+        Mm_raise!(t)
       end
     end
   
@@ -467,12 +481,28 @@ if t.n >= 2
         dpdb  *= norm
         dpdk  *= norm
       end
+      # Compare with new formula in terms of M_m:
+      pofgn_M = (1+r^2-b^2)*t.Mm[n+1]-t.Mm[n+3]
+      if ~isapprox(convert(Float64,pofgn),convert(Float64,pofgn_M),rtol=1e-2)
+        println("r: ",convert(Float64,r)," b: ",convert(Float64,b)," k^2: ",convert(Float64,t.k2),
+          " P(G_n): ",convert(Float64,pofgn)," new: ",convert(Float64,pofgn_M))
+      end
     # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
     # boundary for n > 0.
     # Compute sn[n]:
       t.sn[n+1] = -pofgn
       t.dsndr[n+1] = -(dpdr+dpdk*dkdr)
+      # Compare dP(G_n)/dr with new formula:
+      dpdr_M = -2*r*((n+2)*t.Mm[n+1]-n*t.Mm[n-1])
+      if ~isapprox(t.dsndr[n+1],dpdr_M,rtol=1e-2)
+        println("n: ",n," dP/dr: ",t.dsndr[n+1]," new: ",dpdr_M," ratio: ",t.dsndr[n+1]/dpdr_M)
+      end
       t.dsndb[n+1] = -(dpdb+dpdk*dkdb)
+      dpdb_M = -n/b*((t.Mm[n+1]-t.Mm[n-1])*(r2+b2)+(b2-r2)^2*t.Mm[n-1])
+      if ~isapprox(t.dsndb[n+1],dpdb_M,rtol=1e-2)
+        println("r: ",r," b: ",b," n: ",n," dP/db: ",t.dsndb[n+1]," new: ",dpdb_M," ratio: ",t.dsndb[n+1]/dpdb_M)
+        println("Mm[n]: ",t.Mm[n+1]," Mm[n-2]: ",t.Mm[n-1])
+      end
     end
   end
 end
