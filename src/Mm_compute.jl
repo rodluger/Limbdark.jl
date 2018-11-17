@@ -74,7 +74,9 @@ else
   t.Mm[4] = t.sqonembmr2^3*t.twothird*cel_bulirsch(t.k2inv,kc,one(T),lam+mu,lam+mu*(1.0-t.k2inv))
 end
 @inbounds for m=4:m_max
-  t.Mm[m+1]=2*(1-1/m)*(1-r^2-b^2)*t.Mm[m-1]-(1-2/m)*t.onembmr2*t.onembpr2*t.Mm[m-3]
+  # I need to replace the onembmr2 and onembpr2 with more accurate expression:
+#  t.Mm[m+1]=2*(1-1/m)*(1-r^2-b^2)*t.Mm[m-1]-(1-2/m)*t.onembmr2*t.onembpr2*t.Mm[m-3]
+  t.Mm[m+1]=2*(1-1/m)*(1-r^2-b^2)*t.Mm[m-1]+(1-2/m)*t.sqarea*t.Mm[m-3]
 end
 return
 end
@@ -90,7 +92,8 @@ Mm_series!(t)
 # Now iterate downwards:
 @inbounds for m=m_max-4:-1:0
   # I need to speed up the following line by reusing former computations:
-  t.Mm[m+1]=((m+4)*t.Mm[m+5]-2*(m+3)*(1-r^2-b^2)*t.Mm[m+3])/((1-(b-r)^2)*((b+r)^2-1)*(m+2))
+#  t.Mm[m+1]=((m+4)*t.Mm[m+5]-2*(m+3)*(1-r^2-b^2)*t.Mm[m+3])/((1-(b-r)^2)*((b+r)^2-1)*(m+2))
+  t.Mm[m+1]=((m+4)*t.Mm[m+5]-2*(m+3)*(1-r^2-b^2)*t.Mm[m+3])/(t.sqarea*(m+2))
 end
 return t.Mm
 end

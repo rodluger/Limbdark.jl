@@ -64,7 +64,7 @@ end
 # Now, compute light curves and plot:
 
 npts = 1000
-iu = 30
+iu = 25
 u_n = ones(iu) / iu
 b0 = zeros(npts)
 for i=1:npts

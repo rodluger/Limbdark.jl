@@ -105,6 +105,7 @@ else
   t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
   t.onembpr2 = (1-r-b)*(1+b+r)
+  t.sqarea = sqarea_triangle(one(T),r,b)
 #  t.k2 = t.onembmr2*t.fourbrinv
   t.k2 = t.onembpr2*t.fourbrinv+1
   if t.k2 > 0
@@ -202,8 +203,6 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
       pofgn += coeff*((r-b)*t.Iv[n0-i+1]+2b*t.Iv[n0-i+2])
     end
     pofgn *= 2r
-    # Compare with new formula in terms of M_m:
-    pofgn_M = (1+r^2-b^2)*t.Mm[n+1]-t.Mm[n+3]
   else
 # Now do the same for odd N_c in sum over J_v:
     n0 = convert(Int64,(n-3)/2)
@@ -216,17 +215,20 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
       pofgn += coeff*((r-b)*t.Jv[n0-i+1]+2b*t.Jv[n0-i+2])
     end
     pofgn *= 2r*t.onembmr2*t.sqonembmr2
-    # Compare with new formula in terms of M_m:
-    pofgn_M = (1+r^2-b^2)*t.Mm[n+1]-t.Mm[n+3]
   end
-  if ~isapprox(convert(Float64,pofgn),convert(Float64,pofgn_M),rtol=1e-2)
-    println("r: ",convert(Float64,r)," b: ",convert(Float64,b)," k^2: ",convert(Float64,t.k2),
-            " P(G_n): ",convert(Float64,pofgn)," new: ",convert(Float64,pofgn_M))
-  end
+  # Compare with new formula in terms of M_m:
+  #pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
+#  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+(1-(b-r)^2)*((b+r)^2-1)*t.Mm[n-1])
+  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
+#  if ~isapprox(convert(Float64,pofgn),convert(Float64,pofgn_M),rtol=1e-2)
+#    println("r: ",convert(Float64,r)," b: ",convert(Float64,b)," k^2: ",convert(Float64,t.k2),
+#            " P(G_n): ",convert(Float64,pofgn)," new: ",convert(Float64,pofgn_M))
+#  end
 # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
 # boundary for n > 0.
 # Compute sn[n]:
   t.sn[n+1] = -pofgn
+#  t.sn[n+1] = -pofgn_M
   flux += t.c_n[n+1]*t.sn[n+1]
 end
 # That's it!
@@ -331,6 +333,7 @@ else
   t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
   t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
   t.onembpr2 = (1-r-b)*(1+b+r)
+  t.sqarea = sqarea_triangle(one(T),r,b)
   t.k2 = t.onembmr2*t.fourbrinv; 
   if t.k2 > 0
     t.k = sqrt(t.k2)
@@ -482,27 +485,32 @@ if t.n >= 2
         dpdk  *= norm
       end
       # Compare with new formula in terms of M_m:
-      pofgn_M = (1+r^2-b^2)*t.Mm[n+1]-t.Mm[n+3]
-      if ~isapprox(convert(Float64,pofgn),convert(Float64,pofgn_M),rtol=1e-2)
-        println("r: ",convert(Float64,r)," b: ",convert(Float64,b)," k^2: ",convert(Float64,t.k2),
-          " P(G_n): ",convert(Float64,pofgn)," new: ",convert(Float64,pofgn_M))
-      end
+#      pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
+#      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r2-b2)*t.Mm[n+1]+t.kite_area2^2*t.Mm[n-1])
+      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r2-b2)*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
+#      if ~isapprox(convert(Float64,pofgn),convert(Float64,pofgn_M),rtol=1e-2)
+#        println("n: ",n,"r: ",convert(Float64,r)," b: ",convert(Float64,b)," k^2: ",convert(Float64,t.k2),
+#          " P(G_n): ",convert(Float64,pofgn)," new: ",convert(Float64,pofgn_M))
+#      end
     # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
     # boundary for n > 0.
     # Compute sn[n]:
       t.sn[n+1] = -pofgn
+#      t.sn[n+1] = -pofgn_M
       t.dsndr[n+1] = -(dpdr+dpdk*dkdr)
       # Compare dP(G_n)/dr with new formula:
       dpdr_M = -2*r*((n+2)*t.Mm[n+1]-n*t.Mm[n-1])
-      if ~isapprox(t.dsndr[n+1],dpdr_M,rtol=1e-2)
-        println("n: ",n," dP/dr: ",t.dsndr[n+1]," new: ",dpdr_M," ratio: ",t.dsndr[n+1]/dpdr_M)
-      end
+#      if ~isapprox(t.dsndr[n+1],dpdr_M,rtol=1e-2)
+#        println("n: ",n," dP/dr: ",t.dsndr[n+1]," new: ",dpdr_M," ratio: ",t.dsndr[n+1]/dpdr_M)
+#      end
+#      t.dsndr[n+1] = dpdr_M
       t.dsndb[n+1] = -(dpdb+dpdk*dkdb)
       dpdb_M = -n/b*((t.Mm[n+1]-t.Mm[n-1])*(r2+b2)+(b2-r2)^2*t.Mm[n-1])
-      if ~isapprox(t.dsndb[n+1],dpdb_M,rtol=1e-2)
-        println("r: ",r," b: ",b," n: ",n," dP/db: ",t.dsndb[n+1]," new: ",dpdb_M," ratio: ",t.dsndb[n+1]/dpdb_M)
-        println("Mm[n]: ",t.Mm[n+1]," Mm[n-2]: ",t.Mm[n-1])
-      end
+#      if ~isapprox(t.dsndb[n+1],dpdb_M,rtol=1e-2)
+#        println("r: ",r," b: ",b," n: ",n," dP/db: ",t.dsndb[n+1]," new: ",dpdb_M," ratio: ",t.dsndb[n+1]/dpdb_M)
+#        println("Mm[n]: ",t.Mm[n+1]," Mm[n-2]: ",t.Mm[n-1])
+#      end
+#      t.dsndb[n+1] = dpdb_M
     end
   end
 end
