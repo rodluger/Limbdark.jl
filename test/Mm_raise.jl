@@ -1,5 +1,6 @@
 include("../src/cel_bulirsch.jl")
 include("../src/transit_structure.jl")
+include("../src/transit_poly_struct.jl")
 include("../src/Mm_compute.jl")
 using QuadGK
 
@@ -29,14 +30,19 @@ for i=1:nb
   b0 = maximum([1e-8,r-1])
   b = b0+i/nb*(1+r-b0)
   t.r = r; t.b = b; t.fourbr = 4*b*r; t.sqbr = sqrt(b*r)
+  t.sqarea = sqarea_triangle(1.0,r,b)
   t.onembmr2 = (1.0-(r-b)^2); t.onembpr2 = 1.0-(b+r)^2
   t.sqonembmr2 = sqrt(t.onembmr2)
   t.k2 = t.onembmr2/t.fourbr; 
   if t.k2 < 1.0
     println("k2: ",t.k2)
     t.k2inv=inv(t.k2); t.kc = sqrt(1.0-t.k2); t.k = sqrt(t.k2); t.kap0 = 2*asin(t.k)
+    t.Eofk = cel_bulirsch(t.k2,t.kc,1.0,1.0,1.0-t.k2)
+    t.Em1mKdm = cel_bulirsch(t.k2,t.kc,1.0,1.0,0.0)
   else
     t.k2inv=inv(t.k2); t.kc = sqrt(1.0-t.k2inv); t.k = sqrt(t.k2); t.kap0 = pi
+    t.Eofk = cel_bulirsch(t.k2inv,t.kc,1.0,1.0,1.0-t.k2inv)
+    t.Em1mKdm = cel_bulirsch(t.k2inv,t.kc,1.0,1.0,0.0)
   end
   Mm_raise!(t)
   Mmr .= t.Mm

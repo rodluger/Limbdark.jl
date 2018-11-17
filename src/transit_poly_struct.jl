@@ -228,7 +228,7 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
 # boundary for n > 0.
 # Compute sn[n]:
   t.sn[n+1] = -pofgn
-#  t.sn[n+1] = -pofgn_M
+  t.sn[n+1] = -pofgn_M
   flux += t.c_n[n+1]*t.sn[n+1]
 end
 # That's it!
@@ -496,14 +496,14 @@ if t.n >= 2
     # boundary for n > 0.
     # Compute sn[n]:
       t.sn[n+1] = -pofgn
-#      t.sn[n+1] = -pofgn_M
+      t.sn[n+1] = -pofgn_M
       t.dsndr[n+1] = -(dpdr+dpdk*dkdr)
       # Compare dP(G_n)/dr with new formula:
       dpdr_M = -2*r*((n+2)*t.Mm[n+1]-n*t.Mm[n-1])
 #      if ~isapprox(t.dsndr[n+1],dpdr_M,rtol=1e-2)
 #        println("n: ",n," dP/dr: ",t.dsndr[n+1]," new: ",dpdr_M," ratio: ",t.dsndr[n+1]/dpdr_M)
 #      end
-#      t.dsndr[n+1] = dpdr_M
+      t.dsndr[n+1] = dpdr_M
       t.dsndb[n+1] = -(dpdb+dpdk*dkdb)
       dpdb_M = -n/b*((t.Mm[n+1]-t.Mm[n-1])*(r2+b2)+(b2-r2)^2*t.Mm[n-1])
 #      if ~isapprox(t.dsndb[n+1],dpdb_M,rtol=1e-2)

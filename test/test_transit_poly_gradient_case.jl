@@ -68,7 +68,7 @@ for i=1:length(r0)
       println("dfdrbu: ",dfdrbu)
       println("tp_grad_array: ",tp_grad_array)
       println("norm(x-y): ",norm(dfdrbu-tp_grad_array))
-      read(STDIN,Char)
+#      read(STDIN,Char)
     end
     @test isapprox(dfdrbu,dfdrbu_big,atol=1e-8)
   end

@@ -57,21 +57,25 @@ r=t.r; b=t.b; m_max=t.m_max; k2 = t.k2; kc = t.kc; t.k2inv = inv(t.k2)
 if k2 < 1.0
   t.Mm[1] = t.kap0
   #  I need to eliminate cel_bulirsch call from the following:
-  t.Mm[2] = 2*t.sqbr*2*k2*cel_bulirsch(k2,kc,one(T),one(T),zero(T))
+#  t.Mm[2] = 2*t.sqbr*2*k2*cel_bulirsch(k2,kc,one(T),one(T),zero(T))
+  t.Mm[2] = 2*t.sqbr*2*k2*t.Em1mKdm
   # I need to reuse prior computations:
-  t.Mm[3] = t.Mm[1]*(1.0-r^2-b^2)+sqrt((1-(r-b)^2)*((b+r)^2-1))
-#  Mm[3] = Mm[1]*(1.0-r^2-b^2)+t.kite_area2
+#  t.Mm[3] = t.Mm[1]*(1.0-r^2-b^2)+sqrt((1-(r-b)^2)*((b+r)^2-1))
+  t.Mm[3] = t.Mm[1]*(1.0-r^2-b^2)+t.kite_area2
   mu = (4*k2-2); lam = (3*k2-2)*(k2-1)
   #  I need to eliminate cel_bulirsch call from the following:
-  t.Mm[4] = (2*t.sqbr)^3*t.twothird*cel_bulirsch(k2,kc,one(T),lam+mu,lam+mu*(1.0-k2))
+#  t.Mm[4] = (2*t.sqbr)^3*t.twothird*cel_bulirsch(k2,kc,one(T),lam+mu,lam+mu*(1.0-k2))
+  t.Mm[4] = (2*t.sqbr)^3*t.twothird*(k2*t.Eofk+k2*(3*k2-2)*t.Em1mKdm)
 else
   t.Mm[1] = pi
   #  I need to eliminate cel_bulirsch call from the following:
-  t.Mm[2] = 2*sqrt(1-(r-b)^2)*cel_bulirsch(t.k2inv,kc,one(T),one(T),1.0-t.k2inv)
+#  t.Mm[2] = 2*sqrt(1-(r-b)^2)*cel_bulirsch(t.k2inv,kc,one(T),one(T),1.0-t.k2inv)
+  t.Mm[2] = 2*sqrt(1-(r-b)^2)*t.Eofk
   t.Mm[3] = pi*(1-r^2-b^2)
   #  I need to eliminate cel_bulirsch call from the following:
   mu = 2*(2-t.k2inv); lam = t.k2inv-1.0
-  t.Mm[4] = t.sqonembmr2^3*t.twothird*cel_bulirsch(t.k2inv,kc,one(T),lam+mu,lam+mu*(1.0-t.k2inv))
+#  t.Mm[4] = t.sqonembmr2^3*t.twothird*cel_bulirsch(t.k2inv,kc,one(T),lam+mu,lam+mu*(1.0-t.k2inv))
+  t.Mm[4] = t.sqonembmr2^3*t.twothird*((3-2*t.k2inv)*t.Eofk+t.k2inv*t.Em1mKdm)
 end
 @inbounds for m=4:m_max
   # I need to replace the onembmr2 and onembpr2 with more accurate expression:
