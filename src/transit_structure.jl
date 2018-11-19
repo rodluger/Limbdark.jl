@@ -73,7 +73,7 @@ else
 end
 # Maximum number of M_m integrals is n+2:
 m_max = n+2
-nmax = 50
+nmax = 100
 trans = Transit_Struct{T}(r,b,u_n,n,v_max,m_max,
   zeros(T,n+1),    # c_n
   zeros(T,n+1),    # sn
