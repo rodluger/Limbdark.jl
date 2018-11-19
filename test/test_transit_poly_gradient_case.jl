@@ -1,5 +1,3 @@
-using LinearAlgebra  # for norm function
-
 function test_transit_poly_gradient_case(u_n,test_name)
 
 r0 = [0.01,.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]; n_u = length(u_n)

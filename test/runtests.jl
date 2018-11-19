@@ -1,5 +1,6 @@
 if VERSION >= v"0.7"
   using Test
+  using LinearAlgebra
 else
   using Base.Test
   include("random.jl")
