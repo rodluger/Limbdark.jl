@@ -8,7 +8,7 @@ r0_name =["0.01","0.1","0.5","0.99","1","1.01","2","10","100"]
 #r0_name =["1"]
 nb = 50
 
-epsilon = 1e-12; delta = 1e-3
+epsilon = 1e-9; delta = 1e-3
 dfdrbu = zeros(n_u+2)
 dfdrbu_big = zeros(BigFloat,n_u+2)
 label_name=["r","b","u_1","u_2","u_3","u_4","u_5","u_6","u_7","u_8","u_9","u_10","u_11","u_12","u_13"]
@@ -60,6 +60,7 @@ for i=1:length(r0)
     tp = transit_poly!(r,bgrid[j],u_n,dfdrbu)
     tp_grad_grid_ana[j,:] .=dfdrbu
     # Compute derivatives in BigFloat (tests precision of derivatives):
+    bigr = big(r)
     tp_big = transit_poly!(big(r),big(bgrid[j]),big.(u_n),dfdrbu_big)
     tp_grad_grid_big[j,:] .=dfdrbu_big
     @test isapprox(dfdrbu,tp_grad_array,atol=1e-6)
@@ -70,7 +71,13 @@ for i=1:length(r0)
       println("norm(x-y): ",norm(dfdrbu-tp_grad_array))
 #      read(STDIN,Char)
     end
-    @test isapprox(dfdrbu,dfdrbu_big,atol=1e-8)
+    @test isapprox(dfdrbu,dfdrbu_big,atol=1e-6)
+    if !isapprox(dfdrbu,dfdrbu_big,atol=1e-6)
+      println("r: ",r," bgrid: ",bgrid[j])
+      println("dfdrbu: ",dfdrbu)
+      println("dfdrbu_big: ",convert(Array{Float64,1},dfdrbu_big))
+      println("norm(x-y): ",norm(dfdrbu-dfdrbu_big))
+    end
   end
   if ~skip_plots
 # Now, make plots:

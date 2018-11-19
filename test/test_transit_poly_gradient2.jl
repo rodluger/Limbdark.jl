@@ -20,7 +20,8 @@ end
 function transit_poly_grad_num(r::T,b::T,u_n::Array{T,1},dq0::T) where {T <: Real}
   dq = big(dq0)
 # Make BigFloat versions of r, b & u_n:
-  r_big = big(r); b_big = big(b); u_big = big.(u_n)
+  r_big = big(r)
+  b_big = big(b); u_big = big.(u_n)
 # Compute flux to BigFloat precision:
   tp=transit_poly(r_big,b_big,u_big)
 # Now, compute finite differences:
@@ -28,6 +29,9 @@ function transit_poly_grad_num(r::T,b::T,u_n::Array{T,1},dq0::T) where {T <: Rea
   tp_plus = transit_poly(r_big+dq,b_big,u_big)
   tp_minus = transit_poly(r_big-dq,b_big,u_big)
   tp_grad_big[1] = (tp_plus-tp_minus)*.5/dq
+  if r == 1.0 && length(u_n) > 2
+    tp_grad_big[1] = (tp_plus-tp)/dq
+  end
   tp_plus = transit_poly(r_big,b_big+dq,u_big)
   if b_big > dq
     tp_minus = transit_poly(r_big,b_big-dq,u_big)
@@ -85,11 +89,11 @@ fgrid3 = test_transit_poly_gradient_case([3.0,-3.0,1.0],"cubic")
 fgridn = test_transit_poly_gradient_case(ones(10)*0.1,"10th order")
 
 if ~skip_plots
-  r0 = [0.01,.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]
+  r0 = [0.01,0.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]
   r0_name =["0.01","0.1","0.5","0.99","1","1.01","2","10","100"]
   nb = 50
 
-  epsilon = 1e-12; delta = 1e-3
+  epsilon = 1e-9; delta = 1e-3
   fig,axes = subplots(3,3)
   for i=1:length(r0)
     global r=r0[i]

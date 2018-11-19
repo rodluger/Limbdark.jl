@@ -42,6 +42,7 @@ mutable struct Transit_Struct{T}
   onembmr2:: T           # 1-(b-r)^2
   onembpr2:: T           # 1-(b+r)^2
   onembmr2inv :: T       # 1/(1-(b-r)^2)
+  onemr2mb2   :: T       # 1-r^2-b^2
   sqonembmr2  :: T       # sqrt(1-(b-r)^2)
   fourbr  :: T           # 4*b*r
   sqbr    :: T           # sqrt(b*r)
@@ -110,6 +111,7 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,m_max,
   zero(T),         # 1-(b-r)^2
   zero(T),         # 1-(b+r)^2
   zero(T),         # 1/(1-(b-r)^2)
+  zero(T),         # 1-r^2-b^2
   zero(T),         # sqrt(1-(b-r)^2)
   zero(T),         # 4*b*r
   zero(T),	   # sqrt(b*r)

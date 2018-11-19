@@ -75,7 +75,7 @@ function transit_poly_c(t::Transit_Struct{T}) where {T <: Real}
 # for which we have a solution in terms of I_v (for even n) and J_v (for odd n).
 # The variable "t" is a structure which contains transit parameters
 # and intermediate quantities computed from these:
-r=t.r; b=t.b; n = t.n; r2=r*r
+r=t.r; b=t.b; n = t.n; r2=r*r; b2 = b*b
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
 # this is a different vector than the Starry case:
 
@@ -108,6 +108,7 @@ else
   t.sqarea = sqarea_triangle(one(T),r,b)
 #  t.k2 = t.onembmr2*t.fourbrinv
   t.k2 = t.onembpr2*t.fourbrinv+1
+  t.onemr2mb2 = (1.0-r)*(1.0+r)-b2
   if t.k2 > 0
     t.k = sqrt(t.k2)
   else
@@ -158,7 +159,6 @@ end
 # Special case of quadratic limb-darkening:
 if t.n == 2
 # Transformed expressions from Mandel & Agol:
-  r2=r*r; b2=b*b
   eta2 = 0.5*r2*(r2+2*b2)
   if t.k2 > 1
     four_pi_eta = 4pi*eta2
@@ -229,6 +229,11 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
 # Compute sn[n]:
   t.sn[n+1] = -pofgn
   t.sn[n+1] = -pofgn_M
+  if t.b <= 1e-6 && r < 1
+    # Use analytic formula near b=0:
+    t.sqrt1mr2 = sqrt(1-r2)
+    t.sn[n+1] = -pi/2*r2*t.sqrt1mr2^(n-4)*(4*(1-r2)^2+n*b2*((2+n)*r2-4))
+  end
   flux += t.c_n[n+1]*t.sn[n+1]
 end
 # That's it!
@@ -335,6 +340,7 @@ else
   t.onembpr2 = (1-r-b)*(1+b+r)
   t.sqarea = sqarea_triangle(one(T),r,b)
   t.k2 = t.onembmr2*t.fourbrinv; 
+  t.onemr2mb2 = (1.0-r)*(1.0+r)-b2
   if t.k2 > 0
     t.k = sqrt(t.k2)
   else
@@ -379,7 +385,7 @@ end
 if t.n >= 2
   if t.n == 2
 # Transformed expressions from Mandel & Agol:
-    r2pb2 = (r2+b2)
+    r2pb2 = r2+b2
     eta2 = 0.5*r2*(r2pb2+b2)
     deta2dr =  2*r*r2pb2
     deta2db = 2*b*r2
@@ -487,7 +493,7 @@ if t.n >= 2
       # Compare with new formula in terms of M_m:
 #      pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
 #      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r2-b2)*t.Mm[n+1]+t.kite_area2^2*t.Mm[n-1])
-      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r2-b2)*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
+      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*(t.onemr2mb2*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
 #      if ~isapprox(convert(Float64,pofgn),convert(Float64,pofgn_M),rtol=1e-2)
 #        println("n: ",n,"r: ",convert(Float64,r)," b: ",convert(Float64,b)," k^2: ",convert(Float64,t.k2),
 #          " P(G_n): ",convert(Float64,pofgn)," new: ",convert(Float64,pofgn_M))
@@ -510,7 +516,20 @@ if t.n >= 2
 #        println("r: ",r," b: ",b," n: ",n," dP/db: ",t.dsndb[n+1]," new: ",dpdb_M," ratio: ",t.dsndb[n+1]/dpdb_M)
 #        println("Mm[n]: ",t.Mm[n+1]," Mm[n-2]: ",t.Mm[n-1])
 #      end
-#      t.dsndb[n+1] = dpdb_M
+      t.dsndb[n+1] = dpdb_M
+      # When b is very small and r < 1, we'll use a Taylor-series expansion to O(b^3):
+      if t.b <= 1e-6 && r < 1
+        # Use analytic formula near b=0:
+        t.sqrt1mr2 = sqrt(1-r2)
+        t.sn[n+1] = -pi/2*r2*t.sqrt1mr2^(n-4)*(4*(1-r2)^2+n*b2*((2+n)*r2-4))
+        t.dsndr[n+1] = 0.5*pi*r*t.sqrt1mr2^(n-6)*(4*(1-r2)^2*((2+n)*r2-2)+
+                         n*b2*(8-8*n*r2+n*(2+n)*r2*r2))
+        t.dsndb[n+1] = pi*r2*n*b*t.sqrt1mr2^(n-4)*(4-(2+n)*r2)
+      end
+      # Handle r=1, n=2 case for small b values:
+      if t.b <= 1e-8 && r == 1.0 && n == 2
+        t.dsndb[n+1] = -4.0
+      end
     end
   end
 end
