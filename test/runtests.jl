@@ -11,7 +11,8 @@ include("test_cel_vec.jl")
 include("test_s2_gradient.jl")
 include("test_transit_poly.jl")
 
-include("test_IJv_derivative.jl")
+#include("test_IJv_derivative.jl")
+#include("test_Mm.jl")
 #include("test_sn_jacobian2.jl")
 
 skip_plots = false

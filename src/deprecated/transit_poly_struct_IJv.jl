@@ -4,6 +4,8 @@ include("define_constants.jl")
 include("transit_structure.jl")
 # Include code which computes linear limb-darkening term:
 include("s2.jl")
+# Include code which computes I_v, J_v, and derivatives wrt k:
+include("IJv_derivative_struct.jl")
 # Include code which computes M_m:
 include("Mm_compute.jl")
 
@@ -70,7 +72,7 @@ function transit_poly_c(t::Transit_Struct{T}) where {T <: Real}
 # while g_{0} = c_0 z^0 (uniform source) and g_{1} = c_1 z^1 (linear limb-darkening)
 # which gives a Green's integral of:
 # P(G_n) = \int_{\pi-\phi}^{2\pi+\phi} (1-r^2-b^2-2br s_\varphi)^{n/2} (r+b s_\varphi) d\varphi
-# for which we have a solution in terms of M_m.
+# for which we have a solution in terms of I_v (for even n) and J_v (for odd n).
 # The variable "t" is a structure which contains transit parameters
 # and intermediate quantities computed from these:
 r=t.r; b=t.b; n = t.n; r2=r*r; b2 = b*b
@@ -169,14 +171,17 @@ if t.n == 2
   return flux
 end
 
-# Compute the M_m functions:
+# Compute the J_v, I_v, and M_m functions:
 if t.k2 > 0
-#  if (t.k2 < 0.5 || t.k2 > 250.0) && t.n > 3
-  if (t.k2 < 0.5) && t.n > 3
-# This computes M_m for the largest four m, and then works down to smaller values:
+  if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
+# This computes I_v,J_v for the largest v, and then works down to smaller values:
+#    IJv_lower!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+    IJv_lower!(t)
     Mm_lower!(t)
   else
-# This computes Mm for m=0 to 3, and then works upward to larger m:
+# This computes I_0,J_0,J_1, and then works upward to larger v:
+#    IJv_raise!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+    IJv_raise!(t)
     Mm_raise!(t)
   end
 end
@@ -185,12 +190,44 @@ end
 flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
 # Next, loop over the Green's function components:
 @inbounds for n=2:t.n
+  pofgn = zero(T)
+  if iseven(n)
+# For even values of n, sum over I_v:
+    n0 = convert(Int64,n/2)
+    coeff = (-t.fourbr)^n0
+    # Compute i=0 term
+    pofgn = coeff*((r-b)*t.Iv[n0+1]+2b*t.Iv[n0+2])
+# For even n, compute coefficients for the sum over I_v:
+    @inbounds for i=1:n0
+      coeff *= -(n0-i+1)/i*t.k2
+      pofgn += coeff*((r-b)*t.Iv[n0-i+1]+2b*t.Iv[n0-i+2])
+    end
+    pofgn *= 2r
+  else
+# Now do the same for odd N_c in sum over J_v:
+    n0 = convert(Int64,(n-3)/2)
+    coeff = (-t.fourbr)^n0
+    # Compute i=0 term
+    pofgn = coeff*((r-b)*t.Jv[n0+1]+2b*t.Jv[n0+2])
+# For odd n, compute coefficients for the sum over J_v:
+    @inbounds for i=1:n0
+      coeff *= -(n0-i+1)/i*t.k2
+      pofgn += coeff*((r-b)*t.Jv[n0-i+1]+2b*t.Jv[n0-i+2])
+    end
+    pofgn *= 2r*t.onembmr2*t.sqonembmr2
+  end
+  # Compare with new formula in terms of M_m:
   #pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
 #  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+(1-(b-r)^2)*((b+r)^2-1)*t.Mm[n-1])
   pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
+#  if ~isapprox(convert(Float64,pofgn),convert(Float64,pofgn_M),rtol=1e-2)
+#    println("r: ",convert(Float64,r)," b: ",convert(Float64,b)," k^2: ",convert(Float64,t.k2),
+#            " P(G_n): ",convert(Float64,pofgn)," new: ",convert(Float64,pofgn_M))
+#  end
 # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
 # boundary for n > 0.
 # Compute sn[n]:
+  t.sn[n+1] = -pofgn
   t.sn[n+1] = -pofgn_M
   if t.b <= 1e-6 && r < 1
     # Use analytic formula near b=0:
@@ -259,7 +296,7 @@ r = t.r; b=t.b; n = t.n; r2 =r*r; b2=b*b
 # while g_{0} = c_0 z^0 (uniform source) and g_{1} = c_1 z^1 (linear limb-darkening)
 # which gives a Green's integral of:
 # P(G_n) = \int_{\pi-\phi}^{2\pi+\phi} (1-r^2-b^2-2br s_\varphi)^{n/2} (r+b s_\varphi) d\varphi
-# for which we have a solution in terms of M_m.
+# for which we have a solution in terms of I_v (for even n) and J_v (for odd n).
 # Compute the derivative of the flux with respect to the different coefficients.
 
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
@@ -334,6 +371,7 @@ end
 # Compute uniform case:
 compute_uniform!(t)
 
+# Compute the highest value of v in J_v or I_v that we need:
 # Compute sn[2] and its derivatives:
 #s2!(t)
 if t.n >= 1
@@ -364,32 +402,121 @@ if t.n >= 2
     t.dsndr[3] = 2*t.dsndr[1]+detadr
     t.dsndb[3] = 2*t.dsndb[1]+detadb
   else
-    # Compute the M_m functions:
+    # Compute the J_v, I_v and M_m functions:
     if t.k2 > 0
-#      if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
-      if (t.k2 < 0.5) && t.n > 3
-    # This computes Mm for largest four m, and then works down to smaller values:
+      if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
+    # This computes I_v,J_v for the largest v, and then works down to smaller values:
+    #    dIJv_lower_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+        dIJv_lower_dk!(t)
         Mm_lower!(t)
       else
-    # This computes Mm and then works upward to larger m:
+    # This computes I_0,J_0,J_1, and then works upward to larger v:
+      #dIJv_raise_dk!(t.k2,t.kck,t.kc,t.kap,t.Eofk,t.Em1mKdm,t)
+        dIJv_raise_dk!(t)
         Mm_raise!(t)
       end
     end
   
     rinv = inv(r); binv = inv(b); rmb_on_onembmr2=(r-b)*t.onembmr2inv
     # Next, loop over the Green's function components:
+    Iv1 = zero(T); Iv2=zero(T); Jv1=zero(T); Jv2=zero(T)
+    nmi = zero(Int64); fac1 = zero(T)
     @inbounds for n=2:t.n
+      pofgn = zero(T)
+      dpdr = zero(T)
+      dpdb = zero(T)
+      dpdk = zero(T)
+      if iseven(n)
+    # For even values of n, sum over I_v:
+        n0 = convert(Int64,n/2)
+        coeff = (-t.fourbr)^n0
+        # Compute i=0 term
+        Iv1 = t.Iv[n0+1]; Iv2 = t.Iv[n0+2]
+        pofgn = coeff*((r-b)*Iv1+2b*Iv2)
+        dpdr = coeff*Iv1
+        dpdb = coeff*(-Iv1+2*Iv2)
+        dpdr += (n0+1)*pofgn*rinv
+        dpdb += n0*pofgn*binv
+        k2n = coeff
+    # For even n, compute coefficients for the sum over I_v:
+        @inbounds for i=1:n0
+          nmi = n0-i+1
+          Iv2 = Iv1; Iv1 = t.Iv[nmi]
+          k2n *= -t.k2
+          coeff = t.bincoeff[i+1,n0]*k2n
+          term =  coeff*((r-b)*Iv1+2b*Iv2)
+          pofgn += term
+          dpdr += coeff*Iv1
+          dpdb += coeff*(-Iv1+2.0*Iv2)
+          fac1 = i*2.0*rmb_on_onembmr2
+          dpdr += term*(-fac1+nmi*rinv)
+          dpdb += term*( fac1+(nmi-1.0)*binv)
+        end
+        pofgn *= 2r
+        dpdr *= 2r
+        dpdb *= 2r
+      else
+    # Now do the same for odd N_c in sum over J_v:
+        n0 = convert(Int64,(n-3)/2)
+        coeff = (-t.fourbr)^n0
+        # Compute i=0 term
+        Jv1 = t.Jv[n0+1]; Jv2 = t.Jv[n0+2]
+        pofgn = coeff*((r-b)*Jv1+2b*Jv2)
+        dpdr = coeff*Jv1
+        dpdb = coeff*(-Jv1+2*Jv2)
+        dpdr  += pofgn*(-3*rmb_on_onembmr2+(n0+1)*rinv)
+        dpdb  += pofgn*( 3*rmb_on_onembmr2+n0*binv)
+        dpdk = coeff*((r-b)*t.dJvdk[n0+1]+2b*t.dJvdk[n0+2])
+    # For even n, compute coefficients for the sum over I_v:
+        k2n = coeff
+        @inbounds for i=1:n0
+          nmi = n0-i+1
+          #coeff *= -nmi/i*t.k2
+          k2n *= -t.k2
+          coeff = t.bincoeff[i+1,n0]*k2n
+          Jv2 = Jv1; Jv1 = t.Jv[nmi]
+          term = coeff*((r-b)*Jv1+2b*Jv2)
+          pofgn += term
+          dpdr  +=  coeff*Jv1
+          dpdb  +=  coeff*(-Jv1+2.0*Jv2)
+          fac1 = (i*2.0+3.0)*rmb_on_onembmr2
+          dpdr  += term*(-fac1+nmi*rinv)
+          dpdb  += term*( fac1+(nmi-1.0)*binv)
+          dpdk  += coeff*((r-b)*t.dJvdk[nmi]+2b*t.dJvdk[nmi+1])
+        end
+        norm = 2r*t.onembmr2*t.sqonembmr2
+        pofgn *= norm
+        dpdr  *= norm
+        dpdb  *= norm
+        dpdk  *= norm
+      end
+      # Compare with new formula in terms of M_m:
 #      pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
 #      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r2-b2)*t.Mm[n+1]+t.kite_area2^2*t.Mm[n-1])
       pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*(t.onemr2mb2*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
+#      if ~isapprox(convert(Float64,pofgn),convert(Float64,pofgn_M),rtol=1e-2)
+#        println("n: ",n,"r: ",convert(Float64,r)," b: ",convert(Float64,b)," k^2: ",convert(Float64,t.k2),
+#          " P(G_n): ",convert(Float64,pofgn)," new: ",convert(Float64,pofgn_M))
+#      end
     # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
     # boundary for n > 0.
     # Compute sn[n]:
+      t.sn[n+1] = -pofgn
       t.sn[n+1] = -pofgn_M
-      dpdr_M = 2*r*((n+2)*t.Mm[n+1]-n*t.Mm[n-1])
-      t.dsndr[n+1] = -dpdr_M
-      dpdb_M = n/b*((t.Mm[n+1]-t.Mm[n-1])*(r2+b2)+(b2-r2)^2*t.Mm[n-1])
-      t.dsndb[n+1] = -dpdb_M
+      t.dsndr[n+1] = -(dpdr+dpdk*dkdr)
+      # Compare dP(G_n)/dr with new formula:
+      dpdr_M = -2*r*((n+2)*t.Mm[n+1]-n*t.Mm[n-1])
+#      if ~isapprox(t.dsndr[n+1],dpdr_M,rtol=1e-2)
+#        println("n: ",n," dP/dr: ",t.dsndr[n+1]," new: ",dpdr_M," ratio: ",t.dsndr[n+1]/dpdr_M)
+#      end
+      t.dsndr[n+1] = dpdr_M
+      t.dsndb[n+1] = -(dpdb+dpdk*dkdb)
+      dpdb_M = -n/b*((t.Mm[n+1]-t.Mm[n-1])*(r2+b2)+(b2-r2)^2*t.Mm[n-1])
+#      if ~isapprox(t.dsndb[n+1],dpdb_M,rtol=1e-2)
+#        println("r: ",r," b: ",b," n: ",n," dP/db: ",t.dsndb[n+1]," new: ",dpdb_M," ratio: ",t.dsndb[n+1]/dpdb_M)
+#        println("Mm[n]: ",t.Mm[n+1]," Mm[n-2]: ",t.Mm[n-1])
+#      end
+      t.dsndb[n+1] = dpdb_M
       # When b is very small and r < 1, we'll use a Taylor-series expansion to O(b^3):
       if t.b <= 1e-6 && r < 1
         # Use analytic formula near b=0:

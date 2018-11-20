@@ -9,7 +9,7 @@ end
 using Random
 Random.seed!(42)
 
-@testset "transit_poly" begin
+#@testset "transit_poly" begin
 
 # Now, integrate by hand:
 function transit_poly_int(r,b,u,ns)
@@ -64,7 +64,7 @@ end
 # Now, compute light curves and plot:
 
 npts = 1000
-iu = 25
+iu = 30
 u_n = ones(iu) / iu
 b0 = zeros(npts)
 for i=1:npts
@@ -93,4 +93,4 @@ plot(b0,lc_num, linewidth=1, label="Numeric")
 println("Maximum difference of lightcurve for N=",iu,": ",maximum(abs,lc_ana-lc_num))
 @test isapprox(lc_ana,lc_num,atol=1e-5)
 
-end
+#end
