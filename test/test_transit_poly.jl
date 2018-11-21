@@ -57,8 +57,8 @@ for i=1:length(r0)
   @time flux = transit_poly!(trans)
   f_num = transit_poly_int(r0[i],b0[i],u,ns)
   @time f_num = transit_poly_int(r0[i],b0[i],u,ns)
-  @test isapprox(f_num,flux,atol=1e-5)
   println("r: ",r0[i]," b: ",b0[i]," f_an: ",flux," f_num: ",f_num," diff: ",flux-f_num)
+  @test isapprox(f_num,flux,atol=1e-5)
 end
 
 # Now, compute light curves and plot:

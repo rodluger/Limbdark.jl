@@ -21,7 +21,8 @@ if b <= 1-r  # k^2 > 1
   t.kap0 = convert(T,pi); t.kck = zero(T)
 else
   # Twice area of kite-shaped region connecting centers of circles & intersection points:
-  t.kite_area2 = sqrt(sqarea_triangle(one(T),b,r)) 
+#  t.kite_area2 = sqrt(sqarea_triangle(one(T),b,r)) 
+  t.kite_area2 = sqrt(t.sqarea)
   # Angle of section for occultor:
   t.kap0  = atan(t.kite_area2,(r-1)*(r+1)+b2)
   # Angle of section for source:
@@ -185,9 +186,13 @@ end
 flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
 # Next, loop over the Green's function components:
 @inbounds for n=2:t.n
-  #pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
+#  pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
+#  pofgn_M = t.onemr2mb2*t.Mm[n+1]-t.Mm[n+3]
 #  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+(1-(b-r)^2)*((b+r)^2-1)*t.Mm[n-1])
-  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
+#  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
+#  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
+#  pofgn_M = 2*r2*t.Mm[n+1]-n/(n+2)*(t.onemr2mb2*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
+  pofgn_M = 2*r2*t.Mm[n+1]-n*t.minv[n+2]*(t.onemr2mb2*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
 # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
 # boundary for n > 0.
 # Compute sn[n]:
@@ -195,7 +200,7 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
   if t.b <= 1e-6 && r < 1
     # Use analytic formula near b=0:
     t.sqrt1mr2 = sqrt(1-r2)
-    t.sn[n+1] = -pi/2*r2*t.sqrt1mr2^(n-4)*(4*(1-r2)^2+n*b2*((2+n)*r2-4))
+    t.sn[n+1] = -0.5*pi*r2*t.sqrt1mr2^(n-4)*(4*(1-r2)^2+n*b2*((2+n)*r2-4))
   end
   flux += t.c_n[n+1]*t.sn[n+1]
 end
@@ -376,25 +381,28 @@ if t.n >= 2
       end
     end
   
-    rinv = inv(r); binv = inv(b); rmb_on_onembmr2=(r-b)*t.onembmr2inv
     # Next, loop over the Green's function components:
+    binv = inv(b)
     @inbounds for n=2:t.n
 #      pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
+#      pofgn_M = t.onemr2mb2*t.Mm[n+1]-t.Mm[n+3]
 #      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r2-b2)*t.Mm[n+1]+t.kite_area2^2*t.Mm[n-1])
-      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*(t.onemr2mb2*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
+#      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*(t.onemr2mb2*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
+#      pofgn_M = 2*r2*t.Mm[n+1]-n/(n+2)*(t.onemr2mb2*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
+      pofgn_M = 2*r2*t.Mm[n+1]-n*t.minv[n+2]*(t.onemr2mb2*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
     # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
     # boundary for n > 0.
     # Compute sn[n]:
       t.sn[n+1] = -pofgn_M
       dpdr_M = 2*r*((n+2)*t.Mm[n+1]-n*t.Mm[n-1])
       t.dsndr[n+1] = -dpdr_M
-      dpdb_M = n/b*((t.Mm[n+1]-t.Mm[n-1])*(r2+b2)+(b2-r2)^2*t.Mm[n-1])
+      dpdb_M = n*binv*((t.Mm[n+1]-t.Mm[n-1])*(r2+b2)+(b2-r2)^2*t.Mm[n-1])
       t.dsndb[n+1] = -dpdb_M
       # When b is very small and r < 1, we'll use a Taylor-series expansion to O(b^3):
       if t.b <= 1e-6 && r < 1
         # Use analytic formula near b=0:
         t.sqrt1mr2 = sqrt(1-r2)
-        t.sn[n+1] = -pi/2*r2*t.sqrt1mr2^(n-4)*(4*(1-r2)^2+n*b2*((2+n)*r2-4))
+        t.sn[n+1] = -0.5*pi*r2*t.sqrt1mr2^(n-4)*(4*(1-r2)^2+n*b2*((2+n)*r2-4))
         t.dsndr[n+1] = 0.5*pi*r*t.sqrt1mr2^(n-6)*(4*(1-r2)^2*((2+n)*r2-2)+
                          n*b2*(8-8*n*r2+n*(2+n)*r2*r2))
         t.dsndb[n+1] = pi*r2*n*b*t.sqrt1mr2^(n-4)*(4-(2+n)*r2)

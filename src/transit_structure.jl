@@ -29,6 +29,7 @@ mutable struct Transit_Struct{T}
   Jv_coeff :: Array{T,3} # coefficients for series expansion of J_v
   dJvdk_coeff :: Array{T,3} # coefficients for series expansion of dJ_v/dk
   Mm_coeff :: Array{T,3} # coefficients for series expansion of M_m
+  minv    :: Array{T,1}  # inverse of the integers m
   k2      :: T           # k^2 = (1-(r-b)^2)/(4br)
   k       :: T           # k = sqrt(k^2)
   kc      :: T           # k_c = sqrt(1-k^2) (unless k > 1, then it is sqrt(1-1/k^2))
@@ -98,6 +99,7 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,m_max,
   zeros(T,2,2,nmax),   # Jv_coeff for k^2 < 1 & k^2 > 1; v_max & v_max-1; series coefficients
   zeros(T,2,2,nmax),   # dJvdk_coeff for k^2 < 1 & k^2 > 1; v_max & v_max-1; series coefficients
   zeros(T,2,4,nmax),   # Mm_coeff for k^2 < 1 & k^2 > 1; m_max-3 to m_max; series coefficients
+  zeros(T,m_max+1), # inverse of integers
   zero(T),         # k^2
   zero(T),         # k
   zero(T),         # k_c
@@ -145,6 +147,10 @@ for n=1:trans.v_max
     end
   end
 end  
+# Inverse of integers:
+for m=1:m_max+1
+  trans.minv[m] = inv(m)
+end
 if grad
   compute_c_n_grad!(trans)
 else

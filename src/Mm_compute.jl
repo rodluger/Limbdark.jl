@@ -49,14 +49,14 @@ end
 
 # Recursive computation of M_m starting at m=1 to 4, and raising to m_max:
 function Mm_raise!(t::Transit_Struct{T}) where {T <: Real}
-r=t.r; b=t.b; m_max=t.m_max; k2 = t.k2; kc = t.kc; t.k2inv = inv(t.k2)
+r=t.r; b=t.b; m_max=t.m_max; k2 = t.k2; kc = t.kc; t.k2inv = inv(t.k2); sqarea=t.sqarea; onemr2mb2=t.onemr2mb2
 # Computes the integrals:
 # M_m(r,b) = (4*b*r)^(m/2) \int_{-\kappa/2}^{\kappa/2} (k^2 - \sin^2{x})^{m/2} dx
 # where k^2 = (1-(r-b)^2)/(4*b*r), \kappa/2 = \sin^{-1}(k) for k<1; otherwise \kappa=\pi.
 # Compute first four integrals:
 Mm_four!(t)
 @inbounds for m=4:m_max
-  t.Mm[m+1]=(2*(m-1)*t.onemr2mb2*t.Mm[m-1]+(m-2)*t.sqarea*t.Mm[m-3])/m
+  t.Mm[m+1]=(2*(m-1)*onemr2mb2*t.Mm[m-1]+(m-2)*sqarea*t.Mm[m-3])*t.minv[m]
 end
 return
 end
@@ -91,8 +91,9 @@ r=t.r; b=t.b; m_max=t.m_max; k2 = t.k2
 # Compute series version:
 Mm_series!(t)
 # Now iterate downwards:
+invsqarea = inv(t.sqarea)
 @inbounds for m=m_max-4:-1:4
-  t.Mm[m+1]=((m+4)*t.Mm[m+5]-2*(m+3)*t.onemr2mb2*t.Mm[m+3])/(t.sqarea*(m+2))
+  t.Mm[m+1]=((m+4)*t.Mm[m+5]-2*(m+3)*t.onemr2mb2*t.Mm[m+3])*invsqarea*t.minv[m+2]
 end
 # Now, compute lowest four exactly:
 Mm_four!(t)
