@@ -1,5 +1,11 @@
 # Define constants for speed:
 include("define_constants.jl")
+# Include linear algebara:
+
+if VERSION >= v"0.7"
+  using LinearAlgebra
+end
+
 # Include definition of Transit structure type:
 include("transit_structure.jl")
 # Include code which computes linear limb-darkening term:
@@ -244,9 +250,12 @@ if t.grad
   fill!(t.dfdrbu,zero(T))
   t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
   t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
-  @inbounds for i=1:t.n, j=0:t.n
-    t.dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
-  end
+#  t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
+  BLAS.gemv!('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
+#  t.dfdrbu[3:t.n+2]=BLAS.gemv('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3])
+#  @inbounds for i=1:t.n, j=0:t.n
+#    t.dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
+#  end
   return flux
 else
   return transit_poly_c(t)

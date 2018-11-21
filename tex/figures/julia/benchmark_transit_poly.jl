@@ -50,6 +50,7 @@ cmap = get_cmap("plasma")
 for iu = 1:nnu
   u_n = ones(nu[iu])/float(nu[iu])
   trans = transit_init(r,b[1],u_n,true)
+#  trans = transit_init(r,b[1],u_n,false)
 # Transform from u_n to c_n coefficients:
   timing = zeros(nnb)
 # Call the function:
@@ -75,6 +76,7 @@ plot(nu,tmed,label="Measured",linewidth=2, color="C0")
 alp = log(tmed[nnu])/log(nu[nnu])
 plot(nu,nu.^0.2,linestyle="--",label=L"$n^{0.2}$",color="C1")
 plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="-.",label=L"$n^2$",color="C1")
+#plot(nu,tmed[nnu]*(nu/nu[nnu]).^1,linestyle="-.",label=L"$n^1$",color="C1")
 xlabel("Number of limb-darkening coefficients")
 ylabel("Relative timing")
 legend(loc="upper left")
