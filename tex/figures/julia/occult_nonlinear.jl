@@ -185,7 +185,7 @@ function optimize_fit!(r::T,b::Array{T,1},fobs::Array{T,1},fmod::Array{T,1},u_n:
       trans.b = b[i]
       fmodel = transit_poly!(trans)
       for j = 1:trans.n
-        G[j] -= 2*(fobs[i]-fmodel)*trans.dfdrbu[j+2]
+        G[j] -= 2*(fobs[i]-fmodel)*trans.dfdu[j]
       end
     end
     return

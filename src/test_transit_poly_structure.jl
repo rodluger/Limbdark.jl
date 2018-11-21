@@ -31,7 +31,8 @@ for i=0:1000000
 #  flux[i+1]= transit_poly!(r,b[i+1],u,fgrad)
   trans.b = b[i+1]
   flux[i+1]= transit_poly!(trans)
-  flux_grad[i+1,:] = trans.dfdrbu
+  flux_grad[i+1,1:2] = trans.dfdrb
+  flux_grad[i+1,3:4] = trans.dfdu
 end
 # Now, plot the flux and derivatives:
 toc()

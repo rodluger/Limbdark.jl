@@ -23,7 +23,8 @@ dfdx = zeros(nu+2,npts)
 for i=1:npts
     trans.b = abs(b[i])
     flux_julia[i] = transit_poly!(trans)
-    dfdx[:,i] = trans.dfdrbu
+    dfdx[1:2,i] = trans.dfdrb
+    dfdx[3:nu+2,i] = trans.dfdu
     if b[i] < 0.0
       dfdx[2,i] *= -1.0
     end
