@@ -224,11 +224,11 @@ t = transit_init(r,b,u_n,true)
 flux = transit_poly_c!(t)
 # Now, transform derivaties from c to u:
 fill!(dfdrbu,zero(T))
-dfdrbu[1] = t.dfdrbc[1]  # r derivative
-dfdrbu[2] = t.dfdrbc[2]  # b derivative
 # u_n derivatives:
+dfdrbu[1] = t.dfdrb[1]
+dfdrbu[2] = t.dfdrb[2]
 @inbounds for i=1:t.n, j=0:t.n
-  dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
+  dfdrbu[i+2] += t.dfdc[j+1]*t.dcdu[j+1,i]
 end
 return flux
 end
@@ -247,14 +247,12 @@ function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
 if t.grad
   flux = transit_poly_c!(t)
   # Now, transform derivaties from c to u:
-  fill!(t.dfdrbu,zero(T))
-  t.dfdrbu[1] = t.dfdrbc[1]  # r derivative
-  t.dfdrbu[2] = t.dfdrbc[2]  # b derivative
+  fill!(t.dfdu,zero(T))
 #  t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
-  BLAS.gemv!('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
+  BLAS.gemv!('T',1.0,t.dcdu,t.dfdc,0.0,t.dfdu)
 #  t.dfdrbu[3:t.n+2]=BLAS.gemv('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3])
 #  @inbounds for i=1:t.n, j=0:t.n
-#    t.dfdrbu[i+2] += t.dfdrbc[j+3]*t.dcdu[j+1,i]
+#    t.dfdu[i] += t.dfdc[j+1]*t.dcdu[j+1,i]
 #  end
   return flux
 else
@@ -265,7 +263,7 @@ end
 
 function transit_poly_c!(t::Transit_Struct{T}) where {T <: Real}
 r = t.r; b=t.b; n = t.n; r2 =r*r; b2=b*b
-@assert((length(t.c_n)+2) == length(t.dfdrbc))
+@assert((length(t.c_n)) == length(t.dfdc))
 @assert(r > 0)
 # Number of limb-darkening components to include (beyond 0 and 1):
 # We are parameterizing these with the function:
@@ -281,32 +279,34 @@ r = t.r; b=t.b; n = t.n; r2 =r*r; b2=b*b
 # Check for different cases:
 if b >= 1+r || r ==  0.0
   # unobscured - return one, and zero derivatives:
-  fill!(t.dfdrbc,zero(T))
+  fill!(t.dfdrb,zero(T))
+  fill!(t.dfdc,zero(T))
   return one(T)
 end
 if r >= 1+b
   # full obscuration - return zero, and zero derivatives:
-  fill!(t.dfdrbc,zero(T))
+  fill!(t.dfdrb,zero(T))
+  fill!(t.dfdc,zero(T))
   return zero(T)
 end
 if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
   flux = zero(T); onemr2 = 1-r2; t.sqrt1mr2 = sqrt(onemr2)
-  fill!(t.dfdrbc,zero(T))
+  fill!(t.dfdc,zero(T))
   flux = (t.c_n[1]*onemr2+t.twothird*t.c_n[2]*t.sqrt1mr2^3)*pi*t.den
   fac  = 2r2*onemr2*pi*t.den
   facd = -2r*pi*t.den
-  t.dfdrbc[1] = t.c_n[1]*facd + t.c_n[2]*facd*t.sqrt1mr2
+  t.dfdrb[1] = t.c_n[1]*facd + t.c_n[2]*facd*t.sqrt1mr2
   @inbounds for i=2:t.n
     flux -= t.c_n[i+1]*fac
-    t.dfdrbc[1] += t.c_n[i+1]*facd*(2*onemr2-i*r2)
-    t.dfdrbc[i+3] -= fac
+    t.dfdrb[1] += t.c_n[i+1]*facd*(2*onemr2-i*r2)
+    t.dfdc[i+1] -= fac
     fac *= t.sqrt1mr2
     facd *= t.sqrt1mr2
   end
-  #  dfdrbc[2]=0 since the derivative with respect to b is zero.
-  t.dfdrbc[3] = (onemr2-flux)*pi*t.den
-  t.dfdrbc[4] = t.twothird*(t.sqrt1mr2^3-flux)*pi*t.den
+  #  dfdrb[2]=0 since the derivative with respect to b is zero.
+  t.dfdc[1] = (onemr2-flux)*pi*t.den
+  t.dfdc[2] = t.twothird*(t.sqrt1mr2^3-flux)*pi*t.den
   # Also need to compute derivatives [ ]
   return flux
 else
@@ -426,19 +426,19 @@ end
 # That's it!
 # Compute derivatives with respect to the coefficients:
 flux = zero(T)
-t.dfdrbc[1]=zero(T)  # Derivative with respect to r
-t.dfdrbc[2]=zero(T)  # Derivative with respect to b
+t.dfdrb[1]=zero(T)  # Derivative with respect to r
+t.dfdrb[2]=zero(T)  # Derivative with respect to b
 @inbounds for i=0:t.n
   # derivatives with respect to the coefficients:
-  t.dfdrbc[i+3]= t.sn[i+1]*t.den
+  t.dfdc[i+1]= t.sn[i+1]*t.den
   # total flux:
-  flux += t.c_n[i+1]*t.dfdrbc[i+3]
+  flux += t.c_n[i+1]*t.dfdc[i+1]
   # derivatives with respect to r and b:
-  t.dfdrbc[1] += t.c_n[i+1]*t.dsndr[i+1]*t.den
-  t.dfdrbc[2] += t.c_n[i+1]*t.dsndb[i+1]*t.den
+  t.dfdrb[1] += t.c_n[i+1]*t.dsndr[i+1]*t.den
+  t.dfdrb[2] += t.c_n[i+1]*t.dsndb[i+1]*t.den
 end
 # Include derivatives with respect to first two c_n parameters:
-t.dfdrbc[3] -= flux*t.den*pi
-t.dfdrbc[4] -= flux*t.den*pi*t.twothird
+t.dfdc[1] -= flux*t.den*pi
+t.dfdc[2] -= flux*t.den*pi*t.twothird
 return flux
 end

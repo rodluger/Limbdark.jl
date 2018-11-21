@@ -22,8 +22,9 @@ mutable struct Transit_Struct{T}
   dsndr   ::  Array{T,1} # derivatives of Green's basis with respect to r
   dsndb   ::  Array{T,1} # derivatives of Green's basis with respect to b
   dcdu    :: Array{T,2}  # derivatives c_n with respect to u_n
-  dfdrbc  :: Array{T,1}  # derivative of flux with respect to c_n
-  dfdrbu  :: Array{T,1}  # derivative of flux with respect to u_n
+  dfdrb   :: Array{T,1}  # derivative of flux with respect to r,b
+  dfdc    :: Array{T,1}  # derivative of flux with respect to c_n
+  dfdu    :: Array{T,1}  # derivative of flux with respect to u_n
   nmax    :: Int64       # maximum number of terms in series expansions of I_v and J_v
   Iv_coeff :: Array{T,1} # coefficients for series expansion of I_v
   Jv_coeff :: Array{T,3} # coefficients for series expansion of J_v
@@ -92,8 +93,9 @@ trans = Transit_Struct{T}(r,b,u_n,n,v_max,m_max,
   zeros(T,n+1),    # dsndr
   zeros(T,n+1),    # dsndb
   zeros(T,n+1,n),  # dcdu
-  zeros(T,n+3),    # dfdrbc
-  zeros(T,n+2),    # dfdrbu
+  zeros(T,2),      # dfdrb
+  zeros(T,n+1),    # dfdc
+  zeros(T,n),      # dfdu
   nmax,		   # nmax
   zeros(T,nmax),   # Iv_coeff
   zeros(T,2,2,nmax),   # Jv_coeff for k^2 < 1 & k^2 > 1; v_max & v_max-1; series coefficients

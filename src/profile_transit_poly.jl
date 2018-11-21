@@ -3,7 +3,7 @@ include("transit_poly_struct.jl")
 #u_n = [0.5,0.25,0.125,0.0625,0.03125]
 #u_n = [0.5,0.25]
 #trans = transit_init(0.1,0.5,u_n,true)
-n = 10
+n = 25
 u_n = 2.^(-linspace(1,n,n))
 #trans = transit_init(0.1,0.5,[0.5,0.25,0.125,0.0625,0.03125],false)
 trans = transit_init(0.1,0.5,u_n,true)
