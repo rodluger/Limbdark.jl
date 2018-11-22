@@ -925,6 +925,29 @@ $\mathcal{M}_n(r,b)$, given by:
 \mathcal{P}(\bvec{G}_n) &=& (1+r^2-b^2)\mathcal{M}_n - \mathcal{M}_{n+2}.
 \end{eqnarray}
 
+The integrals $\mathcal{M}_n$ obey a straightforward recursion relation,
+\begin{eqnarray}
+\mathcal{M}_n &=& \frac{1}{n} \left[ 2(n-1) (1-r^2-b^2) \mathcal{M}_{n-2} \right.\\ 
+  &+& \left. (n-2) (1-(b-r)^2)((b+r)^2-1) M_{n-4}\right],\\
+\mathcal{M}_n &=& \frac{(n+4)\mathcal{M}_{m+4} - 2(n+3)(1-r^2-b^2)\mathcal{M}_{n+2}}{(n+2)(1-(b-r)^2)((b+r)^2-1)},
+\end{eqnarray}
+where the first relation may be used for upwards recursion in $n$ for $\frac{1}{2} < k^2 < 2$, 
+and the second for downward recursion in $n$ otherwise.
+In practice we substitute $\mathcal{M}_{n+2}$ with the recursion relation
+to obtain a more stable expression for $\mathcal{P}_{\bvec{G}_n}$:
+\begin{equation}
+\mathcal{P}(\bvec{G}_n}) = 2r^2 \mathcal{M}_n - \frac{n}{n+2}\left((1-r^2-b^2)\mathcal{M}_n+((1-(b-r)^2)((b+r)^2-1)\mathcal{M}_{n-2}\right).
+\end{equation}
+\end{equation}
+
+Note that these recursion relations involve every fourth term, so we need to compute
+the first four terms analytically.
+
+{\color{red} Give expressions for lowest four terms in $k^2 < 1$ and $k^2 >1$ limits,
+as well as the series expansions.}
+
+{\color{red} Give the Taylor series expansions near $b=0$.}
+
 \subsection{Limb-darkening coefficients}
 
 Our expansion for limb-darkening in terms of $u_n(1-\upmu)^n$ (equation \ref{eq:polynomialld}) needs to
@@ -966,78 +989,15 @@ $F_0$, only depends upon $d_0$ and $d_1$.
 
 \subsection{Analytic derivatives}
 
-For computing the derivatives of $\mathcal{P}(\bvec{G}_n)$, we find it more numerically
-stable to express the $k^{2i}$ terms in terms of $b$ and $r$.  For compactness, we define
+The derivatives of $\mathcal{P}(\bvec{G}_n)$ may be expressed simply as functions
+of $\mathcal{M}_n$:
 \begin{eqnarray}
-T_i &=&  \binom{n_0}{i}(-4br)^{n_0-i}(1-(b-r)^2)^{i},\\
-U_i &=&  \left[(r-b)\mathcal{I}_{n_0-i} + 2b \mathcal{I}_{n_0-i+1}\right],\\
-V_i &=&  \left[(r-b)\mathcal{J}_{n_0-i} + 2b \mathcal{J}_{n_0-i+1}\right],
+\frac{\partial \mathcal{P}}{\partial r} &=& 2r \left[(n+2)\mathcal{M}_n - n \mathcal{M}_{n-2}\right],\\
+\frac{\partial \mathcal{P}}{\partial b} &=& \frac{n}{b} \left[(r^2+b^2)(\mathcal{M}_n - \mathcal{M}_{n-2})+(r^2-b^2)\mathcal{M}_{n-2}\right].\\
 \end{eqnarray}
-so that we can rewrite the primitive integral as
-\begin{eqnarray}
-\mathcal{P}(\mathbf{G}_n) &=& 2r \sum_{i=0}^{n_0} T_i U_i\\
-&=& \mathcal{F} \sum_{i=0}^{n_0} T_i V_i,
-\end{eqnarray}
-where the first line is for even $n$ and the second for odd $n \ge 3$.
-
-We then express the derivatives as
-\begin{eqnarray}
-\frac{d \mathcal{P}}{d r} = \frac{\partial \mathcal{P}}{\partial r}  +  \frac{\partial \mathcal{P}}{\partial k} \frac{\partial k}{\partial r},\\
-\frac{d \mathcal{P}}{d b} = \frac{\partial \mathcal{P}}{\partial b}  +  \frac{\partial \mathcal{P}}{\partial k} \frac{\partial k}{\partial b}.
-\end{eqnarray}
-
-Then, these partial derivatives are given by:
-\begin{eqnarray}
-\frac{\partial \mathcal{P}}{\partial r}  &=& 2r\sum_{i=0}^{n_0} T_i  \left[\left(\frac{2i(b-r)}{1-(b-r)^2} + \frac{n_0+1-i}{r}\right) U_i + \mathcal{I}_{n_0-i}\right],\\
-\frac{\partial \mathcal{P}}{\partial b}  &=& 2r\sum_{i=0}^{n_0} T_i  \left[\left(\frac{2i(r-b)}{1-(b-r)^2} + \frac{n_0-i}{b}\right) U_i - \mathcal{I}_{n_0-i} + 2\mathcal{I}_{n_0-i+1}\right],\\
-\frac{\partial \mathcal{P}}{\partial k}  &=& 0,
-\end{eqnarray}
-for even $n$ and
-\begin{eqnarray}
-\frac{\partial \mathcal{P}}{\partial r}  &=& \mathcal{F}\sum_{i=0}^{n_0} T_i \left[\left(\frac{(2i+3)(b-r)}{1-(b-r)^2} + \frac{n_0+1-i}{b}\right) V_i + \mathcal{J}_{n_0-i}\right],\\
-\frac{\partial \mathcal{P}}{\partial b}  &=& \mathcal{F}\sum_{i=0}^{n_0} T_i \left[\left(\frac{(2i+3)(r-b)}{1-(b-r)^2} + \frac{n_0-i}{b}\right) V_i - \mathcal{J}_{n_0-i} + 2\mathcal{J}_{n_0-i+1}\right],\\
-\frac{\partial \mathcal{P}}{\partial k}  &=& \mathcal{F}\sum_{i=0}^{n_0} T_i \left[(r-b) \frac{\partial\mathcal{J}_{n_0-i}}{\partial k} + 2b \frac{\partial \mathcal{J}_{n_0-i+1}}{\partial k}\right],
-\end{eqnarray}
-for odd $n \ge 3$.
-
-The partial derivatives of $k$ are given by
-\begin{eqnarray}
-\frac{\partial k}{\partial r} &=& \frac{b^2-r^2-1}{8 k b r^2},\\
-\frac{\partial k}{\partial b} &=& \frac{r^2-b^2-1}{8 k b^2 r}.
-\end{eqnarray}
-
-Finally, we need the derivatives of the function $\mathcal{I}_v$ and $\mathcal{J}_v$
-with respect to $k$.  This is given by recursion relations
-\begin{eqnarray}
-\frac{\partial \mathcal{J}_v}{\partial k} &=& -3 k^{-1} \mathcal{J}_v +k^2 \frac{\partial \mathcal{J}_{v-1}}{\partial k},\\
-&=& 3 k^{2v} \int_0^1 u^{v+\tfrac{1}{2}} (1-u)^{1/2} (1-k^2u)^{-1/2}du,\\
-&=& 3 k^{2v} \frac{\sqrt{\pi}}{2} \Gamma(v+\tfrac{3}{2}) \,_2{\tilde F}_1(\tfrac{1}{2},v+\tfrac{3}{2},3+v,k^2),\\
-\frac{\partial \mathcal{J}_0}{\partial k} &=& \frac{2}{k^4}\left[(2-k^2)E(k^2)+2(k^2-1)K(k^2)\right],
-\end{eqnarray}
-for $k^2 < 1$ ($b+r > 1$) and an expression for $I_v$
-\begin{equation}
-\frac{\partial \mathcal{I}_v}{\partial k} = 2k^{2v} k_c^{-1}.
-\end{equation}
-
-For $k^2 > 1$ ($b+r <1$), we have
-\begin{eqnarray}
-\frac{\partial \mathcal{J}_0}{\partial k} &=& k^{-3} \left[2(2-k^2)E(k^{-2}) + 2(k^2-1) K(k^{-2})\right]\\
-\frac{\partial \mathcal{J}_v}{\partial k} &=& (-1)^{v+1} \frac{3k^{-3}\pi^{3/2}}{\Gamma(-(v+\tfrac{1}{2}))} \,_2\tilde{F}_1(-\tfrac{1}{2},v+\tfrac{3}{2},v+2,k^{-2})
-\end{eqnarray}
-while the same recursion relation applies for $\partial \mathcal{J}_v/\partial k$ as in the $k^2 < 1$ case,
-and $d\mathcal{I}_v/dk = 0$.
 
 As with \starry, we find that upward recursion in $v$ is more stable for $\tfrac{1}{2} < k^2 < 2$,
-while downward recursion is more stable for $k^2 < \tfrac{1}{2}$ and $k^2 > 2$.  This
-requires computing the derivatives, $\frac{\partial \mathcal{J}_v}{\partial k}$, first
-for large values of $v$. Rather than using the integral or Hypergeometric functions given
-above, we accomplish this by differentiating each term the series expansion for
-$\mathcal{J}_v$ with respect to $k$.  This is given by
-\begin{equation}
-    \label{eq:Jlargek}
-\frac{\partial \mathcal{J}_v}{\partial k}
-=             \pi \sum_{j=0}^\infty (-1)^j \binom{3/2}{j} \frac{(2j+2v-1)!!}{2^{j+v} (j+v)!} (-2j)k^{-2j-1}.
-\end{equation}
+while downward recursion is more stable for $k^2 < \tfrac{1}{2}$ and $k^2 > 2$. 
 
 With the computation of $S_n = -\mathcal{P}(\bvec{G}_n)$ for $n \ge 2$, we then
 compute the derivatives of the light curve as
