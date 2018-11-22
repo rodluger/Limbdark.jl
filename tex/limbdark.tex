@@ -918,7 +918,7 @@ $\kappa = \pi$ for $k^2 > 1$.  Note that $\kappa = \kappa_0$, so in practice we
 reuse the value of $\kappa_0$ which was computed in the uniform limb-darkening
 case (\S \ref{sec:uniform}).
 
-We can express this in terms of a series of integrals,
+We can express this in terms of a sequence of integrals,
 $\mathcal{M}_n(r,b)$, given by:
 \begin{eqnarray}
 \mathcal{M}_n(r,b) &=& (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} d\xi,\\
@@ -942,6 +942,23 @@ to obtain a more stable expression for $\mathcal{P}_{\bvec{G}_n}$:
 
 Note that these recursion relations involve every fourth term, so we need to compute
 the first four terms analytically.
+
+When $k^2 < 1$, the integrals may be expressed in terms of Hypergeometric functions
+and an infinite series:
+\begin{eqnarray}
+\mathcal{M}_n &=& (4br)^n k^{2n+1} \pi^{1/2} \frac{\Gamma(n+1)}{\Gamma(n+\tfrac{3}{2})} _2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+n;k^2),\\
+&=& \sum_{j=0}^{j_{max}} \mathcal{b}_j k^{2j},\\
+\mathcal{b}_0 = \sqrt{\pi} \frac{\Gamma(\tfrac{n}{2}+1)}{\Gamma(\tfrac{n}{2}+\tfrac{3}{2}}(1-(r-b)^2)^{n} k,\\
+\mathcal{b}_j = \mathcal{b}_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)},\\
+\end{eqnarray}
+while for $k^2 > 1$,
+\begin{eqnarray}
+\mathcal{M}_n &=& \pi k^n _2F_1(\tfrac{1}{2},-\tfrac{n}{2};1;k^{-2}),\\
+&=& \sum_{j=0}^{j_{max}} \mathcal{c}_j k^{-2j},\\
+\mathcal{c}_0 = \pi (1-(r-b)^2)^{n},\\
+\mathcal{c}_j = \mathcal{c}_{j-1} \frac{(2+n+2j)(1-2j)}{4j^2},\\
+\end{eqnarray}
+
 
 {\color{red} Give expressions for lowest four terms in $k^2 < 1$ and $k^2 >1$ limits,
 as well as the series expansions.}
