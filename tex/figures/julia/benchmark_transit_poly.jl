@@ -5,6 +5,9 @@
 using Statistics
 using PyPlot
 
+# Specify single-threading for BLAS routine:
+LinearAlgebra.BLAS.set_num_threads(1)
+
 # Defines the function that computes the transit:
 include("../../../src/transit_poly_struct.jl")
 
@@ -31,7 +34,8 @@ for j=1:length(nb)
     for i=1:nb0
       b[i] = sqrt(((i-float(nb0)/2)*2/float(nb0)*(1.0+2.0*trans.r))^2)
       trans.b = b[i]
-      flux[i] = transit_poly!(trans)
+#      flux[i] = transit_poly!(trans)
+      flux[i] = transit_poly_c!(trans)
     end
     tmean[k] = (time_ns()-elapsed)*1e-9
 
@@ -75,8 +79,8 @@ loglog(nu,tmed,"o", color="C0")
 plot(nu,tmed,label="Measured",linewidth=2, color="C0")
 alp = log(tmed[nnu])/log(nu[nnu])
 plot(nu,nu.^0.2,linestyle="--",label=L"$n^{0.2}$",color="C1")
-plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="-.",label=L"$n^2$",color="C1")
-#plot(nu,tmed[nnu]*(nu/nu[nnu]).^1,linestyle="-.",label=L"$n^1$",color="C1")
+#plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="-.",label=L"$n^2$",color="C1")
+plot(nu,tmed[nnu]*(nu/nu[nnu]).^1,linestyle="-.",label=L"$n^1$",color="C1")
 xlabel("Number of limb-darkening coefficients")
 ylabel("Relative timing")
 legend(loc="upper left")
