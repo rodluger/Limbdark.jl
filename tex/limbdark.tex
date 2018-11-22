@@ -658,6 +658,15 @@ We have tested these formulae with finite-difference derivatives evaluated at
 256-bit precision, and, as with the total flux term, we find that these are accurate
 to $\la 2 \times 10^{-15}$, close to machine precision.
 
+\section{Quadratic limb-darkening}
+
+The next order of limb-darkening has been widely studied due to its
+accurate description of stellar atmospheres \citep{Claret2000,MandelAgol2002,Pal2008}.
+We summarize here the formulae for quadratic limb-darkening, and it derivatives,
+using the transformed expressions described above.
+
+{\color{red} Include the quadratic limb-darkening expressions.}
+
 Finally, we turn our attention to the general polynomial limb-darkening case,
 $\upmu^n$ with $n \ge 2$.  These terms may be expressed as the sum of
 spherical harmonics with $m=0$, and thus they are a special case of the \starry
@@ -856,32 +865,32 @@ Green's functions whose curl has dependence on $z$ for axially-symmetric
 limb-darkening.  Following Luger et al. (2018), we choose a Green's function
 of the form
 \begin{equation}
-\mathbf{G}_n = f(z) (-y \xhat + x \yhat)
+\mathbf{G}_n = f_n(z) (-y \xhat + x \yhat)
 \end{equation}
 giving
 \begin{eqnarray}
 \gbasisn(x,y) &=& \frac{\dd {G_n}_y}{\dd \x} - \frac{\dd {G_n}_x}{\dd \y}\\
-&=& 2 f(z) + \frac{df}{dz} \frac{z^2-1}{z},\\
-&=& \frac{1}{z} \frac{d}{dz}\left[ f(z)(z^2-1)\right].
+&=& 2 f_n(z) + \frac{df}{dz} \frac{z^2-1}{z},\\
+&=& \frac{1}{z} \frac{d}{dz}\left[ f_n(z)(z^2-1)\right].
 \end{eqnarray}
 This yields particularly simple form for the primitive integrals of
 \begin{align}
     \label{eq:primitiveP}
     \mathcal{P}(\bvec{G}_n) &=
-    \int\displaylimits_{\pi-\phi}^{2\pi + \phi} f(z) (r+b \sin{\varphi}) r d\varphi
+    \int\displaylimits_{\pi-\phi}^{2\pi + \phi} f_n(z) (r+b \sin{\varphi}) r d\varphi
     %
 \intertext{and}
     %
     \label{eq:primitiveQ}
     \mathcal{Q}(\bvec{G}_n) &=
-    \int\displaylimits_{\pi-\lambda}^{2\pi + \lambda} f(z) d \varphi
+    \int\displaylimits_{\pi-\lambda}^{2\pi + \lambda} f_n(z) d \varphi
 \end{align}
 
-We choose $f(z) = z^n$, so that
+We choose the functions $f_n(z) = z^n$, so that
 \begin{equation}
 \gbasisn(x,y) =  (n+2)z^n-n z^{n-2},
 \end{equation}
-is the basis set for the surface brightness of the polynomial limb-darkening,
+for $n \ge 2$ is the basis set for the surface brightness of the polynomial limb-darkening,
 along with the uniform, $\tilde{g}_0 = z^0$,
 and linear, $\tilde{g}_1 = z^1$, terms which we have derived in \S \ref{sec:reparam}.
 Note that the total flux of each term in this basis set, $\tilde{g}_n$, integrates
@@ -904,38 +913,17 @@ We make the transformation $\xi = \tfrac{1}{2} \left(\varphi - \tfrac{3\pi}{2}\r
 2r (4br)^{\frac{n}{2}}\int\displaylimits_{-\tfrac{\kappa}{2}}^{\tfrac{\kappa}{2}}
 (k^2-\sin^2\xi)^{\tfrac{n}{2}} (r-b + 2b \sin^2 \xi) d\xi,
 \end{equation}
-for even values of $n$ and
-\begin{equation}
-\mathcal{P}(\bvec{G}_n) =
-2r (4br)^{\frac{n}{2}} k^3 \int\displaylimits_{-\tfrac{\kappa}{2}}^{\tfrac{\kappa}{2}}
-(k^2-\sin^2\xi)^{\tfrac{n-3}{2}} (1-k^{-2} \sin^2 \xi)^{3/2} (r-b + 2b \sin^2 \xi) d\xi,
-\end{equation}
-for odd values of $n \ge 3$, where $\kappa = 2 \sin^{-1}k$ for $k^2 \le 1$ and
+for $n \ge 2$, where $\kappa = 2 \sin^{-1}k$ for $k^2 \le 1$ and
 $\kappa = \pi$ for $k^2 > 1$.  Note that $\kappa = \kappa_0$, so in practice we
 reuse the value of $\kappa_0$ which was computed in the uniform limb-darkening
 case (\S \ref{sec:uniform}).
 
-Each of the terms $(k^2-\sin^2\xi)^c$ can be expanded with the binomial theorem,
-and then expressed in terms of the integrals $\mathcal{I}_v(k)$ and $\mathcal{J}_v(k)$
-(defined in Luger et al. 2018) as
+We can express this in terms of a series of integrals,
+$\mathcal{M}_n(r,b)$, given by:
 \begin{eqnarray}
-\mathcal{P}(\mathbf{G}_n)
-= 2r(4br)^{n_0} \sum_{i=0}^{n_0} \binom{n_0}{i}(-1)^{n_0-i} k^{2i} \left[(r-b)\mathcal{I}_{n_0-i} + 2b \mathcal{I}_{n_0-i+1}\right],
+\mathcal{M}_n(r,b) &=& (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} d\xi,\\
+\mathcal{P}(\bvec{G}_n) &=& (1+r^2-b^2)\mathcal{M}_n - \mathcal{M}_{n+2}.
 \end{eqnarray}
-for even $n$, where $n_0 = n/2$, and
-\begin{eqnarray}
-\mathcal{P}(\mathbf{G}_n)
-= \mathcal{F}(4br)^{n_0} \sum_{i=0}^{n_0} \binom{n_0}{i} (-1)^{n_0-i} k^{2i} \left[(r-b)\mathcal{J}_{n_0-i} + 2b \mathcal{J}_{n_0-i+1}\right],
-\end{eqnarray}
-for odd $n \ge 3$, where $n_0 = (n-3)/2$ and
- $\mathcal{F} = 2r(1-(b-r)^2)^{3/2}$.
-
-For completeness we list the expressions for the functions $\mathcal{I}_v(k)$ and $\mathcal{J}_v(k)$:
-\begin{eqnarray}
-\mathcal{I}_{v} &=& \int_{-\kappa/2}^{\kappa/2} s_\varphi^{2v} d\varphi \quad,\\
-\mathcal{J}_v &=& \int_{-\kappa/2}^{\kappa/2} d\varphi s^{2v}_\varphi\left(1-k^{-2}s^2_\varphi\right)^{3/2},
-\end{eqnarray}
-where, again, we note that $\kappa$ is a simple function of $k$.
 
 \subsection{Limb-darkening coefficients}
 
