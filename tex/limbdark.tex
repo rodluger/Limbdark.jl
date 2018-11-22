@@ -940,8 +940,25 @@ to obtain a more stable expression for $\mathcal{P}(\bvec{G}_n)$:
 \end{equation}
 
 Note that these recursion relations involve every fourth term, so we need to compute
-the first four terms analytically.
+the first four terms analytically.  These are given by:
+\begin{eqnarray}
+\mathcal{M}_0 &=& \kappa_0,\\
+\mathcal{M}_1 &=& 2 (4br)^{1/2} \left[E(k^2)-(1-k^2)K(k^2)\right],\\
+\mathcal{M}_2 &=& 4br\left[(k^2-\tfrac{1}{2}) \kappa_0 + k\sqrt{1-k^2}\right],\\
+\mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} \left[(4k^2-2)E(k^2)+(3k^2-2)(k^2-1)K(k^2)\right],\\
+\end{eqnarray}
+for $k^2 < 1$, while for $k^2 > 1$,
+\begin{eqnarray}
+\mathcal{M}_0 &=& \pi,\\
+\mathcal{M}_1 &=& 2(1-(r-b)^2)^{1/2}E(k^{-2}),\\
+\mathcal{M}_2 &=& \pi(1-b^2-r^2),\\
+\mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} k^3\left[2(2-k^{-2})E(k^{-2})-(1-k^{-2})K(k^{-2})\right].
+\end{eqnarray}
+Note that we express the elliptic integrals in terms of the $cel$ integrals which
+were already computed for the $n=1$ case.
 
+For downward recursion, we compute the top four $\mathcal{M}_n$ expressions
+in terms of series expansions.
 When $k^2 < 1$, the integrals may be expressed in terms of Hypergeometric functions
 and an infinite series:
 \begin{eqnarray}
@@ -957,10 +974,6 @@ while for $k^2 > 1$,
 \mathcal{c}_0 = \pi (1-(r-b)^2)^{n},\\
 \mathcal{c}_j = \mathcal{c}_{j-1} \frac{(2+n+2j)(1-2j)}{4j^2},\\
 \end{eqnarray}
-
-
-{\color{red} Give expressions for lowest four terms in $k^2 < 1$ and $k^2 >1$ limits,
-as well as the series expansions.}
 
 {\color{red} Give the Taylor series expansions near $b=0$.}
 
