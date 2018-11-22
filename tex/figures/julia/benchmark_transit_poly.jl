@@ -5,11 +5,12 @@
 using Statistics
 using PyPlot
 
-# Specify single-threading for BLAS routine:
-LinearAlgebra.BLAS.set_num_threads(1)
 
 # Defines the function that computes the transit:
 include("../../../src/transit_poly_struct.jl")
+
+# Specify single-threading for BLAS routine:
+LinearAlgebra.BLAS.set_num_threads(1)
 
 nu = [1,2,3,5,8,13,21,34,55,89,144]; #233,377,610];
 nnu = length(nu)
