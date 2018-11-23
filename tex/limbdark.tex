@@ -299,7 +299,7 @@ the first basis function in the \starry implementation from Luger et al. (2018).
 
 The partial derivatives of this formula with respect to the radius
 ratio, $r$, and impact parameter, $b$, turn out to be straightforward:
-\begin{eqnarray}
+\begin{eqnarray}\label{eq:dS0_drb}
 \frac{\partial S_0(r,b)}{\partial r} &=& -2r \kappa_0,\\
 \frac{\partial S_0(r,b)}{\partial b} &=& \frac{A_{kite}}{b},
 \end{eqnarray}
@@ -665,7 +665,63 @@ accurate description of stellar atmospheres \citep{Claret2000,MandelAgol2002,Pal
 We summarize here the formulae for quadratic limb-darkening, and it derivatives,
 using the transformed expressions described above.
 
-{\color{red} Include the quadratic limb-darkening expressions.}
+\begin{align}
+    \label{eq:eta}
+    \eta &=
+    \begin{dcases}
+          \frac{1}{2\pi}\left[\kappa_1+r^2(r^2+2b^2)\kappa_0-\frac{1}{2}(1+5r^2+b^2)A_{kite}\right]
+          %
+          & \qquad k^2 < 1
+          %
+          \\[1.5em]
+          %
+          \frac{r^2}{2}(r^2+2b^2)
+          %
+          & \qquad k^2 > 1\\
+    \end{dcases}
+\end{align}
+Note that $\kappa_0$, $\kappa_1$, and $A_{kite}$ were already computed in the
+uniform case, so these quantities are reused in the quadratic case.
+The derivatives are given by:
+\begin{align}
+    \label{eq:eta}
+    \frac{\partial \eta}{\partial r} &=
+    \begin{dcases}
+          \frac{2r}{\pi}\left[(r^2+b^2)\kappa_0-2A_{kite}\right]
+          %
+          & \qquad k^2 < 1
+          %
+          \\[1.5em]
+          %
+          2r^3+2rb^2
+          %
+          & \qquad k^2 > 1\\
+    \end{dcases}
+\end{align}
+and
+\begin{align}
+    \label{eq:eta}
+    \frac{\partial \eta}{\partial b} &=
+    \begin{dcases}
+          \frac{1}{2b\pi}\left[4r^2b^2\kappa_0-2(1+b^2+r^2)A_{kite}\right]
+          %
+          & \qquad k^2 < 1
+          %
+          \\[1.5em]
+          %
+          2r^2b
+          %
+          & \qquad k^2 > 1\\
+    \end{dcases}
+\end{align}
+
+With this definition, then the quadratic term, $S_2(r,b)$ is given by
+\begin{eqnarray}
+S_2 &=& 2 S_0 + 4\pi \eta - 2\pi,\\
+\frac{\partial S_2}{\partial r} &=& 2 \frac{\partial S_0}{\partial r} + 4\pi \frac{\partial \eta}{\partial r},\\
+\frac{\partial S_2}{\partial b} &=& 2 \frac{\partial S_0}{\partial b} + 4\pi \frac{\partial \eta}{\partial b},\\
+\end{eqnarray}
+where $S_0$ and its derivatives are defined in equations \ref{eq:uniform}-\ref{eq:dS0_drb}.
 
 Finally, we turn our attention to the general polynomial limb-darkening case,
 $\upmu^n$ with $n \ge 2$.  These terms may be expressed as the sum of
@@ -974,6 +1030,10 @@ while for $k^2 > 1$,
 c_0 &=& \pi (1-(r-b)^2)^{n},\\
 c_j &=& c_{j-1} \frac{(2+n+2j)(1-2j)}{4j^2},\\
 \end{eqnarray}
+where $j_{max}=\infty$ for $k^2 < 1$ and for $k^2 > 1$ with odd $n$.  For
+$k^2 > 1$ and even $n$, $j_{max} = n/2$;  in practice we set $j_{max} = 100$.  
+The series is truncated when a term goes below a tolerance specified
+by the numerical precision.
 
 {\color{red} Give the Taylor series expansions near $b=0$.}
 
