@@ -324,8 +324,6 @@ else
     println("negative k2: ",t.k2," r: ",r," b: ",b)
     t.k2 = 0.0; t.k = 0.0
   end
-  dkdr = (b2-r2-1)/(8*t.k*b*r2)
-  dkdb = (r2-b2-1)/(8*t.k*b2*r)
   if t.k2 > 1
     if t.k2 > 2.0
       t.kc2 = 1.0-inv(t.k2)
