@@ -4,16 +4,16 @@
 
 # Defines the transit Type:
 #include("transit_structure.jl")
-# Defines the function that computes the c_n coefficients:
-#include("compute_c_n_struct.jl")
+# Defines the function that computes the d_n coefficients:
+#include("compute_d_n_struct.jl")
 
 # Defines the function that computes the transit:
 include("transit_poly_struct.jl")
 
 # Instantiate a transit with r=0.1, b=0.5, u_n=[0.2,0.3]:
 
-# Transform from u_n to c_n coefficients (this is now added to transit_init function):
-#compute_c_n_grad!(trans) 
+# Transform from u_n to d_n coefficients (this is now added to transit_init function):
+#compute_d_n_grad!(trans) 
 
 # Load in PyPlot (Julia matplotlib wrapper):
 using PyPlot

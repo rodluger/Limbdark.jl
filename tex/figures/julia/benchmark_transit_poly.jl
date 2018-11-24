@@ -36,7 +36,7 @@ for j=1:length(nb)
       b[i] = sqrt(((i-float(nb0)/2)*2/float(nb0)*(1.0+2.0*trans.r))^2)
       trans.b = b[i]
 #      flux[i] = transit_poly!(trans)
-      flux[i] = transit_poly_c!(trans)
+      flux[i] = transit_poly_d!(trans)
     end
     tmean[k] = (time_ns()-elapsed)*1e-9
 
@@ -56,7 +56,7 @@ for iu = 1:nnu
   u_n = ones(nu[iu])/float(nu[iu])
   trans = transit_init(r,b[1],u_n,true)
 #  trans = transit_init(r,b[1],u_n,false)
-# Transform from u_n to c_n coefficients:
+# Transform from u_n to d_n coefficients:
   timing = zeros(nnb)
 # Call the function:
   @time timing =profile_transit_poly(trans,nb)

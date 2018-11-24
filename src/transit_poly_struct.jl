@@ -10,8 +10,8 @@ end
 include("transit_structure.jl")
 # Include code which computes linear limb-darkening term:
 include("s2.jl")
-# Include code which computes M_m:
-include("Mm_compute.jl")
+# Include code which computes M_n:
+include("Mn_compute.jl")
 
 # Computes the coefficient for the uniform disk case, S_0:
 function compute_uniform!(t::Transit_Struct{T}) where {T <: Real}
@@ -70,14 +70,14 @@ end
 # height on the star relative to the sky plane if the radius 
 # of the star is unity.
 
-function transit_poly_c(t::Transit_Struct{T}) where {T <: Real}
+function transit_poly_d(t::Transit_Struct{T}) where {T <: Real}
 # Number of limb-darkening components to include (beyond 0 and 1):
 # We are parameterizing these with the function:
-# g_n = c_n [(n+2) z^n - n z^{n-2}] for n >= 2
-# while g_{0} = c_0 z^0 (uniform source) and g_{1} = c_1 z^1 (linear limb-darkening)
+# g_n = d_n [(n+2) z^n - n z^{n-2}] for n >= 2
+# while g_{0} = d_0 z^0 (uniform source) and g_{1} = d_1 z^1 (linear limb-darkening)
 # which gives a Green's integral of:
 # P(G_n) = \int_{\pi-\phi}^{2\pi+\phi} (1-r^2-b^2-2br s_\varphi)^{n/2} (r+b s_\varphi) d\varphi
-# for which we have a solution in terms of M_m.
+# for which we have a solution in terms of M_n.
 # The variable "t" is a structure which contains transit parameters
 # and intermediate quantities computed from these:
 r=t.r; b=t.b; n = t.n; r2=r*r; b2 = b*b
@@ -97,10 +97,10 @@ if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
   onemr2 = 1-r2
   flux = zero(T); t.sqrt1mr2 = sqrt(onemr2)
-  flux = (t.c_n[1]*onemr2+t.twothird*t.c_n[2]*t.sqrt1mr2^3)
+  flux = (t.d_n[1]*onemr2+t.twothird*t.d_n[2]*t.sqrt1mr2^3)
   fac= 2r2*onemr2
   @inbounds for i=2:t.n
-    flux += -t.c_n[i+1]*fac
+    flux += -t.d_n[i+1]*fac
     fac *= t.sqrt1mr2
   end
   return flux*pi*t.den
@@ -143,7 +143,7 @@ end
 compute_uniform!(t)
 # If uniform model, then return:
 if t.n == 0
-  return t.c_n[1]*t.sn[1]*t.den
+  return t.d_n[1]*t.sn[1]*t.den
 end
 
 # Compute linear case, sn[2]:
@@ -156,8 +156,8 @@ t.sn[2],t.Eofk,t.Em1mKdm = s2_ell(r,b)
 #end
 # Special case of linear limb-darkening:
 if t.n == 1
-  flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
-  flux *= t.den  # for c_2 and above, the flux is zero.
+  flux = t.d_n[1]*t.sn[1]+t.d_n[2]*t.sn[2]
+  flux *= t.den  # for d_2 and above, the flux is zero.
   return flux
 end
 
@@ -171,34 +171,34 @@ if t.n == 2
     four_pi_eta = 2*(pi-t.pimkap1+2*eta2*t.kap0-0.25*t.kite_area2*(1.0+5r2+b2))
   end
   t.sn[3] = 2*(t.sn[1]-pi)+four_pi_eta
-  flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]+t.c_n[3]*t.sn[3]
-  flux *= t.den  # for c_2 and above, the flux is zero.
+  flux = t.d_n[1]*t.sn[1]+t.d_n[2]*t.sn[2]+t.d_n[3]*t.sn[3]
+  flux *= t.den  # for d_2 and above, the flux is zero.
   return flux
 end
 
-# Compute the M_m functions:
+# Compute the M_n functions:
 if t.k2 > 0
 #  if (t.k2 < 0.5 || t.k2 > 250.0) && t.n > 3
   if (t.k2 < 0.5) && t.n > 3
-# This computes M_m for the largest four m, and then works down to smaller values:
-    Mm_lower!(t)
+# This computes M_n for the largest four m, and then works down to smaller values:
+    Mn_lower!(t)
   else
-# This computes Mm for m=0 to 3, and then works upward to larger m:
-    Mm_raise!(t)
+# This computes Mn for m=0 to 3, and then works upward to larger m:
+    Mn_raise!(t)
   end
 end
 
 # Add up first two terms in flux numerator:
-flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
+flux = t.d_n[1]*t.sn[1]+t.d_n[2]*t.sn[2]
 # Next, loop over the Green's function components:
 @inbounds for n=2:t.n
-#  pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
-#  pofgn_M = t.onemr2mb2*t.Mm[n+1]-t.Mm[n+3]
-#  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+(1-(b-r)^2)*((b+r)^2-1)*t.Mm[n-1])
-#  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
-#  pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
-#  pofgn_M = 2*r2*t.Mm[n+1]-n/(n+2)*(t.onemr2mb2*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
-  pofgn_M = 2*r2*t.Mm[n+1]-n*t.minv[n+2]*(t.onemr2mb2*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
+#  pofgn_M = (1+(r-b)*(r+b))*t.Mn[n+1]-t.Mn[n+3]
+#  pofgn_M = t.onemr2mb2*t.Mn[n+1]-t.Mn[n+3]
+#  pofgn_M = 2*r^2*t.Mn[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mn[n+1]+(1-(b-r)^2)*((b+r)^2-1)*t.Mn[n-1])
+#  pofgn_M = 2*r^2*t.Mn[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mn[n+1]+sqarea_triangle(one(T),r,b)*t.Mn[n-1])
+#  pofgn_M = 2*r^2*t.Mn[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
+#  pofgn_M = 2*r2*t.Mn[n+1]-n/(n+2)*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
+  pofgn_M = 2*r2*t.Mn[n+1]-n*t.minv[n+2]*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
 # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
 # boundary for n > 0.
 # Compute sn[n]:
@@ -208,20 +208,20 @@ flux = t.c_n[1]*t.sn[1]+t.c_n[2]*t.sn[2]
     t.sqrt1mr2 = sqrt(1-r2)
     t.sn[n+1] = -0.5*pi*r2*t.sqrt1mr2^(n-4)*(4*(1-r2)^2+n*b2*((2+n)*r2-4))
   end
-  flux += t.c_n[n+1]*t.sn[n+1]
+  flux += t.d_n[n+1]*t.sn[n+1]
 end
 # That's it!
-# flux = sum(t.c_n.*t.sn)/(pi*(t.c_n[1]+t.twothird*t.c_n[2]))  # for c_2 and above, the flux is zero.
+# flux = sum(t.d_n.*t.sn)/(pi*(t.d_n[1]+t.twothird*t.d_n[2]))  # for d_2 and above, the flux is zero.
 # Divide by denominator:
-flux *= t.den  # for c_2 and above, the flux is zero.
+flux *= t.den  # for d_2 and above, the flux is zero.
 return flux
 end
 # That's it!
 
 function transit_poly!(r::T,b::T,u_n::Array{T,1},dfdrbu::Array{T,1}) where {T <: Real}
 t = transit_init(r,b,u_n,true)
-# Pass c_n (without last two dummy values):
-flux = transit_poly_c!(t)
+# Pass d_n (without last two dummy values):
+flux = transit_poly_d!(t)
 # Now, transform derivaties from c to u:
 fill!(dfdrbu,zero(T))
 # u_n derivatives:
@@ -235,17 +235,17 @@ end
 
 function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
 t = transit_init(r,b,u_n,false)
-# Pass c_n (without last two dummy values):
-return transit_poly_c(t) 
+# Pass d_n (without last two dummy values):
+return transit_poly_d(t) 
 end
 
 function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
-# This function assumes that c_n has already been computed from u_n
+# This function assumes that d_n has already been computed from u_n
 # (this can be used to save compute time when limb-darkening is fixed for
 # a range of radii/impact parameters).
 # Pass transit structure, and compute flux:
 if t.grad
-  flux = transit_poly_c!(t)
+  flux = transit_poly_d!(t)
   # Now, transform derivaties from c to u:
   fill!(t.dfdu,zero(T))
 #  t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dcdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
@@ -256,22 +256,22 @@ if t.grad
 #  end
   return flux
 else
-  return transit_poly_c(t)
+  return transit_poly_d(t)
 end
 return
 end
 
-function transit_poly_c!(t::Transit_Struct{T}) where {T <: Real}
+function transit_poly_d!(t::Transit_Struct{T}) where {T <: Real}
 r = t.r; b=t.b; n = t.n; r2 =r*r; b2=b*b
-@assert((length(t.c_n)) == length(t.dfdc))
+@assert((length(t.d_n)) == length(t.dfdc))
 @assert(r > 0)
 # Number of limb-darkening components to include (beyond 0 and 1):
 # We are parameterizing these with the function:
-# g_n = c_n [(n+2) z^n - n z^{n-2}] for n >= 2
-# while g_{0} = c_0 z^0 (uniform source) and g_{1} = c_1 z^1 (linear limb-darkening)
+# g_n = d_n [(n+2) z^n - n z^{n-2}] for n >= 2
+# while g_{0} = d_0 z^0 (uniform source) and g_{1} = d_1 z^1 (linear limb-darkening)
 # which gives a Green's integral of:
 # P(G_n) = \int_{\pi-\phi}^{2\pi+\phi} (1-r^2-b^2-2br s_\varphi)^{n/2} (r+b s_\varphi) d\varphi
-# for which we have a solution in terms of M_m.
+# for which we have a solution in terms of M_n.
 # Compute the derivative of the flux with respect to the different coefficients.
 
 # Set up a vector for storing results of P(G_n)-Q(G_n); note that
@@ -293,13 +293,13 @@ if b == 0.0
   # Annular eclipse - integrate around the full boundary of both bodies:
   flux = zero(T); onemr2 = 1-r2; t.sqrt1mr2 = sqrt(onemr2)
   fill!(t.dfdc,zero(T))
-  flux = (t.c_n[1]*onemr2+t.twothird*t.c_n[2]*t.sqrt1mr2^3)*pi*t.den
+  flux = (t.d_n[1]*onemr2+t.twothird*t.d_n[2]*t.sqrt1mr2^3)*pi*t.den
   fac  = 2r2*onemr2*pi*t.den
   facd = -2r*pi*t.den
-  t.dfdrb[1] = t.c_n[1]*facd + t.c_n[2]*facd*t.sqrt1mr2
+  t.dfdrb[1] = t.d_n[1]*facd + t.d_n[2]*facd*t.sqrt1mr2
   @inbounds for i=2:t.n
-    flux -= t.c_n[i+1]*fac
-    t.dfdrb[1] += t.c_n[i+1]*facd*(2*onemr2-i*r2)
+    flux -= t.d_n[i+1]*fac
+    t.dfdrb[1] += t.d_n[i+1]*facd*(2*onemr2-i*r2)
     t.dfdc[i+1] -= fac
     fac *= t.sqrt1mr2
     facd *= t.sqrt1mr2
@@ -376,34 +376,34 @@ if t.n >= 2
     t.dsndr[3] = 2*t.dsndr[1]+detadr
     t.dsndb[3] = 2*t.dsndb[1]+detadb
   else
-    # Compute the M_m functions:
+    # Compute the M_n functions:
     if t.k2 > 0
 #      if (t.k2 < 0.5 || t.k2 > 2.0) && t.v_max > 3
       if (t.k2 < 0.5) && t.n > 3
-    # This computes Mm for largest four m, and then works down to smaller values:
-        Mm_lower!(t)
+    # This computes Mn for largest four m, and then works down to smaller values:
+        Mn_lower!(t)
       else
-    # This computes Mm and then works upward to larger m:
-        Mm_raise!(t)
+    # This computes Mn and then works upward to larger m:
+        Mn_raise!(t)
       end
     end
   
     # Next, loop over the Green's function components:
     binv = inv(b)
     @inbounds for n=2:t.n
-#      pofgn_M = (1+(r-b)*(r+b))*t.Mm[n+1]-t.Mm[n+3]
-#      pofgn_M = t.onemr2mb2*t.Mm[n+1]-t.Mm[n+3]
-#      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*((1-r2-b2)*t.Mm[n+1]+t.kite_area2^2*t.Mm[n-1])
-#      pofgn_M = 2*r^2*t.Mm[n+1]-n/(n+2)*(t.onemr2mb2*t.Mm[n+1]+sqarea_triangle(one(T),r,b)*t.Mm[n-1])
-#      pofgn_M = 2*r2*t.Mm[n+1]-n/(n+2)*(t.onemr2mb2*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
-      pofgn_M = 2*r2*t.Mm[n+1]-n*t.minv[n+2]*(t.onemr2mb2*t.Mm[n+1]+t.sqarea*t.Mm[n-1])
+#      pofgn_M = (1+(r-b)*(r+b))*t.Mn[n+1]-t.Mn[n+3]
+#      pofgn_M = t.onemr2mb2*t.Mn[n+1]-t.Mn[n+3]
+#      pofgn_M = 2*r^2*t.Mn[n+1]-n/(n+2)*((1-r2-b2)*t.Mn[n+1]+t.kite_area2^2*t.Mn[n-1])
+#      pofgn_M = 2*r^2*t.Mn[n+1]-n/(n+2)*(t.onemr2mb2*t.Mn[n+1]+sqarea_triangle(one(T),r,b)*t.Mn[n-1])
+#      pofgn_M = 2*r2*t.Mn[n+1]-n/(n+2)*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
+      pofgn_M = 2*r2*t.Mn[n+1]-n*t.minv[n+2]*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
     # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
     # boundary for n > 0.
     # Compute sn[n]:
       t.sn[n+1] = -pofgn_M
-      dpdr_M = 2*r*((n+2)*t.Mm[n+1]-n*t.Mm[n-1])
+      dpdr_M = 2*r*((n+2)*t.Mn[n+1]-n*t.Mn[n-1])
       t.dsndr[n+1] = -dpdr_M
-      dpdb_M = n*binv*((t.Mm[n+1]-t.Mm[n-1])*(r2+b2)+(b2-r2)^2*t.Mm[n-1])
+      dpdb_M = n*binv*((t.Mn[n+1]-t.Mn[n-1])*(r2+b2)+(b2-r2)^2*t.Mn[n-1])
       t.dsndb[n+1] = -dpdb_M
       # When b is very small and r < 1, we'll use a Taylor-series expansion to O(b^3):
       if t.b <= 1e-6 && r < 1
@@ -430,12 +430,12 @@ t.dfdrb[2]=zero(T)  # Derivative with respect to b
   # derivatives with respect to the coefficients:
   t.dfdc[i+1]= t.sn[i+1]*t.den
   # total flux:
-  flux += t.c_n[i+1]*t.dfdc[i+1]
+  flux += t.d_n[i+1]*t.dfdc[i+1]
   # derivatives with respect to r and b:
-  t.dfdrb[1] += t.c_n[i+1]*t.dsndr[i+1]*t.den
-  t.dfdrb[2] += t.c_n[i+1]*t.dsndb[i+1]*t.den
+  t.dfdrb[1] += t.d_n[i+1]*t.dsndr[i+1]*t.den
+  t.dfdrb[2] += t.d_n[i+1]*t.dsndb[i+1]*t.den
 end
-# Include derivatives with respect to first two c_n parameters:
+# Include derivatives with respect to first two d_n parameters:
 t.dfdc[1] -= flux*t.den*pi
 t.dfdc[2] -= flux*t.den*pi*t.twothird
 return flux
