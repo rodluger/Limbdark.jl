@@ -982,11 +982,11 @@ case (\S \ref{sec:uniform}).
 We can express this in terms of a sequence of integrals,
 $\mathcal{M}_n(r,b)$, given by:
 \begin{equation}
-\mathcal{M}_n(r,b) &=& (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} d\xi,
+\mathcal{M}_n(r,b) = (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} d\xi,
 \end{equation}
 in terms of which the primitive integral takes the particulary simple form
 \begin{equation}\label{eq:primitive}
-\mathcal{P}(\bvec{G}_n) &=& (1+r^2-b^2)\mathcal{M}_n - \mathcal{M}_{n+2}.
+\mathcal{P}(\bvec{G}_n) = (1+r^2-b^2)\mathcal{M}_n - \mathcal{M}_{n+2}.
 \end{equation}
 
 The integrals $\mathcal{M}_n$ obey a straightforward recursion relation,
@@ -1018,16 +1018,16 @@ for $k^2 \le 1$, while for $k^2 > 1$,
 \mathcal{M}_2 &=& \pi(1-b^2-r^2),\\
 \mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} k^3\left[2(2-k^{-2})E(k^{-2})-(1-k^{-2})K(k^{-2})\right].
 \end{eqnarray}
-We express the elliptic integrals for $n=1$ and $3$ in terms of the $cel$ integrals which
+We express the elliptic integrals for $n=1$ and $3$ in terms of the cel integrals which
 were already computed for the $n=1$ case,
 \begin{eqnarray}
-\mathcal{M}_1 &=& 2 (4br)^{1/2} k^2 cel(k_c,1,1,0),\\
-\mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} \left[k^2 cel(k_c,1,1,kc^2)+(3k^2-2)k^2 cel(k_c,1,1,0)\right],\\
+\mathcal{M}_1 &=& 2 (4br)^{1/2} k^2 \mathrm{cel}(k_c,1,1,0),\\
+\mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2}k^2 \left[ \mathrm{cel}(k_c,1,1,kc^2)+(3k^2-2) \mathrm{cel}(k_c,1,1,0)\right],\\
 \end{eqnarray}
 for $k^2 \le 1$, while for $k^2 > 1$,
 \begin{eqnarray}
-\mathcal{M}_1 &=& 2(1-(r-b)^2)^{1/2} cel(k_c,1,1,k_c^2),\\
-\mathcal{M}_3 &=& \tfrac{2}{3}(1-(b-r)^2)^{3/2} \left[(3-2k^{-2}) cel(k_c,1,1,k_c^2)+k^{-2} cel(k_c,1,1,0\right].
+\mathcal{M}_1 &=& 2(1-(r-b)^2)^{1/2} \mathrm{cel}(k_c,1,1,k_c^2),\\
+\mathcal{M}_3 &=& \tfrac{2}{3}(1-(b-r)^2)^{3/2} \left[(3-2k^{-2}) \mathrm{cel}(k_c,1,1,k_c^2)+k^{-2} \mathrm{cel}(k_c,1,1,0\right].
 \end{eqnarray}
 where, as before, $k_c = \sqrt{1-k^2}$ for $k^2 \le 1$, and $k_c = \sqrt{1-k^{-2}}$ for $k^2 > 1$.
 
@@ -1036,22 +1036,21 @@ in terms of series expansions.
 When $k^2 \le 1$, the integrals may be expressed in terms of the following
 Hypergeometric functions and infinite series,
 \begin{eqnarray}
-\mathcal{M}_n &=& (4br)^{n/2} k^{n+1} \pi^{1/2} \frac{\Gamma{1+\frac{n}{2}}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+\frac{n}{2};k^2),\\
-&=& \sum_{j=0}^{j_{max}} \alpha_j k^{2j},\\
-\alpha_0 &=& \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})}(1-(r-b)^2)^{n/2} k,\\
+\mathcal{M}_n &=& (4br)^{n/2} k^{n+1} \pi^{1/2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+\tfrac{n}{2};k^2),\\
+&=& (1-(r-b)^2)^{n/2} k \sum_{j=0}^{j_{max}} \alpha_j k^{2j},\\
+\alpha_0 &=& \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})},\\
 \alpha_j &=& \alpha_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)},\\
 \end{eqnarray}
 while for $k^2 > 1$,
 \begin{eqnarray}
 \mathcal{M}_n &=& \pi (4br)^{n/2}k^n \,_2F_1(\tfrac{1}{2},-\tfrac{n}{2};1;k^{-2}),\\
-&=& \sum_{j=0}^{j_{max}} \beta_j k^{-2j},\\
-\beta_0 &=& \pi (1-(r-b)^2)^{n/2},\\
+&=& (1-(r-b)^2)^{n/2} \sum_{j=0}^{j_{max}} \beta_j k^{-2j},\\
+\beta_0 &=& \pi ,\\
 \beta_j &=& \beta_{j-1} \frac{(2+n+2j)(1-2j)}{4j^2},\\
 \end{eqnarray}
-where $j_{max}=\infty$ for $k^2 \le 1$ and for $k^2 > 1$ with odd $n$.  For
-$k^2 > 1$ and even $n$, $j_{max} = n/2$;  in practice we set $j_{max} = 100$.  
-The series is truncated when a term goes below a tolerance specified
-by the numerical precision.
+where for $k^2 > 1$ and even $n$, $j_{max} = n/2$, and otherwise $j_{max}=\infty$.  In 
+practice we set $j_{max} = 100$, and the series is truncated when a term goes below a 
+tolerance specified by the numerical precision.
 
 {\color{red} Give the Taylor series expansions near $b=0$.}
 
@@ -1144,21 +1143,29 @@ which are reused throughout the light curve, and we also use this structure
 to store variables which are used throughout a given computation to save
 on memory allocation and on computation time.
 
-Some terms only need to be computed once.  Once the number of limb-darkening
+Some are computed once, and stored.  Due to the greater computational
+expense of square-roots and divisions, where possible we try to only
+compute a square root or division once, storing these in a variable, and
+then reusing these with cheaper multiplication throughout the computation
+when needed.  For instance, for many formulae we require the
+inverse of an integer, so an array of integer inverses is computed once
+and stored, and then accessed as required rather than recomputed.
+Once the number of limb-darkening
 terms, $n$, is specified, then the series coefficients for $\mathcal{M}_n$,
 $\alpha_j$ and $\beta_j$, are a simple function of $j$ and $n$, and so we 
 compute these coefficients once, and store them in a vector for $k^2 \le 1$ 
-and $k^2 > 1$, separately for $n_{max}-3$ to $n_{max}$, where $n_{max}=n+1$.
+and $k^2 > 1$, separately for $n-3$ to $n$.
 
 In addition, once $n$ is specified, then the transformation matrix for
 the Jacobian from $d_i$ to $u_i$ remains the same throughout the light curve 
 computation, so we compute this matrix only once.
 
-In computing the elliptic integrals, $cel$, we found that several terms
+In computing the elliptic integrals, cel, we found that several terms
 which appear in the Bartky formalism are repeated amongst all three elliptic 
 integrals which appear in the expressions for $S_1$.  Consequently, we carry 
 out a parallel computation of these elliptic integrals such that these
-repeated terms are only computed once;  this gives efficiency
+repeated terms are only computed once;  this improves the efficiency of
+the elliptic integral computation.
 
 We find that the precision of the computation begins to degrade for
 $ n \approx 25-30$.  For large values of $n$, the computing time for
@@ -1168,13 +1175,7 @@ algebra library (specifically, the routine \texttt{gemv}) for efficient
 multiplication of this matrix times the derivative of the light curve with 
 respect to $d_i$ in order to obtain the derivatives with respect to $u_i$.
 Other quantities, such as the denominator of the flux, $F_0$, need to
-only be computed once per light curve.  Due to the greater computational
-expense of square-roots and divisions, where possible we try to only
-compute a square root or division once, storing these in a variable, and
-then reusing these with cheaper multiplication throughout the computation
-when needed.  For instance, for many formulae we require the
-inverse of an integer, so an array of integer inverses is computed once
-and stored, and then accessed as required rather than recomputed.
+only be computed once per light curve.  
 
 \section{Benchmarking}\label{sec:benchmark}
 

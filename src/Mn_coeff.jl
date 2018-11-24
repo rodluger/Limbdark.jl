@@ -1,18 +1,18 @@
 function Mn_series_coeff!(t::Transit_Struct{T}) where {T <: Real}
 # Use series expansion to compute M_n. (don't need its derivative, dM_n/dk.)
 # Computing leading coefficient (n=0).  Need to compute for
-# m_max-3 to m_max.  Also, need to keep track of k^2 < 1
+# n_max-3 to n_max.  Also, need to keep track of k^2 < 1
 # and k^2 >= 1.  So, Mn_coeff is 3-dimensional array:
 # Mn_coeff[2,4,jmax], where first dimension is for k^2 < 1 (1)
-# and k^2 >= 1 (2); second dimension is for m_max-3 (1) to m_max (4),
+# and k^2 >= 1 (2); second dimension is for n_max-3 (1) to n_max (4),
 # while third dimension is for the series coefficients.
 # Computing leading coefficient (n=0):
 for k2 = 0:1
 coeff = zero(T)
-# Loop over m_max to m_max-3:
+# Loop over n_max to n_max-3:
 for j=1:4
-  # m is m_max to m_max-3 (we need both since downward recursion requires two):
-  m = t.m_max+j-4
+  # m is n_max to n_max-3 (we need both since downward recursion requires two):
+  m = t.n_max+j-4
   mhalf = 0.5*m
   if k2 < 1
     coeff = sqrt(pi)*exp(lgamma(mhalf+1.0)-lgamma(mhalf+1.5))
