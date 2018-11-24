@@ -198,7 +198,7 @@ flux = t.d_n[1]*t.sn[1]+t.d_n[2]*t.sn[2]
 #  pofgn_M = 2*r^2*t.Mn[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mn[n+1]+sqarea_triangle(one(T),r,b)*t.Mn[n-1])
 #  pofgn_M = 2*r^2*t.Mn[n+1]-n/(n+2)*((1-r^2-b^2)*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
 #  pofgn_M = 2*r2*t.Mn[n+1]-n/(n+2)*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
-  pofgn_M = 2*r2*t.Mn[n+1]-n*t.minv[n+2]*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
+  pofgn_M = 2*r2*t.Mn[n+1]-n*t.ninv[n+2]*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
 # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
 # boundary for n > 0.
 # Compute sn[n]:
@@ -396,7 +396,7 @@ if t.n >= 2
 #      pofgn_M = 2*r^2*t.Mn[n+1]-n/(n+2)*((1-r2-b2)*t.Mn[n+1]+t.kite_area2^2*t.Mn[n-1])
 #      pofgn_M = 2*r^2*t.Mn[n+1]-n/(n+2)*(t.onemr2mb2*t.Mn[n+1]+sqarea_triangle(one(T),r,b)*t.Mn[n-1])
 #      pofgn_M = 2*r2*t.Mn[n+1]-n/(n+2)*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
-      pofgn_M = 2*r2*t.Mn[n+1]-n*t.minv[n+2]*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
+      pofgn_M = 2*r2*t.Mn[n+1]-n*t.ninv[n+2]*(t.onemr2mb2*t.Mn[n+1]+t.sqarea*t.Mn[n-1])
     # Q(G_n) is zero in this case since on limb of star z^n = 0 at the stellar
     # boundary for n > 0.
     # Compute sn[n]:

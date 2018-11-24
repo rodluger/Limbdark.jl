@@ -1161,7 +1161,7 @@ out a parallel computation of these elliptic integrals such that these
 repeated terms are only computed once;  this gives efficiency
 
 We find that the precision of the computation begins to degrade for
-$ n \approx 25$.  For large values of $n$, the computing time for
+$ n \approx 25-30$.  For large values of $n$, the computing time for
 propagating the derivatives from $d_i$ to $u_i$ scales as $n^2$, and
 thus can dominate the computation time.  We utilize the BLAS linear
 algebra library (specifically, the routine \texttt{gemv}) for efficient 
@@ -1171,8 +1171,10 @@ Other quantities, such as the denominator of the flux, $F_0$, need to
 only be computed once per light curve.  Due to the greater computational
 expense of square-roots and divisions, where possible we try to only
 compute a square root or division once, storing these in a variable, and
-then reusing these with a multiplication throughtout the computation
-when necessary.
+then reusing these with cheaper multiplication throughout the computation
+when needed.  For instance, for many formulae we require the
+inverse of an integer, so an array of integer inverses is computed once
+and stored, and then accessed as required rather than recomputed.
 
 \section{Benchmarking}\label{sec:benchmark}
 
