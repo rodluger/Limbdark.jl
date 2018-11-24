@@ -203,7 +203,8 @@ flux = t.d_n[1]*t.sn[1]+t.d_n[2]*t.sn[2]
 # boundary for n > 0.
 # Compute sn[n]:
   t.sn[n+1] = -pofgn_M
-  if t.b <= 1e-6 && r < 1
+  # Near the origin, use a Taylor-series expansion to cubic order in b:
+  if t.b <= 1e-6 && r < 1 && T == Float64  # Skip this if working in higher precision
     # Use analytic formula near b=0:
     t.sqrt1mr2 = sqrt(1-r2)
     t.sn[n+1] = -0.5*pi*r2*t.sqrt1mr2^(n-4)*(4*(1-r2)^2+n*b2*((2+n)*r2-4))
