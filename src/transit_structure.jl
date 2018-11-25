@@ -7,17 +7,19 @@ mutable struct Transit_Struct{T}
   n_max   :: Int64       # maximum number of terms in M_n
   d_n     :: Array{T,1}  # Green's basis coefficients
   sn      :: Array{T,1}  # Green's basis terms
-  Mn      ::  Array{T,1} # integral over (k^2-sin(phi)^2)^(m/2)
+  Mn      ::  Array{T,1} # integral over (k^2-sin^2(phi))^(m/2)
+  Nn      ::  Array{T,1} # integral over (k^2-sin^2(phi))^(m/2)*sin^2(phi)
   grad    :: Bool        # true for gradient; false for no gradient
   s2_grad :: Array{T,1}  # gradient of s2 with respect to (r,b) - this is S_1 = s_2 from starry
   dsndr   ::  Array{T,1} # derivatives of Green's basis with respect to r
   dsndb   ::  Array{T,1} # derivatives of Green's basis with respect to b
-  dcdu    :: Array{T,2}  # derivatives d_n with respect to u_n
+  dddu    :: Array{T,2}  # derivatives d_n with respect to u_n
   dfdrb   :: Array{T,1}  # derivative of flux with respect to r,b
-  dfdc    :: Array{T,1}  # derivative of flux with respect to d_n
+  dfdd    :: Array{T,1}  # derivative of flux with respect to d_n
   dfdu    :: Array{T,1}  # derivative of flux with respect to u_n
   jmax    :: Int64       # maximum number of terms in series expansions of I_v and J_v
   Mn_coeff :: Array{T,3} # coefficients for series expansion of M_n
+  Nn_coeff :: Array{T,2} # coefficients for series expansion of N_n
   ninv    :: Array{T,1}  # inverse of the integers n
   k2      :: T           # k^2 = (1-(r-b)^2)/(4br)
   k       :: T           # k = sqrt(k^2)
@@ -50,6 +52,7 @@ end
 using SpecialFunctions
 include("compute_d_n_struct.jl")
 include("Mn_coeff.jl")
+include("Nn_coeff.jl")
 
 function transit_init(r::T,b::T,u_n::Array{T,1},grad::Bool) where {T <: Real}
 # Initializs a transit structure.
@@ -61,16 +64,18 @@ trans = Transit_Struct{T}(r,b,u_n,n,n_max,
   zeros(T,n+1),    # d_n
   zeros(T,n+1),    # sn
   zeros(T,n_max+1),# M_n from m= 0 to n_max
+  zeros(T,n_max+1),# N_n from m= 0 to n_max
   grad,            # grad
   zeros(T,2),      # s2_grad
   zeros(T,n+1),    # dsndr
   zeros(T,n+1),    # dsndb
-  zeros(T,n+1,n),  # dcdu
+  zeros(T,n+1,n),  # dddu
   zeros(T,2),      # dfdrb
-  zeros(T,n+1),    # dfdc
+  zeros(T,n+1),    # dfdd
   zeros(T,n),      # dfdu
   jmax,		   # jmax
   zeros(T,2,4,jmax),   # Mn_coeff for k^2 < 1 & k^2 > 1; n_max-3 to n_max; series coefficients
+  zeros(T,2,jmax),  # Nn_coeff for k^2 < 1; n_max-1 to n_max; series coefficients
   zeros(T,n_max+2), # inverse of integers
   zero(T),         # k^2
   zero(T),         # k
@@ -99,8 +104,9 @@ trans = Transit_Struct{T}(r,b,u_n,n,n_max,
   convert(T,2)/3,  # 2/3
   zero(T)         # sqrt(r*(1-r))
 )
-# Initialize series coefficients for M_n:
+# Initialize series coefficients for M_n and N_n:
 Mn_series_coeff!(trans)
+Nn_series_coeff!(trans)
 # Inverse of integers:
 for n=1:n_max+2
   trans.ninv[n] = inv(n)

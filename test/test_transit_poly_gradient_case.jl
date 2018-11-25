@@ -1,7 +1,7 @@
 function test_transit_poly_gradient_case(u_n,test_name)
 
-r0 = [0.01,.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]; n_u = length(u_n)
-#r0 = [0.01,.1,0.5,0.999999,1.0,1.000001,2.0,10.,100.0]; n_u = length(u_n)
+#r0 = [0.01,.1,0.5,0.99,1.0,1.01,2.0,10.,100.0]; n_u = length(u_n)
+r0 = [0.01,.1,0.5,0.999999,1.0,1.000001,2.0,10.,100.0]; n_u = length(u_n)
 #r0 = [1.0]; n_u = length(u_n)
 #r0_name =["0.01","0.1","0.5","0.999999","1","1.000001","2","10","100"]
 r0_name =["0.01","0.1","0.5","0.99","1","1.01","2","10","100"]
@@ -37,13 +37,18 @@ for i=1:length(r0)
      L"$r+1-10^{-3}$",L"$r+1-10^{-13}$"]
   end
   nbgrid = length(bgrid)
-  tp_grad_grid = zeros(nbgrid,n_u+2)
-  tp_grad_array= zeros(n_u+2)
+#  tp_grad_grid = zeros(nbgrid,n_u+2)
+  tp_grad_grid = zeros(nbgrid,2)
+#  tp_grad_array= zeros(n_u+2)
+  tp_grad_array= zeros(2)
   tp_grid = zeros(nbgrid)
   tp_grid_big = zeros(nbgrid)
-  tp_grad_grid_num = zeros(nbgrid,n_u+2)
-  tp_grad_grid_ana = zeros(nbgrid,n_u+2)
-  tp_grad_grid_big = zeros(nbgrid,n_u+2)
+#  tp_grad_grid_num = zeros(nbgrid,n_u+2)
+  tp_grad_grid_num = zeros(nbgrid,2)
+#  tp_grad_grid_ana = zeros(nbgrid,n_u+2)
+  tp_grad_grid_ana = zeros(nbgrid,2)
+#  tp_grad_grid_big = zeros(nbgrid,n_u+2)
+  tp_grad_grid_big = zeros(nbgrid,2)
   for j=1:nbgrid
     tp=transit_poly(r,bgrid[j],u_n)
     tp_grid[j]=tp
@@ -58,22 +63,32 @@ for i=1:length(r0)
     tp_grid_big[j,:] .=tp
     # Compute analytic derivatives:
     tp = transit_poly!(r,bgrid[j],u_n,dfdrbu)
-    tp_grad_grid_ana[j,:] .=dfdrbu
+    tp_grad_grid_ana[j,:] .=dfdrbu[1:2]
     # Compute derivatives in BigFloat (tests precision of derivatives):
     bigr = big(r)
     tp_big = transit_poly!(big(r),big(bgrid[j]),big.(u_n),dfdrbu_big)
-    tp_grad_grid_big[j,:] .=dfdrbu_big
-    @test isapprox(dfdrbu,tp_grad_array,atol=1e-6)
-    if !isapprox(dfdrbu,tp_grad_array,atol=1e-6)
-      println("r: ",r," bgrid: ",bgrid[j])
-      println("dfdrbu: ",dfdrbu)
+    tp_grad_grid_big[j,:] .=dfdrbu_big[1:2]
+    if r != 1.0
+      @test isapprox(dfdrbu[1:2],tp_grad_array,atol=1e-7)
+    else
+      @test isapprox(dfdrbu[1:2],tp_grad_array,atol=3e-6)
+    end
+    if !isapprox(dfdrbu[1:2],tp_grad_array,atol=1e-7)
+#      println("r: ",r," bgrid: ",bgrid[j])
+      println("k2: ",(1-(r-bgrid[j])^2)/(4*r*bgrid[j])," r: ",r," bgrid: ",bgrid[j])
+      println("dfdrbu: ",dfdrbu[1:2])
       println("tp_grad_array: ",tp_grad_array)
-      println("norm(x-y): ",norm(dfdrbu-tp_grad_array))
+      println("norm(x-y): ",norm(dfdrbu[1:2]-tp_grad_array))
 #      read(STDIN,Char)
     end
-    @test isapprox(dfdrbu,dfdrbu_big,atol=1e-6)
-    if !isapprox(dfdrbu,dfdrbu_big,atol=1e-6)
-      println("r: ",r," bgrid: ",bgrid[j])
+    if r != 1.0
+      @test isapprox(dfdrbu,dfdrbu_big,atol=1e-7)
+    else
+      @test isapprox(dfdrbu,dfdrbu_big,atol=3e-6)
+    end  
+    if !isapprox(dfdrbu,dfdrbu_big,atol=1e-7)
+#      println("r: ",r," bgrid: ",bgrid[j])
+      println("k2: ",(1-(r-bgrid[j])^2)/(4*r*bgrid[j])," r: ",r," bgrid: ",bgrid[j])
       println("dfdrbu: ",dfdrbu)
       println("dfdrbu_big: ",convert(Array{Float64,1},dfdrbu_big))
       println("norm(x-y): ",norm(dfdrbu-dfdrbu_big))
@@ -84,7 +99,8 @@ for i=1:length(r0)
     ax = axes[i]
     y = abs.(asinh.(tp_grid) .-asinh.(tp_grid_big)); mask = y .<= floor; y[mask] .=floor
     ax[:semilogy](y,lw=1,label="flux")
-    for n=1:n_u+2
+#    for n=1:n_u+2
+    for n=1:2
       y = abs.(asinh.(tp_grad_grid_ana[:,n]) .-asinh.(tp_grad_grid_big[:,n])); mask = y .<= floor; y[mask] .=floor
       ax[:semilogy](y,lw=1,label=string(label_name[n]," vs. big"))
       y = abs.(asinh.(tp_grad_grid_ana[:,n]) .-asinh.(tp_grad_grid_num[:,n])); mask = y .<= floor; y[mask] .=floor

@@ -55,7 +55,8 @@ end
   println("ell3: ",ell3)
   for i=1:3
     @test isapprox(ell1[i],ell2[i])
-    @test isapprox(ell1[i],ell3[i],atol=1e-6)
+#    @test isapprox(ell1[i],ell3[i],atol=1e-6)
+    @test isapprox(ell1[i],ell3[i])
   end
   # Test positive p values:
   p = rand(); a=rand(3); b=rand(3)
@@ -66,7 +67,8 @@ end
   println("ell3: ",ell3)
   for i=1:3
     @test isapprox(ell1[i],ell2[i])
-    @test isapprox(ell1[i],ell3[i],atol=1e-6)
+#    @test isapprox(ell1[i],ell3[i],atol=1e-6)
+    @test isapprox(ell1[i],ell3[i])
   end
   # Test small kc values:
   p = rand(); a=rand(3); b=rand(3)
@@ -77,7 +79,8 @@ end
   println("ell3: ",ell3)
   for i=1:3
     @test isapprox(ell1[i],ell2[i])
-    @test isapprox(ell1[i],ell3[i],atol=1e-6)
+#    @test isapprox(ell1[i],ell3[i],atol=1e-6)
+    @test isapprox(ell1[i],ell3[i])
   end
   # Test large kc values:
   p = rand(); a=rand(3); b=rand(3)
@@ -88,6 +91,7 @@ end
   println("ell3: ",ell3)
   for i=1:3
     @test isapprox(ell1[i],ell2[i])
-    @test isapprox(ell1[i],ell3[i],atol=1e-6)
+#    @test isapprox(ell1[i],ell3[i],atol=1e-6)
+    @test isapprox(ell1[i],ell3[i])
   end
 end

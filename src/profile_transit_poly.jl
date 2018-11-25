@@ -10,16 +10,17 @@ trans = transit_init(0.1,0.5,u_n,true)
 #Transit_Struct{Float64}(0.1, 0.5, [0.5, 0.5], 2, 3, [-0.25, 1.5, -0.125], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], false, [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0 0.0; 0.0 0.0; 0.0 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0])
 
 function transit_b(trans,b)
-#  flux = zeros(length(b))
-#  gradient = zeros(length(b),2+trans.n)
+  flux = zeros(length(b))
+  gradient = zeros(length(b),2+trans.n)
   for i=1:length(b)
     trans.b = b[i]
-#    flux[i]=transit_poly!(trans)
-#    gradient[i,:]=trans.dfdrbu
+    flux[i]=transit_poly!(trans)
+    gradient[i,1:2]=trans.dfdrb
+    gradient[i,3:2+trans.n]=trans.dfdu
     transit_poly!(trans)
   end
-#  return flux,gradient
-  return
+  return flux,gradient
+#  return
 end
 b = abs.(linspace(-1.2,1.2,10000000))
 

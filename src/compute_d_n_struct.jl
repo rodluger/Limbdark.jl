@@ -60,35 +60,35 @@ for j=t.n:-1:2
   if j >= t.n-1
     t.d_n[j+1] = a_n[j+1]/(j+2)
     for i=1:t.n
-      t.dcdu[j+1,i] = dadu[j+1,i]/(j+2)
+      t.dddu[j+1,i] = dadu[j+1,i]/(j+2)
     end
   else
     t.d_n[j+1] = a_n[j+1]/(j+2)+t.d_n[j+3]
     for i=1:t.n
-      t.dcdu[j+1,i] = dadu[j+1,i]/(j+2) + t.dcdu[j+3,i]
+      t.dddu[j+1,i] = dadu[j+1,i]/(j+2) + t.dddu[j+3,i]
     end
   end
 end
 if t.n >= 3
   t.d_n[2] = a_n[2]+3*t.d_n[4]
   for i=1:t.n
-    t.dcdu[2,i] = dadu[2,i] + 3*t.dcdu[4,i]
+    t.dddu[2,i] = dadu[2,i] + 3*t.dddu[4,i]
   end
 else
   t.d_n[2] = a_n[2]
   for i=1:t.n
-    t.dcdu[2,i] = dadu[2,i]
+    t.dddu[2,i] = dadu[2,i]
   end
 end
 if t.n >= 2
   t.d_n[1] = a_n[1]+2*t.d_n[3]
   for i=1:t.n
-    t.dcdu[1,i] = dadu[1,i] + 2*t.dcdu[3,i]
+    t.dddu[1,i] = dadu[1,i] + 2*t.dddu[3,i]
   end
 else
   t.d_n[1] = a_n[1]
   for i=1:t.n
-    t.dcdu[1,i] = dadu[1,i]
+    t.dddu[1,i] = dadu[1,i]
   end
 end
 return
