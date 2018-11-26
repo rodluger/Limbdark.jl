@@ -863,50 +863,50 @@ for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\b
     \end{centering}
 \end{figure}
 
-\begin{align}
-    \label{eq:PGnI}
-    \mathcal{P}(\bvec{G}_n) &=
-    \begin{dcases}
-        %
-        r^{l+2} \sum\displaylimits_{i=0}^{\frac{l}{2}}
-                {\frac{l}{2} \choose i}
-                \left(\frac{b}{r}\right)^{\frac{l-2i}{2}}
-                \mathcal{I}_{\frac{l+4}{2}, i}
-            %
-            & \qquad \frac{l}{2} \, \mathrm{even}
-        \\[1em]
-        %
-        -r^{l-2} \left( b \mathcal{J}_{l-3,1} + r \mathcal{J}_{l-3,2} \right)
-        %
-        & \qquad l = 1
-        \\[1em]
-        %
-        r^{l-1} \sum\displaylimits_{i=0}^{\frac{l-1}{2}}
-                {\frac{l-1}{2} \choose i}
-                \left(\frac{b}{r}\right)^{\frac{l-2i-1}{2}}
-                \mathcal{J}_{\frac{l-1}{2}, i}
-            & \qquad \frac{l-1}{2} \, \mathrm{even}
-        \\[1em]
-        %
-        0 & \qquad \mathrm{otherwise}
-    \end{dcases}
-%
-\end{align}
-%
-\begin{align}
-%
-    \nonumber \\
-    \label{eq:QGnI}
-    \mathcal{Q}(\bvec{G}_n) &=
-    \begin{dcases}
-        \mathcal{H}_{\frac{l+4}{2}, \frac{l}{2}}
-        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \frac{l}{2} \, \mathrm{even}
-        \\[1em]
-        %
-        0
-        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \mathrm{otherwise} \quad.
-    \end{dcases}
-\end{align}
+%\begin{align}
+%    \label{eq:PGnI}
+%    \mathcal{P}(\bvec{G}_n) &=
+%    \begin{dcases}
+%        %
+%        r^{l+2} \sum\displaylimits_{i=0}^{\frac{l}{2}}
+%                {\frac{l}{2} \choose i}
+%                \left(\frac{b}{r}\right)^{\frac{l-2i}{2}}
+%                \mathcal{I}_{\frac{l+4}{2}, i}
+%            %
+%            & \qquad \frac{l}{2} \, \mathrm{even}
+%        \\[1em]
+%        %
+%        -r^{l-2} \left( b \mathcal{J}_{l-3,1} + r \mathcal{J}_{l-3,2} \right)
+%        %
+%        & \qquad l = 1
+%        \\[1em]
+%        %
+%        r^{l-1} \sum\displaylimits_{i=0}^{\frac{l-1}{2}}
+%                {\frac{l-1}{2} \choose i}
+%                \left(\frac{b}{r}\right)^{\frac{l-2i-1}{2}}
+%                \mathcal{J}_{\frac{l-1}{2}, i}
+%            & \qquad \frac{l-1}{2} \, \mathrm{even}
+%        \\[1em]
+%        %
+%        0 & \qquad \mathrm{otherwise}
+%    \end{dcases}
+%%
+%\end{align}
+%%
+%\begin{align}
+%%
+%    \nonumber \\
+%    \label{eq:QGnI}
+%    \mathcal{Q}(\bvec{G}_n) &=
+%    \begin{dcases}
+%        \mathcal{H}_{\frac{l+4}{2}, \frac{l}{2}}
+%        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \frac{l}{2} \, \mathrm{even}
+%        \\[1em]
+%        %
+%        0
+%        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \mathrm{otherwise} \quad.
+%    \end{dcases}
+%\end{align}
 
 We have computed derivatives of these expressions using automatic
 differentiation within the \starry code base.
@@ -914,7 +914,7 @@ differentiation within the \starry code base.
 \section{Alternative Green's function expansion} \label{sec:power_law}
 
 Although the foregoing analysis takes advantage of the existing formalism
-developed for occultation of spheres with arbitrary spherical harmonic
+in \starry developed for occultation of spheres with arbitrary spherical harmonic
 brightness, the problem can be simplified significantly for the limb-darkening
 case due to the azimuthal symmetry assumed for a star.  This simplification
 leads to analytic expressions for the derivatives, which we find can be
@@ -932,9 +932,15 @@ giving
 \begin{eqnarray}
 \gbasisn(x,y) &=& \frac{\dd {G_n}_y}{\dd \x} - \frac{\dd {G_n}_x}{\dd \y}\\
 &=& 2 f_n(z) + \frac{df}{dz} \frac{z^2-1}{z},\\
-&=& \frac{1}{z} \frac{d}{dz}\left[ f_n(z)(z^2-1)\right].
+&=& \frac{1}{z} \frac{d}{dz}\left[ f_n(z)(z^2-1)\right],
 \end{eqnarray}
-This yields particularly simple form for the primitive integrals of
+where $\gbasisn$ is the basis function for the limb-darkening surface brightness.
+The two dimensional integral of this surface brightness, $\gbasisn$, is converted into
+two one dimensional ``primitive" integrals of $f_n \propto \mathbf{G}_n \cdot d\mathbf{r}$ 
+over the boundary arcs of the two intersecting circles, one for the occultor, 
+$\mathcal{P}(\mathbf{G}_n)$, and the boundary of the source, $\mathcal{Q}(\mathbf{G}_n)$.
+
+This choice of Green's function yields particularly simple form for the primitive integrals of
 \begin{align}
     \label{eq:primitiveP}
     \mathcal{P}(\bvec{G}_n) &=
@@ -1053,8 +1059,6 @@ where for $k^2 > 1$ and even $n$, $j_{max} = n/2$, and otherwise $j_{max}=\infty
 practice we set $j_{max} = 100$, and the series is truncated when a term goes below a 
 tolerance specified by the numerical precision.
 
-{\color{red} Give the Taylor series expansions near $b=0$.}
-
 \subsection{Limb-darkening coefficients}
 
 Our expansion for limb-darkening in terms of $u_n(1-\upmu)^n$ (equation \ref{eq:polynomialld}) needs to
@@ -1082,7 +1086,7 @@ starting with $n=N$, with $d_{N+1}=d_{N+2}=0$.
 
 The total light curve is computed from
 \begin{eqnarray}\label{eq:flux}
-\frac{F}{F_0} &=& \frac{1}{F_0}\sum_{n=0}^N d_n S_n,\\
+\mathcal{F} = \frac{F}{F_0} &=& \frac{1}{F_0}\sum_{n=0}^N d_n S_n,\\
 F_0 &=& \pi(d_0+ \tfrac{2}{3} d_1),
 \end{eqnarray}
 where $F_0$ is the unobscured flux, $S_0$ is given for uniform limb-darkening
@@ -1117,11 +1121,11 @@ section \ref{sec:reparam}.
 
 The light curve derivatives are then computed as
 \begin{eqnarray}\label{eq:derivatives}
-\frac{\partial F/F_0}{\partial r} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial r},\\
-\frac{\partial F/F_0}{\partial b} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial b},\\
-\frac{\partial F/F_0}{\partial d_0} &=&  -\frac{\pi F}{F_0^2} + \frac{S_0}{F_0},\\
-\frac{\partial F/F_0}{\partial d_1} &=&  -\frac{2\pi F}{3F_0^2} +\frac{S_1}{F_0},\\
-\frac{\partial F/F_0}{\partial d_n} &=&  \frac{S_n}{F_0},
+\frac{\partial \mathcal{F}}{\partial r} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial r},\\
+\frac{\partial \mathcal{F}}{\partial b} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial b},\\
+\frac{\partial \mathcal{F}}{\partial d_0} &=&  -\frac{\pi F}{F_0^2} + \frac{S_0}{F_0},\\
+\frac{\partial \mathcal{F}}{\partial d_1} &=&  -\frac{2\pi F}{3F_0^2} +\frac{S_1}{F_0},\\
+\frac{\partial \mathcal{F}}{\partial d_n} &=&  \frac{S_n}{F_0},
 \end{eqnarray}
 where the last line is for $n \ge 2$.
 
@@ -1129,7 +1133,7 @@ The derivatives of the coefficients, $\frac{\partial u_i}{\partial d_j}$, are
 computed by differentiating each term, and propagating the derivatives via the
 chain rule.  Then, the light curve derivatives are given by
 \begin{eqnarray}
-\frac{\partial F/F_0}{\partial u_i} =  \sum_{j} \frac{\partial F/F_0}{\partial d_j}\frac{\partial d_j}{\partial u_i}.
+\frac{\partial \mathcal{F}{\partial u_i} =  \sum_{j} \frac{\partial \mathcal{F}}{\partial d_j}\frac{\partial d_j}{\partial u_i}.
 \end{eqnarray}
 
 \section{Implementation details}

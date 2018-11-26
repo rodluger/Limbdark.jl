@@ -181,8 +181,8 @@ end
 
 # Compute the M_n functions:
 if t.k2 > 0
-  if (t.k2 < 0.5 || t.k2 > 20.0) && t.n > 3
-#  if (t.k2 < 0.5) && t.n > 3
+#  if (t.k2 < 0.5 || t.k2 > 20.0) && t.n > 3
+  if (t.k2 < 0.5) && t.n > 3
 # This computes M_n for the largest four m, and then works down to smaller values:
     Mn_lower!(t)
   else
