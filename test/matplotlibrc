@@ -1,7 +1,4 @@
-if VERSION >= v"0.7"
-  backend: agg
-else
-  backend: MacOSX
-end
+#backend: agg
+backend: MacOSX
 text.usetex: True
 mathtext.fontset: stix

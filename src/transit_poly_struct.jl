@@ -260,7 +260,7 @@ return
 end
 
 function transit_poly_d!(t::Transit_Struct{T}) where {T <: Real}
-r = t.r; b=t.b; n = t.n; r2 =r*r; b2=b*b
+r = t.r; b=t.b; n = t.n; r2 =r*r; b2=b*b; bcut = 1e-3
 @assert((length(t.d_n)) == length(t.dfdd))
 @assert(r > 0)
 # Number of limb-darkening components to include (beyond 0 and 1):
@@ -381,15 +381,19 @@ if t.n >= 2
       if (t.k2 < 0.5) && t.n > 3
     # This computes Mn for largest four m, and then works down to smaller values:
         Mn_lower!(t)
-        Nn_lower!(t)
+        if b < bcut
+          Nn_lower!(t)
+        end
       else
     # This computes Mn and then works upward to larger m:
         Mn_raise!(t)
-        Nn_raise!(t)
+        if b < bcut
+          Nn_raise!(t)
+        end
       end
     end
     # Next, loop over the Green's function components:
-#    binv = inv(b)
+    binv = inv(b)
 #    @inbounds for n=2:t.n
     @inbounds for n=3:t.n
 #      pofgn_M = (1+(r-b)*(r+b))*t.Mn[n+1]-t.Mn[n+3]
@@ -406,9 +410,12 @@ if t.n >= 2
 #      dpdr_M = 2*r*((2-(n+2)*(b-r)^2)*t.Mn[n-1]-4*(n+2)*b*r*t.Nn[n-1])
 #      dpdr_M = 2*r*((2+n-n/t.onembmr2)*t.Mn[n+1]-n/t.k2*t.Nn[n+1])
       t.dsndr[n+1] = -dpdr_M
-#      dpdb_M = n*binv*((t.Mn[n+1]-t.Mn[n-1])*(r2+b2)+(b2-r2)^2*t.Mn[n-1])
-      # Now use function which doesn't involve division by b:
-      dpdb_M = n*(t.Mn[n-1]*(2*r^3+b^3-b-3*r2*b)+b*t.Mn[n+1]-4*r^3*t.Nn[n-1])
+      if b < bcut
+       # For small b, use function which doesn't involve division by b:
+        dpdb_M = n*(t.Mn[n-1]*(2*r^3+b^3-b-3*r2*b)+b*t.Mn[n+1]-4*r^3*t.Nn[n-1])
+      else
+        dpdb_M = n*binv*((t.Mn[n+1]-t.Mn[n-1])*(r2+b2)+(b2-r2)^2*t.Mn[n-1])
+      end
       t.dsndb[n+1] = -dpdb_M
     end
   end
