@@ -153,7 +153,7 @@ to higher order limb-darkening.
 
 The third goal, of numerical stability, has yet to be addressed in the literature.
 Although some numerical approaches are numerically stable, such as \cite{Gimenez2006}
-and \cite{Kreidberg2015}, these approaches tend to be slower, they have precisions
+\cite{Kreidberg2015}, and \cite{Parviainen2015}, these approaches tend to be slower, they have precisions
 which depend upon the tolerance of the computation, and, in addition, they do not
 yield derivatives of the light curves.
 
@@ -1456,6 +1456,31 @@ bodies are assumed to have a sharp boundary.
 All of these assumptions are violated in every transit event to some extent,
 but in many cases can yield an adequate approximation given a particular
 signal-to-noise ratio.
+
+The parameterization of limb-darkening can impact the precision of the computation
+of transit light curves.  A common approach is to derive limb-darkening
+coefficients for a particular limb-darkening model from stellar atmosphere models, 
+and to either fix these at the tabulated values given an observing band and an 
+estimate of stellar parameters \citep{Claret2011,Howarth2011}, or at least to place 
+a prior that the limb-darkening parameters should nearly match these values.
+This approach can have several pitfalls:  the limb-darkening model may not be
+sufficiently precise,  the stellar atmosphere model may not be precise, and
+the stellar parameters may not be precise.
+In computing limb-darkening from stellar atmosphere models, 
+the spherical nature of limb-darkening can affect the transit light curve
+\citep{Neilson203,Neilson2017}, and thus the limb-darkening coefficients must be fit
+with care \citep{Claret2018}.  Even more importantly, full three dimensional
+stellar atmosphere models appear to give a more accurate description of
+stellar limb-darkening by capturing the structure of the atmosphere under
+the influence of granulation \citep{Hayek2012,Magic2015}.  However, any
+physical model for a stellar atmosphere has limitations in the fidelity at
+which it can model actual stellar atmospheres,
+and can only explore a finite set of parameters (effective temperature,
+metallicity, surface gravity, and magnetic field strength).
+In practice, then, it may be most robust to simply let the limb-darkening parameters 
+be free parameters, let the limb-darkening model be as flexible as possible, 
+and to let the limb-darkening model be fit along with the radius ratio and
+orbital parameters \citep{Csizmadia2012,Espinoza2015}.
 
 However, any model for the surface brightness of a star can only be approximate:
 most stars are convective, rotationally-oblate, spotted, oscillating, flaring,
