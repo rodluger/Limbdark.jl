@@ -121,12 +121,13 @@ $r$, which is the radius of the occultor divided by the radius of the source.
 As much as possible we will follow the notation of the \starry package
 introduced by Luger et al. (2018).
 
-Uniform limb-darkening scales as $\upmu^0$ and linear as $\upmu^1$;
-these are the two most important cases which can be integrated analytically,
-which we describe in detail below in sections \ref{sec:uniform} and
-\ref{sec:reparam}.  We show that higher order powers of $\upmu^n$ with integer
-$n$ can be integrated analytically when expressed as recursion relations with
-these first two cases.  Linear combinations of these laws can be constructed,
+Uniform limb-darkening scales as $\upmu^0$, linear as $\upmu^1$, and
+quadratic as $\upmu^2$;
+these are the three most important cases which can be integrated analytically,
+which we describe in detail below in sections \ref{sec:uniform}, 
+\ref{sec:reparam}, and \ref{sec:quadratic}.  We show that higher order powers of $\upmu^n$ with integer
+$n$ can be integrated analytically when expressed as recursion relations.
+Linear combinations of these laws can be constructed,
 with various parameterizations, to describe stellar limb-darkening more precisely.
 
 The first goal, of modelling higher-order limb-darkening, was accomplished
@@ -143,7 +144,7 @@ of numerical stability we need to revert to series solutions in some limits.
 
 The second goal, of computing dervatives of the light curve with respect to
 the model parameters, was accomplished by \cite{Pal2008} for the quadratic
-limb-darkening case.  He derived the partial derivatives of the quadratic
+limb-darkening case.  P\'al derived the partial derivatives of the quadratic
 limb-darkening model with respect to $b$, $r$, and the two quadratic
 limb-darkening coefficients.  In this work, we give modified expressions
 for the quadratic limb-darkened flux and its derivatives which are
@@ -156,7 +157,7 @@ and \cite{Kreidberg2015}, these approaches tend to be slower, they have precisio
 which depend upon the tolerance of the computation, and, in addition, they do not
 yield derivatives of the light curves.
 
-A disadvantage of our approach is that it requires linear powers of the limb-darkening
+A disadvantage of our approach is that it requires integer powers of the limb-darkening
 expansion.  \citet{Claret2000} has shown that a non-linear limb-darkening law,
 with half-integer powers of $\upmu$, gives an accurate description of stellar
 limb-darkening models.  More recently, the power-law model, $I(\upmu) = 1-
@@ -190,7 +191,7 @@ the area of overlap, minus the area of a kite-shaped region which connects the
 centers of the circles with their points of intersection gives the area of the
 lens-shaped region of overlap of the two circles.
 
-Taking the radius of the larger circle to be unity, the formula for
+Taking the radius of the larger circle to be unity, the standard formula for
 the lens-shaped overlap area is given by
 \begin{align} \label{eq:MAuniform}
 A_{lens} = \pi \Lambda^e(r,b) &=
@@ -214,7 +215,7 @@ We find that numerical round-off error limits the precision of this formula when
 $b \approx 0$, $b+r \approx 1$, or $b \approx 1+r$;  these are the cases in which
 the kite-shaped region becomes thin, in which the sum of two sides becomes similar
 in length to the spine of the kite.  The square root term in this formula (equation
-\ref{eq:MAuniform}) is computing the area of the kite-shaped region, which in this
+\ref{eq:MAuniform}) computes the area of the kite-shaped region, which in this
 form causes round-off error when the kite is flattened.  The same issue occurs when
 computing the area of a triangle in which two of the sides are of similar length;
 the kite has an area that is twice the area of the triangle connecting the centers
@@ -222,15 +223,14 @@ of both circles and one of the intersection points.  \cite{Goldberg1991} gives a
 formula for precisely computing the area of a triangle, based on a method developed
 by \citet{Kahan2000}, which we reproduce here,
 \begin{eqnarray}
-A_{kite} &=& \frac{1}{2}\sqrt{(a+(b+c))(c-(a-b))(c+(a-b))(a+(b-c))},\\
-a &\ge& b \ge c,
+A_{kite} &=& \frac{1}{2}\sqrt{(a+(b+c))(c-(a-b))(c+(a-b))(a+(b-c))},
 \end{eqnarray}
-where the tuple $\{a,b,c\}$ equals $\{1,r,b\}$ sorted from from greatest to least.
+for $a \ge b \ge c$, where the tuple $\{a,b,c\}$ equals $\{1,r,b\}$ sorted from from greatest to least.
 
 Next, the inverse cosine formulae are also imprecise when $\cos{\kappa_0} = x_0 \approx
-1$ or $\cos{\kappa_1} = x_1 \approx 1$.  The approximate solution in this limit
-is $\kappa_0 \approx [2(1-x_0)]^{1/2}$ and $\kappa_1 \approx [2(1-x_1)]^{1/2}$, and so round-off
-error can occur both in taking the difference of two numbers close to one,
+1$ or $\cos{\kappa_1} = x_1 \approx 1$.  The approximate solutions in this limit
+are $\kappa_0 \approx [2(1-x_0)]^{1/2}$ and $\kappa_1 \approx [2(1-x_1)]^{1/2}$, and so round-off
+error can occur both in taking the difference of two numbers close to unity,
 and in taking the square root.
 
 Instead, we use the function $\theta = \mathrm{atan2}(y,x)$ with $y=\sin{\theta}$ and
@@ -246,10 +246,10 @@ the circles and one intersection point.
 Note that both $\sin{\kappa_0}$ and $\cos{\kappa_0}$ are divided by $br$, and
 $\sin{\kappa_1}$ and $\cos{\kappa_1}$ are divided by $b$, so that
 in the arctangent formula these denoninator terms cancel, which can improve
-numerical stability for small values of $b$ or $r$; this cancellation doesn't happen
+numerical stability for small values of $b$ or $r$; this cancellation does not happen
 in the arccosine case given in equation \ref{eq:cosine_formulation}.
 
-This gives the equations:
+This results in the equations:
 \begin{eqnarray} \label{eq:area_of_overlap}
 A_{lens} &=& \kappa_1 + r^2\kappa_0 - A_{kite},\\
 \kappa_0 &=& \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\\
@@ -311,7 +311,8 @@ are a set of measure zero, and so we simply set the derivatives to zero
 at these points.
 
 In the remainder of this paper we will need to use these formulae in computing
-the higher order limb-darkened light curves.
+the higher order limb-darkened light curves.  Next, we revisit the formulae
+for linear limb-darkening.
 
 \begin{figure}
     \begin{centering}
@@ -449,9 +450,9 @@ elliptic integrals into a general complete elliptic integral defined by \citet{B
 \begin{equation}
 {\rm cel}(k_c,p,a,b) = \int_0^{\pi/2} \frac{a\cos^2{\phi} + b\sin^2{\phi}}{\cos^2{\phi}+p\sin^2{\phi}} \frac{d\phi}{\sqrt{\cos^2{\phi}+k_c^2\sin^2{\phi}}},
 \end{equation}
-where $k_c = \sqrt{1-m}$, and for $b+r \ge 1$,
-$m=k^2$, while for $b+r \le 1$, $m=1/k^2$.  Although $k_c$ can be computed from
-$m$, we have found better numerical stability in computing $k_c$ analytically
+where $k_c = \sqrt{1-m_k}$, and for $b+r \ge 1$,
+$m_k=k^2$, while for $b+r \le 1$, $m_k=1/k^2$.  Although $k_c$ can be computed from
+$m_k$, we have found better numerical stability in computing $k_c$ analytically
 from $b$ and $r$:
 \begin{align}
     k_c &=
@@ -461,20 +462,20 @@ from $b$ and $r$:
    \end{dcases}
 \end{align}
 In practice, we let the subroutine that computes ${\rm cel}$ accept both
-$m$ and $k_c$ as input for numerical precision.
+$m_k$ and $k_c$ as input for numerical precision.
 
 To transform the elliptic integrals in equation \ref{eq:biglam},
 we used the following relations from \citet{Bulirsch1969}:
 \begin{eqnarray}
-\lambda K(m) + q E(m) &=& {\rm cel}(k_c,1,\lambda+q,\lambda+q k_c^2)\\
-\lambda K(m) + q \Pi(n,m) &=& {\rm cel}(k_c,1-n,\lambda+q,\lambda+q k_c^2)\\
-E(m) &=& {\rm cel}(k_c,1,1,1-m)\\
-E(m)-(1-m)K(m) &=& m \, {\rm cel}(k_c,1,1,0)\\
-\Pi(n,m)-K(m)  &=& n \, {\rm cel}(k_c,1-n,0,1),
+\lambda K(m_k) + q E(m_k) &=& {\rm cel}(k_c,1,\lambda+q,\lambda+q k_c^2)\\
+\lambda K(m_k) + q \Pi(n,m_k) &=& {\rm cel}(k_c,1-n,\lambda+q,\lambda+q k_c^2)\\
+E(m_k) &=& {\rm cel}(k_c,1,1,1-m_k)\\
+E(m_k)-(1-m_k)K(m_k) &=& m_k \, {\rm cel}(k_c,1,1,0)\\
+\Pi(n,m_k)-K(m_k)  &=& n \, {\rm cel}(k_c,1-n,0,1),
 \end{eqnarray}
-noting that \citet{Bulirsch1969} uses a different sign convention for $\Pi(n,m)$.
-In particular, the expressions for $\Pi(n,m)-K(m)$ and $E(m)-(1-m)K(m)$ are useful for eliminating
-the singularities and cancellations which occur at $m=1$ when $b+r=1$ and $m=0$ when
+noting that \citet{Bulirsch1969} uses a different sign convention for $\Pi(n,m_k)$.
+In particular, the expressions for $\Pi(n,m_k)-K(m_k)$ and $E(m_k)-(1-m_k)K(m_k)$ are useful for eliminating
+the singularities and cancellations which occur at $m_k=1$ when $b+r=1$ and $m_k=0$ when
 $r \rightarrow \infty$.  The general complete elliptic integral is evaluated
 with the approach of \citet{Bartky1938}, which uses recursion to approximate the
 integral to a specified precision.
@@ -489,13 +490,13 @@ expression for the linear limb-darkening flux, $S_1(r,b) = s_2(r,b)$, in which
           0 & \qquad  \vert r- b\vert \ge 1\\
           -\tfrac{2}{3}(1-r^2)^{3/2} & \qquad b = 0\\
           \tfrac{1}{3} - \tfrac{4}{9\pi} & \qquad b = r = \tfrac{1}{2}\\
-          \tfrac{1}{3} + \tfrac{2}{9\pi} {\rm cel}\left(k_c,1,m-3,(1-m)(2m-3)\right) & \qquad b= r < \tfrac{1}{2}\\
-          \tfrac{1}{3} + \tfrac{1}{9\pi r} {\rm cel}\left(k_c,1,m-3,1-m\right) & \qquad b= r > \tfrac{1}{2}\\  % I think this equation may have a mistake [ ]  EA 7/17/2018
+          \tfrac{1}{3} + \tfrac{2}{9\pi} {\rm cel}\left(k_c,1,m_k-3,(1-m_k)(2m_k-3)\right) & \qquad b= r < \tfrac{1}{2}\\
+          \tfrac{1}{3} + \tfrac{1}{9\pi r} {\rm cel}\left(k_c,1,m_k-3,1-m_k\right) & \qquad b= r > \tfrac{1}{2}\\  % I think this equation may have a mistake [ ]  EA 7/17/2018
           \tfrac{2}{9\pi}\left[3\cos^{-1}(1-2r) -2(3+2r-8r^2)\sqrt{rb}-3\pi\Theta(r-\tfrac{1}{2})\right] & \qquad b+r =1\\
           \frac{1-(b-r)^2}{9 \pi \sqrt{b r}} \Bigg[
-                \frac{(b+r)^2-1}{4br}(b^2-r^2){\rm cel}(k_c,(b-r)^2(1-m),0,3)
+                \frac{(b+r)^2-1}{4br}(b^2-r^2){\rm cel}(k_c,(b-r)^2(1-m_k),0,3)
                 &\\ \phantom{XXXX}
-               - (3-6r^2-2br){\rm cel}(k_c,1,1,0)-4brE(m)
+               - (3-6r^2-2br){\rm cel}(k_c,1,1,0)-4brE(m_k)
           \Bigg]
           %
           & \qquad k^2 < 1
@@ -506,7 +507,7 @@ expression for the linear limb-darkening flux, $S_1(r,b) = s_2(r,b)$, in which
                 \big(1 - (r + b)^2\big)
                 {\rm cel}(k_c,p,1+q,p+q) &\\ \phantom{XXXX}
                 - (4 - 7 r^2 - b^2)
-                E\left(m\right)
+                E\left(m_k\right)
           \Bigg]
           %
           & \qquad k^2 > 1\\
@@ -551,7 +552,7 @@ pseudocode from \citet{Bulirsch1969} to compute ${\rm cel}(k_c,p,a,b)$,
 which has a termination test that scales as the square root of
 the machine precision.  We find that the transformed expressions
 are accurate to $\la \times 10^{-14}$ when computed in double precision
-within $10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
+within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
 
 \begin{figure}\label{transit_linear}
     \begin{centering}
@@ -576,8 +577,8 @@ within $10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/s2_machine.pdf}
     \caption{The accuracy of $S_1(r,b)$ near $b=r$ (left panel) and
-    $b=1-r$ (right panel). The x-axese are impact parameter b,
-    while the y axes in the top panels show $S_1(r,b)$, with $r$
+    $b=1-r$ (right panel) for $\epsilon = 10^{-8}$. The $x$-axes are impact parameter $b$,
+    while the $y$ axes in the top panels show $S_1(r,b)$, with $r$
     given in the legend of each panel. The middle panels plot
     the difference $(S_1(b,b\pm\epsilon)-S_1(b,b))/\epsilon$
     and $(S_1(b,1-b\pm\epsilon)-S_1(b,1-b))/\epsilon$. The bottom
@@ -658,7 +659,7 @@ We have tested these formulae with finite-difference derivatives evaluated at
 256-bit precision, and, as with the total flux term, we find that these are accurate
 to $\la 2 \times 10^{-15}$, close to machine precision.
 
-\section{Quadratic limb-darkening}
+\section{Quadratic limb-darkening}\label{sec:quadratic}
 
 The next order of limb-darkening has been widely studied due to its
 accurate description of stellar atmospheres \citep{Claret2000,MandelAgol2002,Pal2008}.
@@ -728,12 +729,12 @@ With the definitions of $S_0$, $S_1$, and $S_2$, the light curve and derivatives
 may be computed with equations \ref{eq:flux} and \ref{eq:derivatives} given below.
 
 Finally, we turn our attention to the general polynomial limb-darkening case,
-$\upmu^n$ with $n \ge 2$.  These terms may be expressed as the sum of
+$\upmu^n$ with $n > 2$.  These terms may be expressed as the sum of
 spherical harmonics with $m=0$, and thus they are a special case of the \starry
-computation (written in C and Python), which we describe next in \S \ref{sec:quad}.
-We have also derived a new approach exploiting the azimuthal symmetry of the
-limb-darkening problem, which we describe below in \S \ref{sec:power_law},
-which is implemented in \texttt{Julia}.
+computation (written in C and Python), which we describe next in \S \ref{sec:poly}.
+Subsequently, we exploit the azimuthal symmetry of the limb-darkening problem to 
+derive more efficient and accurate formulae, which we describe below in \S \ref{sec:power_law},
+which is implemented in \starry and in \texttt{Julia}.
 
 %\begin{eqnarray}
 %\frac{\partial \Lambda}{\partial r} &=& \frac{8br^2 E(k^2) + 2r(1-(b+r)^2)K(k^2)}{\pi\sqrt{br}}\\
@@ -750,9 +751,9 @@ which is implemented in \texttt{Julia}.
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 %
-\clearpage
+%\clearpage
 \section{Polynomial Limb-Darkening}
-\label{sec:quad}
+\label{sec:poly}
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 % ==============================================================================
@@ -765,7 +766,7 @@ order $l_\mathrm{max}$ as
 \begin{align}
     \label{eq:polynomialld}
     \frac{I(\upmu)}{I(1)} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - ... - u_{l_\mathrm{lmax}}(1 - \upmu)^{l_\mathrm{lmax}} \nonumber \\
-                          &= \sum_{l=0}^{l_\mathrm{lmax}} \sum_{k=0}^l u_l {l \choose k} (-1)^k \upmu^k
+                          &= \sum_{l=0}^{l_\mathrm{lmax}} \sum_{j=0}^l u_l {l \choose j} (-1)^j \upmu^j
     \quad,
 \end{align}
 %
@@ -778,12 +779,12 @@ where $u_0 \equiv 1$. For convenience, this can be expressed as the matrix equat
 \end{align}
 %
 where $\bvec{u}^\top$ is a row vector whose value at index
-$l$ is $u_l$, $\pmb{\upmu}$ is a column vector whose value at index $k$ is $\upmu^k$,
+$l$ is $u_l$, $\pmb{\upmu}$ is a column vector whose value at index $j$ is $\upmu^j$,
 and $\bvec{L}$ is the lower triangular matrix with components given by
 %
 \begin{align}
     \label{eq:Llk}
-    L_{lk} = {l \choose k} (-1)^k
+    L_{lk} = {l \choose j} (-1)^j
     \quad.
 \end{align}
 %
@@ -797,7 +798,7 @@ form, the spherical harmonics of order $m = 0$ may be written
 \begin{align}
     \label{eq:Ylzero}
     Y_{l,0}(\upmu) = \sqrt{\frac{2l + 1}{4\pi}}
-              \sum_{k=0}^l {l \choose k} \frac{(k + l - 1)!!}{(k - l - 1)!!} \upmu^k
+              \sum_{j=0}^l {l \choose j} \frac{(j + l - 1)!!}{(j - l - 1)!!} \upmu^j
 \end{align}
 %
 where $\upmu = z = \sqrt{1 - x^2 - y^2}$, $\binom{\bigdot}{\bigdot}$ is a binomial
@@ -826,7 +827,7 @@ $l$ is $c_l$ and $\bvec{M}$ is the lower triangular matrix with components given
 %
 \begin{align}
     \label{eq:Mlk}
-    M_{lk} = \sqrt{\frac{2l + 1}{4\pi}} {l \choose k} \frac{(k + l - 1)!!}{(k - l - 1)!!}
+    M_{lk} = \sqrt{\frac{2l + 1}{4\pi}} {l \choose j} \frac{(j + l - 1)!!}{(j - l - 1)!!}
     \quad.
 \end{align}
 %
@@ -1464,6 +1465,14 @@ However, our new precise formulae, with derivatives, will be useful
 for the perturbative approach to the detection of transit timing
 variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
 model.
+
+\section{Applications}
+
+We envision that this code will be used for fits to higher precision
+transit data, such as gathered by JWST, which require an improved model
+of stellar limb-darkening.  Here we discuss some potential avenues for
+application of this model.
+
 
 \section{Conclusions}
 
