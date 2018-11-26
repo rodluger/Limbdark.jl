@@ -53,7 +53,7 @@ r=t.r; b=t.b; n_max=t.n_max; k2 = t.k2; kc = t.kc; t.k2inv = inv(t.k2)
 # Compute first two integrals:
 if k2 <= 1.0
   t.Nn[1] = 0.5*t.kap0-t.k*t.kc 
-  t.Nn[2] = t.twothird*2*t.sqbr*(-t.k2*t.Eofk+2*t.k2*t.Em1mKdm)
+  t.Nn[2] = t.twothird*2*t.sqbr*t.k2*(-t.Eofk+2*t.Em1mKdm)
 else
   t.Nn[1] = 0.5*pi
   t.Nn[2] =  t.twothird*2*t.sqbr*t.k*(2*t.Eofk - t.Em1mKdm)

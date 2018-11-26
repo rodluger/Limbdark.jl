@@ -986,7 +986,13 @@ $\kappa = \pi$ for $k^2 > 1$.  Note that $\kappa = \kappa_0$, so in practice we
 reuse the value of $\kappa_0$ which was computed in the uniform limb-darkening
 case (\S \ref{sec:uniform}).
 
-We can express this in terms of a sequence of integrals,
+With these integrals defined, the basis functions for the lightcurve are given
+by $S_n$, where $S_0$ is given for uniform limb-darkening
+in section \ref{eq:uniform}, $S_1=s_2$ is given by the linear limb-darkened
+solution from section \ref{sec:reparam}, and  $S_n = \mathcal{Q}(\bvec{G}_n)
+- \mathcal{P}(\bvec{G}_n) = -\mathcal{P}(\bvec{G}_n)$ for $n \ge 2$.
+
+We can express $\mathcal{P}(\bvec{G}_n)$ in terms of a sequence of integrals,
 $\mathcal{M}_n(r,b)$, given by:
 \begin{equation}
 \mathcal{M}_n(r,b) = (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} d\xi,
@@ -1046,18 +1052,26 @@ Hypergeometric functions and infinite series,
 \mathcal{M}_n &=& (4br)^{n/2} k^{n+1} \pi^{1/2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+\tfrac{n}{2};k^2),\\
 &=& (1-(r-b)^2)^{n/2} k \sum_{j=0}^{j_{max}} \alpha_j k^{2j},\\
 \alpha_0 &=& \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})},\\
-\alpha_j &=& \alpha_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)},\\
+\alpha_j &=& \alpha_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)}.
 \end{eqnarray}
-while for $k^2 > 1$,
-\begin{eqnarray}
-\mathcal{M}_n &=& \pi (4br)^{n/2}k^n \,_2F_1(\tfrac{1}{2},-\tfrac{n}{2};1;k^{-2}),\\
-&=& (1-(r-b)^2)^{n/2} \sum_{j=0}^{j_{max}} \beta_j k^{-2j},\\
-\beta_0 &=& \pi ,\\
-\beta_j &=& \beta_{j-1} \frac{(2+n+2j)(1-2j)}{4j^2},\\
-\end{eqnarray}
-where for $k^2 > 1$ and even $n$, $j_{max} = n/2$, and otherwise $j_{max}=\infty$.  In 
-practice we set $j_{max} = 100$, and the series is truncated when a term goes below a 
+%while for $k^2 > 1$,
+%\begin{eqnarray}
+%\mathcal{M}_n &=& \pi (4br)^{n/2}k^n \,_2F_1(\tfrac{1}{2},-\tfrac{n}{2};1;k^{-2}),\\
+%&=& (1-(r-b)^2)^{n/2} \sum_{j=0}^{j_{max}} \beta_j k^{-2j},\\
+%\beta_0 &=& \pi ,\\
+%\beta_j &=& \beta_{j-1} \frac{(2+n+2j)(1-2j)}{4j^2},
+%\end{eqnarray}
+%where for $k^2 > 1$ and even $n$, $j_{max} = n/2$, and otherwise $j_{max}=\infty$.  
+In practice we set $j_{max} = 100$, and the series is truncated when a term goes below a 
 tolerance specified by the numerical precision.
+
+We find that upward recursion in $n$ is more stable for $k^2 > \tfrac{1}{2} $,
+while downward recursion is more stable for $k^2 < \tfrac{1}{2}$.  Note that
+this differs from \starry for which downward recusion was also required for $k^2 > 2$.
+
+With the computation of the light curves for the basis functions, $S_n$, the final step is to
+combine these into the full light curve with limb-darkening coefficients, which we describe
+next.
 
 \subsection{Limb-darkening coefficients}
 
@@ -1089,10 +1103,7 @@ The total light curve is computed from
 \mathcal{F} = \frac{F}{F_0} &=& \frac{1}{F_0}\sum_{n=0}^N d_n S_n,\\
 F_0 &=& \pi(d_0+ \tfrac{2}{3} d_1),
 \end{eqnarray}
-where $F_0$ is the unobscured flux, $S_0$ is given for uniform limb-darkening
-in section \ref{eq:uniform}, $S_1=s_2$ is given by the linear limb-darkened
-solution from section \ref{sec:reparam}, and  $S_n = \mathcal{Q}(\bvec{G}_n)
-- \mathcal{P}(\bvec{G}_n)$ for $n \ge 2$.
+where $F_0$ is the unobscured flux. 
 
 We note that the unobscured flux for each basis function (for $b \ge 1+r$ or $r=0$) is zero for
 all $S_n(r,b)$ with $n \ge 2$, which is why the total unobscured flux,
@@ -1107,8 +1118,48 @@ of $\mathcal{M}_n$:
 \frac{\partial \mathcal{P}}{\partial b} &=& \frac{n}{b} \left[(r^2+b^2)(\mathcal{M}_n - \mathcal{M}_{n-2})+(r^2-b^2)^2\mathcal{M}_{n-2}\right].\\
 \end{eqnarray}
 
-As with \starry, we find that upward recursion in $n$ is more stable for $\tfrac{1}{2} < k^2 < 2$,
-while downward recursion is more stable for $k^2 < \tfrac{1}{2}$ and $k^2 > 2$. 
+We find that the derivative with respect to impact parameter becomes numerically
+unstable for small values of $b$ due to the small difference between the two
+terms which are subtracted, followed by division by $b$.  To avoid this problem
+for small $b$, we have derived an alternative expression which we utilize when
+$b < b_0$, which avoids division by $b$:
+\begin{eqnarray}
+\frac{\partial \mathcal{P}}{\partial b} &=& n \left[b\mathcal{M}_n +(2r^3+b^3-3r^2b-b-3) \mathcal{M}_{n-2})-4r^3\mathcal{N}_{n-2}\right],\\
+\mathcal{N}_n(r,b) &=& (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} \sin^2{\xi} d\xi,
+\end{eqnarray}
+where we have defined a new integral $\mathcal{N}_n$ which obeys the recursion relation
+\begin{equation}
+\mathcal{N}_n = \frac{1}{n+2} \left[\mathcal{M}_n + n(1-(b+r)^2) \mathcal{N}_{n-2}\right].
+\end{equation}
+Since this recursion relation only involves every other term, we need the two lowest terms,
+which are given by:
+\begin{eqnarray}
+\mathcal{N}_0 &=& \frac{\kappa_0}{2} - k k_c,\\
+\mathcal{N}_1 &=& \tfrac{2}{3}(4br)^{1/2} k^2 \left[-\mathrm{cel}(k_c,1,1,k_c^2) + 2 \mathrm{cel}(k_c,1,1,0)\right],
+\end{eqnarray}
+for $k^2 \le 1$ and
+\begin{eqnarray}
+\mathcal{N}_0 &=& \frac{\pi}{2},\\
+\mathcal{N}_1 &=&  \tfrac{2}{3}(4br)^{1/2} k \left[2\mathrm{cel}(k_c,1,1,k_c^2) - \mathrm{cel}(k_c,1,1,0)\right],
+\end{eqnarray}
+for $k^2 > 1$.
+
+In the $k^2 < 1/2$ limit, we find the recursion to be unstable, and so we evaluate
+the expressions numerically, as we did for $\mathcal{M}_n$,
+\begin{eqnarray}
+\mathcal{N}_n &=& (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\\
+&=& (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\\
+\gamma_0 &=& \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\\
+\gamma_j &=& \gamma_{j-1} \frac{(4j^2-1)}{2j(3+n+2j)}.
+\end{eqnarray}
+For $k^2 < 1/2$, we compute the values of $N_{n}$ and $N_{n-1}$, and use downward
+recursion with the relation
+\begin{equation}
+\mathcal{N}_n = \frac{(n+4)\mathcal{N}_{n+2} - \mathcal{M}_{n+2}}{(n+2)(1-(b+r)^2)}.
+\end{equation}
+Although evaluating this additional integral adds further computational expense, in
+practice we only need to compute it for $b < b_0 = 10^{-3}$ to obtain similar accuracy
+to the other expressions.
 
 With the computation of $S_n = -\mathcal{P}(\bvec{G}_n)$ for $n \ge 2$, we then
 compute the derivatives of the light curve as
@@ -1133,7 +1184,7 @@ The derivatives of the coefficients, $\frac{\partial u_i}{\partial d_j}$, are
 computed by differentiating each term, and propagating the derivatives via the
 chain rule.  Then, the light curve derivatives are given by
 \begin{eqnarray}
-\frac{\partial \mathcal{F}{\partial u_i} =  \sum_{j} \frac{\partial \mathcal{F}}{\partial d_j}\frac{\partial d_j}{\partial u_i}.
+\frac{\partial \mathcal{F}}{\partial u_i} =  \sum_{j} \frac{\partial \mathcal{F}}{\partial d_j}\frac{\partial d_j}{\partial u_i}.
 \end{eqnarray}
 
 \section{Implementation details}
