@@ -176,7 +176,9 @@ of uniform surface brightness.
 % ------------------------------------------------------------------------------
 %
 
-\section{Uniform brightness}\label{sec:uniform}
+\section{Uniform brightness}
+
+\label{sec:uniform}
 
 The transit light curve of a uniformly bright star amounts to computing the
 area of overlap of two disks \citep{MandelAgol2002}.  This has a well-known
@@ -481,7 +483,7 @@ with the approach of \citet{Bartky1938}, which uses recursion to approximate the
 integral to a specified precision.
 
 These elliptic integral transformations lead to the following numerically-stable
-expression for the linear limb-darkening flux, $S_1(r,b) = s_2(r,b)$, in which
+expression for the linear limb-darkening flux, $S_1(r,b)$, in which
 \begin{align}
     \label{eq:biglam_stable}
     \Lambda &=
@@ -988,7 +990,7 @@ case (\S \ref{sec:uniform}).
 
 With these integrals defined, the basis functions for the lightcurve are given
 by $S_n$, where $S_0$ is given for uniform limb-darkening
-in section \ref{eq:uniform}, $S_1=s_2$ is given by the linear limb-darkened
+in section \ref{eq:uniform}, $S_1$ is given by the linear limb-darkened
 solution from section \ref{sec:reparam}, and  $S_n = \mathcal{Q}(\bvec{G}_n)
 - \mathcal{P}(\bvec{G}_n) = -\mathcal{P}(\bvec{G}_n)$ for $n \ge 2$.
 
@@ -1008,7 +1010,7 @@ The integrals $\mathcal{M}_n$ obey a straightforward recursion relation,
   &+& \left. (n-2) (1-(b-r)^2)((b+r)^2-1) M_{n-4}\right],\\
 \mathcal{M}_n &=& \frac{(n+4)\mathcal{M}_{m+4} - 2(n+3)(1-r^2-b^2)\mathcal{M}_{n+2}}{(n+2)(1-(b-r)^2)((b+r)^2-1)},
 \end{eqnarray}
-where the first relation may be used for upwards recursion in $n$ for $\frac{1}{2} < k^2 < 2$, 
+where the first relation may be used for upwards recursion in $n$ for $k^2 > \frac{1}{2}$, 
 and the second for downward recursion in $n$ otherwise.
 In practice we substitute $\mathcal{M}_{n+2}$ in equation \ref{eq:primitive} with 
 the recursion relation to obtain a more stable expression for $\mathcal{P}(\bvec{G}_n)$:
@@ -1032,7 +1034,7 @@ for $k^2 \le 1$, while for $k^2 > 1$,
 \mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} k^3\left[2(2-k^{-2})E(k^{-2})-(1-k^{-2})K(k^{-2})\right].
 \end{eqnarray}
 We express the elliptic integrals for $n=1$ and $3$ in terms of the cel integrals which
-were already computed for the $n=1$ case,
+were already computed for the linear limb-darkening case,
 \begin{eqnarray}
 \mathcal{M}_1 &=& 2 (4br)^{1/2} k^2 \mathrm{cel}(k_c,1,1,0),\\
 \mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2}k^2 \left[ \mathrm{cel}(k_c,1,1,k_c^2)+(3k^2-2) \mathrm{cel}(k_c,1,1,0)\right],\\
@@ -1062,15 +1064,15 @@ Hypergeometric functions and infinite series,
 %\beta_j &=& \beta_{j-1} \frac{(2+n+2j)(1-2j)}{4j^2},
 %\end{eqnarray}
 %where for $k^2 > 1$ and even $n$, $j_{max} = n/2$, and otherwise $j_{max}=\infty$.  
-In practice we set $j_{max} = 100$, and the series is truncated when a term goes below a 
-tolerance specified by the numerical precision.
+Although $j_{max} = \infty$, in practice we set $j_{max} = 100$, and the series is 
+truncated when a term goes below a tolerance specified by the numerical precision.
 
 We find that upward recursion in $n$ is more stable for $k^2 > \tfrac{1}{2} $,
 while downward recursion is more stable for $k^2 < \tfrac{1}{2}$.  Note that
 this differs from \starry for which downward recusion was also required for $k^2 > 2$.
 
 With the computation of the light curves for the basis functions, $S_n$, the final step is to
-combine these into the full light curve with limb-darkening coefficients, which we describe
+combine these to make the full light curve with limb-darkening coefficients, which we describe
 next.
 
 \subsection{Limb-darkening coefficients}
@@ -1122,7 +1124,7 @@ We find that the derivative with respect to impact parameter becomes numerically
 unstable for small values of $b$ due to cancellation between the two
 terms, followed by division by $b$.  To avoid this problem
 for small $b$, we have derived an alternative expression which we utilize when
-$b < b_0$, which avoids division by $b$:
+$b < b_0$, where $b_0$ is a cutoff value, which avoids division by $b$:
 \begin{eqnarray}
 \frac{\partial \mathcal{P}}{\partial b} &=& n \left[b\mathcal{M}_n +(2r^3+b^3-3r^2b-b-3) \mathcal{M}_{n-2}-4r^3\mathcal{N}_{n-2}\right],\\
 \mathcal{N}_n(r,b) &=& (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} \sin^2{\xi} d\xi,
@@ -1131,7 +1133,7 @@ where we have defined a new integral, $\mathcal{N}_n$, which obeys the recursion
 \begin{equation}
 \mathcal{N}_n = \frac{1}{n+2} \left[\mathcal{M}_n + n(1-(b+r)^2) \mathcal{N}_{n-2}\right].
 \end{equation}
-Since this recursion relation only involves every other term, we need the two lowest terms,
+Since this recursion relation only involves every other term, we only need the two lowest terms,
 which are given by:
 \begin{eqnarray}
 \mathcal{N}_0 &=& \tfrac{1}{2}\kappa_0 - k k_c,\\
@@ -1145,7 +1147,7 @@ for $k^2 \le 1$ and
 for $k^2 > 1$.
 
 In the $k^2 < \tfrac{1}{2}$ limit, we find the upward recursion to be unstable, and so we evaluate
-the expressions numerically, as we did for $\mathcal{M}_n$,
+the expressions with a series solution, as we did for $\mathcal{M}_n$,
 \begin{eqnarray}
 \mathcal{N}_n &=& (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\\
 &=& (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\\
@@ -1159,7 +1161,8 @@ recursion with the relation
 \end{equation}
 Although evaluating this additional integral adds further computational expense, in
 practice we only need to compute it for $b < b_0 = 10^{-3}$ to obtain similar accuracy
-to the other expressions.
+to the other expressions.  This is encountered rarely as it only applies when the
+occultor is nearly aligned with the source.
 
 With the computation of $S_n = -\mathcal{P}(\bvec{G}_n)$ for $n \ge 2$, we then
 compute the derivatives of the light curve as
@@ -1175,21 +1178,21 @@ $d_n$ are then computed as
 \begin{eqnarray}\label{eq:derivatives}
 \frac{\partial \mathcal{F}}{\partial r} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial r},\\
 \frac{\partial \mathcal{F}}{\partial b} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial b},\\
-\frac{\partial \mathcal{F}}{\partial d_0} &=&  -\frac{\pi F}{F_0^2} + \frac{S_0}{F_0},\\
-\frac{\partial \mathcal{F}}{\partial d_1} &=&  -\frac{2\pi F}{3F_0^2} +\frac{S_1}{F_0},\\
+\frac{\partial \mathcal{F}}{\partial d_0} &=&  -\frac{\pi \mathcal{F}}{F_0} + \frac{S_0}{F_0},\\
+\frac{\partial \mathcal{F}}{\partial d_1} &=&  -\frac{2\pi \mathcal{F}}{3F_0} +\frac{S_1}{F_0},\\
 \frac{\partial \mathcal{F}}{\partial d_n} &=&  \frac{S_n}{F_0},
 \end{eqnarray}
 where the last line is for $n \ge 2$.
 
-The derivatives of the coefficients, $\frac{\partial u_i}{\partial d_j}$, are
+The derivatives of the coefficients, $\frac{\partial d_i}{\partial u_j}$, are
 computed by differentiating each term, and propagating the derivatives via the
 chain rule.  Then, the light curve derivatives are given by
 \begin{eqnarray}
-\frac{\partial \mathcal{F}}{\partial u_i} =  \sum_{j} \frac{\partial \mathcal{F}}{\partial d_j}\frac{\partial d_j}{\partial u_i}.
+\frac{\partial \mathcal{F}}{\partial u_i} =  \sum_{j} \frac{\partial d_j}{\partial u_i}\frac{\partial \mathcal{F}}{\partial d_j}.
 \end{eqnarray}
 
 This completes the description of the light curve computation, along
-with its derivatives.  We now turn to dicussing the implementation of
+with its derivatives.  We now turn to discussing the implementation of
 the computation, followed by comparison with existing codes.
 
 \section{Implementation details}
@@ -1218,8 +1221,10 @@ for $k^2 \le 1$, separately for $n-3$ to $n$ for $\mathcal{M}_n$, and for
 $n-1$ and $n$ for $\mathcal{N}_n$.
 
 In addition, once $n$ is specified, then the transformation matrix for
-the Jacobian from $d_i$ to $u_i$ remains the same throughout the light curve 
-computation, so we compute this matrix only once.
+the Jacobian from $d_i$ to $u_j$, $\frac{\partial d_i}{\partial u_j}$,  
+remains the same throughout the light curve 
+computation, so we compute this matrix only once, and then compute the
+flux derivative (equation \ref{eq:dFdu}) with matrix multiplication.
 
 In computing the elliptic integrals, cel, we found that several terms
 which appear in the Bartky formalism are repeated amongst all three elliptic 
@@ -1293,23 +1298,26 @@ which are produced by models of stellar atmospheres.
 Although we can only model limb-darkening which is integer powers of $\upmu$,
 we can use the polynomial model as an alternative limb-darkening model.
 
-\begin{itemize}
-\item Compare polynomial models to non-linear light curves. [x]
-\item Fit polynomial model to stellar limb-darkening models.
-\end{itemize}
+%\begin{itemize}
+%\item Compare polynomial models to non-linear light curves. [x]
+%\item Fit polynomial model to stellar limb-darkening models.
+%\end{itemize}
 
 We have computed an example non-linear light curve with $r=0.1$ and
 $c_1=c_2=c_3=c_4=0.2$, and then fit it with successive orders of the
-polynomial approximation.  The model we compute with a ``layer-cake"
-model in which sums of layers of surface brightness with different
-radii are added together to approximate the lightcurve;  this
+polynomial approximation.  The non-linear light curve model model
+we computed numerically as the analytic expressions in \citet{MandelAgol2002}
+are in terms of hypergeomtric functions which are expensive to evaluate.  
+We compute the light curve with a ``layer-cake" model in which sums of 
+layers of surface brightness with a grid of increasing radii are added together 
+to approximate the lightcurve;  this
 is the approach taken in the numerical model used to compute the
 non-linear limb-darkening light curves in the code of \citet{MandelAgol2002},
-and it is also the approach taken by \citet{Kreidberg2015} for
+and it is analagous to the approach taken by \citet{Kreidberg2015} for
 computing models with arbitrary limb-darkening profiles.
 
 We find that the fit improves steadily up until $N=6$ (a sextic
-polynomial), while beyond sextic, the RMS improves impercetibly.
+polynomial), while beyond sextic, the RMS improves imperceptibly.
 The RMS of the sextic fit for this example is $<5 \times 10^{-7}$
 relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
 
@@ -1323,29 +1331,29 @@ relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
     \end{centering}
 \end{figure}
 
-Since the non-linear model is just an effective model of stellar
-atmospheres, we next turn to fitting the non-linear model to
-computed stellar atmospheres, and comparing these fits with
-polynomial limb-darkening to different orders.
-
-\citet{Claret2018} discusses a precise means for fitting limb-darkening
-models to spherically-symmetric models for stellar atmospheres.  The
-stellar surface brightness drops rapidly from a finite value to zero surface
-brightness over a few scale heights of the stellar atmosphere.
-The scale height of an atmosphere is small compared with the size of a star,
-and so the limb-darkening model can treat the radius of the star as a
-free parameter, and then treat the drop in surface brightness as a step-
-function near the limb of the star.  This gives a more precise model
-for the limb-darkening, and \citet{Claret2018} finds good precision
-using the non-linear limb-darkening model.
-
-We used the same set of atmospheres as \citet{Claret2018}, but fit these
-with the polynomial model, varying the order of the polynomial until the
-fit no longer improves. TBD
-
-\section{Examples}
-
-Give some examples of the usage: non-linear optimization, HMC.
+%Since the non-linear model is just an effective model of stellar
+%atmospheres, we next turn to fitting the non-linear model to
+%computed stellar atmospheres, and comparing these fits with
+%polynomial limb-darkening to different orders.
+%
+%\citet{Claret2018} discusses a precise means for fitting limb-darkening
+%models to spherically-symmetric models for stellar atmospheres.  The
+%stellar surface brightness drops rapidly from a finite value to zero surface
+%brightness over a few scale heights of the stellar atmosphere.
+%The scale height of an atmosphere is small compared with the size of a star,
+%and so the limb-darkening model can treat the radius of the star as a
+%free parameter, and then treat the drop in surface brightness as a step-
+%function near the limb of the star.  This gives a more precise model
+%for the limb-darkening, and \citet{Claret2018} finds good precision
+%using the non-linear limb-darkening model.
+%
+%We used the same set of atmospheres as \citet{Claret2018}, but fit these
+%with the polynomial model, varying the order of the polynomial until the
+%fit no longer improves. TBD
+%
+%\section{Examples}
+%
+%Give some examples of the usage: non-linear optimization, HMC.
 
 \section{Comparison with other work} \label{sec:comparison}
 
@@ -1401,10 +1409,8 @@ We have also compared the evaluation speed of our code with P\'al's as well.
 We compiled P\'al's code using \texttt{gfortrans -O3}, and found that
 the computation of quadratic limb-darkened light curves and
 derivatives takes an average of 0.52 seconds to compute $10^6$ models,
-while the \texttt{transit\_poly\_struct.jl} takes an average of 0.29 seconds,
-giving our Julia code a 44\% speed advantage over the Fortran code;
-we have yet to optimize all aspects of the code, so there may be room
-for improvement on this benchmark.
+while the \texttt{transit\_poly\_struct.jl} takes an average of 0.16 seconds,
+giving our Julia code a 70\% speed advantage over the Fortran code.
 
 \begin{figure}
     \begin{centering}
@@ -1468,7 +1474,7 @@ sufficiently precise,  the stellar atmosphere model may not be precise, and
 the stellar parameters may not be precise.
 In computing limb-darkening from stellar atmosphere models, 
 the spherical nature of limb-darkening can affect the transit light curve
-\citep{Neilson203,Neilson2017}, and thus the limb-darkening coefficients must be fit
+\citep{Neilson2013,Neilson2017}, and thus the limb-darkening coefficients must be fit
 with care \citep{Claret2018}.  Even more importantly, full three dimensional
 stellar atmosphere models appear to give a more accurate description of
 stellar limb-darkening by capturing the structure of the atmosphere under
@@ -1482,7 +1488,8 @@ be free parameters, let the limb-darkening model be as flexible as possible,
 and to let the limb-darkening model be fit along with the radius ratio and
 orbital parameters \citep{Csizmadia2012,Espinoza2015}.
 
-However, any model for the surface brightness of a star can only be approximate:
+Even so, this approach still assumes azimuthal symmetry for the star, while 
+any model for the surface brightness of a star can only be approximate:
 most stars are convective, rotationally-oblate, spotted, oscillating, flaring,
 etc.  The model we have presented, then, will only resemble any given star to
 a precision which is limited by the lack of uniformity of the actual stellar
@@ -1501,7 +1508,7 @@ account for outliers, account for correlations in the noise, or actually
 try to model the deviations of the star from azimuthal symmetry
 \citep[e.g.][]{SanchisOjeda2011}.
 
-In additional to the variability and inhomogeneity of stars, the limb-darkening model
+In addition to the variability and inhomogeneity of stars, the limb-darkening model
 can only describe the variation of surface brightness with a limited accuracy.
 Our analytic model can be thought of as a Taylor series with which the
 limb-darkening can be expanded to as high an order as the data require.
@@ -1528,15 +1535,16 @@ convenient for this model in that these terms do not contribute to the
 total flux of the star.  A third possibility is to fit stellar atmosphere
 models with the polynomial limb-darkening model until a sufficient precision
 is reached given that warranted by the data, and then to place priors
-on the limb-darkening parameters.
+on the limb-darkening parameters, informed by the stellar limb-darkening
+models.
 
-Example applications:
-\begin{enumerate}
-\item optimization with and without analytic derivatives;
-\item fitting to stellar limb-darkening models;
-\item time integrated model with derivatives;
-\item HMC.
-\end{enumerate}
+%Example applications:
+%\begin{enumerate}
+%\item optimization with and without analytic derivatives;
+%\item fitting to stellar limb-darkening models;
+%\item time integrated model with derivatives;
+%\item HMC.
+%\end{enumerate}
 
 The detection of transit-timing variations with low-amplitude sinusoidal
 variations can make use of the fact that small variations in transit time
@@ -1553,12 +1561,12 @@ for the perturbative approach to the detection of transit timing
 variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
 model.
 
-\section{Applications}
-
-We envision that this code will be used for fits to higher precision
-transit data, such as gathered by JWST, which require an improved model
-of stellar limb-darkening.  Here we discuss some potential avenues for
-application of this model.
+%\section{Applications}
+%
+%We envision that this code will be used for fits to higher precision
+%transit data, such as gathered by JWST, which require an improved model
+%of stellar limb-darkening.  Here we discuss some potential avenues for
+%application of this model.
 
 
 \section{Conclusions}
@@ -1567,24 +1575,25 @@ We have presented an analytic model for the transits, occultations, and
 eclipses of limb-darkened bodies with a polynomial dependence of the limb-darkening
 on the $z$ component of the stellar surface (or, alternatively, the
 cosine of the angle from the sub-stellar point).  The model is more precise
-and accurate than prior models that we have compared to, especially in near
+and accurate than prior models that we have compared to, especially near
 special limits such as the points of contact and the coincidence of the edge
 of the occultor with the center of the source.  The model also compares favorably in
-speed of evaluation, about a factor of two faster than the code due
+speed of evaluation, about a factor of three faster than the code due
 to \citet{Pal2008}, XXX faster than Gimenez, YYY faster than batman,
 and ZZZ faster than ExoFast.
 
 We expect that this code may be used both as a workhorse model for
 general fitting of transit models, as well as a tool for more
 specialized applications, such as photodynamical modeling of
-interacting planets, triple stars, and transiting circumbinary planets.
-{\color{red} Add references for these use cases.}
+interacting planets \citep{Carter2012}, triple stars \citep{Carter2011}, and 
+transiting circumbinary planets \citep{Doyle2011}.
 
 The code is open source, and has two versions:  one of which is a part
 of the \starry package, \texttt{http://github.com/luger/starry/}, written
 in a combination of C++ and Python, and a new code written in Julia as
 part of the development of the equations in this paper,
-\texttt{http://github.com/luger/limbdark/}.
+\texttt{http://github.com/luger/limbdark/}.  We welcome usage of these
+codes, and contributions to further develop and enhance their capabilities.
 
 \acknowledgements
 
