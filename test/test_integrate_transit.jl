@@ -1,4 +1,5 @@
 # This is test of the code for computing a transit model integrated over a time step.
+using PyPlot
 
 include("../src/integrate_transit.jl")
 
@@ -66,4 +67,4 @@ end
 # Now plot the estimate of the difference:
 plot(favg4-favg0)
 b = sqrt.(param[4]^2+(param[2]*(t-param[1])).^2)
-plot(dt^2*(d2fdb2.*(param[2]*(t-param[1])./b).^2+dfdb.*param[2]^2./b)/22.)
+plot(dt^2*(d2fdb2.*(param[2]*(t-param[1])./b).^2+dfdb.*param[2]^2./b)/24.0)
