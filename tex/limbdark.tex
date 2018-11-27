@@ -1191,6 +1191,51 @@ chain rule.  Then, the light curve derivatives are given by
 \frac{\partial \mathcal{F}}{\partial u_i} =  \sum_{j} \frac{\partial d_j}{\partial u_i}\frac{\partial \mathcal{F}}{\partial d_j}.
 \end{eqnarray}
 
+With the description of the integration complete, we next discuss
+the integration of the light curve over a finite time step.
+
+\section{Time integration}
+
+Given that most observations are made over a finite exposure time,
+the integration of the light curve over time is necessary for representing
+the transit with high fidelity \citep{Kipping2010}.
+
+The time integration is given by 
+\begin{eqnarray}
+\overline{\mathcal{F}} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \mathcal{F}(t) dt,\\
+\frac{\partial \overline{\mathcal{F}}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial r}(t) dt,\\
+\frac{\partial \overline{\mathcal{F}}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial b}(t) dt,\\
+\frac{\partial \overline{\mathcal{F}}}{\partial d_i}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial d_i}(t) dt,\\
+\frac{\partial \overline{\mathcal{F}}}{\partial \bvec{x}} &=& \frac{1}{\Delta t}
+\int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial b}\frac{\partial b}{\partial \bvec{x}}(t) dt,
+\end{eqnarray}
+where $b(\bvec{x},t)$ is a model for the impact parameter as a function of time
+and model parameters $\bvec{x}$.  The set of model parameters need to be specified
+by a function, which, for example, might be a Keplerian orbit of the two bodies
+with respect to one another.
+
+As an example, we choose the approximate model $b = (b_0^2 + v^2(t-t_0)^2)^{1/2}$
+and compute the time-averaged flux and derivatives for a lengthy integration time.
+The integration is carried out with an adaptive refinement of the interval by
+factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
+of the mean of the start and end (Foreman-Mackey, priv.\ comm.) with a maximum
+number of refinement depths of 32.  Figure \ref{fig:integrated_derivs} shows a
+comparison of the derivatives of the time-integrated light curve for this
+impact parameter model.  The time-integration smooths both the features of
+the light curve, as well as the features of the derivative curves.
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/integrate_transit_gradient.pdf}
+    \caption{Comparison of the normalized flux and its derivatives with (solid) and
+    without (dashed) time-integration.  The integration time is indicated in the
+    upper left panel with a horizontal blue line. The derivatives are computed with
+    respect to $\{r,t_0,v,b_0,u_1,u_2\}$.  The parameters are given by $r=0.1$,
+    $t_0 = 0$, $b_0=0.5$, $u_1=u_2=0.3$.}
+    \label{fig:integrated_derivs}
+    \end{centering}
+\end{figure}
+
 This completes the description of the light curve computation, along
 with its derivatives.  We now turn to discussing the implementation of
 the computation, followed by comparison with existing codes.
@@ -1406,7 +1451,7 @@ evaluate than the \citet{Bulirsch1965a} code for computing elliptic
 integrals.
 
 We have also compared the evaluation speed of our code with P\'al's as well.
-We compiled P\'al's code using \texttt{gfortrans -O3}, and found that
+We compiled P\'al's code using \texttt{gfortran -O3}, and found that
 the computation of quadratic limb-darkened light curves and
 derivatives takes an average of 0.52 seconds to compute $10^6$ models,
 while the \texttt{transit\_poly\_struct.jl} takes an average of 0.16 seconds,
@@ -1443,7 +1488,7 @@ giving our Julia code a 70\% speed advantage over the Fortran code.
 
 \begin{itemize}
 \item Compare with Gimenez for speed and accuracy for higher order limb-darkening. [ ]
-\item Compare with Batman for speed and accuracy. [ ]
+\item Compare with Batman for speed and accuracy. [x]
 \item Compare derivatives with Pal for speed and accuracy. [x]
 \item Show the scaling with the number of points in the light curve
 and with the number of limb-darkening components. [x]
@@ -1454,10 +1499,11 @@ and with the number of limb-darkening components. [x]
 We have presented formulae for the transit (or occultation/eclipse) of a
 limb-darkened body with a limb-darkening profile which is given by a polynomial
 in $\upmu$.  These formulae have multiple assumptions built in:  both bodies
-are treated as spherical \citep{Seager2002,Hui2002}, so that their projected
-sufaces are assumed to be circular \citep{Barnes2003,Barnes2004,Barnes2009b};  limb-
-darkening is treated as azimuthally-symmetric \citep{Barnes2009a}; refraction
-and any relativistic effects are ignored \citep{Sidis2010}; the edges of both
+are treated as spherical \citep[but see][]{Seager2002,Hui2002}, so that their projected
+sufaces are assumed to be circular \citep[but see][]{Barnes2003,Barnes2004,Barnes2009b,
+DobbsDixon2012};  limb-
+darkening is treated as azimuthally-symmetric \citep[but see][]{Barnes2009a}; refraction
+and any relativistic effects are ignored \citep[but see][]{Sidis2010}; the edges of both
 bodies are assumed to have a sharp boundary.
 All of these assumptions are violated in every transit event to some extent,
 but in many cases can yield an adequate approximation given a particular
@@ -1536,7 +1582,9 @@ total flux of the star.  A third possibility is to fit stellar atmosphere
 models with the polynomial limb-darkening model until a sufficient precision
 is reached given that warranted by the data, and then to place priors
 on the limb-darkening parameters, informed by the stellar limb-darkening
-models.
+models.  A limitation of our computational approach is that the precision
+begins to degrade for $n \approx 25-30$; however, we anticipate that such
+a high order will rarely be required.
 
 %Example applications:
 %\begin{enumerate}
@@ -1548,7 +1596,7 @@ models.
 
 The detection of transit-timing variations with low-amplitude sinusoidal
 variations can make use of the fact that small variations in transit time
-can be expanded as a Taylor series to linear order so that perturbations
+can be expanded as a Taylor series to linear order in time so that perturbations
 in the transit time are the sum of a periodic component and a constant
 times the derivative of the limb-darkened light curve \citep{Ofir2018}.
 This approach requires derivatives of the light curve with respect to

@@ -17,9 +17,9 @@ favg4 = zeros(nt); depth4 = zeros(Int64,nt); diff4 = zeros(nt)
 # The following compares different tolerances and maxdepths:
 r = 0.1; b0 = 0.5; u_n = [0.2,0.2,0.2,0.2,0.2]
 trans = transit_init(r,b0,u_n,false)
-param = [0.0,1.0,r,b0]
+param = [0.0,1.0,b0]
 for i=1:nt
-  trans.b = sqrt(param[4]^2+(param[2]*(t[i]-param[1]))^2)
+  trans.b = sqrt(param[3]^2+(param[2]*(t[i]-param[1]))^2)
   favg0[i] = transit_poly_d!(trans)
   favg1[i],depth1[i],diff1[i] = integrate_timestep_track(param,trans,t[i],dt,1e-5*r^2,4)
   favg2[i],depth2[i],diff2[i]  = integrate_timestep_track(param,trans,t[i],dt,1e-5*r^2,256)
@@ -36,7 +36,7 @@ favg4 /= dt
 # Now, carry out speed test:
 
 @time for i=1:nt
-        trans.b = sqrt(param[4]^2+(param[2]*(t[i]-param[1]))^2)
+        trans.b = sqrt(param[3]^2+(param[2]*(t[i]-param[1]))^2)
         favg0[i] = transit_poly_d!(trans)
       end
 dtinv = inv(dt)
@@ -49,11 +49,14 @@ dtinv = inv(dt)
 
 d2fdb2 = zeros(nt)
 dfdb = zeros(nt)
+# Initialize a BigFloat version of the transit structure:
 trans_big = transit_init(big(r),big(b0),big.(u_n),true)
-bigparam = [big(0.0),big(1.0),big(r),big(b0)]
+bigparam = [big(0.0),big(1.0),big(b0)]
 dq = 1e-18
+# Loop over time steps, and at each time step compute the second derivative
+# with respect to b using finite difference of BigFloat for accuracy:
 for i=1:nt
-  trans_big.b = sqrt(bigparam[4]^2+(bigparam[2]*(t[i]-bigparam[1]))^2)
+  trans_big.b = sqrt(bigparam[3]^2+(bigparam[2]*(t[i]-bigparam[1]))^2)
   trans_big.b -= dq
   transit_poly_d!(trans_big)
   dfdbm = trans_big.dfdrb[2]
@@ -66,5 +69,5 @@ end
 
 # Now plot the estimate of the difference:
 plot(favg4-favg0)
-b = sqrt.(param[4]^2+(param[2]*(t-param[1])).^2)
+b = sqrt.(param[3]^2+(param[2]*(t-param[1])).^2)
 plot(dt^2*(d2fdb2.*(param[2]*(t-param[1])./b).^2+dfdb.*param[2]^2./b)/24.0)
