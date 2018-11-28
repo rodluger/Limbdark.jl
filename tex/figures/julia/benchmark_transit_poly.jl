@@ -66,7 +66,7 @@ for iu = 1:nnu
     timing_ratio[:,iu] = timing./timing_ratio[:,1]
   end
   loglog(nb,timing,color=cmap(float(iu)/(1.25 * nnu)))
-  loglog(nb,timing,"o",color=cmap(float(iu)/(1.25 * nnu)),label=string("n: ",nu[iu]))
+  loglog(nb,timing,"o",color=cmap(float(iu)/(1.25 * nnu)),label=string("N: ",nu[iu]))
 end
 xlabel("Number of points")
 ylabel("Timing [sec]")
@@ -79,9 +79,9 @@ tmed = vec(median(timing_ratio;dims=1))
 loglog(nu,tmed,"o", color="C0")
 plot(nu,tmed,label="Measured",linewidth=2, color="C0")
 alp = log(tmed[nnu])/log(nu[nnu])
-plot(nu,nu.^0.2,linestyle="--",label=L"$n^{0.2}$",color="C1")
-#plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="-.",label=L"$n^2$",color="C1")
-plot(nu,tmed[nnu]*(nu/nu[nnu]).^1,linestyle="-.",label=L"$n^1$",color="C1")
+plot(nu,nu.^0.2,linestyle="--",label=L"$N^{0.2}$",color="C1")
+#plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="-.",label=L"$N^2$",color="C1")
+plot(nu,tmed[nnu]*(nu/nu[nnu]).^1,linestyle="-.",label=L"$N^1$",color="C1")
 xlabel("Number of limb-darkening coefficients")
 ylabel("Relative timing")
 legend(loc="upper left")

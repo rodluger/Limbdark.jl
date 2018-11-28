@@ -675,9 +675,9 @@ and
 where we have given some of the expressions in terms of both the standard elliptic integrals
 and the general elliptic integral.
 
-Note that if we had included the radius of the source star in these formulae,
-then the derivatives with respect to the radius of the star yield the
-transit light curve of a uniform, thin emission shell \citep{Schlawin2010}.
+% Note that if we had included the radius of the source star in these formulae,
+% then the derivatives with respect to the radius of the star yield the
+% transit light curve of a uniform, thin emission shell \citep{Schlawin2010}.
 
 We have tested these formulae with finite-difference derivatives evaluated at
 256-bit precision, and, as with the total flux term, we find that these are accurate
@@ -694,11 +694,11 @@ $u_2=-1$, so that $I(\mu)=\mu^2$, along with the derivatives, using the transfor
 expressions described above.  The general quadratic case may be computed as
 a linear combination with the foregoing uniform and linear cases.
 
-We first give the formula for $\eta$, which is used in \citet{MandelAgol2002}, in
+We first give the formula for the function $\eta(r,b)$, which is used in \citet{MandelAgol2002}, in
 terms of quantities we have defined above for the uniform case:
 \begin{align}
     \label{eq:eta}
-    \eta &=
+    \eta(r,b) &=
     \begin{dcases}
           \frac{1}{2\pi}\left[\kappa_1+r^2(r^2+2b^2)\kappa_0-\frac{1}{2}(1+5r^2+b^2)A_{kite}\right]
           %
@@ -753,7 +753,7 @@ S_2 &=& 2 S_0 + 4\pi \eta - 2\pi,\\
 \frac{\partial S_2}{\partial b} &=& 2 \frac{\partial S_0}{\partial b} + 4\pi \frac{\partial \eta}{\partial b},\\
 \end{eqnarray}
 where $S_0$ and its derivatives are defined in equations \ref{eq:uniform}-\ref{eq:dS0_drb}.
-With the definitions of $S_0$, $S_1$, and $S_2$, the light curve and derivatives
+With the formulae for $S_0$, $S_1$, and $S_2$, the light curve and derivatives
 of quadratic limb-darkening may be computed with equations \ref{eq:flux} and 
 \ref{eq:derivatives} given below.
 
@@ -986,15 +986,15 @@ We choose the functions $f_n(z) = z^n$, so that
 \begin{equation}
 \gbasisn(x,y) =  (n+2)z^n-n z^{n-2},
 \end{equation}
-for $n \ge 2$ is the basis set for the surface brightness of the polynomial limb-darkening,
+for $2 \le n \le N$ is the basis set for the surface brightness of the polynomial limb-darkening,
 along with the uniform, $\tilde{g}_0 = z^0$,
 and linear, $\tilde{g}_1 = z^1$, terms which we have derived in \SS \ref{sec:uniform} and 
 \ref{sec:reparam}.
 Note that the total flux of each term in this basis set, $\tilde{g}_n$, integrates
-to zero for $n \ge 2$.
+to zero for $2 \le n \le N$.
 
 Also, with this choice of basis, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for
-$n \ge 1$ since $z=0$ at the boundary of the star.   The $n=0$ case we have already
+$1 \le n \le N$ since $z=0$ at the boundary of the star.   The $n=0$ case we have already
 solved for uniform limb-darkening, and so it remains to find $\mathcal{P}(\bvec{G}_n)$.
 
 The primitive integral
@@ -1010,7 +1010,7 @@ We make the transformation $\xi = \tfrac{1}{2} \left(\varphi - \tfrac{3\pi}{2}\r
 2r (4br)^{\frac{n}{2}}\int\displaylimits_{-\tfrac{\kappa}{2}}^{\tfrac{\kappa}{2}}
 (k^2-\sin^2\xi)^{\tfrac{n}{2}} (r-b + 2b \sin^2 \xi) d\xi,
 \end{equation}
-for $n \ge 2$, where $\kappa = 2 \sin^{-1}k$ for $k^2 \le 1$ and
+for $2 \le n \le N$, where $\kappa = 2 \sin^{-1}k$ for $k^2 \le 1$ and
 $\kappa = \pi$ for $k^2 > 1$.  Note that $\kappa = \kappa_0$, so in practice we
 reuse the value of $\kappa_0$ which was computed in the uniform limb-darkening
 case (\S \ref{sec:uniform}).
@@ -1019,7 +1019,7 @@ With these integrals defined, the basis functions for the lightcurve are given
 by $S_n$, where $S_0$ is given for uniform limb-darkening
 in section \ref{eq:uniform}, $S_1$ is given by the linear limb-darkened
 solution from section \ref{sec:reparam}, and  $S_n = \mathcal{Q}(\bvec{G}_n)
-- \mathcal{P}(\bvec{G}_n) = -\mathcal{P}(\bvec{G}_n)$ for $n \ge 2$;
+- \mathcal{P}(\bvec{G}_n) = -\mathcal{P}(\bvec{G}_n)$ for $2 \le n \le N$;
 we have already given an alternate expression for $S_2$ in section \ref{sec:quadratic}.
 
 We can express $\mathcal{P}(\bvec{G}_n)$ in terms of a sequence of integrals,
@@ -1074,7 +1074,7 @@ for $k^2 \le 1$, while for $k^2 > 1$,
 \end{eqnarray}
 where, as before, $k_c = \sqrt{1-k^2}$ for $k^2 \le 1$, and $k_c = \sqrt{1-k^{-2}}$ for $k^2 > 1$.
 
-For downward recursion, we compute the top four $\mathcal{M}_n$ expressions
+For downward recursion, we compute the top four $\mathcal{M}_n$ expressions, $n-3 \le n \le N$,
 in terms of series expansions.
 When $k^2 \le 1$, the integrals may be expressed in terms of the following
 Hypergeometric functions and infinite series,
@@ -1117,10 +1117,14 @@ We rewrite $I(\upmu)$ in terms of these three expansions
 &=& \sum_{n=0}^N a_n \upmu^n,\\
 &=& d_0 + d_1 \upmu + \sum_{n=2}^N d_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right].
 \end{eqnarray}
-Note that $a_0= 1-\sum_{n=1}^N a_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
+Note that $a_0 \equiv 1-\sum_{n=1}^N a_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
 The transformation between $u_n$ and $a_n$ is straightforward based on
 looping over the binomial expansion of each of the $u_n$ terms (equation \ref{eq:polynomialld}),
-for example $a_1 = \sum_{n=1}^N n u_n$.
+for example $a_1 = \sum_{n=1}^N n u_n$, while in general
+\begin{equation}
+a_n = -\sum_{i=n}^N u_i \binom{i}{n}(-1)^n,
+\end{equation}
+for $1 \le n \le N$.
 Then, with the computed $a_n$ values, we can find $d_n$ from downward recursion
 using the relation
 \begin{equation}
@@ -1136,7 +1140,7 @@ F_0 &=& \pi(d_0+ \tfrac{2}{3} d_1),
 where $F_0$ is the unobscured flux. 
 
 Note that the unobscured flux for each basis function (for $b \ge 1+r$ or $r=0$) is zero for
-all $S_n(r,b)$ with $n \ge 2$, which is why the total unobscured flux,
+all $S_n(r,b)$ with $2 \le n \le N$, which is why the total unobscured flux,
 $F_0$, only depends upon $d_0$ and $d_1$.
 
 \subsection{Analytic derivatives}
@@ -1185,7 +1189,7 @@ the expressions with a series solution, as we did for $\mathcal{M}_n$,
 \gamma_0 &=& \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\\
 \gamma_j &=& \gamma_{j-1} \frac{(4j^2-1)}{2j(3+n+2j)}.
 \end{eqnarray}
-For $k^2 < \tfrac{1}{2}$, we compute the values of $\mathcal{N}_{n}$ and $\mathcal{N}_{n-1}$, and use downward
+For $k^2 < \tfrac{1}{2}$, we compute the values of $\mathcal{N}_{N}$ and $\mathcal{N}_{N-1}$, and use downward
 recursion with the relation
 \begin{equation}
 \mathcal{N}_n = \frac{(n+4)\mathcal{N}_{n+2} - \mathcal{M}_{n+2}}{(n+2)(1-(b+r)^2)}.
@@ -1195,13 +1199,13 @@ practice we only need to compute it for $b < b_0 = 10^{-3}$ to obtain similar ac
 to the other expressions.  This is encountered rarely as it only applies when the
 occultor is nearly aligned with the source.
 
-With the computation of $S_n = -\mathcal{P}(\bvec{G}_n)$ for $n \ge 2$, we then
+With the computation of $S_n = -\mathcal{P}(\bvec{G}_n)$, we then
 compute the derivatives of the light curve as
 \begin{eqnarray}
 \frac{\partial S_n}{\partial r} &= & -\frac{\partial \mathcal{P}(\bvec{G}_n)}{\partial r},\\
 \frac{\partial S_n}{\partial b} &= & -\frac{\partial \mathcal{P}(\bvec{G}_n)}{\partial b},
 \end{eqnarray}
-for $n \ge 2$, while the $n=0$ and $n=1$ terms must be handled separately as in
+for $2 \le n \le N$, while the $n=0$ and $n=1$ terms are handled separately as in
 section \ref{sec:reparam}.
 
 The derivatives of the normalized flux, $\mathcal{F}$, as a function of $r$, $b$, and
@@ -1213,7 +1217,7 @@ $d_n$ are then computed as
 \frac{\partial \mathcal{F}}{\partial d_1} &=&  -\frac{2\pi \mathcal{F}}{3F_0} +\frac{S_1}{F_0},\\
 \frac{\partial \mathcal{F}}{\partial d_n} &=&  \frac{S_n}{F_0},
 \end{eqnarray}
-where the last line is for $n \ge 2$.
+where the last line is for $2 \le n \le N$.
 
 The derivatives of the coefficients, $\frac{\partial d_i}{\partial u_j}$, are
 computed by differentiating each term, and propagating the derivatives via the
@@ -1313,13 +1317,13 @@ require the inverse of an integer, so an array of integer inverses is computed
 once and stored, and then accessed as required rather than recomputed.
 
 Once the number of limb-darkening
-terms, $n$, is specified, then the series coefficients for $\mathcal{M}_n$
+terms, $N$, is specified, then the series coefficients for $\mathcal{M}_n$
 and $\mathcal{N}_n$, $\alpha_j$ and $\gamma_j$, are a simple function of $j$ 
 and $n$, and so we compute these coefficients once, and store them in a vector 
-for $k^2 \le 1$, separately for $n-3$ to $n$ for $\mathcal{M}_n$, and for 
-$n-1$ and $n$ for $\mathcal{N}_n$.
+for $k^2 \le 1$, separately for $N-3$ to $N$ for $\mathcal{M}_n$, and for 
+$N-1$ and $N$ for $\mathcal{N}_n$.
 
-In addition, once $n$ is specified, then the transformation matrix for
+In addition, once $N$ is specified, then the transformation matrix for
 the Jacobian from $d_i$ to $u_j$, $\frac{\partial d_i}{\partial u_j}$,  
 remains the same throughout the light curve 
 computation, so we compute this matrix only once, and then compute the
@@ -1333,7 +1337,7 @@ In practice, we are usually only concerned with optimizing a likelihood
 or computing gradients of a likelihood for Hamiltonian Markov Chain
 Monte Carlo, so the derivatives of the particular points in the
 light curve with respect to $u_i$ aren't needed.  This results in a
-significant computational savings, especially for large $n$.
+significant computational savings, especially for large $N$.
 Transformation to other parameterizations, such as $q_1$ and $q_2$
 defined by \citet{Kipping2013}, may also be accomplished after the
 fact by applying the Jacobian to compute the gradient of the likelihood 
@@ -1345,14 +1349,14 @@ integrals which appear in the expressions for $S_1$.  Consequently, we carry
 out a parallel computation of these elliptic integrals such that these
 repeated terms are only computed once;  this improves the efficiency of
 the elliptic integral computation.  Once these elliptic integrals
-are computed for $S_1$, the elliptic integrals $E(m_k) = \mathrm{cel}(k_c,1,1,k_c^2)$
-and $(E(m_k)-(1-m_k)K(m_k))/m_k = \mathrm{cel}(k_c,1,1,0)$ are
+are computed for $S_1$, the elliptic integrals $\mathrm{cel}(k_c,1,1,k_c^2)=E(m_k)$
+and $\mathrm{cel}(k_c,1,1,0)=(E(m_k)-(1-m_k)K(m_k))/m_k $ are
 stored in the structure and reused for computing $\mathcal{M}_n$
 and $\mathcal{N}_n$.
 
 We find that the precision of the computation begins to degrade for
-$ n \approx 25-30$.  For large values of $n$, the computing time for
-propagating the derivatives from $d_i$ to $u_i$ scales as $n^2$, and
+$N \approx 25-30$.  For large values of $N$, the computing time for
+propagating the derivatives from $d_i$ to $u_i$ scales as $N^2$, and
 thus can dominate the computation time.  We utilize the BLAS linear
 algebra library (specifically, the routine \texttt{gemv}) for efficient 
 multiplication of this matrix times the derivative of the light curve with 
@@ -1380,7 +1384,7 @@ in the light curve).  The linear scaling with time holds for each value of
 the number of limb-darkening coefficients.
 
 Figure \ref{fig:nlimb} shows that the time dependence scales approximately
-as $n^{0.2-1}$.  As with the number of light-curve points, we have taken
+as $N^{0.2-1}$.  As with the number of light-curve points, we have taken
 the median over nine measurements for each set of parameters.  We then
 scaled the timing to the single-coefficient case, and took a second
 median over the number of light curve points as the cube-root scaling scales
@@ -1390,7 +1394,8 @@ about the same with different numbers of points in the light curve.
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/benchmark_transit_poly.pdf}
     \caption{Scaling of the computation time in seconds with the number of
-    data points in the light curve for $r=0.1$ with $b$ ranging from $0$ to $1.2$.}
+    data points in the light curve for $r=0.1$ with $b$ ranging from $0$ to $1.2$,
+    and with the number of limb-darkening coefficients, $N$.}
     \label{fig:ncoeff}
     \end{centering}
 \end{figure}
@@ -1399,7 +1404,7 @@ about the same with different numbers of points in the light curve.
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/benchmark_limbdark_timing.pdf}
     \caption{Scaling of the computation time with the number of
-    limb-darkening coeffients.  The $y$-axis scales the timing with respect
+    limb-darkening coeffients, $N$.  The $y$-axis scales the timing with respect
     to the timing for a single limb-darkening coefficient.}
     \label{fig:nlimb}
     \end{centering}
@@ -1470,7 +1475,7 @@ relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
 %
 %Give some examples of the usage: non-linear optimization, HMC.
 
-\section{Comparison with other work} \label{sec:comparison}
+\section{Comparison with prior work} \label{sec:comparison}
 
 In this section we compare our computations with existing code in terms
 of accuracy and speed.
@@ -1481,7 +1486,11 @@ For uniform, linear or quadratic limb-darkening, the widely used computation
 by \citet{MandelAgol2002} has been improved in speed by utilizing the
 \citet{Bulirsch1965a,Bulirsch1965b} expressions for the complete elliptic
 integral of the third kind which is needed for the linear case, as implemented
-in the \texttt{EXOFAST} routines \citep{Eastman2013}.
+in the \texttt{EXOFAST} routines \citep{Eastman2013}.  It also uses a series 
+approximation for the complete elliptic integrals of the first and second 
+kind \citep{Hastings1955}. These three elliptic integrals, especially the third
+kind, are the bottleneck in the computation, and the Bulirsch version is faster
+than widely used Carlson implementation of elliptic integrals \citep{Carlson1979}.
 
 We have carried out a numerical comparison of the \citet{MandelAgol2002}
 for the linear case ($u_1=1$), and find that the most severe errors
@@ -1504,6 +1513,13 @@ parameter space.
     \label{fig:compareMA}
     \end{centering}
 \end{figure}
+
+A speed comparison for a transit computed with $10^7$ data points shows that
+the Julia implementation of these routines takes about 60\% of the CPU
+time as the IDL EXOFAST implementation without derivatives, and about 75\%
+of the computation time when including the derivatives.  Consequently, we
+conclude that our new implementation is both faster (by 25-40\%) and more 
+accurate than the Mandel \& Agol IDL implementation.
 
 \subsection{Derivative comparison with P\'al}
 
@@ -1536,7 +1552,32 @@ giving our Julia code a 70\% speed advantage over the Fortran code.
     \end{centering}
 \end{figure}
 
-\subsection{Comparison to batman}
+\subsection{Comparison to \texttt{batman}}
+
+A Python implementation of transit light curves which has been widely applied
+is the \texttt{batman} package by \citet{Kreidberg2015}.  This package
+implements a fast C++ version of the computation, called by Python for
+ease of use.
+
+The \texttt{batman} package computes the quadratic limb-darkening model
+of \citet{MandelAgol2002}, and uses the same approach for computing
+the complete elliptic integrals as EXOFAST.  We have made a comparison
+of our implementation of quadratic limb-darkening with \texttt{batman},
+which is shown in Figure \ref{fig:batman_comparison}.  Without computing
+derivatives, our approach take about 60\% of the time of \texttt{batman};
+with derivatives, the two are comparable in speed.
+
+Next, we ran a comparison with the non-linear limb-darkening model which
+proves to be a better fit than the quadratic model to both simulated
+and observed stellar atmospheres.  The \texttt{batman} code carries out
+a numerical integration over the surface brightness as a function of
+radius over the stellar disk, which requires additional computational
+time and limits the precision.  We have carried out a fit to the
+non-linear limb-darkening profile with $c_1=c_2=c_3=c_4=0.2$ with a
+polynomial limb-darkening model with $N=15$.  We then ran a timing
+comparison between the \texttt{batman} model and the polynomial
+model, and we find that the polynomial model is about 7 times
+as accurate and 25 times faster to evaluate compared with \texttt{batman}.
 
 \begin{figure}
     \begin{centering}
@@ -1571,15 +1612,16 @@ limb-darkened body with a limb-darkening profile which is given by a polynomial
 in $\upmu$.  These formulae have multiple assumptions built in:  both bodies
 are treated as spherical \citep[but see][]{Seager2002,Hui2002}, so that their projected
 sufaces are assumed to be circular \citep[but see][]{Barnes2003,Barnes2004,Barnes2009b,
-DobbsDixon2012};  limb-
-darkening is treated as azimuthally-symmetric \citep[but see][]{Barnes2009a}; refraction
-and any relativistic effects are ignored \citep[but see][]{Sidis2010}; the edges of both
-bodies are assumed to have a sharp boundary.
+DobbsDixon2012};  limb-darkening is treated as azimuthally-symmetric \citep[but see][]{Barnes2009a}; 
+refraction and any relativistic effects are ignored \citep[but see][]{Sidis2010}; 
+and the edges of both bodies are assumed to have a sharp boundary.
 All of these assumptions are violated in every transit event to some extent,
-but in many cases can yield an adequate approximation given a particular
-signal-to-noise ratio.
+but in the majority of cases these assumptions can yield a precise model for 
+a given signal-to-noise ratio.
 
-The parameterization of limb-darkening can impact the precision of the computation
+Given these assumptions, generally one next assumes a particular functional
+form for the limb-darkening law \citep{Csizmadia2018}.  The parameterization of 
+the limb-darkening model can impact the precision of the computation
 of transit light curves.  A common approach is to derive limb-darkening
 coefficients for a particular limb-darkening model from stellar atmosphere models, 
 and to either fix these at the tabulated values given an observing band and an 
@@ -1597,10 +1639,10 @@ stellar limb-darkening by capturing the structure of the atmosphere under
 the influence of granulation \citep{Hayek2012,Magic2015}.  However, any
 physical model for a stellar atmosphere has limitations in the fidelity at
 which it can model actual stellar atmospheres,
-and can only explore a finite set of parameters (effective temperature,
+and any modeler can only explore a finite set of parameters (effective temperature,
 metallicity, surface gravity, and magnetic field strength).
-In practice, then, it may be most robust to simply let the limb-darkening parameters 
-be free parameters, let the limb-darkening model be as flexible as possible, 
+In practice, then, it may be most robust simply to let the limb-darkening parameters 
+be free parameters, to let the limb-darkening model be as flexible as possible, 
 and to let the limb-darkening model be fit along with the radius ratio and
 orbital parameters \citep{Csizmadia2012,Espinoza2015}.
 
@@ -1612,9 +1654,9 @@ a precision which is limited by the lack of uniformity of the actual stellar
 surface.  This begs the question of why a numerically precise model is required
 for modelling transit light curves.  The answer is computational accuracy
 and stability: this more accurate model can be used over all of parameter space,
-and the high precision enables computation of derivatives which are beneficial
-when optimizing model parameters, computing the Fisher information matrix, or
-deriving parameter posteriors with MCMC.
+without returning spurious results, and the high precision enables computation 
+of derivatives which are beneficial when optimizing model parameters, computing 
+the Fisher information matrix, or deriving parameter posteriors with MCMC.
 
 Since we are limited in the knowledge of the properties of any given star,
 the discrepancies of an azimuthally-symmetric limb-darkened model can be
@@ -1624,19 +1666,19 @@ account for outliers, account for correlations in the noise, or actually
 try to model the deviations of the star from azimuthal symmetry
 \citep[e.g.][]{SanchisOjeda2011}.
 
-In addition to the variability and inhomogeneity of stars, the limb-darkening model
-can only describe the variation of surface brightness with a limited accuracy.
-Our analytic model can be thought of as a Taylor series with which the
-limb-darkening can be expanded to as high an order as the data require.
-In fact, for planetary transits in which $r$ is small, an arbitrary limb-darkening
-model could be treated as a Taylor series about the location of the planet,
-using the analytic formulae to compute an approximate light curve.  This
-would require varying the polynomial limb-darkening coefficients as the
-planet moved across the disk of the star, which would need to be propagated
-through the derivatives properly.  Such a model could be a faster, and
-perhaps, more accurate way to treat arbitrary limb-darkening laws, such
-as ``non-linear" limb-darkening \citep{Claret2000} or power-law limb-darkening
-\citep{Maxted2018}.
+% In addition to the variability and inhomogeneity of stars, the limb-darkening model
+% can only describe the variation of surface brightness with a limited accuracy.
+% Our analytic model can be thought of as a Taylor series with which the
+% limb-darkening can be expanded to as high an order as the data require.
+% In fact, for planetary transits in which $r$ is small, an arbitrary limb-darkening
+% model could be treated as a Taylor series about the location of the planet,
+% using the analytic formulae to compute an approximate light curve.  This
+% would require varying the polynomial limb-darkening coefficients as the
+% planet moved across the disk of the star, which would need to be propagated
+% through the derivatives properly.  Such a model could be a faster, and
+% perhaps, more accurate way to treat arbitrary limb-darkening laws, such
+% as ``non-linear" limb-darkening \citep{Claret2000} or power-law limb-darkening
+% \citep{Maxted2018}.
 
 One question is what order of the limb-darkening model to choose to
 fit the data?  Here we suggest several possibile solutions.  The order of the
@@ -1644,16 +1686,16 @@ limb-darkening can be varied until the chi-square no longer improves (subject
 to a penalty for the greater freedom in the model, such as Bayesian Information
 Criterion).  A high-order limb-darkening model can be chosen, with the
 coefficients regularized to favor small values;  should the data require
-a higher-order model, then the coefficients will increase to acommodate
+a higher-order model, then the coefficients will increase to accommodate
 the data.  The parameterization of the limb-darkening with terms with
-$d_n ((n+2)\upmu^n-\upmu^{n-2})$ for $n \ge 2$ may be particularly
+$d_n ((n+2)\upmu^n-\upmu^{n-2})$ for $2 \le n \le N$ may be particularly
 convenient for this model in that these terms do not contribute to the
 total flux of the star.  A third possibility is to fit stellar atmosphere
 models with the polynomial limb-darkening model until a sufficient precision
 is reached given that warranted by the data, and then to place priors
 on the limb-darkening parameters, informed by the stellar limb-darkening
 models.  A limitation of our computational approach is that the precision
-begins to degrade for $n \approx 25-30$; however, we anticipate that such
+begins to degrade for $N \approx 25-30$; however, we anticipate that such
 a high order will rarely be required.
 
 %Example applications:
@@ -1663,21 +1705,6 @@ a high order will rarely be required.
 %\item time integrated model with derivatives;
 %\item HMC.
 %\end{enumerate}
-
-The detection of transit-timing variations with low-amplitude sinusoidal
-variations can make use of the fact that small variations in transit time
-can be expanded as a Taylor series to linear order in time so that perturbations
-in the transit time are the sum of a periodic component and a constant
-times the derivative of the limb-darkened light curve \citep{Ofir2018}.
-This approach requires derivatives of the light curve with respect to
-time, for which the \citet{MandelAgol2002} computation is too
-imprecise near the points of contact, $b \approx r$ and $b \approx 1-r$,
-within an impact parameter distance of $10^{-4}$, as shown by \citet{Ofir2018}.
-They extrapolated over these regions with polynomials.
-However, our new precise formulae, with derivatives, will be useful
-for the perturbative approach to the detection of transit timing
-variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
-model.
 
 \section{Applications}
 
@@ -1699,18 +1726,33 @@ With such higher precision, as well as the wavelength-dependence afforded
 by several JWST observing modes, once can expect that high fidelity transit
 models will be required for making precise observations.
 
+The detection of transit-timing variations with low-amplitude sinusoidal
+variations can make use of the fact that small variations in transit time
+can be expanded as a Taylor series to linear order in time so that perturbations
+in the transit time are the sum of a periodic component and a constant
+times the derivative of the limb-darkened light curve \citep{Ofir2018}.
+This approach requires derivatives of the light curve with respect to
+time, for which the \citet{MandelAgol2002} computation is too
+imprecise near the points of contact, $b \approx r$ and $b \approx 1-r$,
+within an impact parameter distance of $10^{-4}$, as shown by \citet{Ofir2018}.
+They extrapolated over these regions with polynomials.
+However, our new precise formulae, with derivatives, will be useful
+for the perturbative approach to the detection of transit timing
+variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
+model.
+
 \section{Conclusions}
 
 We have presented an analytic model for the transits, occultations, and
 eclipses of limb-darkened bodies with a polynomial dependence of the limb-darkening
 on the $z$ component of the stellar surface (or, alternatively, the
-cosine of the angle from the sub-stellar point).  The model is more precise
+cosine of the angle from the sub-stellar point, $\upmu$).  The model is more precise
 and accurate than prior models that we have compared to, especially near
 special limits such as the points of contact and the coincidence of the edge
 of the occultor with the center of the source.  The model also compares favorably in
 speed of evaluation, about a factor of three faster than the code due
-to \citet{Pal2008}, XXX faster than Gimenez, YYY faster than batman,
-and ZZZ faster than ExoFast.
+to \citet{Pal2008}, XXX faster than Gimenez, a factor of 2-25 faster than \texttt{batman}
+(depending on the order of the limb-darkening), and 25-40\% faster than EXOFAST.
 
 We expect that this code may be used both as a workhorse model for
 general fitting of transit models, as well as a tool for more

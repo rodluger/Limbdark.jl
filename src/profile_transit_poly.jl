@@ -22,7 +22,7 @@ function transit_b(trans,b)
 #  return flux,gradient
   return
 end
-b = abs.(linspace(-1.2,1.2,1000000))
+b = abs.(linspace(-1.2,1.2,10000000))
 
 @time transit_b(trans,b);
 @time transit_b(trans,b);
