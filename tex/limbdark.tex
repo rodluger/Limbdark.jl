@@ -9,7 +9,7 @@
 \setlength{\belowdisplayskip}{1.5em}
 
 \title{%
-Analytic Transit Light Curves for Stars with Polynomial Limb-Darkening
+Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomial Limb-Darkening
 }
 
 
@@ -22,14 +22,20 @@ Analytic Transit Light Curves for Stars with Polynomial Limb-Darkening
 \begin{abstract}
  We derive analytic, closed-form solutions for the light curve of a planet
  transiting a star with a limb darkening profile which is a polynomial function
- up to arbitrary integer order.  We provide updated analytic expressions for the
- uniform and linear limb darkened cases, as well as new expressions
- for higher order integer powers of limb darkening.  The formulae are crafted to be numerically
- stable over the expected range of usage.  We additionally present formulae for
+ of the stellar elevation, up to arbitrary integer order. 
+ We provide improved analytic expressions for the uniform, linear, and quadratic
+ limb-darkened cases, as well as novel expressions for higher order integer powers 
+ of limb darkening.  The formulae are crafted to be numerically stable over the 
+ expected range of usage.  We additionally present analytic formulae for
  the partial derivatives of instantaneous flux with respect to the radius ratio,
- impact parameter, and limb-darkening coefficients.  Our expressions are rapid to
- evaluate and can be used to accurately compute the first partial derivatives of
- transit light curves.
+ impact parameter, and limb-darkening coefficients.  These expressions are rapid to
+ evaluate, and compare quite favorably in speed and accuracy to existing transit light
+ curve codes. These may also be used to accurately compute the first partial 
+ derivatives of exposure-time averaged transit light curves with respect to all 
+ model parameters.  An additional application is modeling multiple eclipsing star
+ systems in cases where the stars may be treated as spherically symmetric.
+ We provide code which implements these formulae in C++, Python, and Julia, with
+ tests and example usage.
 \end{abstract}
 
 % ------------------------------------------------------------------------------
@@ -1133,7 +1139,7 @@ where we have defined a new integral, $\mathcal{N}_n$, which obeys the recursion
 \begin{equation}
 \mathcal{N}_n = \frac{1}{n+2} \left[\mathcal{M}_n + n(1-(b+r)^2) \mathcal{N}_{n-2}\right].
 \end{equation}
-Since this recursion relation only involves every other term, we only need the two lowest terms,
+Since this recursion relation involves every other term, we only need the two lowest terms,
 which are given by:
 \begin{eqnarray}
 \mathcal{N}_0 &=& \tfrac{1}{2}\kappa_0 - k k_c,\\
@@ -1191,43 +1197,61 @@ chain rule.  Then, the light curve derivatives are given by
 \frac{\partial \mathcal{F}}{\partial u_i} =  \sum_{j} \frac{\partial d_j}{\partial u_i}\frac{\partial \mathcal{F}}{\partial d_j}.
 \end{eqnarray}
 
-With the description of the integration complete, we next discuss
+With the description of the light curve computation complete, we next discuss
 the integration of the light curve over a finite time step.
 
 \section{Time integration}
 
 Given that most observations are made over a finite exposure time,
 the integration of the light curve over time is necessary for representing
-the transit with high fidelity \citep{Kipping2010}.  For constructing
+a transit light curve with high fidelity \citep{Kipping2010}.  For constructing
 a light curve, usually one divides the fluence by the integration time
 to obtain the time-averaged flux.  For optimizing and inferring the 
 posterior of model parameters, we would like to compute the derivatives
 of the time-averaged flux with respect to the model parameters.
 
-The time-averaged flux, $\overline{\mathcal{F}}$, and its derivatives, are given by 
-\begin{eqnarray}
-\overline{\mathcal{F}} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \mathcal{F}(t) dt,\\
-\frac{\partial \overline{\mathcal{F}}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t)}{\partial r} dt,\\
-%\frac{\partial \overline{\mathcal{F}}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t)}{\partial b} dt,\\
-\frac{\partial \overline{\mathcal{F}}}{\partial d_i}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t)}{\partial d_i} dt,\\
-\frac{\partial \overline{\mathcal{F}}}{\partial \bvec{x}} &=& \frac{1}{\Delta t}
-\int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial b}\frac{\partial b(t)}{\partial \bvec{x}} dt,
-\end{eqnarray}
+The instantaneous flux is a function of $3+n$ parameters in the Green's basis, 
+$\{r,b,d_n}$, or $2+n$ parameters in the polynomial in $1-\upmu$ basis, and of
+these, only one varies with time, $b(t)$.  Thus, we can compute the time-
+dependent flux with a model for $b(t)=b(\bvec{x},t)$, where
 where $b(\bvec{x},t)$ is a model for the impact parameter as a function of time
 and model parameters $\bvec{x}$.  The set of model parameters need to be specified
 by a function, which, for example, might be a Keplerian orbit of the two bodies
-with respect to one another.
+with respect to one another, or a full dynamical model of an n-body system.
+To compute the derivatives of the light curve with respect to $\bvec{x}$, the
+derivatives of the dynamical model must be computed as well.
 
-As an example, we choose the approximate model $b(t) = (b_0^2 + v^2(t-t_0)^2)^{1/2}$,
-which ignores acceleration and curvature during a transit,
-and compute the time-averaged flux and derivatives for a length of integration time.
-The integration is carried out with an adaptive refinement of the interval by
+The time-averaged flux, $\overline{\mathcal{F}}$, and its derivatives, are given by 
+\begin{eqnarray}
+\overline{\mathcal{F}} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \mathcal{F}(t^\prime) dt^\prime,\\
+\frac{\partial \overline{\mathcal{F}}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t^\prime)}{\partial r} dt^\prime,\\
+%\frac{\partial \overline{\mathcal{F}}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t^\prime)}{\partial b} dt^\prime,\\
+\frac{\partial \overline{\mathcal{F}}}{\partial d_i}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t^\prime)}{\partial d_i} dt^\prime,\\
+\frac{\partial \overline{\mathcal{F}}}{\partial \bvec{x}} &=& \frac{1}{\Delta t}
+\int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial b}\frac{\partial b(t^\prime)}{\partial \bvec{x}} dt^\prime,
+\end{eqnarray}
+where $t$ is taken to be the mid-point of the transit exposure time, and
+$\Delta t$ is the exposure time.
+
+As an example, we choose the approximate transit model $b(t) = (b_0^2 + v^2(t-t_0)^2)^{1/2}$,
+which ignores acceleration and curvature during a transit, and thus is valid in the
+limit of large orbital seperation.  We compute the time-averaged flux and derivatives 
+with respect to $\bvec{x} = \{t_0,v,b_0\}$ for a length of integration time $\Delta t$.
+The integration is carried out with an adaptive refinement of the exposure time interval by
 factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
 of the mean of the start and end (Foreman-Mackey, priv.\ comm.) with a maximum
 number of refinement depths of 32.  Figure \ref{fig:integrated_derivs} shows a
 comparison of the derivatives of the time-integrated light curve for this
-impact parameter model.  The time-integration smooths both the features of
-the light curve, as well as the features of the derivative curves.
+impact parameter model.  
+
+The time-integration smooths both the features of
+the light curve, as well as the features of the derivative curves.  The similarity of
+the shape of the derivative with respect to $v$ and $b_0$ makes it apparent
+that there may be partial degeneracies between the impact parameter and duration
+of a transit, which can make the impact parameter more difficult to measure, especially 
+when the exposure time is longer than the time of ingress/egress.  Likewise, the
+derivatives with respect to the two limb-darkening parameters have a similar shape,
+which explains why in some cases it can be difficult to constrain both parameters.
 
 \begin{figure}
     \begin{centering}
@@ -1624,13 +1648,25 @@ for the perturbative approach to the detection of transit timing
 variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
 model.
 
-%\section{Applications}
-%
-%We envision that this code will be used for fits to higher precision
-%transit data, such as gathered by JWST, which require an improved model
-%of stellar limb-darkening.  Here we discuss some potential avenues for
-%application of this model.
+\section{Applications}
 
+We envision that this code will be used for fits to higher precision
+transit data, such as gathered by the James Webb Space Telescope (JWST), 
+which require an improved model of stellar limb-darkening.  Here we discuss 
+some potential avenues for application of this model.
+
+The derivatives of the time-integrated light curves may be used to revisit the
+Fisher information analysis as carried out by \citet{Price2014}, as originally
+investigated without time-integration by \citet{Carter2008}.  Accounting
+for correlated noise in this analysis will give more plausible estimates
+for the impact of stellar variability on the determination of transit
+transmission spectroscopy and transit-timing variations \citep{ForemanMackey2017}.  
+This limit will be encountered as more precise measurements are made by gathering 
+more photons during a transit.  For example, for some targets, one can expect to 
+obtain $\sim 10^2$ times as many photons with JWST as collected with Kepler.
+With such higher precision, as well as the wavelength-dependence afforded
+by several JWST observing modes, once can expect that high fidelity transit
+models will be required for making precise observations.
 
 \section{Conclusions}
 
