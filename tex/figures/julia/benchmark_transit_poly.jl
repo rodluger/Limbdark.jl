@@ -25,7 +25,7 @@ timing_ratio = zeros(nnb,nnu)
 function profile_transit_poly(trans,nb)
 fgrad = zeros(2+trans.n)
 timing = zeros(length(nb))
-tmean = zeros(5)
+tmean = zeros(9)
 for j=1:length(nb)
   nb0 = nb[j]
   b = zeros(nb0)
@@ -85,7 +85,7 @@ plot(nu,tmed[nnu]*(nu/nu[nnu]).^1,linestyle="-.",label=L"$n^1$",color="C1")
 xlabel("Number of limb-darkening coefficients")
 ylabel("Relative timing")
 legend(loc="upper left")
-axis([1,144,0.7,2e2])
+axis([1,144,0.8,10.])
 savefig("benchmark_limbdark_timing.pdf", bbox_inches="tight")
 
 #return

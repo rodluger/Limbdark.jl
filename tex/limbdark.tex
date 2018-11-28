@@ -1198,24 +1198,29 @@ the integration of the light curve over a finite time step.
 
 Given that most observations are made over a finite exposure time,
 the integration of the light curve over time is necessary for representing
-the transit with high fidelity \citep{Kipping2010}.
+the transit with high fidelity \citep{Kipping2010}.  For constructing
+a light curve, usually one divides the fluence by the integration time
+to obtain the time-averaged flux.  For optimizing and inferring the 
+posterior of model parameters, we would like to compute the derivatives
+of the time-averaged flux with respect to the model parameters.
 
-The time integration is given by 
+The time-averaged flux, $\overline{\mathcal{F}}$, and its derivatives, are given by 
 \begin{eqnarray}
 \overline{\mathcal{F}} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \mathcal{F}(t) dt,\\
-\frac{\partial \overline{\mathcal{F}}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial r}(t) dt,\\
-\frac{\partial \overline{\mathcal{F}}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial b}(t) dt,\\
-\frac{\partial \overline{\mathcal{F}}}{\partial d_i}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial d_i}(t) dt,\\
+\frac{\partial \overline{\mathcal{F}}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t)}{\partial r} dt,\\
+%\frac{\partial \overline{\mathcal{F}}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t)}{\partial b} dt,\\
+\frac{\partial \overline{\mathcal{F}}}{\partial d_i}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t)}{\partial d_i} dt,\\
 \frac{\partial \overline{\mathcal{F}}}{\partial \bvec{x}} &=& \frac{1}{\Delta t}
-\int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial b}\frac{\partial b}{\partial \bvec{x}}(t) dt,
+\int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial b}\frac{\partial b(t)}{\partial \bvec{x}} dt,
 \end{eqnarray}
 where $b(\bvec{x},t)$ is a model for the impact parameter as a function of time
 and model parameters $\bvec{x}$.  The set of model parameters need to be specified
 by a function, which, for example, might be a Keplerian orbit of the two bodies
 with respect to one another.
 
-As an example, we choose the approximate model $b = (b_0^2 + v^2(t-t_0)^2)^{1/2}$
-and compute the time-averaged flux and derivatives for a lengthy integration time.
+As an example, we choose the approximate model $b(t) = (b_0^2 + v^2(t-t_0)^2)^{1/2}$,
+which ignores acceleration and curvature during a transit,
+and compute the time-averaged flux and derivatives for a length of integration time.
 The integration is carried out with an adaptive refinement of the interval by
 factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
 of the mean of the start and end (Foreman-Mackey, priv.\ comm.) with a maximum
@@ -1270,6 +1275,16 @@ the Jacobian from $d_i$ to $u_j$, $\frac{\partial d_i}{\partial u_j}$,
 remains the same throughout the light curve 
 computation, so we compute this matrix only once, and then compute the
 flux derivative (equation \ref{eq:dFdu}) with matrix multiplication.
+In fact, since the Jacobian matrix for transforming the derivatives from $d_i$
+to $u_j$ can be expensive to apply, we can carrying out the gradient of the 
+likelihood fucntion with respect to $d_i$, and then apply the Jacobian 
+transformation from $d_i$ to $u_j$ only once to obtain the gradient
+of the likelihood with respect to the limb-darkening parameterization.
+In practice, we are usually only concerned with optimizing a likelihood
+or computing gradients of a likelihood for Hamiltonian Markov Chain
+Monte Carlo, so the derivatives of the particular points in the
+light curve with respect to $u_i$ aren't needed.  This results in a
+significant computational savings, especially for large $n$.
 
 In computing the elliptic integrals, cel, we found that several terms
 which appear in the Bartky formalism are repeated amongst all three elliptic 
