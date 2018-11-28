@@ -1,4 +1,6 @@
-using DelimitedFiles
+if VERSION >= v"0.7"
+  using DelimitedFiles
+end
 
 include("../../../src/transit_poly_struct.jl")
 
@@ -7,7 +9,7 @@ function profile_transit_poly!(trans,flux,b)
     for k=1:10
         for i=1:length(b)
           trans.b = b[i]
-          flux[i] = transit_poly!(trans)
+          flux[i] = transit_poly_d!(trans)
         end
     end
     elapsed = 1e-10 * (time_ns() - t1)

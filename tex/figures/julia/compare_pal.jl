@@ -1,6 +1,8 @@
 # Compares with Pal's computation:
 
-using DelimitedFiles
+if VERSION >= v"0.7"
+  using DelimitedFiles
+end
 using PyPlot
 include("../../../src/transit_poly_struct.jl")
 
