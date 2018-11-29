@@ -25,6 +25,11 @@ python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fop
 python setup.py install
 popd
 
+# DEBUG!
+echo "TESTING PYTRANSIT BEGIN"
+python -c "from pytransit import Gimenez; m = Gimenez(); print(m)"
+echo "TESTING PYTRANSIT END"
+
 # Attempt to resolve issues with SSL certificate expiring for purl.org:
 # https://tectonic.newton.cx/t/how-to-use-tectonic-if-you-can-t-access-purl-org/44
 mkdir -p $HOME/.config/Tectonic

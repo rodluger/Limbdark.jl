@@ -12,6 +12,9 @@ julia:
 matrix:
     - PYTHON=Conda-python
 
+before_install:
+    - sudo apt-get install -y gfortran
+
 install:
     - source .ci/travis.sh
     - julia .ci/install.jl

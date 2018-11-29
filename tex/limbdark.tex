@@ -14,8 +14,11 @@ Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomia
 
 
 \author[0000-0002-0802-9145]{Eric Agol}\altaffiliation{Guggenheim Fellow}
-\author[0000-0002-0296-3826]{Rodrigo Luger}
 \affil{Department~of~Astronomy, University~of~Washington, Seattle, WA}
+\affil{Virtual~Planetary~Laboratory, University~of~Washington, Seattle, WA}
+\author[0000-0002-0296-3826]{Rodrigo Luger}
+\affil{Center~for~Computational~Astrophysics, Flatiron~Institute, New~York, NY}
+\affil{Virtual~Planetary~Laboratory, University~of~Washington, Seattle, WA}
 
 \keywords{methods: analytic --- techniques: photometric}
 
@@ -342,7 +345,8 @@ for linear limb-darkening.
     \caption{The area of overlap of two circles can be computed as the sum of
     the area of the sectors formed by the centers of each circle and the
     boundary between the points of intersection, minus the area of the kite-shaped
-    region formed by the centers of the circles and the intersection points.}\label{fig:circle_overlap}
+    region formed by the centers of the circles and the intersection points.
+    \pycodelink{overlap}}\label{fig:circle_overlap}
     \end{centering}
 \end{figure}
 
@@ -358,7 +362,7 @@ for linear limb-darkening.
     is limited by the conversion of the result to double-precision. The
     solid and empty circles (top) indicate the positions of the circles at the left
     hand side of the axes.  In the left panels the dash-dot grey line indicates the
-    limiting precision for representing $\pi r^2$.}\label{fig:overlap_precision}
+    limiting precision for representing $\pi r^2$. \jlcodelink{area_of_overlap_r01}}\label{fig:overlap_precision}
     \end{centering}
 \end{figure}
 
@@ -585,15 +589,15 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     eclipsed, $S_1(r,b)$.
     In the limit $b > r+1$, no eclipse occurs, so $S_1=1$.  For $b < r-1$, the star
     is completely eclipsed and $S_1=0$.  In the limits $b=r$ and $b=1-r$, special
-    expressions must be used.}
+    expressions must be used.\jlcodelink{transit_linear}}
     \end{centering}
 \end{figure}
 
 \begin{figure}\label{s2_plot}
     \begin{centering}
     \includegraphics[width=0.85\linewidth]{figures/julia/s2_residuals.pdf}
-    \caption{The numerical error in computing the flux of an eclipsed,  linearly
-    limb-darkened star ($u_1=1$), $S_1(r,b)$.}
+    \caption{The numerical error in computing the flux of an eclipsed, linearly
+    limb-darkened star ($u_1=1$), $S_1(r,b)$. \jlcodelink{s2_residuals}}
     \end{centering}
 \end{figure}
 
@@ -607,7 +611,7 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     the difference $(S_1(b,b\pm\epsilon)-S_1(b,b))/\epsilon$
     and $(S_1(b,1-b\pm\epsilon)-S_1(b,1-b))/\epsilon$. The bottom
     panels show the numerical precision by the comparing double precision
-    computation with \texttt{BigFloat} precision (256-bit).}
+    computation with \texttt{BigFloat} precision (256-bit). \jlcodelink{s2_machine}}
     \end{centering}
 \end{figure}
 
@@ -888,7 +892,7 @@ for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\b
 \begin{figure}[t!]
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/high_order_ld.pdf}
-    \caption{\label{fig:high_order_ld} Tenth order limb-darkening example with \starry. }
+    \caption{\label{fig:high_order_ld} Tenth order limb-darkening example with \starry. \pycodelink{high_order_ld}}
     \end{centering}
 \end{figure}
 
@@ -1289,7 +1293,7 @@ which explains why in some cases it can be difficult to constrain both parameter
     without (dashed) time-integration.  The integration time is indicated in the
     upper left panel with a horizontal blue line. The derivatives are computed with
     respect to $\{r,t_0,v,b_0,u_1,u_2\}$.  The parameters are given by $r=0.1$,
-    $t_0 = 0$, $b_0=0.5$, $u_1=u_2=0.3$.}
+    $t_0 = 0$, $b_0=0.5$, $u_1=u_2=0.3$. \jlcodelink{integrate_transit_gradient}}
     \label{fig:integrated_derivs}
     \end{centering}
 \end{figure}
@@ -1395,7 +1399,7 @@ about the same with different numbers of points in the light curve.
     \includegraphics[width=\linewidth]{figures/julia/benchmark_transit_poly.pdf}
     \caption{Scaling of the computation time in seconds with the number of
     data points in the light curve for $r=0.1$ with $b$ ranging from $0$ to $1.2$,
-    and with the number of limb-darkening coefficients, $N$.}
+    and with the number of limb-darkening coefficients, $N$. \jlcodelink{benchmark_transit_poly}}
     \label{fig:ncoeff}
     \end{centering}
 \end{figure}
@@ -1405,7 +1409,7 @@ about the same with different numbers of points in the light curve.
     \includegraphics[width=\linewidth]{figures/julia/benchmark_limbdark_timing.pdf}
     \caption{Scaling of the computation time with the number of
     limb-darkening coeffients, $N$.  The $y$-axis scales the timing with respect
-    to the timing for a single limb-darkening coefficient.}
+    to the timing for a single limb-darkening coefficient. \jlcodelink{benchmark_transit_poly}}
     \label{fig:nlimb}
     \end{centering}
 \end{figure}
@@ -1446,7 +1450,7 @@ relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
     \includegraphics[width=\linewidth]{figures/julia/occult_nonlinear_poly.pdf}
     \caption{Comparison of the non-linear limb-darkening with polynomial
     fits of various orders.  The maximum deviation ceases to improve
-    beyond a sextic fit.}
+    beyond a sextic fit. \jlcodelink{occult_nonlinear}}
     \label{fig:nonlinear}
     \end{centering}
 \end{figure}
@@ -1509,7 +1513,8 @@ parameter space.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_MA2002.pdf}
-    \caption{Comparison of Mandel \& Agol (2002) with Agol \& Luger (2018).}
+    \caption{Comparison of Mandel \& Agol (2002) with Agol \& Luger (2018).
+    \jlcodelink{compare_MA2002}}
     \label{fig:compareMA}
     \end{centering}
 \end{figure}
@@ -1547,7 +1552,7 @@ giving our Julia code a 70\% speed advantage over the Fortran code.
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_pal.pdf}
     \caption{Comparison of \citet{Pal2008} with Agol \& Luger (2018).  The
-    coefficients are $u_1=0.2$ and $u_2=0.3$.}
+    coefficients are $u_1=0.2$ and $u_2=0.3$. \jlcodelink{compare_pal}}
     \label{fig:Pal_comparison}
     \end{centering}
 \end{figure}
@@ -1583,7 +1588,8 @@ as accurate and 25 times faster to evaluate compared with \texttt{batman}.
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/compare_to_batman.pdf}
     \caption{Comparison of \citet{Kreidberg2015} with Agol \& Luger (2018) for
-             a transit across a quadratically limb-darkened star.}
+             a transit across a quadratically limb-darkened star.
+             \pycodelink{compare_to_batman}}
     \label{fig:batman_comparison}
     \end{centering}
 \end{figure}
@@ -1592,7 +1598,8 @@ as accurate and 25 times faster to evaluate compared with \texttt{batman}.
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/compare_to_batman_nonlinear.pdf}
     \caption{Comparison of \citet{Kreidberg2015} with Agol \& Luger (2018) for
-             a transit across a nonlinearly limb-darkened star.}
+             a transit across a nonlinearly limb-darkened star.
+             \pycodelink{compare_to_batman_nonlinear}}
     \label{fig:batman_nonlinear_comparison}
     \end{centering}
 \end{figure}

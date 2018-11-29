@@ -13,6 +13,8 @@ TECTONIC    = $(shell command -v tectonic >/dev/null && echo true || echo false 
 default: limbdark.pdf
 
 limbdark.pdf: limbdark.tex stylez.tex $(JLFIGURES) $(PYFIGURES)
+	# Generate links to current git commit
+	python gitlinks.py
 	if [ "${TECTONIC}" = "true" ]; then\
 		tectonic limbdark.tex --print --keep-logs;\
 	else\
