@@ -18,6 +18,13 @@ conda info -a
 # Install some dependencies
 pip install batman-package
 
+pushd $HOME
+git clone https://github.com/hpparvi/pytransit.git
+cd pytransit
+python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build
+python setup.py install
+popd
+
 # Attempt to resolve issues with SSL certificate expiring for purl.org:
 # https://tectonic.newton.cx/t/how-to-use-tectonic-if-you-can-t-access-purl-org/44
 mkdir -p $HOME/.config/Tectonic
