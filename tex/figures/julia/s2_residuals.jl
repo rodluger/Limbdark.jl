@@ -24,7 +24,7 @@ for ib=1:nb
 end
 
 clf()
-img=imshow(1e15 * (fgrid-fgrid_big)',interpolation="nearest",origin="lower",
+img=imshow(1e15 * (fgrid-fgrid_big),interpolation="nearest",origin="lower",
            extent=[0,2,0,2],cmap="plasma",vmin=-1.5, vmax=1.5)
 plot([0,1],[1,2],"k-")
 plot([1,2],[0,1],"k-")
