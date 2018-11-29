@@ -31,6 +31,11 @@ clean:
 	rm -rf $(PYFIGURES)
 	rm -rf $(JLFIGURES)
 
+figures/julia/s2_residuals_MA2002.pdf: figures/julia/s2_residuals_MA2002.jl
+	cd figures/julia;\
+	f2py -c occultquad.f -m occultquad;\
+	julia s2_residuals_MA2002.jl
+
 figures/julia/%.pdf: figures/julia/%.jl
 	cd $(<D);julia $(<F)
 

@@ -589,7 +589,8 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     eclipsed, $S_1(r,b)$.
     In the limit $b > r+1$, no eclipse occurs, so $S_1=1$.  For $b < r-1$, the star
     is completely eclipsed and $S_1=0$.  In the limits $b=r$ and $b=1-r$, special
-    expressions must be used.\jlcodelink{transit_linear}}
+    expressions must be used.
+    \jlcodelink{transit_linear}}
     \end{centering}
 \end{figure}
 
@@ -598,6 +599,15 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     \includegraphics[width=0.85\linewidth]{figures/julia/s2_residuals.pdf}
     \caption{The numerical error in computing the flux of an eclipsed, linearly
     limb-darkened star ($u_1=1$), $S_1(r,b)$. \jlcodelink{s2_residuals}}
+    \end{centering}
+\end{figure}
+
+\begin{figure}\label{s2_plot_MA2002}
+    \begin{centering}
+    \includegraphics[width=0.85\linewidth]{figures/julia/s2_residuals_MA2002.pdf}
+    \caption{The numerical error in computing the flux of an eclipsed, linearly
+             limb-darkened star using the code from \citet{MandelAgol2002}.
+             \jlcodelink{s2_residuals_MA2002}}
     \end{centering}
 \end{figure}
 
@@ -614,7 +624,6 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     computation with \texttt{BigFloat} precision (256-bit). \jlcodelink{s2_machine}}
     \end{centering}
 \end{figure}
-
 
 From \citet{MandelAgol2002}, the total flux visible during the occultation of a
 body whose surface map is given by $I(\upmu)/I(1) = 1 - u_1(1 - \upmu)$ may be computed
