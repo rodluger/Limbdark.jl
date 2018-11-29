@@ -1515,10 +1515,10 @@ parameter space.
 \end{figure}
 
 A speed comparison for a transit computed with $10^7$ data points shows that
-the Julia implementation of these routines takes about 60\% of the CPU
-time as the IDL EXOFAST implementation without derivatives, and about 75\%
+the Julia implementation of these routines takes about 55\% of the CPU
+time as the IDL EXOFAST implementation without derivatives, and about 65\%
 of the computation time when including the derivatives.  Consequently, we
-conclude that our new implementation is both faster (by 25-40\%) and more 
+conclude that our new implementation is both faster (by 35-45\%) and more 
 accurate than the Mandel \& Agol IDL implementation.
 
 \subsection{Derivative comparison with P\'al}
@@ -1752,7 +1752,7 @@ special limits such as the points of contact and the coincidence of the edge
 of the occultor with the center of the source.  The model also compares favorably in
 speed of evaluation, about a factor of three faster than the code due
 to \citet{Pal2008}, XXX faster than Gimenez, a factor of 2-25 faster than \texttt{batman}
-(depending on the order of the limb-darkening), and 25-40\% faster than EXOFAST.
+(depending on the order of the limb-darkening), and 35-45\% faster than EXOFAST.
 
 We expect that this code may be used both as a workhorse model for
 general fitting of transit models, as well as a tool for more
@@ -1774,7 +1774,7 @@ We thank Andr\'as P\'al, Kevin Stevenson, Kai Ueltzh\"offer, Mario Damasso,
 Matthew Heising, Robert Morehead, and Laura Kreidberg for pointing out
 errors or inaccuracies in the Mandel \& Agol paper and code, which we have
 hopefully rectified in this paper.
-E.A. acknowledges NSF grant AST-1615315, NASA grant NNX14AK26G and from
+EA acknowledges NSF grant AST-1615315, NASA grant NNX13AF62G, and from
 the NASA Astrobiology Institute's Virtual Planetary Laboratory Lead Team,
 funded through the NASA Astrobiology Institute under solicitation NNH12ZDA002C
 and Cooperative Agreement Number NNA13AA93A.

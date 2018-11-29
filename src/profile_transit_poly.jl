@@ -9,7 +9,7 @@ u_n = [0.5,0.25]
 trans = transit_init(0.1,0.5,u_n,true)
 #Transit_Struct{Float64}(0.1, 0.5, [0.5, 0.5], 2, 3, [-0.25, 1.5, -0.125], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], false, [0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0], [0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0 0.0; 0.0 0.0; 0.0 0.0], [0.0, 0.0, 0.0, 0.0, 0.0], [0.0, 0.0, 0.0, 0.0])
 
-function transit_b(trans,b)
+function transit_b!(trans::Transit_Struct{T},b::Array{T,1},flux::Array{T,1}) where {T <: Real}
 #  flux = zeros(length(b))
 #  gradient = zeros(length(b),2+trans.n)
   for i=1:length(b)
@@ -17,15 +17,21 @@ function transit_b(trans,b)
 #    flux[i]=transit_poly_d!(trans)
 #    gradient[i,1:2]=trans.dfdrb
 #    gradient[i,3:2+trans.n]=trans.dfdu
-    transit_poly_d!(trans)
+    if trans.grad
+      flux[i]=transit_poly_d!(trans)
+    else
+      flux[i]=transit_poly_d(trans)
+    end
   end
 #  return flux,gradient
   return
 end
-b = abs.(linspace(-1.2,1.2,10000000))
 
-@time transit_b(trans,b);
-@time transit_b(trans,b);
+nb = 10000000
+b = abs.(linspace(-1.2,1.2,nb))
+flux = zeros(nb)
+@time transit_b!(trans,b,flux);
+@time transit_b!(trans,b,flux);
 
 #=
 Profile.clear()
