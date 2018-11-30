@@ -114,12 +114,14 @@ endif
 inegressuni = where(z[notusedyet] ge abs(1.d0-p) and z[notusedyet] lt 1.d0+p)
 if inegressuni[0] ne -1 then begin
     ndxuse = notusedyet[inegressuni]
+    sqarea_triangle,z[ndxuse],p,sqarea
+    kite_area2 = sqrt(sqarea)
+    kap1 = atan(kite_area2,(1d0-p)*(p+1d0)+z[ndxuse]^2)
+    kap0 = atan(kite_area2,(p-1d0)*(p+1d0)+z[ndxuse]^2)
+;    kap1 = acos(-1.d0 > ((1.d0-p^2+z[ndxuse]^2)/2.d0/z[ndxuse]) < 1.d0)
+;    kap0 = acos(-1.d0 > ((p^2+z[ndxuse]^2-1.d0)/2.d0/p/z[ndxuse]) < 1.d0)
 
-    kap1 = acos(-1.d0 > ((1.d0-p^2+z[ndxuse]^2)/2.d0/z[ndxuse]) < 1.d0)
-    kap0 = acos(-1.d0 > ((p^2+z[ndxuse]^2-1.d0)/2.d0/p/z[ndxuse]) < 1.d0)
-
-    lambdae[ndxuse] = (p^2*kap0+kap1 - 0.5d0*sqrt(4.d0*z[ndxuse]^2-$
-                              (1.d0+z[ndxuse]^2-p^2)^2  > 0.d0))/!dpi
+    lambdae[ndxuse] = (p^2*kap0+kap1 - 0.5d0*kite_area2)/!dpi
     ;; eta_1
     etad[ndxuse] = 1.d0/2.d0/!dpi*(kap1+p^2*(p^2+2.d0*z[ndxuse]^2)*$
                       kap0-(1.d0+5.d0*p^2+z[ndxuse]^2)/4.d0*$
