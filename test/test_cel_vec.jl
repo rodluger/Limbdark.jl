@@ -14,6 +14,8 @@ Random.seed!(42)
 # Function which tests cel_bulirsch both numerically, one-by-one and vectorized:
 function test_cel!(kc,p,a,b)
 k2 = 1.0-kc^2
+# Evaluate all three at once:
+ell2 = cel_bulirsch(k2,kc,p,a[1],a[2],a[3],b[1],b[2],b[3])
 ell1 = zeros(3)
 nphi = 100000
 if p < 0
@@ -21,9 +23,9 @@ if p < 0
   p0 = sqrt((kc*kc-p)/(1-p))
   a0 = (a[1]-b[1])/(1-p)
   b0 = -(b[1]-a[1]*p)/(1-p)^2*(1-kc^2)/p0+a0*p0
-  p = p0
   a[1] = a0
-  b[1] = b0
+  b[1] = b0*p0
+  p = p0*p0
 end
 # Numerically compute the integrals:
 dphi = .5*pi/nphi
@@ -39,8 +41,6 @@ ell1[1] = cel_bulirsch(k2,kc,p,a[1],b[1])
 ell1[2] = cel_bulirsch(k2,kc,1.0,a[2],b[2])
 ell1[3] = cel_bulirsch(k2,kc,1.0,a[3],b[3])
 
-# Next, evaluate all three at once:
-ell2 = cel_bulirsch(k2,kc,p,a[1],a[2],a[3],b[1],b[2],b[3])
 
 return ell1,ell2,ell3
 end
