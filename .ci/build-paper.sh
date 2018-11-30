@@ -1,5 +1,5 @@
 #!/bin/bash -x
-#set -e
+set -e
 
 # Only build the paper with Julia 0.7
 if [ $TRAVIS_JULIA_VERSION == "0.7.0" ]
