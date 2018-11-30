@@ -228,7 +228,7 @@ for i, N in enumerate(Narr):
     tstart = time.time()
     for k in range(number):
         #pytransit_flux = m(b, rplanet, u_g)
-        pass # DEBUG!!!!!!
+        pytransit_flux = np.zeros_like(b) # DEBUG!!!
     pytransit_time[i] = (time.time() - tstart) / number
 
     # Multiprecision
