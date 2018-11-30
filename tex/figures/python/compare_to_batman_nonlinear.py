@@ -227,7 +227,8 @@ for i, N in enumerate(Narr):
     m = pytransit.Gimenez(nldc=15, interpolate=False, nthr=0)
     tstart = time.time()
     for k in range(number):
-        pytransit_flux = m(b, rplanet, u_g)
+        #pytransit_flux = m(b, rplanet, u_g)
+        pass # DEBUG!!!!!!
     pytransit_time[i] = (time.time() - tstart) / number
 
     # Multiprecision
