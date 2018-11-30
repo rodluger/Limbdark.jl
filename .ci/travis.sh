@@ -21,7 +21,9 @@ pip install batman-package
 pushd $HOME
 git clone https://github.com/hpparvi/pytransit.git
 cd pytransit
-python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
+#python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
+# DEBUG: disable openmp on travis
+python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -march=native" build install
 popd
 
 # DEBUG!

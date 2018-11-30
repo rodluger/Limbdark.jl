@@ -133,7 +133,7 @@ the sky, this parameter is given by $\upmu = \cos{\theta} =\sqrt{1-b^2}$, where
 $0\le b \le 1$ within the stellar disk.  We also introduce the radius ratio,
 $r$, which is the radius of the occultor divided by the radius of the source.
 In general we will follow the notation of the \starry package
-introduced by Luger et al. (2018).
+introduced by \citet{starry}.
 
 Uniform limb-darkening scales as $I(\upmu) \propto \upmu^0$, first-order 
 limb-darkening as $I(\upmu) \propto \upmu^1$, and second-order limb-darkening 
@@ -275,11 +275,11 @@ in the arccosine case given in equation \ref{eq:cosine_formulation}.
 
 This results in the following equations for the overlap area, $A_{lens}$, of two 
 partially overlapping circles:
-\begin{eqnarray} \label{eq:area_of_overlap}
-A_{lens} &=& \kappa_1 + r^2\kappa_0 - A_{kite},\\
-\kappa_0 &=& \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\\
-\kappa_1 &=& \mathrm{atan2}(2A_{kite},(1-r)(1+r)+b^2).
-\end{eqnarray}
+\begin{proof}{kite_area} \label{eq:area_of_overlap}
+A_{lens} &= \kappa_1 + r^2\kappa_0 - A_{kite},\\
+\kappa_0 &= \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\\
+\kappa_1 &= \mathrm{atan2}(2A_{kite},(1-r)(1+r)+b^2).
+\end{proof}
 
 The performance of this formula relative to the standard formula is profiled
 in Figure \ref{fig:overlap_precision} for $r=0.1$, a typical
@@ -320,7 +320,7 @@ S_0(r,b) &=& \pi-A_{lens}\\
 rather than the obscured area, $A_{lens}$.  So, instead of computing $\kappa_1$,
 we compute $\pi-\kappa_1 = -\mathrm{atan2}(\sin{\kappa_1},\cos{\kappa_1})$.
 We find that this leads to machine-precision as well.  Note that $S_0=s_0$,
-the first basis function in the \starry implementation from Luger et al. (2018).
+the first basis function in the \starry implementation from \citet{starry}.
 
 The partial derivatives of this formula with respect to the radius
 ratio, $r$, and impact parameter, $b$, turn out to be straightforward:
@@ -447,7 +447,7 @@ with
     \quad.
 \end{align}
 Note that $S_1(r,b) = s_2(r,b)$ in the spherical harmonic expansion used in \starry as
-described in Luger et al. (2018).
+described in \citet{starry}.
 For the cases $b=r$, $b=1-r$, $b=0$, $r=0$, or $\vert r-b\vert \ge 1$, there are special
 expressions for $\Lambda(r,b)$ given below.
 %
@@ -969,7 +969,7 @@ evaluated with greater speed and accuracy compared with automatic differentiatio
 Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2-y^2}$,
 where $(x,y,z)$ are the coordinates of the unit sphere, then we only require
 Green's functions whose curl has dependence on $z$ for axially-symmetric
-limb-darkening.  Following Luger et al. (2018), we choose a Green's function
+limb-darkening.  Following \citet{starry}, we choose a Green's function
 of the form
 \begin{equation}
 \mathbf{G}_n = f_n(z) (-y \xhat + x \yhat)
