@@ -1134,13 +1134,13 @@ Note that $a_0 \equiv 1-\sum_{n=1}^N a_n = 1 - \sum_{i=1}^N u_i$ in the formalis
 The transformation between $u_n$ and $a_n$ is straightforward based on
 looping over the binomial expansion of each of the $u_n$ terms (equation \ref{eq:polynomialld}),
 for example $a_1 = \sum_{n=1}^N n u_n$, while in general
-\begin{equation}
+\begin{equation}\label{eq:an_of_un}
 a_n = -\sum_{i=n}^N u_i \binom{i}{n}(-1)^n,
 \end{equation}
 for $1 \le n \le N$.
 Then, with the computed $a_n$ values, we can find $d_n$ from downward recursion
 using the relation
-\begin{equation}
+\begin{equation} \label{eq:dn_of_an}
 d_n = \frac{a_n}{n+2} + d_{n+2},
 \end{equation}
 starting with $n=N$, with $d_{N+1}=d_{N+2}=0$.
@@ -1177,7 +1177,7 @@ where we have defined a new integral, $\mathcal{N}_n$,
 \begin{equation}
 \mathcal{N}_n(r,b) = (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} \sin^2{\xi} d\xi,
 \end{equation}
-, which obeys the recursion relation
+which obeys the recursion relation
 \begin{equation}
 \mathcal{N}_n = \frac{1}{n+2} \left[\mathcal{M}_n + n(1-(b+r)^2) \mathcal{N}_{n-2}\right].
 \end{equation}
@@ -1194,20 +1194,21 @@ for $k^2 \le 1$ and
 \end{eqnarray}
 for $k^2 > 1$.
 
-In the $k^2 < \tfrac{1}{2}$ limit, we find the upward recursion to be unstable, and so we evaluate
-the expressions with a series solution, as we did for $\mathcal{M}_n$,
+In the $k^2 < \tfrac{1}{2}$ limit, we find the upward recursion to be unstable, and so we evaluate the expressions for $\mathcal{N}_{N}$ and $\mathcal{N}_{N-1}$
+with a series solution (as we did for $\mathcal{M}_{N-3}-\mathcal{M}_N$),
 \begin{eqnarray}
 \mathcal{N}_n &=& (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\\
 &=& (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\\
 \gamma_0 &=& \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\\
 \gamma_j &=& \gamma_{j-1} \frac{(4j^2-1)}{2j(3+n+2j)}.
 \end{eqnarray}
-For $k^2 < \tfrac{1}{2}$, we compute the values of $\mathcal{N}_{N}$ and $\mathcal{N}_{N-1}$, and use downward
-recursion with the relation
+We then use downward recursion with the relation
 \begin{equation}
-\mathcal{N}_n = \frac{(n+4)\mathcal{N}_{n+2} - \mathcal{M}_{n+2}}{(n+2)(1-(b+r)^2)}.
+\mathcal{N}_n = \frac{(n+4)\mathcal{N}_{n+2} - \mathcal{M}_{n+2}}{(n+2)(1-(b+r)^2)},
 \end{equation}
-Although evaluating this additional integral adds further computational expense, in
+to iterate down to $n=3$, while finally computing $n=1$ and $n=2$ exactly.
+
+Evaluating this additional integral adds further computational expense, but in
 practice we only need to compute it for $b < b_0 = 10^{-3}$ to obtain similar accuracy
 to the other expressions.  This is encountered rarely as it only applies when the
 occultor is nearly aligned with the source.
@@ -1226,15 +1227,19 @@ $d_n$ are then computed as
 \begin{eqnarray}\label{eq:derivatives}
 \frac{\partial \mathcal{F}}{\partial r} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial r},\\
 \frac{\partial \mathcal{F}}{\partial b} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial b},\\
-\frac{\partial \mathcal{F}}{\partial d_0} &=&  -\frac{\pi \mathcal{F}}{F_0} + \frac{S_0}{F_0},\\
+\frac{\partial \mathcal{F}}{\partial d_0} &=&  -\frac{\pi \mathcal{F}}{F_0} + \frac{S_0}{F_0},
+\end{eqnarray}
+\begin{eqnarray}
 \frac{\partial \mathcal{F}}{\partial d_1} &=&  -\frac{2\pi \mathcal{F}}{3F_0} +\frac{S_1}{F_0},\\
 \frac{\partial \mathcal{F}}{\partial d_n} &=&  \frac{S_n}{F_0},
 \end{eqnarray}
 where the last line is for $2 \le n \le N$.
 
-The derivatives of the coefficients, $\frac{\partial d_i}{\partial u_j}$, are
-computed by differentiating each term, and propagating the derivatives via the
-chain rule.  Then, the light curve derivatives are given by
+The derivatives of the coefficients, $\frac{\partial d_j}{\partial u_i}$, are
+computed by differentiating each term in equation \ref{eq:an_of_un} to obtain
+$\frac{\partial a_n}{\partial u_i}$, and differentiating each term in equation
+\ref{eq:dn_of_an} to obtain $\frac{\partial d_j}{\partial a_n}$, and propagating 
+the derivatives via the chain rule.  Then, the light curve derivatives are given by
 \begin{eqnarray}
 \frac{\partial \mathcal{F}}{\partial u_i} =  \sum_{j} \frac{\partial d_j}{\partial u_i}\frac{\partial \mathcal{F}}{\partial d_j}.
 \end{eqnarray}

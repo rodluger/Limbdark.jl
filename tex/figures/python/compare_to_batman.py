@@ -162,5 +162,6 @@ leg = axleg2.legend(loc='center', labelspacing=1, frameon=False)
 leg.set_title('log error', prop={'weight': 'bold'})
 
 # Print average ratio
+print(np.nanmedian(agol_grad_time / batman_time))
 print(np.nanmedian(agol_time / batman_time))
 fig.savefig("compare_to_batman.pdf", bbox_inches='tight')
