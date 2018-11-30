@@ -33,6 +33,7 @@ for ib=1:nb
 end
 
 clf()
+figure(figsize=(5, 4))
 logresid = log10.(resid)
 img=imshow(logresid,interpolation="nearest",origin="lower",
            extent=[0,2,0,2],cmap="plasma",vmin=-15, vmax=-3)
@@ -67,4 +68,4 @@ cbar[:ax][:set_yticklabels]([L"$10^{-15}$",
                              L"$10^{-6}$",
                              L"$10^{-3}$"])
 
-savefig("s2_residuals_MA2002.pdf", bbox_inches="tight")
+savefig("s2_residuals_MA2002.pdf")

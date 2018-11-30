@@ -24,6 +24,7 @@ for ib=1:nb
 end
 
 clf()
+figure(figsize=(5, 4))
 img=imshow(1e15 * (fgrid-fgrid_big),interpolation="nearest",origin="lower",
            extent=[0,2,0,2],cmap="plasma",vmin=-1.5, vmax=1.5)
 plot([0,1],[1,2],"k-")
@@ -59,4 +60,4 @@ cbar[:ax][:set_yticklabels]([L"$-1.5\times 10^{-15}$",
                              L"$1.0\times 10^{-15}$",
                              L"$1.5\times 10^{-15}$"])
 
-savefig("s2_residuals.pdf", bbox_inches="tight")
+savefig("s2_residuals.pdf")
