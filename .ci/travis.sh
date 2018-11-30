@@ -21,13 +21,12 @@ pip install batman-package
 pushd $HOME
 git clone https://github.com/hpparvi/pytransit.git
 cd pytransit
-python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build
-python setup.py install
+python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
 popd
 
 # DEBUG!
 echo "TESTING PYTRANSIT BEGIN"
-python -c "from pytransit import Gimenez; m = Gimenez(); print(m)"
+python -c "from pytransit import Gimenez; m = Gimenez(nldc=2, interpolate=False, nthr=0); print(m([0.1, 0.2, 0.3], 0.1, [0.4, 0.2]))"
 echo "TESTING PYTRANSIT END"
 
 # Attempt to resolve issues with SSL certificate expiring for purl.org:
