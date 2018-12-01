@@ -1,6 +1,6 @@
 echo "TESTING PYTRANSIT BEGIN"
 
-pushd $HOME/.ci
+pushd .ci
 python -c "from test_pytransit import test; test(1, 2)"
 python -c "from test_pytransit import test; test(100, 2)"
 python -c "from test_pytransit import test; test(10000, 2)"
