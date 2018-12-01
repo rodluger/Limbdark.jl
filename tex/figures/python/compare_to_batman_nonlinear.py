@@ -226,8 +226,8 @@ for i, N in enumerate(Narr):
     # on travis. No clue why. Let's call it in a separate
     # subprocess.
     np.savetxt("u_g.txt", X=u_g)
-    foo = subprocess.check_output(['python', "pytransit_hack"])
     try:
+        foo = subprocess.check_output(['python', "pytransit_hack"])
         pytransit_flux = np.loadtxt("flux_pytransit.txt")
         pytransit_time[i] = float(foo.decode('utf-8'))
         assert len(pytransit_flux) == len(b)
