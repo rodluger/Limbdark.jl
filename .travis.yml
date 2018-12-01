@@ -19,7 +19,6 @@ addons:
 
 install:
     - source .ci/travis.sh
-    - source .ci/test-pytransit.sh
     - julia .ci/install.jl
 
 script:
