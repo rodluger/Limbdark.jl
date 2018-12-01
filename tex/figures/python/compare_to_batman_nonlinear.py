@@ -196,9 +196,14 @@ for i, N in enumerate(Narr):
     batman_time[i] = (time.time() - tstart) / number
 
     # pytransit
-    pytransit_flux = np.loadtxt("pytransit/pytransit_flux%d.txt" % N)
-    pytransit_time[i] = np.loadtxt("pytransit/pytransit_time%d.txt" % N)
-
+    try:
+        pytransit_flux = np.loadtxt("pytransit/pytransit_flux%d.txt" % N)
+        pytransit_time[i] = np.loadtxt("pytransit/pytransit_time%d.txt" % N)
+    except:
+        pytransit_flux = b * np.nan
+        pytransit_time[i] = np.nan
+        print("Error loading PyTransit data for N=%d." % N)
+        
     # Multiprecision
     if i == 1:
         flux_multi = [NumericalFlux(bi, 0.1, c) for bi in b]
