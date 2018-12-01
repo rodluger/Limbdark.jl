@@ -34,17 +34,6 @@ def PolynomialJac(mu, *u):
     return jac
 
 
-def GimenezPolynomial(mu, *u):
-    """The Gimenez polynomial limb darkening model."""
-    return 1 - np.sum([u[l] * (1 - mu ** (l + 1)) for l in range(len(u))], axis=0)
-
-
-def GimenezPolynomialJac(mu, *u):
-    """The derivative matrix of the Gimenez polynomial model."""
-    jac = -np.array([(1 - mu ** (l + 1)) for l in range(len(u))]).transpose()
-    return jac
-
-
 def GetPolynomialCoeffs(c, order):
     """Get the polynomial coefficents that approximate the nonlinear model."""
     N = 1000
@@ -54,19 +43,6 @@ def GetPolynomialCoeffs(c, order):
     guess = -np.linalg.solve(np.dot(X.transpose(), X), np.dot(X.transpose(), I))[1:]
     u, _ = curve_fit(Polynomial, mu, I, guess, jac=PolynomialJac)
     IPoly = Polynomial(mu, *u)
-    err = np.sum((I - IPoly) ** 2) / N
-    return u, err
-
-
-def GetGimenezPolynomialCoeffs(c, order):
-    """Get the polynomial coefficents that approximate the nonlinear model."""
-    N = 1000
-    mu = np.linspace(0, 1, N)
-    I = NonLinear(mu, *c)
-    X = np.vander((1 - mu), N=order + 1, increasing=True)
-    guess = -np.linalg.solve(np.dot(X.transpose(), X), np.dot(X.transpose(), I))[1:]
-    u, _ = curve_fit(GimenezPolynomial, mu, I, guess, jac=GimenezPolynomialJac)
-    IPoly = GimenezPolynomial(mu, *u)
     err = np.sum((I - IPoly) ** 2) / N
     return u, err
 
@@ -164,9 +140,6 @@ order = 15
 u, err = GetPolynomialCoeffs(c, order)
 print("Polynomial fit error: %.3e" % err)
 
-u_g, err = GetGimenezPolynomialCoeffs(c, order)
-print("Polynomial fit error (Gimenez): %.3e" % err)
-
 # Timing params
 number = 30
 nN = 8
@@ -222,19 +195,9 @@ for i, N in enumerate(Narr):
         batman_flux = m.light_curve(params)
     batman_time[i] = (time.time() - tstart) / number
 
-    # HACK: pytransit keeps segfaulting in this script
-    # on travis. No clue why. Let's call it in a separate
-    # subprocess.
-    np.savetxt("u_g.txt", X=u_g)
-    try:
-        foo = subprocess.check_output(['python', "pytransit_hack"])
-        pytransit_flux = np.loadtxt("flux_pytransit.txt")
-        pytransit_time[i] = float(foo.decode('utf-8'))
-        assert len(pytransit_flux) == len(b)
-    except:
-        pytransit_flux = np.zeros_like(b) * np.nan
-        pytransit_time[i] = np.nan
-        print("PyTransit failed with N=%d." % N)
+    # pytransit
+    pytransit_flux = np.loadtxt("pytransit/pytransit_flux%d.txt" % N)
+    pytransit_time[i] = np.loadtxt("pytransit/pytransit_time%d.txt" % N)
 
     # Multiprecision
     if i == 1:
