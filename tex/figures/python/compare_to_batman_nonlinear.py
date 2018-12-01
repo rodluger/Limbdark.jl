@@ -196,6 +196,8 @@ for i, N in enumerate(Narr):
     batman_time[i] = (time.time() - tstart) / number
 
     # pytransit
+    # HACK: We run this in a separate script since it sometimes
+    # segfaults and causes the entire build to fail.
     try:
         pytransit_flux = np.loadtxt("pytransit/pytransit_flux%d.txt" % N)
         pytransit_time[i] = np.loadtxt("pytransit/pytransit_time%d.txt" % N)

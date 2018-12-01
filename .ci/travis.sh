@@ -19,9 +19,8 @@ conda info -a
 pip install batman-package
 
 # Install pytransit and run all its scripts
-# now. I believe the julia installation messes up
-# something about gfortran, since running this script
-# later in the build leads to segfaults.
+# now. PyTransit occasionally segfaults, so let's
+# isolate that from the rest of the build.
 pushd $HOME
 git clone https://github.com/hpparvi/pytransit.git
 cd pytransit
