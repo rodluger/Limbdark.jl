@@ -1,5 +1,5 @@
 #!/bin/bash -x
-#set -e
+set -e
 
 # Only build the paper with Julia 0.7
 if [ $TRAVIS_JULIA_VERSION == "0.7.0" ]
@@ -9,6 +9,7 @@ then
     # https://github.com/JuliaPy/PyPlot.jl/issues/317#issuecomment-337348563
     echo "Generating julia figures..."
     cd $TRAVIS_BUILD_DIR/tex/figures/julia
+	f2py -c occultquad.f -m occultquad
     for f in *.jl; do
         echo "Running $f..."
         julia "$f"
@@ -24,6 +25,7 @@ then
 
     # Build the paper with tectonic
     cd $TRAVIS_BUILD_DIR/tex
+    python gitlinks.py
 	tectonic limbdark.tex
 
     # Force push the paper to GitHub

@@ -5,6 +5,7 @@ import time
 import matplotlib.pyplot as pl
 import numpy as np
 import batman
+import pytransit
 import subprocess
 
 # Marker size is proportional to log error
@@ -35,8 +36,7 @@ Nmax = 5
 Narr = np.logspace(1, Nmax, nN)
 agol_time = np.zeros(nN)
 agol_grad_time = np.zeros(nN)
-starry_time = np.zeros(nN)
-starry_grad_time = np.zeros(nN)
+pytransit_time = np.zeros(nN)
 batman_time = np.zeros(nN)
 
 # Loop over number of cadences
@@ -45,7 +45,7 @@ for i, N in enumerate(Narr):
     # Time array
     t = np.linspace(-0.15, 0.15, N)
 
-    # starry to compute b(t)
+    # Use starry to compute b(t)
     star = Primary()
     star[1] = u1
     star[2] = u2
@@ -58,20 +58,6 @@ for i, N in enumerate(Narr):
     system = System(star, planet)
     system.compute(t)
     b = np.sqrt(planet.X ** 2 + planet.Y ** 2)
-
-    # Starry map flux
-    map = Map()
-    map[1] = u1
-    map[2] = u2
-    tstart = time.time()
-    for k in range(number):
-        starry_flux = map.flux(yo=b, ro=0.1)
-    starry_time[i] = (time.time() - tstart) / number
-    tstart = time.time()
-    for k in range(number):
-        _ = map.flux(yo=b, ro=0.1, gradient=True)
-    starry_grad_time[i] = (time.time() - tstart) / number
-
 
     # Feed b(t) to julia
     # HACK: PyJulia is currently broken, so this is how we have to do this...
@@ -100,6 +86,13 @@ for i, N in enumerate(Narr):
         batman_flux = m.light_curve(params)
     batman_time[i] = (time.time() - tstart) / number
 
+    # pytransit
+    m = pytransit.MandelAgol(interpolate=False, nthr=0)
+    tstart = time.time()
+    for k in range(number):
+        pytransit_flux = m(b, rplanet, [u1, u2])
+    pytransit_time[i] = (time.time() - tstart) / number
+
     # Multiprecision
     if i == 4:
         star_multi = Primary(multi=True)
@@ -115,7 +108,7 @@ for i, N in enumerate(Narr):
         system_multi.compute(t)
         flux_multi = np.array(system_multi.lightcurve)
         err_agol = np.nanmedian(np.abs(agol_flux - flux_multi))
-        err_starry = np.nanmedian(np.abs(starry_flux - flux_multi))
+        err_pytransit = np.nanmedian(np.abs(pytransit_flux - flux_multi))
         err_batman = np.nanmedian(np.abs(batman_flux - flux_multi))
 
 
@@ -133,10 +126,8 @@ ax.plot(Narr, agol_time, 'o', ms=ms(err_agol), color='C0')
 ax.plot(Narr, agol_time, '-', lw=0.75, color='C0')
 ax.plot(Narr, agol_grad_time, 'o', ms=ms(err_agol), color='C0')
 ax.plot(Narr, agol_grad_time, '--', lw=0.75, color='C0')
-ax.plot(Narr, starry_time, 'o', ms=ms(err_starry), color='C4')
-ax.plot(Narr, starry_time, '-', lw=0.75, color='C4')
-ax.plot(Narr, starry_grad_time, 'o', ms=ms(err_starry), color='C4')
-ax.plot(Narr, starry_grad_time, '--', lw=0.75, color='C4')
+ax.plot(Narr, pytransit_time, 'o', ms=ms(err_pytransit), color='C4')
+ax.plot(Narr, pytransit_time, '-', lw=0.75, color='C4')
 
 # Tweak and save
 ax.set_ylabel("Time [s]", fontsize=10)
@@ -147,8 +138,7 @@ ax.set_yscale('log')
 # Legend
 axleg1.plot([0, 1], [0, 1], color='C0', label='this work', lw=1.5)
 axleg1.plot([0, 1], [0, 1], '--', color='C0', label='this work\n(+ gradients)', lw=1.5)
-axleg1.plot([0, 1], [0, 1], color='C4', label='starry', lw=1.5)
-axleg1.plot([0, 1], [0, 1], '--', color='C4', label='starry\n(+ gradients)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], color='C4', label='PyTransit', lw=1.5)
 axleg1.plot([0, 1], [0, 1], color='C1', label='batman', lw=1.5)
 axleg1.set_xlim(2, 3)
 leg = axleg1.legend(loc='center', frameon=False, fontsize=8)

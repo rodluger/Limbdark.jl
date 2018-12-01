@@ -14,8 +14,11 @@ Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomia
 
 
 \author[0000-0002-0802-9145]{Eric Agol}\altaffiliation{Guggenheim Fellow}
-\author[0000-0002-0296-3826]{Rodrigo Luger}
 \affil{Department~of~Astronomy, University~of~Washington, Seattle, WA}
+\affil{Virtual~Planetary~Laboratory, University~of~Washington, Seattle, WA}
+\author[0000-0002-0296-3826]{Rodrigo Luger}
+\affil{Center~for~Computational~Astrophysics, Flatiron~Institute, New~York, NY}
+\affil{Virtual~Planetary~Laboratory, University~of~Washington, Seattle, WA}
 
 \keywords{methods: analytic --- techniques: photometric}
 
@@ -130,7 +133,7 @@ the sky, this parameter is given by $\upmu = \cos{\theta} =\sqrt{1-b^2}$, where
 $0\le b \le 1$ within the stellar disk.  We also introduce the radius ratio,
 $r$, which is the radius of the occultor divided by the radius of the source.
 In general we will follow the notation of the \starry package
-introduced by Luger et al. (2018).
+introduced by \citet{starry}.
 
 Uniform limb-darkening scales as $I(\upmu) \propto \upmu^0$, first-order 
 limb-darkening as $I(\upmu) \propto \upmu^1$, and second-order limb-darkening 
@@ -211,7 +214,7 @@ lens-shaped region of overlap of the two circles.
 
 Taking the radius of the larger circle to be unity, the standard formula for
 the lens-shaped overlap area is given by
-\begin{align} \label{eq:MAuniform}
+\begin{proof}{lens_area} \label{eq:MAuniform}
 A_{lens} = \pi \Lambda^e(r,b) &=
 \begin{dcases}
 0 & \qquad 1+r \le b,\\
@@ -219,7 +222,7 @@ r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\
 \pi r^2 & \qquad b \le 1-r,\\
 \pi & \qquad b \le r-1,\\
 \end{dcases}
-\end{align}
+\end{proof}
 \citep[e.g.][]{MandelAgol2002}, where
 \begin{eqnarray}\label{eq:cosine_formulation}
 \cos{\kappa_0} &=& \left(\frac{(r-1)(r+1)+b^2}{2br}\right),\\
@@ -272,11 +275,11 @@ in the arccosine case given in equation \ref{eq:cosine_formulation}.
 
 This results in the following equations for the overlap area, $A_{lens}$, of two 
 partially overlapping circles:
-\begin{eqnarray} \label{eq:area_of_overlap}
-A_{lens} &=& \kappa_1 + r^2\kappa_0 - A_{kite},\\
-\kappa_0 &=& \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\\
-\kappa_1 &=& \mathrm{atan2}(2A_{kite},(1-r)(1+r)+b^2).
-\end{eqnarray}
+\begin{proof}{kite_area} \label{eq:area_of_overlap}
+A_{lens} &= \kappa_1 + r^2\kappa_0 - A_{kite},\\
+\kappa_0 &= \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\\
+\kappa_1 &= \mathrm{atan2}(2A_{kite},(1-r)(1+r)+b^2).
+\end{proof}
 
 The performance of this formula relative to the standard formula is profiled
 in Figure \ref{fig:overlap_precision} for $r=0.1$, a typical
@@ -317,7 +320,7 @@ S_0(r,b) &=& \pi-A_{lens}\\
 rather than the obscured area, $A_{lens}$.  So, instead of computing $\kappa_1$,
 we compute $\pi-\kappa_1 = -\mathrm{atan2}(\sin{\kappa_1},\cos{\kappa_1})$.
 We find that this leads to machine-precision as well.  Note that $S_0=s_0$,
-the first basis function in the \starry implementation from Luger et al. (2018).
+the first basis function in the \starry implementation from \citet{starry}.
 
 The partial derivatives of this formula with respect to the radius
 ratio, $r$, and impact parameter, $b$, turn out to be straightforward:
@@ -336,17 +339,18 @@ In the remainder of this paper we will need to use these formulae in computing
 the higher order limb-darkened light curves.  Next, we revisit the formulae
 for linear limb-darkening.
 
-\begin{figure}
+\begin{figure}[p!]
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/overlap.pdf}
     \caption{The area of overlap of two circles can be computed as the sum of
     the area of the sectors formed by the centers of each circle and the
     boundary between the points of intersection, minus the area of the kite-shaped
-    region formed by the centers of the circles and the intersection points.}\label{fig:circle_overlap}
+    region formed by the centers of the circles and the intersection points.
+    \pycodelink{overlap}\label{fig:circle_overlap}}
     \end{centering}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[p!]
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/area_of_overlap_r01.pdf}
     \caption{Precision of formulae for the area of overlap of two circles with
@@ -358,7 +362,7 @@ for linear limb-darkening.
     is limited by the conversion of the result to double-precision. The
     solid and empty circles (top) indicate the positions of the circles at the left
     hand side of the axes.  In the left panels the dash-dot grey line indicates the
-    limiting precision for representing $\pi r^2$.}\label{fig:overlap_precision}
+    limiting precision for representing $\pi r^2$. \jlcodelink{area_of_overlap_r01}\label{fig:overlap_precision}}
     \end{centering}
 \end{figure}
 
@@ -443,7 +447,7 @@ with
     \quad.
 \end{align}
 Note that $S_1(r,b) = s_2(r,b)$ in the spherical harmonic expansion used in \starry as
-described in Luger et al. (2018).
+described in \citet{starry}.
 For the cases $b=r$, $b=1-r$, $b=0$, $r=0$, or $\vert r-b\vert \ge 1$, there are special
 expressions for $\Lambda(r,b)$ given below.
 %
@@ -578,26 +582,40 @@ the machine precision.  We find that the transformed expressions
 are accurate to $\la \times 10^{-14}$ when computed in double precision
 within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
 
-\begin{figure}\label{transit_linear}
+\begin{figure}
     \begin{centering}
-    \includegraphics[width=0.85\linewidth]{figures/julia/transit_linear.pdf}
+    \includegraphics[width=0.8\linewidth]{figures/julia/transit_linear.pdf}
     \caption{The intensity of a linearly limb-darkened star ($u_1=1$) being
     eclipsed, $S_1(r,b)$.
     In the limit $b > r+1$, no eclipse occurs, so $S_1=1$.  For $b < r-1$, the star
     is completely eclipsed and $S_1=0$.  In the limits $b=r$ and $b=1-r$, special
-    expressions must be used.}
+    expressions must be used.
+    \jlcodelink{transit_linear}\label{transit_linear}}
     \end{centering}
 \end{figure}
 
-\begin{figure}\label{s2_plot}
+\begin{figure}[p!]
     \begin{centering}
-    \includegraphics[width=0.85\linewidth]{figures/julia/s2_residuals.pdf}
-    \caption{The numerical error in computing the flux of an eclipsed,  linearly
-    limb-darkened star ($u_1=1$), $S_1(r,b)$.}
+    \includegraphics[width=0.8\linewidth]{figures/julia/s2_residuals_MA2002.pdf}
+    \caption{The numerical error in computing the flux of an eclipsed, linearly
+             limb-darkened star ($u_1=1$) using the equations in \citet{MandelAgol2002}.
+             \jlcodelink{s2_residuals_MA2002}\label{s2_plot_MA2002}}
     \end{centering}
 \end{figure}
 
-\begin{figure}\label{s2_machine}
+\begin{figure}[p!]
+    \begin{centering}
+    \includegraphics[width=0.8\linewidth]{figures/julia/s2_residuals.pdf}
+    \caption{The numerical error in computing the flux of an eclipsed, linearly
+    limb-darkened star ($u_1=1$) using the $S_1(r,b)$ formalism introduced in this
+    paper. Compare to Figure~\ref{s2_plot_MA2002}, noting the change in the color
+    scale. The new method is eight orders of magnitude more precise on average,
+    approaching machine epsilon everywhere in the domain. 
+    \jlcodelink{s2_residuals}\label{s2_plot}}
+    \end{centering}
+\end{figure}
+
+\begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/s2_machine.pdf}
     \caption{The accuracy of $S_1(r,b)$ near $b=r$ (left panel) and
@@ -607,10 +625,9 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     the difference $(S_1(b,b\pm\epsilon)-S_1(b,b))/\epsilon$
     and $(S_1(b,1-b\pm\epsilon)-S_1(b,1-b))/\epsilon$. The bottom
     panels show the numerical precision by the comparing double precision
-    computation with \texttt{BigFloat} precision (256-bit).}
+    computation with \texttt{BigFloat} precision (256-bit). \jlcodelink{s2_machine}\label{s2_machine}}
     \end{centering}
 \end{figure}
-
 
 From \citet{MandelAgol2002}, the total flux visible during the occultation of a
 body whose surface map is given by $I(\upmu)/I(1) = 1 - u_1(1 - \upmu)$ may be computed
@@ -888,7 +905,7 @@ for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\b
 \begin{figure}[t!]
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/high_order_ld.pdf}
-    \caption{\label{fig:high_order_ld} Tenth order limb-darkening example with \starry. }
+    \caption{\label{fig:high_order_ld} Tenth order limb-darkening example with \starry. \pycodelink{high_order_ld}}
     \end{centering}
 \end{figure}
 
@@ -952,7 +969,7 @@ evaluated with greater speed and accuracy compared with automatic differentiatio
 Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2-y^2}$,
 where $(x,y,z)$ are the coordinates of the unit sphere, then we only require
 Green's functions whose curl has dependence on $z$ for axially-symmetric
-limb-darkening.  Following Luger et al. (2018), we choose a Green's function
+limb-darkening.  Following \citet{starry}, we choose a Green's function
 of the form
 \begin{equation}
 \mathbf{G}_n = f_n(z) (-y \xhat + x \yhat)
@@ -1295,8 +1312,8 @@ which explains why in some cases it can be difficult to constrain both parameter
     without (dashed) time-integration.  The integration time is indicated in the
     upper left panel with a horizontal blue line. The derivatives are computed with
     respect to $\{r,t_0,v,b_0,u_1,u_2\}$.  The parameters are given by $r=0.1$,
-    $t_0 = 0$, $b_0=0.5$, $u_1=u_2=0.3$.}
-    \label{fig:integrated_derivs}
+    $t_0 = 0$, $b_0=0.5$, $u_1=u_2=0.3$. \jlcodelink{integrate_transit_gradient}
+    \label{fig:integrated_derivs}}
     \end{centering}
 \end{figure}
 
@@ -1401,8 +1418,8 @@ about the same with different numbers of points in the light curve.
     \includegraphics[width=\linewidth]{figures/julia/benchmark_transit_poly.pdf}
     \caption{Scaling of the computation time in seconds with the number of
     data points in the light curve for $r=0.1$ with $b$ ranging from $0$ to $1.2$,
-    and with the number of limb-darkening coefficients, $N$.}
-    \label{fig:ncoeff}
+    and with the number of limb-darkening coefficients, $N$. \jlcodelink{benchmark_transit_poly}
+    \label{fig:ncoeff}}
     \end{centering}
 \end{figure}
 
@@ -1411,8 +1428,8 @@ about the same with different numbers of points in the light curve.
     \includegraphics[width=\linewidth]{figures/julia/benchmark_limbdark_timing.pdf}
     \caption{Scaling of the computation time with the number of
     limb-darkening coeffients, $N$.  The $y$-axis scales the timing with respect
-    to the timing for a single limb-darkening coefficient.}
-    \label{fig:nlimb}
+    to the timing for a single limb-darkening coefficient. \jlcodelink{benchmark_transit_poly}
+    \label{fig:nlimb}}
     \end{centering}
 \end{figure}
 
@@ -1451,9 +1468,9 @@ relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/occult_nonlinear_poly.pdf}
     \caption{Comparison of the non-linear limb-darkening with polynomial
-    fits of various orders.  The maximum deviation ceases to improve
-    beyond a sextic fit.}
-    \label{fig:nonlinear}
+    fits of various orders. 
+    \jlcodelink{occult_nonlinear}
+    \label{fig:nonlinear}}
     \end{centering}
 \end{figure}
 
@@ -1515,8 +1532,9 @@ parameter space.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_MA2002.pdf}
-    \caption{Comparison of Mandel \& Agol (2002) with Agol \& Luger (2018).}
-    \label{fig:compareMA}
+    \caption{Comparison of Mandel \& Agol (2002) with Agol \& Luger (2018).
+    \jlcodelink{compare_MA2002}
+    \label{fig:compareMA}}
     \end{centering}
 \end{figure}
 
@@ -1553,8 +1571,8 @@ giving our Julia code a 70\% speed advantage over the Fortran code.
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_pal.pdf}
     \caption{Comparison of \citet{Pal2008} with Agol \& Luger (2018).  The
-    coefficients are $u_1=0.2$ and $u_2=0.3$.}
-    \label{fig:Pal_comparison}
+    coefficients are $u_1=0.2$ and $u_2=0.3$. \jlcodelink{compare_pal}
+    \label{fig:Pal_comparison}}
     \end{centering}
 \end{figure}
 
@@ -1589,8 +1607,9 @@ as accurate and 25 times faster to evaluate compared with \texttt{batman}.
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/compare_to_batman.pdf}
     \caption{Comparison of \citet{Kreidberg2015} with Agol \& Luger (2018) for
-             a transit across a quadratically limb-darkened star.}
-    \label{fig:batman_comparison}
+             a transit across a quadratically limb-darkened star.
+             \pycodelink{compare_to_batman}
+    \label{fig:batman_comparison}}
     \end{centering}
 \end{figure}
 
@@ -1598,8 +1617,9 @@ as accurate and 25 times faster to evaluate compared with \texttt{batman}.
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/compare_to_batman_nonlinear.pdf}
     \caption{Comparison of \citet{Kreidberg2015} with Agol \& Luger (2018) for
-             a transit across a nonlinearly limb-darkened star.}
-    \label{fig:batman_nonlinear_comparison}
+             a transit across a nonlinearly limb-darkened star.
+             \pycodelink{compare_to_batman_nonlinear}
+    \label{fig:batman_nonlinear_comparison}}
     \end{centering}
 \end{figure}
 

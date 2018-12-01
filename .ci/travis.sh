@@ -18,6 +18,18 @@ conda info -a
 # Install some dependencies
 pip install batman-package
 
+# Install pytransit and run all its scripts
+# now. PyTransit occasionally segfaults, so let's
+# isolate that from the rest of the build.
+pushd $HOME
+git clone https://github.com/hpparvi/pytransit.git
+cd pytransit
+python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
+popd
+pushd $TRAVIS_BUILD_DIR/tex/figures/python/pytransit
+python compare_to_pytransit.py
+popd
+
 # Attempt to resolve issues with SSL certificate expiring for purl.org:
 # https://tectonic.newton.cx/t/how-to-use-tectonic-if-you-can-t-access-purl-org/44
 mkdir -p $HOME/.config/Tectonic

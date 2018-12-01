@@ -13,6 +13,8 @@ TECTONIC    = $(shell command -v tectonic >/dev/null && echo true || echo false 
 default: limbdark.pdf
 
 limbdark.pdf: limbdark.tex stylez.tex $(JLFIGURES) $(PYFIGURES)
+	# Generate links to current git commit
+	python gitlinks.py
 	if [ "${TECTONIC}" = "true" ]; then\
 		tectonic limbdark.tex --print --keep-logs;\
 	else\
@@ -28,6 +30,11 @@ clean:
 	rm -rf limbdarkNotes.bib
 	rm -rf $(PYFIGURES)
 	rm -rf $(JLFIGURES)
+
+figures/julia/s2_residuals_MA2002.pdf: figures/julia/s2_residuals_MA2002.jl
+	cd figures/julia;\
+	f2py -c occultquad.f -m occultquad;\
+	julia s2_residuals_MA2002.jl
 
 figures/julia/%.pdf: figures/julia/%.jl
 	cd $(<D);julia $(<F)
