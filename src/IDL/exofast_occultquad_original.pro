@@ -1,4 +1,4 @@
-pro exofast_occultquad,z0,u1,u2,p0,muo1,mu0,d=d
+pro exofast_occultquad_original,z0,u1,u2,p0,muo1,mu0,d=d
 ;+
 ; NAME:
 ;   EXOFAST_OCCULTQUAD
@@ -114,18 +114,16 @@ endif
 inegressuni = where(z[notusedyet] ge abs(1.d0-p) and z[notusedyet] lt 1.d0+p)
 if inegressuni[0] ne -1 then begin
     ndxuse = notusedyet[inegressuni]
-    sqarea_triangle,z[ndxuse],p,sqarea
-    kite_area2 = sqrt(sqarea)
-    kap1 = atan(kite_area2,(1d0-p)*(p+1d0)+z[ndxuse]^2)
-    kap0 = atan(kite_area2,(p-1d0)*(p+1d0)+z[ndxuse]^2)
-;    kap1 = acos(-1.d0 > ((1.d0-p^2+z[ndxuse]^2)/2.d0/z[ndxuse]) < 1.d0)
-;    kap0 = acos(-1.d0 > ((p^2+z[ndxuse]^2-1.d0)/2.d0/p/z[ndxuse]) < 1.d0)
 
-    lambdae[ndxuse] = (p^2*kap0+kap1 - 0.5d0*kite_area2)/!dpi
+    kap1 = acos(-1.d0 > ((1.d0-p^2+z[ndxuse]^2)/2.d0/z[ndxuse]) < 1.d0)
+    kap0 = acos(-1.d0 > ((p^2+z[ndxuse]^2-1.d0)/2.d0/p/z[ndxuse]) < 1.d0)
+
+    lambdae[ndxuse] = (p^2*kap0+kap1 - 0.5d0*sqrt(4.d0*z[ndxuse]^2-$
+                              (1.d0+z[ndxuse]^2-p^2)^2  > 0.d0))/!dpi
     ;; eta_1
-    etad[ndxuse] = 1.d0/(2.d0*!dpi)*(kap1+p^2*(p^2+2.d0*z[ndxuse]^2)*$
-                      kap0-0.25d0*(1.d0+5.d0*p^2+z[ndxuse]^2)*kite_area2)
-                      
+    etad[ndxuse] = 1.d0/2.d0/!dpi*(kap1+p^2*(p^2+2.d0*z[ndxuse]^2)*$
+                      kap0-(1.d0+5.d0*p^2+z[ndxuse]^2)/4.d0*$
+                      sqrt((1.d0-x1[ndxuse])*(x2[ndxuse]-1.d0)))
 
 endif
 
@@ -167,23 +165,16 @@ inegress = where((z[notusedyet] gt 0.5d0+abs(p-0.5d0) and $
                  z[notusedyet] lt p), complement=notused4)
 if inegress[0] ne - 1 then begin
     ndxuse = notusedyet[inegress]
-;    q=sqrt((1.d0-x1[ndxuse])/(x2[ndxuse]-x1[ndxuse]))
-    onembpr2 = (1-z[ndxuse]-p)*(1+z[ndxuse]+p) & onembmr2=(p-z[ndxuse]+1)*(1-p+z[ndxuse]) & fourbr = 4*z[ndxuse]*p & fourbrinv = 1d0/fourbr
-    k2 = onembpr2*fourbrinv+1
-    kc2 = -onembpr2*fourbrinv & kc = sqrt(kc2)
-    cel_bulirsch_vec,k2,kc,(z[ndxuse]-p)^2*kc2,0d0,1d0,1d0,3*kc2*(z[ndxuse]-p)*(z[ndxuse]+p),kc2,0d0,Piofk,Eofk,Em1mKdm 
-;      Lambda1 = onembmr2*(Piofk+ (-3+6r^2+2*b*r)*Em1mKdm-fourbr*Eofk)/(3*sqrt(b*r))
-    lambdad[ndxuse]  = onembmr2*(Piofk+ (-3+6*p^2+2*z[ndxuse]*p)*Em1mKdm-fourbr*Eofk)/(9*!dpi*sqrt(z[ndxuse]*p))
+    q=sqrt((1.d0-x1[ndxuse])/(x2[ndxuse]-x1[ndxuse]))
+    ellke, q, Ek, Kk
+    n=1.d0/x1[ndxuse]-1.d0
 
-;    ellke, q, Ek, Kk
-;    n=1.d0/x1[ndxuse]-1.d0
-;
-;    ;; lambda_1: 
-;    lambdad[ndxuse]=2.d0/9.d0/!dpi/sqrt(x2[ndxuse]-x1[ndxuse])*$
-;      (((1.d0-x2[ndxuse])*(2.d0*x2[ndxuse]+x1[ndxuse]-3.d0)-3.d0*$
-;        x3[ndxuse]*(x2[ndxuse]-2.d0))*Kk+(x2[ndxuse]-x1[ndxuse])*$
-;       (z[ndxuse]^2+7.d0*p^2-4.d0)*Ek-3.d0*x3[ndxuse]/x1[ndxuse]*$
-;       ellpic_bulirsch(n,q))
+    ;; lambda_1: 
+    lambdad[ndxuse]=2.d0/9.d0/!dpi/sqrt(x2[ndxuse]-x1[ndxuse])*$
+      (((1.d0-x2[ndxuse])*(2.d0*x2[ndxuse]+x1[ndxuse]-3.d0)-3.d0*$
+        x3[ndxuse]*(x2[ndxuse]-2.d0))*Kk+(x2[ndxuse]-x1[ndxuse])*$
+       (z[ndxuse]^2+7.d0*p^2-4.d0)*Ek-3.d0*x3[ndxuse]/x1[ndxuse]*$
+       ellpic_bulirsch(n,q))
 
 endif
 if notused4[0] eq -1 then goto, final
@@ -219,27 +210,17 @@ if inside[0] ne -1 then begin
         if notused7[0] eq -1 then goto, final
         ndxuse = ndxuse[notused7]
     endif
-
-    onembpr2 = (1-z[ndxuse]-p)*(1+z[ndxuse]+p) & onembmr2=(p-z[ndxuse]+1)*(1-p+z[ndxuse]) & fourbr = 4*z[ndxuse]*p & fourbrinv = 1d0/fourbr
-    k2 = onembpr2*fourbrinv+1
-    onembmr2inv = 1d0/onembmr2 & k2inv = 1d0/k2 & kc2 =onembpr2*onembmr2inv & kc = sqrt(kc2)
-    bmrdbpr = (z[ndxuse]-p)/(z[ndxuse]+p)
-    mu = 3*bmrdbpr*onembmr2inv
-    p_bulirsch = bmrdbpr^2*onembpr2*onembmr2inv
-    cel_bulirsch_vec,k2inv,kc,p_bulirsch,1+mu,1d0,1d0,p_bulirsch+mu,kc2,0d0,Piofk,Eofk,Em1mKdm
-;      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)/3
-    lambdad[ndxuse] = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7*p^2-z[ndxuse]^2)*Eofk)/(9d0*!dpi)
    
-;    q=sqrt((x2[ndxuse]-x1[ndxuse])/(1.d0-x1[ndxuse]))
-;    n=x2[ndxuse]/x1[ndxuse]-1.d0
-;    ellke, q, Ek, Kk
-;
-;    ;; Case 3, Case 9 - anywhere in between
-;    ;; lambda_2
-;    lambdad[ndxuse] = 2.d0/9.d0/!dpi/sqrt(1.d0-x1[ndxuse])*$
-;      ((1.d0-5.d0*z[ndxuse]^2+p^2+x3[ndxuse]^2)*Kk+(1.d0-x1[ndxuse])*$
-;       (z[ndxuse]^2+7.d0*p^2-4.d0)*Ek-3.d0*x3[ndxuse]/x1[ndxuse]*$
-;       ellpic_bulirsch(n,q))
+    q=sqrt((x2[ndxuse]-x1[ndxuse])/(1.d0-x1[ndxuse]))
+    n=x2[ndxuse]/x1[ndxuse]-1.d0
+    ellke, q, Ek, Kk
+
+    ;; Case 3, Case 9 - anywhere in between
+    ;; lambda_2
+    lambdad[ndxuse] = 2.d0/9.d0/!dpi/sqrt(1.d0-x1[ndxuse])*$
+      ((1.d0-5.d0*z[ndxuse]^2+p^2+x3[ndxuse]^2)*Kk+(1.d0-x1[ndxuse])*$
+       (z[ndxuse]^2+7.d0*p^2-4.d0)*Ek-3.d0*x3[ndxuse]/x1[ndxuse]*$
+       ellpic_bulirsch(n,q))
 endif
 ;; if there are still unused elements, there's a bug in the code
 ;; (please report it)

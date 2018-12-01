@@ -1,5 +1,5 @@
 ; More efficient "Vector" version of cel:
-pro cel_bulirsch,k2,kc,p,a1,a2,a3,b1,b2,b3,f1,f2,f3
+pro cel_bulirsch_vec,k2,kc,p,a1,a2,a3,b1,b2,b3,f1,f2,f3
 ; This assumes first value of a and b uses p, the rest have p=1.
 ca = sqrt(k2*2.2d-16)
 ; Avoid undefined k2=1 case:

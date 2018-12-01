@@ -165,11 +165,11 @@ end
 if t.n >= 2
 # Special case of quadratic limb-darkening:
 # Transformed expressions from Mandel & Agol:
-  eta2 = 0.5*r2*(r2+2*b2)
+  eta2 = r2*(r2+2*b2)
   if t.k2 >= 1
-    four_pi_eta = 4pi*(eta2-0.5)
+    four_pi_eta = 2pi*(eta2-1.0)
   else
-    four_pi_eta = 2*(-t.pimkap1+2*eta2*t.kap0-0.25*t.kite_area2*(1.0+5r2+b2))
+    four_pi_eta = 2*(-t.pimkap1+eta2*t.kap0-0.25*t.kite_area2*(1.0+5r2+b2))
   end
   t.sn[3] = 2*t.sn[1]+four_pi_eta
   if t.n == 2
@@ -358,15 +358,15 @@ if t.n >= 2
 #  if t.n == 2
 # Transformed expressions from Mandel & Agol for n=2:
   r2pb2 = r2+b2
-  eta2 = 0.5*r2*(r2pb2+b2)
+  eta2 = r2*(r2pb2+b2)
   deta2dr =  2*r*r2pb2
   deta2db = 2*b*r2
   if t.k2 > 1
-    four_pi_eta = 4pi*(eta2-0.5)
+    four_pi_eta = 2pi*(eta2-1.0)
     detadr = 4pi*deta2dr
     detadb = 4pi*deta2db
   else
-    four_pi_eta = 2*(-t.pimkap1+2*eta2*t.kap0-0.25*t.kite_area2*(1.0+5r2+b2))
+    four_pi_eta = 2*(-t.pimkap1+eta2*t.kap0-0.25*t.kite_area2*(1.0+5r2+b2))
     detadr = 8r*(r2pb2*t.kap0-t.kite_area2)
     detadb = 2/b*(4*b2*r2*t.kap0-(1+r2pb2)*t.kite_area2)
   end
