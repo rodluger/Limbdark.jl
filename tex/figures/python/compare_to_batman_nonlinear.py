@@ -4,7 +4,6 @@ import time
 import matplotlib.pyplot as pl
 import numpy as np
 import batman
-import pytransit
 import subprocess
 from scipy.optimize import curve_fit
 from scipy.special import gamma
@@ -223,13 +222,19 @@ for i, N in enumerate(Narr):
         batman_flux = m.light_curve(params)
     batman_time[i] = (time.time() - tstart) / number
 
-    # pytransit
-    m = pytransit.Gimenez(nldc=15, interpolate=False, nthr=0)
-    tstart = time.time()
-    for k in range(number):
-        # DEBUG! Currently segfaulting on travis. pytransit_flux = m(b, rplanet, u_g)
-        pytransit_flux = np.ones_like(b) * np.nan
-    pytransit_time[i] = (time.time() - tstart) / number
+    # HACK: pytransit keeps segfaulting in this script
+    # on travis. No clue why. Let's call it in a separate
+    # subprocess.
+    np.savetxt("u_g.txt", X=u_g)
+    foo = subprocess.check_output(['python', "pytransit_hack"])
+    try:
+        pytransit_flux = np.loadtxt("flux_pytransit.txt")
+        pytransit_time[i] = float(foo.decode('utf-8'))
+        assert len(pytransit_flux) == len(b)
+    except:
+        pytransit_flux = np.zeros_like(b) * np.nan
+        pytransit_time[i] = np.nan
+        print("PyTransit failed with N=%d." % N)
 
     # Multiprecision
     if i == 1:
