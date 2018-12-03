@@ -8,6 +8,7 @@ import subprocess
 from scipy.optimize import curve_fit
 from scipy.special import gamma
 from scipy.integrate import dblquad
+import pytransit
 
 
 def ms(error):
@@ -43,6 +44,30 @@ def GetPolynomialCoeffs(c, order):
     guess = -np.linalg.solve(np.dot(X.transpose(), X), np.dot(X.transpose(), I))[1:]
     u, _ = curve_fit(Polynomial, mu, I, guess, jac=PolynomialJac)
     IPoly = Polynomial(mu, *u)
+    err = np.sum((I - IPoly) ** 2) / N
+    return u, err
+
+
+def GimenezPolynomial(mu, *u):
+    """The Gimenez polynomial limb darkening model."""
+    return 1 - np.sum([u[l] * (1 - mu ** (l + 1)) for l in range(len(u))], axis=0)
+
+
+def GimenezPolynomialJac(mu, *u):
+    """The derivative matrix of the Gimenez polynomial model."""
+    jac = -np.array([(1 - mu ** (l + 1)) for l in range(len(u))]).transpose()
+    return jac
+
+
+def GetGimenezPolynomialCoeffs(c, order):
+    """Get the polynomial coefficents that approximate the nonlinear model."""
+    N = 1000
+    mu = np.linspace(0, 1, N)
+    I = NonLinear(mu, *c)
+    X = np.vander((1 - mu), N=order + 1, increasing=True)
+    guess = -np.linalg.solve(np.dot(X.transpose(), X), np.dot(X.transpose(), I))[1:]
+    u, _ = curve_fit(GimenezPolynomial, mu, I, guess, jac=GimenezPolynomialJac)
+    IPoly = GimenezPolynomial(mu, *u)
     err = np.sum((I - IPoly) ** 2) / N
     return u, err
 
@@ -140,6 +165,10 @@ order = 15
 u, err = GetPolynomialCoeffs(c, order)
 print("Polynomial fit error: %.3e" % err)
 
+# Get the Gimenez polynomial coeffs
+u_g, err = GetGimenezPolynomialCoeffs(c, order)
+print("Polynomial fit error (Gimenez): %.3e" % err)
+
 # Timing params
 number = 30
 nN = 8
@@ -196,16 +225,18 @@ for i, N in enumerate(Narr):
     batman_time[i] = (time.time() - tstart) / number
 
     # pytransit
-    # HACK: We run this in a separate script since it sometimes
-    # segfaults and causes the entire build to fail.
-    try:
-        pytransit_flux = np.loadtxt("pytransit/pytransit_flux%d.txt" % N)
-        pytransit_time[i] = np.loadtxt("pytransit/pytransit_time%d.txt" % N)
-    except:
+    if (N < 100000):
+        m = pytransit.Gimenez(nldc=len(u_g), interpolate=False, nthr=0)
+        tstart = time.time()
+        for k in range(number):
+            pytransit_flux = m(b, 0.1, u_g)
+        pytransit_time[i] = (time.time() - tstart) / number
+    else:
+        # HACK: PyTransit segfaults on Travis for N = 100000
+        # Let's be generous and linearly extrapolate
         pytransit_flux = b * np.nan
-        pytransit_time[i] = np.nan
-        print("Error loading PyTransit data for N=%d." % N)
-        
+        pytransit_time[i] = pytransit_time[i - 1] * Narr[i] / Narr[i - 1]
+
     # Multiprecision
     if i == 1:
         flux_multi = [NumericalFlux(bi, 0.1, c) for bi in b]
