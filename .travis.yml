@@ -12,6 +12,11 @@ julia:
 matrix:
     - PYTHON=Conda-python
 
+addons:
+    apt:
+        packages:
+            - gfortran
+
 install:
     - source .ci/travis.sh
     - julia .ci/install.jl
@@ -26,3 +31,6 @@ cache:
 
 after_success:
     - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then source .ci/build-paper.sh; fi
+
+after_failure:
+    - sleep 3

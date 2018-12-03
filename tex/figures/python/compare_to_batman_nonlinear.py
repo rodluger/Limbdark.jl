@@ -1,6 +1,5 @@
 """Starry speed tests."""
 from starry.kepler import Primary, Secondary, System
-from starry import Map
 import time
 import matplotlib.pyplot as pl
 import numpy as np
@@ -9,6 +8,7 @@ import subprocess
 from scipy.optimize import curve_fit
 from scipy.special import gamma
 from scipy.integrate import dblquad
+import pytransit
 
 
 def ms(error):
@@ -44,6 +44,30 @@ def GetPolynomialCoeffs(c, order):
     guess = -np.linalg.solve(np.dot(X.transpose(), X), np.dot(X.transpose(), I))[1:]
     u, _ = curve_fit(Polynomial, mu, I, guess, jac=PolynomialJac)
     IPoly = Polynomial(mu, *u)
+    err = np.sum((I - IPoly) ** 2) / N
+    return u, err
+
+
+def GimenezPolynomial(mu, *u):
+    """The Gimenez polynomial limb darkening model."""
+    return 1 - np.sum([u[l] * (1 - mu ** (l + 1)) for l in range(len(u))], axis=0)
+
+
+def GimenezPolynomialJac(mu, *u):
+    """The derivative matrix of the Gimenez polynomial model."""
+    jac = -np.array([(1 - mu ** (l + 1)) for l in range(len(u))]).transpose()
+    return jac
+
+
+def GetGimenezPolynomialCoeffs(c, order):
+    """Get the polynomial coefficents that approximate the nonlinear model."""
+    N = 1000
+    mu = np.linspace(0, 1, N)
+    I = NonLinear(mu, *c)
+    X = np.vander((1 - mu), N=order + 1, increasing=True)
+    guess = -np.linalg.solve(np.dot(X.transpose(), X), np.dot(X.transpose(), I))[1:]
+    u, _ = curve_fit(GimenezPolynomial, mu, I, guess, jac=GimenezPolynomialJac)
+    IPoly = GimenezPolynomial(mu, *u)
     err = np.sum((I - IPoly) ** 2) / N
     return u, err
 
@@ -136,10 +160,14 @@ a = ((P * 86400) ** 2 * (1.32712440018e20 * mstar) /
 # Get the inclination in degrees
 inc = np.arccos(b0 / a) * 180 / np.pi
 
-# Get the polynomial coeffs for l = 6
+# Get the polynomial coeffs for l = 15
 order = 15
 u, err = GetPolynomialCoeffs(c, order)
 print("Polynomial fit error: %.3e" % err)
+
+# Get the Gimenez polynomial coeffs
+u_g, err = GetGimenezPolynomialCoeffs(c, order)
+print("Polynomial fit error (Gimenez): %.3e" % err)
 
 # Timing params
 number = 30
@@ -148,8 +176,7 @@ Nmax = 5
 Narr = np.logspace(1, Nmax, nN)
 agol_time = np.zeros(nN) * np.nan
 agol_grad_time = np.zeros(nN) * np.nan
-starry_time = np.zeros(nN)
-starry_grad_time = np.zeros(nN)
+pytransit_time = np.zeros(nN)
 batman_time = np.zeros(nN)
 
 # Loop over number of cadences
@@ -158,7 +185,7 @@ for i, N in enumerate(Narr):
     # Time array
     t = np.linspace(-0.15, 0.15, N)
 
-    # starry to compute b(t)
+    # Use starry to compute b(t)
     star = Primary()
     planet = Secondary()
     planet.r = rplanet
@@ -169,18 +196,6 @@ for i, N in enumerate(Narr):
     system = System(star, planet)
     system.compute(t)
     b = np.sqrt(planet.X ** 2 + planet.Y ** 2)
-
-    # Starry map flux
-    map = Map(order)
-    map[:] = u
-    tstart = time.time()
-    for k in range(number):
-        starry_flux = map.flux(yo=b, ro=0.1)
-    starry_time[i] = (time.time() - tstart) / number
-    tstart = time.time()
-    for k in range(number):
-        _ = map.flux(yo=b, ro=0.1, gradient=True)
-    starry_grad_time[i] = (time.time() - tstart) / number
 
     # Feed b(t) to julia
     # HACK: PyJulia is currently broken, so this is how we have to do this...
@@ -209,11 +224,24 @@ for i, N in enumerate(Narr):
         batman_flux = m.light_curve(params)
     batman_time[i] = (time.time() - tstart) / number
 
+    # pytransit
+    if (N < 100000):
+        m = pytransit.Gimenez(nldc=len(u_g), interpolate=False, nthr=0)
+        tstart = time.time()
+        for k in range(number):
+            pytransit_flux = m(b, 0.1, u_g)
+        pytransit_time[i] = (time.time() - tstart) / number
+    else:
+        # HACK: PyTransit segfaults on Travis for N = 100000
+        # Let's be generous and linearly extrapolate
+        pytransit_flux = b * np.nan
+        pytransit_time[i] = pytransit_time[i - 1] * Narr[i] / Narr[i - 1]
+
     # Multiprecision
     if i == 1:
         flux_multi = [NumericalFlux(bi, 0.1, c) for bi in b]
         err_agol = np.nanmedian(np.abs(agol_flux - flux_multi))
-        err_starry = np.nanmedian(np.abs(starry_flux - flux_multi))
+        err_pytransit = np.nanmedian(np.abs(pytransit_flux - flux_multi))
         err_batman = np.nanmedian(np.abs(batman_flux - flux_multi))
 
 # Plot
@@ -228,10 +256,8 @@ ax.plot(Narr, agol_time, 'o', ms=ms(err_agol), color='C0')
 ax.plot(Narr, agol_time, '-', lw=0.75, color='C0')
 ax.plot(Narr, agol_grad_time, 'o', ms=ms(err_agol), color='C0')
 ax.plot(Narr, agol_grad_time, '--', lw=0.75, color='C0')
-ax.plot(Narr, starry_time, 'o', ms=ms(err_starry), color='C4')
-ax.plot(Narr, starry_time, '-', lw=0.75, color='C4')
-ax.plot(Narr, starry_grad_time, 'o', ms=ms(err_starry), color='C4')
-ax.plot(Narr, starry_grad_time, '--', lw=0.75, color='C4')
+ax.plot(Narr, pytransit_time, 'o', ms=ms(err_pytransit), color='C4')
+ax.plot(Narr, pytransit_time, '-', lw=0.75, color='C4')
 ax.plot(Narr, batman_time, 'o', ms=ms(err_batman), color='C1')
 ax.plot(Narr, batman_time, '-', lw=0.75, color='C1')
 
@@ -244,8 +270,7 @@ ax.set_yscale('log')
 # Legend
 axleg1.plot([0, 1], [0, 1], color='C0', label='this work', lw=1.5)
 axleg1.plot([0, 1], [0, 1], '--', color='C0', label='this work\n(+ gradients)', lw=1.5)
-axleg1.plot([0, 1], [0, 1], color='C4', label='starry', lw=1.5)
-axleg1.plot([0, 1], [0, 1], '--', color='C4', label='starry\n(+ gradients)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], color='C4', label='PyTransit', lw=1.5)
 axleg1.plot([0, 1], [0, 1], color='C1', label='batman', lw=1.5)
 axleg1.set_xlim(2, 3)
 leg = axleg1.legend(loc='center', frameon=False, fontsize=8)
