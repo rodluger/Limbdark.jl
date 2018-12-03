@@ -218,120 +218,120 @@ flux = ((1.0-convert(T,r>b))*2pi-Lambda1)*third
 return flux,Eofk,Em1mKdm
 end
 
-"""
-    s2!(trans)
- 
-Computes the linear limb-darkening case, as well as the gradient,
-trans.s2_grad=[ds_2/dr,ds_2/db] is a pre-allocated two-element array.
-Returns trans.s2, and computes the complete elliptic integrals, 
-trans.Eofk, E(k), and trans.Em1mKdm, (E(m)-(1-m)K(m))/m, where m = k^2.
-
-NOTE:  This is only meant to be run in tandem with `transit_poly_struct.jl`,
-which computes the necessary elements of the structure first.
-
-# Example
-```julia-repl
-julia> trans=transit_init(0.1,0.5,[0.5,0.5],true)
-julia> s2!(trans)
-julia> trans.sn[2]
-julia> trans.s2_grad
-2-element Array{Float64,1}:
- -0.53988  
-  0.0182916
-```
-"""
-function s2!(t::Transit_Struct{T}) where {T <: Real}
-r=t.r; b=t.b
-# Elliptic integrals:
-t.Eofk = zero(T)
-t.Em1mKdm = zero(T)
-# Lambda1 = 3\pi \Lambda_1 from starry/limbdark papers:
-Lambda1 = zero(T)
-if t.grad
-  fill!(t.s2_grad,zero(T))
-end
-if b >= 1.0+r ||  r == 0.0
-  # No occultation:
-  Lambda1 = zero(T)  # Case 1
-elseif b <= r-1.0
-  # Full occultation:
-  Lambda1 = zero(T)  # Case 11
-else 
-  if b == 0 
-    t.sqrt1mr2 = sqrt(1.0-r^2)
-    Lambda1 = -2pi*t.sqrt1mr2^3 # Case 10
-    if t.grad
-      t.s2_grad[1] = -2pi*r*t.sqrt1mr2 # dLambda/dr (dLambda/db= 0)
-    end
-    t.Eofk = 0.5*pi
-    t.Em1mKdm = 0.25*pi
-  elseif b==r
-    if r == 0.5
-      Lambda1 = pi-4*t.third # Case 6; added in analytic first derivaties.
-      if t.grad
-        t.s2_grad[1] = -2      # dLambda/dr
-        t.s2_grad[2] =  t.twothird  # dLambda/db
-      end
-      t.Eofk = one(T)
-      t.Em1mKdm = one(T)
-    elseif r < 0.5
-      m = 4r^2
-      t.Eofk = cel_bulirsch(m,one(T),one(T),1-m)
-      t.Em1mKdm = cel_bulirsch(m,one(T),one(T),zero(T))
-      Lambda1 = pi+t.twothird*((2m-3)*t.Eofk - m*t.Em1mKdm) # Case 5
-      if t.grad
-        t.s2_grad[1] = -4*r*t.Eofk      # Adding in first derivative dLambda/dr
-        t.s2_grad[2] = -4*r*t.third*(t.Eofk-2*t.Em1mKdm) # Adding in first derivative dLambda/db
-      end
-    else
-      m = 4r^2; minv = inv(m)
-      t.Eofk = cel_bulirsch(minv,one(T),one(T),1-minv)
-      t.Em1mKdm = cel_bulirsch(minv,one(T),one(T),zero(T))
-      Lambda1 = pi+t.third/r*(-m*t.Eofk + (2m-3)*t.Em1mKdm)  # Case 7
-      if t.grad
-        t.s2_grad[1] = -2*t.Em1mKdm # dLambda/dr
-        t.s2_grad[2] =  t.twothird*(2*t.Eofk-t.Em1mKdm)  # dLambda/db
-      end
-    end
-  else
-#    t.onembpr2 = (1-b-r)*(1+b+r); t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
-#    t.k2 = t.onembpr2*t.fourbrinv+1
-    if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
-#      t.kc2 = -t.onembpr2*t.fourbrinv; t.kc = sqrt(t.kc2); t.sqbr=sqrt(b*r); t.sqbrinv = inv(t.sqbr)
-      Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(t.k2,t.kc,(b-r)^2*t.kc2,zero(T),one(T),one(T),3*t.kc2*(b-r)*(b+r),t.kc2,zero(T))
-      Lambda1 = t.onembmr2*(Piofk+ (-3+6r^2+2*b*r)*t.Em1mKdm-t.fourbr*t.Eofk)*t.sqbrinv*t.third
-      if t.grad
-        t.s2_grad[1] = -2r*t.onembmr2*t.Em1mKdm*t.sqbrinv
-        t.s2_grad[2] = 2r*t.onembmr2*(-t.Em1mKdm+2*t.Eofk)*t.sqbrinv*t.third
-      end
-    elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
-#      t.onembmr2inv=inv(t.onembmr2); t.k2inv = inv(t.k2); t.kc2 = t.onembpr2*t.onembmr2inv; t.kc = sqrt(t.kc2)
-      bmrdbpr = (b-r)/(b+r); 
-      mu = 3bmrdbpr*t.onembmr2inv
-      p = bmrdbpr^2*t.onembpr2*t.onembmr2inv
-      t.k2inv = inv(t.k2)
-#      println("calling cel with: ",t.k2inv,t.kc,p,1+mu,one(T),one(T),p+mu,t.kc2,zero(T))
-      Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(t.k2inv,t.kc,p,1+mu,one(T),one(T),p+mu,t.kc2,zero(T))
-#      t.sqonembmr2 = sqrt(t.onembmr2)
-      Lambda1 = 2*t.sqonembmr2*(t.onembpr2*Piofk -(4-7r^2-b^2)*t.Eofk)*t.third
-      if t.grad
-        t.s2_grad[1] = -4*r*t.sqonembmr2*t.Eofk
-        t.s2_grad[2] = -4*r*t.third*t.sqonembmr2*(t.Eofk - 2*t.Em1mKdm)
-      end
-    else
-      # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
-      t.sqr1mr = sqrt(r*(1-r))
-      Lambda1 = 2*acos(1.0-2.0*r)-4*t.third*(3+2r-8r^2)*t.sqr1mr-2pi*convert(T,r>0.5) 
-      if t.grad
-        t.s2_grad[1] = -8*r*t.sqr1mr
-        t.s2_grad[2] = -t.s2_grad[1]*t.third
-      end
-      t.Eofk = one(T)
-      t.Em1mKdm = one(T)
-    end
-  end
-end
-#flux = ((1.0-convert(T,r>b))*2pi-Lambda1)/3
-t.sn[2] = ((1.0-convert(T,r>b))*2pi-Lambda1)*t.third
-return
-end
+#"""
+#    s2!(trans)
+# 
+#Computes the linear limb-darkening case, as well as the gradient,
+#trans.s2_grad=[ds_2/dr,ds_2/db] is a pre-allocated two-element array.
+#Returns trans.s2, and computes the complete elliptic integrals, 
+#trans.Eofk, E(k), and trans.Em1mKdm, (E(m)-(1-m)K(m))/m, where m = k^2.
+#
+#NOTE:  This is only meant to be run in tandem with `transit_poly_struct.jl`,
+#which computes the necessary elements of the structure first.
+#
+## Example
+#```julia-repl
+#julia> trans=transit_init(0.1,0.5,[0.5,0.5],true)
+#julia> s2!(trans)
+#julia> trans.sn[2]
+#julia> trans.s2_grad
+#2-element Array{Float64,1}:
+# -0.53988  
+#  0.0182916
+#```
+#"""
+#function s2!(t::Transit_Struct{T}) where {T <: Real}
+#r=t.r; b=t.b
+## Elliptic integrals:
+#t.Eofk = zero(T)
+#t.Em1mKdm = zero(T)
+## Lambda1 = 3\pi \Lambda_1 from starry/limbdark papers:
+#Lambda1 = zero(T)
+#if t.grad
+#  fill!(t.s2_grad,zero(T))
+#end
+#if b >= 1.0+r ||  r == 0.0
+#  # No occultation:
+#  Lambda1 = zero(T)  # Case 1
+#elseif b <= r-1.0
+#  # Full occultation:
+#  Lambda1 = zero(T)  # Case 11
+#else 
+#  if b == 0 
+#    t.sqrt1mr2 = sqrt(1.0-r^2)
+#    Lambda1 = -2pi*t.sqrt1mr2^3 # Case 10
+#    if t.grad
+#      t.s2_grad[1] = -2pi*r*t.sqrt1mr2 # dLambda/dr (dLambda/db= 0)
+#    end
+#    t.Eofk = 0.5*pi
+#    t.Em1mKdm = 0.25*pi
+#  elseif b==r
+#    if r == 0.5
+#      Lambda1 = pi-4*t.third # Case 6; added in analytic first derivaties.
+#      if t.grad
+#        t.s2_grad[1] = -2      # dLambda/dr
+#        t.s2_grad[2] =  t.twothird  # dLambda/db
+#      end
+#      t.Eofk = one(T)
+#      t.Em1mKdm = one(T)
+#    elseif r < 0.5
+#      m = 4r^2
+#      t.Eofk = cel_bulirsch(m,one(T),one(T),1-m)
+#      t.Em1mKdm = cel_bulirsch(m,one(T),one(T),zero(T))
+#      Lambda1 = pi+t.twothird*((2m-3)*t.Eofk - m*t.Em1mKdm) # Case 5
+#      if t.grad
+#        t.s2_grad[1] = -4*r*t.Eofk      # Adding in first derivative dLambda/dr
+#        t.s2_grad[2] = -4*r*t.third*(t.Eofk-2*t.Em1mKdm) # Adding in first derivative dLambda/db
+#      end
+#    else
+#      m = 4r^2; minv = inv(m)
+#      t.Eofk = cel_bulirsch(minv,one(T),one(T),1-minv)
+#      t.Em1mKdm = cel_bulirsch(minv,one(T),one(T),zero(T))
+#      Lambda1 = pi+t.third/r*(-m*t.Eofk + (2m-3)*t.Em1mKdm)  # Case 7
+#      if t.grad
+#        t.s2_grad[1] = -2*t.Em1mKdm # dLambda/dr
+#        t.s2_grad[2] =  t.twothird*(2*t.Eofk-t.Em1mKdm)  # dLambda/db
+#      end
+#    end
+#  else
+##    t.onembpr2 = (1-b-r)*(1+b+r); t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
+##    t.k2 = t.onembpr2*t.fourbrinv+1
+#    if (b+r) > 1.0 # k^2 < 1, Case 2, Case 8
+##      t.kc2 = -t.onembpr2*t.fourbrinv; t.kc = sqrt(t.kc2); t.sqbr=sqrt(b*r); t.sqbrinv = inv(t.sqbr)
+#      Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(t.k2,t.kc,(b-r)^2*t.kc2,zero(T),one(T),one(T),3*t.kc2*(b-r)*(b+r),t.kc2,zero(T))
+#      Lambda1 = t.onembmr2*(Piofk+ (-3+6r^2+2*b*r)*t.Em1mKdm-t.fourbr*t.Eofk)*t.sqbrinv*t.third
+#      if t.grad
+#        t.s2_grad[1] = -2r*t.onembmr2*t.Em1mKdm*t.sqbrinv
+#        t.s2_grad[2] = 2r*t.onembmr2*(-t.Em1mKdm+2*t.Eofk)*t.sqbrinv*t.third
+#      end
+#    elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
+##      t.onembmr2inv=inv(t.onembmr2); t.k2inv = inv(t.k2); t.kc2 = t.onembpr2*t.onembmr2inv; t.kc = sqrt(t.kc2)
+#      bmrdbpr = (b-r)/(b+r); 
+#      mu = 3bmrdbpr*t.onembmr2inv
+#      p = bmrdbpr^2*t.onembpr2*t.onembmr2inv
+#      t.k2inv = inv(t.k2)
+##      println("calling cel with: ",t.k2inv,t.kc,p,1+mu,one(T),one(T),p+mu,t.kc2,zero(T))
+#      Piofk,t.Eofk,t.Em1mKdm = cel_bulirsch(t.k2inv,t.kc,p,1+mu,one(T),one(T),p+mu,t.kc2,zero(T))
+##      t.sqonembmr2 = sqrt(t.onembmr2)
+#      Lambda1 = 2*t.sqonembmr2*(t.onembpr2*Piofk -(4-7r^2-b^2)*t.Eofk)*t.third
+#      if t.grad
+#        t.s2_grad[1] = -4*r*t.sqonembmr2*t.Eofk
+#        t.s2_grad[2] = -4*r*t.third*t.sqonembmr2*(t.Eofk - 2*t.Em1mKdm)
+#      end
+#    else
+#      # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
+#      t.sqr1mr = sqrt(r*(1-r))
+#      Lambda1 = 2*acos(1.0-2.0*r)-4*t.third*(3+2r-8r^2)*t.sqr1mr-2pi*convert(T,r>0.5) 
+#      if t.grad
+#        t.s2_grad[1] = -8*r*t.sqr1mr
+#        t.s2_grad[2] = -t.s2_grad[1]*t.third
+#      end
+#      t.Eofk = one(T)
+#      t.Em1mKdm = one(T)
+#    end
+#  end
+#end
+##flux = ((1.0-convert(T,r>b))*2pi-Lambda1)/3
+#t.sn[2] = ((1.0-convert(T,r>b))*2pi-Lambda1)*t.third
+#return
+#end
