@@ -9,7 +9,8 @@ include("../src/integrate_transit.jl")
 include("../test/loglinspace.jl")
 
 t1 = -1.2; t2 = 1.2; nt = 1000; dt = (t2-t1)/nt*100
-t = linearspace(t1,t2,nt)
+t = zeros(nt)
+t .= linearspace(t1,t2,nt)
 # The following compares different tolerances and maxdepths:
 r = 0.1; b0 = 0.5; u_n = [0.5,0.5]; nu = length(u_n)
 favg0 = zeros(nt,3+nu)
@@ -20,18 +21,24 @@ param = [0.0,1.0,r,b0]
 # Now, carry out speed test:
 
 @time for i=1:nt
-        trans.b = sqrt(param[4]^2+(param[2]*(t[i]-param[1]))^2)
-        favg0[i,1] = transit_poly!(trans)
-        favg0[i,2:3] = trans.dfdrb
-        favg0[i,4:3+nu] = trans.dfdu
-      end
+  trans.b = sqrt(param[4]^2+(param[2]*(t[i]-param[1]))^2)
+  favg0[i,1] = transit_poly!(trans)
+  favg0[i,2:3] = trans.dfdrb
+  favg0[i,4:3+nu] = trans.dfdu
+end
+
+#function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64) where {T <: Real}
 dtinv = inv(dt)
-@time for i=1:nt
-        ftmp = integrate_timestep_gradient(param,trans,t[i],dt,1e-5*r^2,8)*dtinv
-        favg1[i,1:3]=ftmp[1:3]
-        # Convert from d_n to u_n derivatives:
-        favg1[i,4:3+nu]=BLAS.gemv('T',1.0,trans.dddu,ftmp[4:4+nu])
-      end
+for i=1:nt
+  ftmp = integrate_timestep_gradient(param,trans,t[i],dt,1e-5*trans.r^2,8)*dtinv
+  favg1[i,1:3]=ftmp[1:3]
+  # Convert from d_n to u_n derivatives:
+  favg1[i,4:3+nu]=BLAS.gemv('T',1.0,trans.dddu,ftmp[4:4+nu])
+end
+#return
+#end
+
+#@time integrate_lightcurve!(trans,param,t,dt,favg1,nt)
 
 # Now plot the results:
 fig,axes = subplots(2,2)

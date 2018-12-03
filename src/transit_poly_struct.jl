@@ -305,7 +305,6 @@ if b == 0.0
   #  dfdrb[2]=0 since the derivative with respect to b is zero.
   t.dfdd[1] = (onemr2-flux)*pi*t.den
   t.dfdd[2] = t.twothird*(t.sqrt1mr2^3-flux)*pi*t.den
-  # Also need to compute derivatives [ ]
   return flux
 else
 # Next, compute k^2 = m:
@@ -345,7 +344,18 @@ end
 compute_uniform!(t)
 
 # Compute sn[2] and its derivatives:
-#s2!(t)
+#if t.n >= 1
+#  s2!(t)
+#  # debug:
+#  s2_grad = zeros(T,2)
+#  sn2,Eofk,Em1mKdm = s2!(r,b,s2_grad)
+#  if (abs(t.sn[2]-sn2) > 1e-8) || (abs(t.s2_grad[1]-s2_grad[1]) > 1e-8) || (abs(t.s2_grad[2]-s2_grad[2]) > 1e-8)
+#    println("r: ",r,"b: ",b," s2 new: ",t.sn[2]," s2 old: ",sn2)
+#    println("ds2/dr new: ",t.s2_grad[1]," ds2/dr old: ",s2_grad[1])
+#    println("ds2/db new: ",t.s2_grad[2]," ds2/db old: ",s2_grad[2])
+#    read(STDIN,Char)
+#  end
+#end
 if t.n >= 1
   t.sn[2],t.Eofk,t.Em1mKdm = s2!(r,b,t.s2_grad)
   t.dsndr[2] = t.s2_grad[1]

@@ -1,9 +1,10 @@
 # This is code for computing a transit model integrated over
-# a time step.
+# a time step, giving the fluence in units of time (since 
+# flux is normalized to unity).
 
 include("transit_poly_struct.jl")
 
-# First the version without derivatives:
+# First the version without derivatives, which tracks the number of depths:
 function integrate_timestep_track(param::Array{T,1},trans::Transit_Struct{T},time::T,dt::T,tol::T,maxdepth::Int64) where {T <: Real}
 
   function solver(param::Array{T,1},time::T) where {T <: Real}
@@ -44,7 +45,7 @@ function integrate_timestep_track(param::Array{T,1},trans::Transit_Struct{T},tim
 return fint,dmax,diff
 end
 
-# First the version without derivatives:
+# First the version without derivatives, which doesn't track depth:
 function integrate_timestep(param::Array{T,1},trans::Transit_Struct{T},time::T,dt::T,tol::T,maxdepth::Int64) where {T <: Real}
 
   function solver(param::Array{T,1},time::T) where {T <: Real}
@@ -107,7 +108,9 @@ function integrate_timestep_gradient(param::Array{T,1},trans::Transit_Struct{T},
   # Compute: flux, df/dr, df/dt0, df/dv, df/db0, df/d d_n:
   fmid = [fmid0;trans.dfdrb[1];trans.dfdrb[2]/trans.b*param[2]*(param[1]-tmid);
      trans.dfdrb[2]*param[2]/trans.b*(tmid-param[1])^2;trans.dfdrb[2]*param[3]/trans.b;trans.dfdd]
+  # Extrapolate the flux at the boundaries to the midpoint:
   fapprox = 0.5*(f1+f2)
+  # Tolerance is set by the flux term only:
   d = abs(fmid[1]-fapprox[1])
   if d > tol && depth < maxdepth
      a = integrate(param,f1,fmid,t1,tmid,depth+1)
