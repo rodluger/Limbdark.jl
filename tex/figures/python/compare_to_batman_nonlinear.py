@@ -225,7 +225,7 @@ for i, N in enumerate(Narr):
     batman_time[i] = (time.time() - tstart) / number
 
     # pytransit
-    if True: #(N < 100000):
+    if (N < 100000):
         m = pytransit.Gimenez(nldc=len(u_g), interpolate=False, nthr=0)
         tstart = time.time()
         for k in range(number):
@@ -233,8 +233,9 @@ for i, N in enumerate(Narr):
         pytransit_time[i] = (time.time() - tstart) / number
     else:
         # HACK: PyTransit segfaults on Travis for N = 100000
+        # Let's be generous and linearly extrapolate
         pytransit_flux = b * np.nan
-        pytransit_time[i] = np.nan
+        pytransit_time[i] = pytransit_time[i - 1] * Narr[i] / Narr[i - 1]
 
     # Multiprecision
     if i == 1:
