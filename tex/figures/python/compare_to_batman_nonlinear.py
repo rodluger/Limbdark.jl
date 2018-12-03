@@ -225,7 +225,7 @@ for i, N in enumerate(Narr):
     batman_time[i] = (time.time() - tstart) / number
 
     # pytransit
-    if (N < 100000):
+    if True: #(N < 100000):
         m = pytransit.Gimenez(nldc=len(u_g), interpolate=False, nthr=0)
         tstart = time.time()
         for k in range(number):
