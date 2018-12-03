@@ -732,7 +732,7 @@ As $\kappa_0$, $\kappa_1$, and $A_{kite}$ were already computed in the
 uniform case, these quantities are reused in the quadratic computation.
 The derivatives are given by:
 \begin{align}
-    \label{eq:eta}
+    \label{eq:detadr}
     \frac{\partial \eta}{\partial r} &=
     \begin{dcases}
           \frac{2r}{\pi}\left[(r^2+b^2)\kappa_0-2A_{kite}\right]
@@ -748,7 +748,7 @@ The derivatives are given by:
 \end{align}
 and
 \begin{align}
-    \label{eq:eta}
+    \label{eq:detadb}
     \frac{\partial \eta}{\partial b} &=
     \begin{dcases}
           \frac{1}{2b\pi}\left[4r^2b^2\kappa_0-2(1+b^2+r^2)A_{kite}\right]
@@ -1045,16 +1045,18 @@ $\mathcal{M}_n(r,b)$, given by:
 \mathcal{M}_n(r,b) = (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} d\xi,
 \end{equation}
 in terms of which the primitive integral takes the particulary simple form
-\begin{equation}\label{eq:primitive}
+\begin{proof}{pofgn_v01}\label{eq:primitive}
 \mathcal{P}(\bvec{G}_n) = (1+r^2-b^2)\mathcal{M}_n - \mathcal{M}_{n+2}.
-\end{equation}
+\end{proof}
 
 The integrals $\mathcal{M}_n$ obey a straightforward recursion relation,
+\begin{proof}\label{eq:Mn_recursion}
 \begin{eqnarray}
 \mathcal{M}_n &=& \frac{1}{n} \left[ 2(n-1) (1-r^2-b^2) \mathcal{M}_{n-2} \right.\\ 
   &+& \left. (n-2) (1-(b-r)^2)((b+r)^2-1) M_{n-4}\right],\\
 \mathcal{M}_n &=& \frac{(n+4)\mathcal{M}_{m+4} - 2(n+3)(1-r^2-b^2)\mathcal{M}_{n+2}}{(n+2)(1-(b-r)^2)((b+r)^2-1)},
 \end{eqnarray}
+\end{proof}
 where the first relation may be used for upwards recursion in $n$ for $k^2 > \frac{1}{2}$, 
 and the second for downward recursion in $n$ otherwise.
 In practice we replace $\mathcal{M}_{n+2}$ in equation \ref{eq:primitive} with 
