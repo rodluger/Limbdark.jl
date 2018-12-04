@@ -1061,48 +1061,48 @@ where the first relation may be used for upwards recursion in $n$ for $k^2 > \fr
 and the second for downward recursion in $n$ otherwise.
 In practice we replace $\mathcal{M}_{n+2}$ in equation \ref{eq:primitive} with 
 the recursion relation to obtain a more stable expression for $\mathcal{P}(\bvec{G}_n)$:
-\begin{proof}\label{eq:PofGn_v02}
+\begin{proof}{pofgn_v02}\label{eq:PofGn_v02}
 \mathcal{P}(\bvec{G}_n) = 2r^2 \mathcal{M}_n - \frac{n}{n+2}\left((1-r^2-b^2)\mathcal{M}_n+(1-(b-r)^2)((b+r)^2-1)\mathcal{M}_{n-2}\right).
 \end{proof}
 
 Note that these recursion relations involve every fourth term, so we need to compute
 the first four terms analytically.  These are given by:
-\begin{eqnarray}
+\begin{proof}{Mn_initial}
 \mathcal{M}_0 &=& \kappa_0,\\
 \mathcal{M}_1 &=& 2 (4br)^{1/2} \left[E(k^2)-(1-k^2)K(k^2)\right],\\
 \mathcal{M}_2 &=& 4br\left[(k^2-\tfrac{1}{2}) \kappa_0 + k\sqrt{1-k^2}\right],\\
-\mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} \left[(4k^2-2)E(k^2)+(3k^2-2)(k^2-1)K(k^2)\right],\\
-\end{eqnarray}
+\mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} \left[(4k^2-2)E(k^2)+(3k^2-2)(k^2-1)K(k^2)\right],
+\end{proof}
 for $k^2 \le 1$, while for $k^2 > 1$,
-\begin{eqnarray}
+\begin{proof}{Mn_initial}
 \mathcal{M}_0 &=& \pi,\\
 \mathcal{M}_1 &=& 2(1-(r-b)^2)^{1/2}E(k^{-2}),\\
 \mathcal{M}_2 &=& \pi(1-b^2-r^2),\\
 \mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} k^3\left[2(2-k^{-2})E(k^{-2})-(1-k^{-2})K(k^{-2})\right].
-\end{eqnarray}
+\end{proof}
 We re-express the elliptic integrals for $n=1$ and $3$ in terms of the cel integrals which
 were already computed for the linear limb-darkening case,
-\begin{eqnarray}
+\begin{proof}{Mn_cel}
 \mathcal{M}_1 &=& 2 (4br)^{1/2} k^2 \mathrm{cel}(k_c,1,1,0),\\
 \mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2}k^2 \left[ \mathrm{cel}(k_c,1,1,k_c^2)+(3k^2-2) \mathrm{cel}(k_c,1,1,0)\right],\\
-\end{eqnarray}
+\end{proof}
 for $k^2 \le 1$, while for $k^2 > 1$,
-\begin{eqnarray}
+\begin{proof}{Mn_cel}
 \mathcal{M}_1 &=& 2(1-(r-b)^2)^{1/2} \mathrm{cel}(k_c,1,1,k_c^2),\\
 \mathcal{M}_3 &=& \tfrac{2}{3}(1-(b-r)^2)^{3/2} \left[(3-2k^{-2}) \mathrm{cel}(k_c,1,1,k_c^2)+k^{-2} \mathrm{cel}(k_c,1,1,0\right].
-\end{eqnarray}
+\end{proof}
 where, as before, $k_c = \sqrt{1-k^2}$ for $k^2 \le 1$, and $k_c = \sqrt{1-k^{-2}}$ for $k^2 > 1$.
 
 For downward recursion, we compute the top four $\mathcal{M}_n$ expressions, $n-3 \le n \le N$,
 in terms of series expansions.
 When $k^2 \le 1$, the integrals may be expressed in terms of the following
 Hypergeometric functions and infinite series,
-\begin{eqnarray}
+\begin{proof}{Mn_series}
 \mathcal{M}_n &=& (4br)^{n/2} k^{n+1} \pi^{1/2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+\tfrac{n}{2};k^2),\\
 &=& (1-(r-b)^2)^{n/2} k \sum_{j=0}^{j_{max}} \alpha_j k^{2j},\\
 \alpha_0 &=& \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})},\\
 \alpha_j &=& \alpha_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)}.
-\end{eqnarray}
+\end{proof}
 %while for $k^2 > 1$,
 %\begin{eqnarray}
 %\mathcal{M}_n &=& \pi (4br)^{n/2}k^n \,_2F_1(\tfrac{1}{2},-\tfrac{n}{2};1;k^{-2}),\\
