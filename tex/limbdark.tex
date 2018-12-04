@@ -1083,13 +1083,13 @@ for $k^2 \le 1$, while for $k^2 > 1$,
 We re-express the elliptic integrals for $n=1$ and $3$ in terms of the cel integrals which
 were already computed for the linear limb-darkening case,
 \begin{proof}{Mn_cel}
-\mathcal{M}_1 &=& 2 (4br)^{1/2} k^2 \mathrm{cel}(k_c,1,1,0),\\
-\mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2}k^2 \left[ \mathrm{cel}(k_c,1,1,k_c^2)+(3k^2-2) \mathrm{cel}(k_c,1,1,0)\right],\\
+\mathcal{M}_1 &= 2 (4br)^{1/2} k^2 \mathrm{cel}(k_c,1,1,0),\\
+\mathcal{M}_3 &= \tfrac{2}{3}(4br)^{3/2}k^2 \left[ \mathrm{cel}(k_c,1,1,k_c^2)+(3k^2-2) \mathrm{cel}(k_c,1,1,0)\right],\\
 \end{proof}
 for $k^2 \le 1$, while for $k^2 > 1$,
 \begin{proof}{Mn_cel}
-\mathcal{M}_1 &=& 2(1-(r-b)^2)^{1/2} \mathrm{cel}(k_c,1,1,k_c^2),\\
-\mathcal{M}_3 &=& \tfrac{2}{3}(1-(b-r)^2)^{3/2} \left[(3-2k^{-2}) \mathrm{cel}(k_c,1,1,k_c^2)+k^{-2} \mathrm{cel}(k_c,1,1,0\right].
+\mathcal{M}_1 &= 2(1-(r-b)^2)^{1/2} \mathrm{cel}(k_c,1,1,k_c^2),\\
+\mathcal{M}_3 &= \tfrac{2}{3}(1-(b-r)^2)^{3/2} \left[(3-2k^{-2}) \mathrm{cel}(k_c,1,1,k_c^2)+k^{-2} \mathrm{cel}(k_c,1,1,0\right].
 \end{proof}
 where, as before, $k_c = \sqrt{1-k^2}$ for $k^2 \le 1$, and $k_c = \sqrt{1-k^{-2}}$ for $k^2 > 1$.
 
@@ -1098,10 +1098,10 @@ in terms of series expansions.
 When $k^2 \le 1$, the integrals may be expressed in terms of the following
 Hypergeometric functions and infinite series,
 \begin{proof}{Mn_series}
-\mathcal{M}_n &=& (4br)^{n/2} k^{n+1} \pi^{1/2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+\tfrac{n}{2};k^2),\\
+\mathcal{M}_n &= (4br)^{n/2} k^{n+1} \pi^{1/2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+\tfrac{n}{2};k^2),\\
 &=& (1-(r-b)^2)^{n/2} k \sum_{j=0}^{j_{max}} \alpha_j k^{2j},\\
-\alpha_0 &=& \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})},\\
-\alpha_j &=& \alpha_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)}.
+\alpha_0 &= \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})},\\
+\alpha_j &= \alpha_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)}.
 \end{proof}
 %while for $k^2 > 1$,
 %\begin{eqnarray}
@@ -1185,30 +1185,30 @@ where we have defined a new integral, $\mathcal{N}_n$,
 \mathcal{N}_n(r,b) = (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} \sin^2{\xi} d\xi,
 \end{equation}
 which obeys the recursion relation
-\begin{equation}
+\begin{proof}{Nn_recursion}
 \mathcal{N}_n = \frac{1}{n+2} \left[\mathcal{M}_n + n(1-(b+r)^2) \mathcal{N}_{n-2}\right].
-\end{equation}
+\end{proof}
 Since this recursion relation involves every other term, we only need the two lowest terms,
 which are given by:
-\begin{eqnarray}
-\mathcal{N}_0 &=& \tfrac{1}{2}\kappa_0 - k k_c,\\
-\mathcal{N}_1 &=& \tfrac{2}{3}(4br)^{1/2} k^2 \left[-\mathrm{cel}(k_c,1,1,k_c^2) + 2 \mathrm{cel}(k_c,1,1,0)\right],
-\end{eqnarray}
+\begin{proof}{Nn_cel}
+\mathcal{N}_0 &= \tfrac{1}{2}\kappa_0 - k k_c,\\
+\mathcal{N}_1 &= \tfrac{2}{3}(4br)^{1/2} k^2 \left[-\mathrm{cel}(k_c,1,1,k_c^2) + 2 \mathrm{cel}(k_c,1,1,0)\right],
+\end{proof}
 for $k^2 \le 1$ and
-\begin{eqnarray}
+\begin{proof}{Nn_cel}
 \mathcal{N}_0 &=& \frac{\pi}{2},\\
 \mathcal{N}_1 &=&  \tfrac{2}{3}(4br)^{1/2} k \left[2\mathrm{cel}(k_c,1,1,k_c^2) - \mathrm{cel}(k_c,1,1,0)\right],
-\end{eqnarray}
+\end{proof}
 for $k^2 > 1$.
 
 In the $k^2 < \tfrac{1}{2}$ limit, we find the upward recursion to be unstable, and so we evaluate the expressions for $\mathcal{N}_{N}$ and $\mathcal{N}_{N-1}$
 with a series solution (as we did for $\mathcal{M}_{N-3}-\mathcal{M}_N$),
-\begin{eqnarray}
-\mathcal{N}_n &=& (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\\
+\begin{proof}{Nn_series}
+\mathcal{N}_n &= (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\\
 &=& (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\\
-\gamma_0 &=& \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\\
-\gamma_j &=& \gamma_{j-1} \frac{(4j^2-1)}{2j(3+n+2j)}.
-\end{eqnarray}
+\gamma_0 &= \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\\
+\gamma_j &= \gamma_{j-1} \frac{(4j^2-1)}{2j(3+n+2j)}.
+\end{proof}
 We then use downward recursion with the relation
 \begin{equation}
 \mathcal{N}_n = \frac{(n+4)\mathcal{N}_{n+2} - \mathcal{M}_{n+2}}{(n+2)(1-(b+r)^2)},
@@ -1247,7 +1247,7 @@ computed by differentiating each term in equation \ref{eq:an_of_un} to obtain
 $\frac{\partial a_n}{\partial u_i}$, and differentiating each term in equation
 \ref{eq:dn_of_an} to obtain $\frac{\partial d_j}{\partial a_n}$, and propagating 
 the derivatives via the chain rule.  Then, the light curve derivatives are given by
-\begin{eqnarray}
+\begin{eqnarray}\label{eq:dFdu}
 \frac{\partial \mathcal{F}}{\partial u_i} =  \sum_{j} \frac{\partial d_j}{\partial u_i}\frac{\partial \mathcal{F}}{\partial d_j}.
 \end{eqnarray}
 
