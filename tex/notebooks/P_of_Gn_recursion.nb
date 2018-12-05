@@ -13160,7 +13160,7 @@ Cell[BoxData["15"], "Output",
 }, Open  ]]
 },
 WindowSize->{914, 705},
-WindowMargins->{{Automatic, 150}, {-212, Automatic}},
+WindowMargins->{{Automatic, 152}, {-210, Automatic}},
 FrontEndVersion->"11.3 for Mac OS X x86 (32-bit, 64-bit Kernel) (March 5, \
 2018)",
 StyleDefinitions->"Default.nb"
