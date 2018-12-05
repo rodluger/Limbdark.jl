@@ -74,7 +74,7 @@ limb-darkening model which is flexible enough and accurate enough to describe th
 emission from a stellar photosphere.  Linear and quadratic limb-darkening laws
 were sufficient for lower-precision measurements; however, the measurement of
 transit light curves has steadily improved in precision.  Higher order terms or non-linear laws
-have become necessary to describe higher precision measurements \citep{Claret2000,
+have become necessary to describe higher precision measurements \citep{Kopal1950,Claret2000,
 Gimenez2006}, which tend to involve more computational burden.
 
 In addition to computing transit light curves, the derivatives of these light
@@ -1099,7 +1099,7 @@ When $k^2 \le 1$, the integrals may be expressed in terms of the following
 Hypergeometric functions and infinite series,
 \begin{proof}{Mn_series}
 \mathcal{M}_n &= (4br)^{n/2} k^{n+1} \pi^{1/2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+\tfrac{n}{2};k^2),\\
-&=& (1-(r-b)^2)^{n/2} k \sum_{j=0}^{j_{max}} \alpha_j k^{2j},\\
+&= (1-(r-b)^2)^{n/2} k \sum_{j=0}^{j_{max}} \alpha_j k^{2j},\\
 \alpha_0 &= \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})},\\
 \alpha_j &= \alpha_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)}.
 \end{proof}
@@ -1205,7 +1205,7 @@ In the $k^2 < \tfrac{1}{2}$ limit, we find the upward recursion to be unstable, 
 with a series solution (as we did for $\mathcal{M}_{N-3}-\mathcal{M}_N$),
 \begin{proof}{Nn_series}
 \mathcal{N}_n &= (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\\
-&=& (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\\
+&= (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\\
 \gamma_0 &= \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\\
 \gamma_j &= \gamma_{j-1} \frac{(4j^2-1)}{2j(3+n+2j)}.
 \end{proof}
