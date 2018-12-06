@@ -26,3 +26,12 @@ trans = transit_init(0.1, 0.0, u_n, false)
 flux = zeros(length(b))
 println(profile_transit_poly!(trans, flux, b))
 writedlm("flux.txt", flux)
+
+# Multiprecision
+trans_big = transit_init(big(0.1), big(0.0), big.(u_n), false)
+flux_big = zeros(BigFloat, length(b))
+for i=1:length(b)
+  trans_big.b = big(b[i])
+  flux_big[i] = transit_poly_d(trans_big)
+end
+writedlm("flux_multi.txt", flux_big)
