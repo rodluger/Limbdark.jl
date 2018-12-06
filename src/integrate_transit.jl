@@ -30,7 +30,7 @@ function integrate_timestep_track(param::Array{T,1},trans::Transit_Struct{T},tim
      b,dmaxb,db = integrate(param,fmid,f2,tmid,t2,depth+1)
      return a+b,maximum([dmaxa,dmaxb]),maximum([da,db])
   end
-  return fapprox*(t2-t1),depth,d
+  return 0.5*(fapprox+fmid)*(t2-t1),depth,d
   end
   
   t1 = time - 0.5*dt
@@ -71,7 +71,7 @@ function integrate_timestep(param::Array{T,1},trans::Transit_Struct{T},time::T,d
      b = integrate(param,fmid,f2,tmid,t2,depth+1)
      return a+b
   end
-  return fapprox*(t2-t1)
+  return 0.5*(fapprox+fmid)*(t2-t1)
   end
   
   t1 = time - 0.5*dt
@@ -117,7 +117,7 @@ function integrate_timestep_gradient(param::Array{T,1},trans::Transit_Struct{T},
      b = integrate(param,fmid,f2,tmid,t2,depth+1)
      return a+b
   end
-  return fapprox*(t2-t1)
+  return 0.5*(fapprox+fmid)*(t2-t1)
   end
   
   t1 = time - 0.5*dt
