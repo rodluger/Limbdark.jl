@@ -510,7 +510,7 @@ integral to a specified precision.
 
 These elliptic integral transformations lead to the following numerically-stable
 expression for the linear limb-darkening flux, $S_1(r,b)$, in which
-\begin{align}
+\begin{proof}{biglam_stable}
     \label{eq:biglam_stable}
     \Lambda &=
     \begin{dcases}
@@ -540,7 +540,7 @@ expression for the linear limb-darkening flux, $S_1(r,b)$, in which
           %
           & \qquad k^2 > 1\\
     \end{dcases}
-\end{align}
+\end{proof}
 where
 \begin{eqnarray}
 q &=& 3\frac{b-r}{(b+r)(1-(b-r)^2)}\\
@@ -548,6 +548,8 @@ p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
 \end{eqnarray}
 in the $k^2 > 1$ case.  Note that in this equation the conditions
 should be evaluated in the order they appear.
+
+{\color{red} NOTE: Error in $b = r > 0.5$ term above.}
 
 The $S_1(r,b)$ function is plotted in Figure \ref{s2_plot}.  The
 function varies smoothly from the lower right where the disk is
