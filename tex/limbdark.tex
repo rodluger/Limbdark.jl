@@ -87,8 +87,8 @@ for looking for multi-modal solutions, for initializing the multi-nest
 algorithm \citep{Feroz2008}, or for computing the Fisher information matrix.
 In some cases, MCMC can be slow to converge, and derivatives can accelerate
 convergence by adding an artificial momentum term to the log likelihood,
-and then allowing the sampler to follow contours of constant ``energy."
-This so-called ``hybrid" or ``Hamiltonian" MCMC approach holds great promise,
+and then allowing the sampler to follow contours of constant ``energy.''
+This so-called ``hybrid'' or ``Hamiltonian'' MCMC approach holds great promise,
 but its application has been hampered by the lack of models with derivatives,
 as derivatives are in general more difficult to compute \citep{Girolami2011,Betancourt2017}.
 
@@ -225,7 +225,7 @@ r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\
 \end{proof}
 \citep[e.g.][]{MandelAgol2002}, where
 \begin{eqnarray}\label{eq:cosine_formulation}
-\cos{\kappa_0} &=& \left(\frac{(r-1)(r+1)+b^2}{2br}\right),\\
+\cos{\kappa_0} &=& \left(\frac{(r-1)(r+1)+b^2}{2br}\right),\nonumber\\
 \cos{\kappa_1} &=& \left(\frac{(1-r)(1+r)+b^2}{2b}\right),
 \end{eqnarray}
 where $\kappa_0$ and $\kappa_1$ are the angles defined in Figure \ref{fig:circle_overlap}.
@@ -238,7 +238,7 @@ term in what follows.
 We find that numerical round-off error limits the precision of the ingress formula when
 $b \approx 0$, $b+r \approx 1$, or $b \approx 1+r$;  these are the cases in which
 the kite-shaped region becomes thin, in which the sum of two sides becomes similar
-in length to the spine of the kite.  The square root term in this formula (equation
+in length to the spine of the kite.  The square root term in this formula (Equation
 \ref{eq:MAuniform}) computes the area of the kite-shaped region, which in this
 form causes round-off error when the kite is flattened.  The same issue occurs when
 computing the area of a triangle in which two of the sides are of similar length;
@@ -262,7 +262,7 @@ $x=\cos{\theta}$ to compute $\kappa_0$ and $\kappa_1$, which avoids the quadrant
 division-by-zero problems of the $\theta = \tan^{-1}(y/x)$ function.  In addition
 to the cosine values above, we require the sine terms, which are given by
 \begin{eqnarray}
-\sin{\kappa_0} &=& \frac{A_{kite}}{br},\\
+\sin{\kappa_0} &=& \frac{A_{kite}}{br},\nonumber\\
 \sin{\kappa_1} &=& \frac{A_{kite}}{b},
 \end{eqnarray}
 which can be derived from the area of the triangles formed by the centers of
@@ -271,13 +271,13 @@ Note that both $\sin{\kappa_0}$ and $\cos{\kappa_0}$ are divided by $br$, and
 $\sin{\kappa_1}$ and $\cos{\kappa_1}$ are divided by $b$, so that
 in the arctangent formula these denoninator terms cancel, which can improve
 numerical stability for small values of $b$ or $r$; this cancellation does not happen
-in the arccosine case given in equation \ref{eq:cosine_formulation}.
+in the arccosine case given in Equation~(\ref{eq:cosine_formulation}).
 
 This results in the following equations for the overlap area, $A_{lens}$, of two 
 partially overlapping circles:
 \begin{proof}{kite_area} \label{eq:area_of_overlap}
-A_{lens} &= \kappa_1 + r^2\kappa_0 - A_{kite},\\
-\kappa_0 &= \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\\
+A_{lens} &= \kappa_1 + r^2\kappa_0 - A_{kite},\nonumber\\
+\kappa_0 &= \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\nonumber\\
 \kappa_1 &= \mathrm{atan2}(2A_{kite},(1-r)(1+r)+b^2).
 \end{proof}
 
@@ -289,7 +289,7 @@ the computation in the \texttt{Julia} language, both in double-precision
 subtracted the results to measure the numerical errors of the computation.
 
 We find that the standard
-formula (equation \ref{eq:MAuniform}) approaches errors of $10^{-8}$
+formula (Equation \ref{eq:MAuniform}) approaches errors of $10^{-8}$
 in the limit of $b \rightarrow 1-r$. This error exceeds the value
 of the area of the smaller circle minus the area of overlap for
 values of $1-r < b < 1-r+10^{-8}$.  Thus, even though this calculation
@@ -299,9 +299,9 @@ the error of the standard formula approaches $10^{-8}$, with the
 error exceeding the value of the area of overlap for $1+r-10^{-8} <
 b < 1+r$.
 
-In contrast, equation \ref{eq:area_of_overlap} gives a precision
+In contrast, Euation~(\ref{eq:area_of_overlap}) gives a precision
 that is double-precision in both limits.  Figure
-\ref{fig:overlap_precision} shows that equation \ref{eq:area_of_overlap}
+\ref{fig:overlap_precision} shows that Equation~(\ref{eq:area_of_overlap})
 gives a precision of $\approx 10^{-17}$ in the limit $b \rightarrow
 1-r$ for $r=0.1$; this limit is due to the limiting precision of
 representing $\pi r^2$ in double-precision, which in this case
@@ -312,9 +312,9 @@ even higher precision is achieved since the area of overlap approaches
 zero, as shown in the right hand panels of Figure \ref{fig:overlap_precision}.
 
 The final modification we make when computing the uniform light
-curve is that we require the visible area of the disk, $S_0$, defined as
+curve is that our computations make use of the visible area of the disk, $S_0$, defined as
 \begin{eqnarray} \label{eq:uniform}
-S_0(r,b) &=& \pi-A_{lens}\\
+S_0(r,b) &=& \pi-A_{lens}\nonumber\\
 &=&\pi -\kappa_1 - r^2\kappa_0 + A_{kite},
 \end{eqnarray}
 rather than the obscured area, $A_{lens}$.  So, instead of computing $\kappa_1$,
@@ -324,10 +324,10 @@ the first basis function in the \starry implementation from \citet{starry}.
 
 The partial derivatives of this formula with respect to the radius
 ratio, $r$, and impact parameter, $b$, turn out to be straightforward:
-\begin{eqnarray}\label{eq:dS0_drb}
-\frac{\partial S_0(r,b)}{\partial r} &=& -2r \kappa_0,\\
-\frac{\partial S_0(r,b)}{\partial b} &=& \frac{A_{kite}}{b},
-\end{eqnarray}
+\begin{proof}{dS0drb}\label{eq:dS0_drb}
+\frac{\partial S_0(r,b)}{\partial r} &= -2r \kappa_0,\nonumber\\
+\frac{\partial S_0(r,b)}{\partial b} &= \frac{2A_{kite}}{b},
+\end{proof}
 which can be computed from the quantities already used in calculating $S_0$.
 At the contact points, when $b = \vert 1\pm r\vert$, the derivatives are undefined.
 In practice this can be a problen when taking finite-differences across
@@ -356,13 +356,13 @@ for linear limb-darkening.
     \caption{Precision of formulae for the area of overlap of two circles with
     radius ratio $r$.  Plotted are the regions near $b=1-r$ (second and third
     points of contact) and $b=1+r$ (first and fourth points of contact) for
-    the standard formula (equation \ref{eq:MAuniform}, blue) and our new formula
-    (equation \ref{eq:area_of_overlap}, orange dots).
+    the standard formula (Equation \ref{eq:MAuniform}, blue) and our new formula
+    (Equation \ref{eq:area_of_overlap}, orange dots).
     The high-precision calculation is shown in green dashed for comparison; this
     is limited by the conversion of the result to double-precision. The
     solid and empty circles (top) indicate the positions of the circles at the left
-    hand side of the axes.  In the left panels the dash-dot grey line indicates the
-    limiting precision for representing $\pi r^2$. \jlcodelink{area_of_overlap_r01}\label{fig:overlap_precision}}
+    hand side of the axes.  In the left panels the horizontal dash-dotted grey line 
+    indicates the limiting precision for representing $\pi r^2$. \jlcodelink{area_of_overlap_r01}\label{fig:overlap_precision}}
     \end{centering}
 \end{figure}
 
@@ -390,9 +390,9 @@ $I(x, y) = \sqrt{1 - \x^2 -\y^2}$ may be computed as
 %
 where $\Theta(\bigdot)$ is the Heaviside step function and
 %
-\begingroup\makeatletter\def\f@size{10}\check@mathfonts
-\def\maketag@@@#1{\hbox{\m@th\large\normalfont#1}}%
-\begin{align}
+\begingroup\makeatletter\def\f@size{9}\check@mathfonts
+\def\maketag@@@#1{\hbox{\m@th\normalsize#1}}%
+\begin{proof}{biglam}
     \label{eq:biglam}
     \Lambda(r,b) &=
     \begin{dcases}
@@ -436,7 +436,7 @@ where $\Theta(\bigdot)$ is the Heaviside step function and
           %
           & \qquad k^2 \ge 1
     \end{dcases}
-\end{align}
+\end{proof}
 \endgroup
 %
 with
@@ -464,8 +464,8 @@ respectively, defined as
     \Pi(n, k^2) &\equiv \int_0^{\frac{\pi}{2}} \frac{\dd \varphi}{(1 - n \sin^2 \varphi)\sqrt{1 - k^2 \sin^2 \varphi}}
     \quad.
 \end{align}
-In equation \ref{eq:biglam} we have transformed the formulae from \citet{MandelAgol2002} using
-equation 17.7.17 from \citet{Abramowitz1970} which yields equations that are better
+In Equation~(\ref{eq:biglam}) we have transformed the formulae from \citet{MandelAgol2002} using
+Equation (17.7.17) from \citet{Abramowitz1970} which yields equations that are better
 behaved in the vicinity of $b=r$.\footnote{Note that we corrected several typos
 in \citet{MandelAgol2002}, which are listed in the Appendix.}  However, these elliptic
 integrals are still subject to numerical instability as $r \rightarrow 1-b$ and $r \gg 1$.
@@ -492,7 +492,7 @@ from $b$ and $r$:
 In practice, we let the subroutine that computes ${\rm cel}$ accept both
 $m_k$ and $k_c$ as input for numerical precision.
 
-To transform the elliptic integrals in equation \ref{eq:biglam},
+To transform the elliptic integrals in Equation~(\ref{eq:biglam}),
 we used the following relations from \citet{Bulirsch1969}:
 \begin{eqnarray}
 \lambda K(m_k) + q E(m_k) &=& {\rm cel}(k_c,1,\lambda+q,\lambda+q k_c^2)\\
@@ -553,7 +553,7 @@ The $S_1(r,b)$ function is plotted in Figure \ref{s2_plot}.  The
 function varies smoothly from the lower right where the disk is
 unocculted to the upper left where it is completely occulted.
 There are several points which need to be handled separately as
-the equation \ref{eq:biglam} expressions become singular or are
+the Equation~(\ref{eq:biglam}) expressions become singular or are
 no longer valid;  the solid lines in Figure \ref{s2_plot} show
 these points.  When $b=0$, the integral over the center of the
 disk simplifies greatly.  When $b=r=1/2$, at the intersection of
@@ -571,7 +571,7 @@ For $r < 1$, the second and third contacts occur when $r=1-b$.
 Near these boundaries, the standard \citet{MandelAgol2002} expressions
 can become singular, and so we paid particular care to the accuracy of these
 new expressions in these regions.  Figure \ref{s2_machine} shows
-that equation \ref{eq:biglam_stable} is accurate to machine
+that Equation~(\ref{eq:biglam_stable}) is accurate to machine
 precision in all of these regimes.
 We tested the accuracy by computing the equations with 256 bit
 arithmetic, which is much less subject to round-off error, and
@@ -769,10 +769,10 @@ S_2 &=& 2 S_0 + 4\pi \eta - 2\pi,\\
 \frac{\partial S_2}{\partial r} &=& 2 \frac{\partial S_0}{\partial r} + 4\pi \frac{\partial \eta}{\partial r},\\
 \frac{\partial S_2}{\partial b} &=& 2 \frac{\partial S_0}{\partial b} + 4\pi \frac{\partial \eta}{\partial b},\\
 \end{eqnarray}
-where $S_0$ and its derivatives are defined in equations \ref{eq:uniform}-\ref{eq:dS0_drb}.
+where $S_0$ and its derivatives are defined in Equations (\ref{eq:uniform})--(\ref{eq:dS0_drb}).
 With the formulae for $S_0$, $S_1$, and $S_2$, the light curve and derivatives
-of quadratic limb-darkening may be computed with equations \ref{eq:flux} and 
-\ref{eq:derivatives} given below.
+of quadratic limb-darkening may be computed with Equations (\ref{eq:flux}) and 
+(\ref{eq:derivatives}) given below.
 
 Finally, we turn our attention to the general polynomial limb-darkening case,
 $\upmu^n$ with $n > 2$.  These terms may be expressed as the sum of
@@ -1059,7 +1059,7 @@ The integrals $\mathcal{M}_n$ obey a straightforward recursion relation,
 \end{proof}
 where the first relation may be used for upwards recursion in $n$ for $k^2 > \frac{1}{2}$, 
 and the second for downward recursion in $n$ otherwise.
-In practice we replace $\mathcal{M}_{n+2}$ in equation \ref{eq:primitive} with 
+In practice we replace $\mathcal{M}_{n+2}$ in Equation~(\ref{eq:primitive}) with 
 the recursion relation to obtain a more stable expression for $\mathcal{P}(\bvec{G}_n)$:
 \begin{proof}{pofgn_v02}\label{eq:PofGn_v02}
 \mathcal{P}(\bvec{G}_n) = 2r^2 \mathcal{M}_n - \frac{n}{n+2}\left((1-r^2-b^2)\mathcal{M}_n+(1-(b-r)^2)((b+r)^2-1)\mathcal{M}_{n-2}\right).
@@ -1124,7 +1124,7 @@ next.
 
 \subsection{Limb-darkening coefficients}
 
-Our expansion for limb-darkening in terms of $u_n(1-\upmu)^n$ (equation \ref{eq:polynomialld}) needs to
+Our expansion for limb-darkening in terms of $u_n(1-\upmu)^n$ (Equation \ref{eq:polynomialld}) needs to
 be re-expressed in terms of the Green's basis terms $d_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right]$,
 where $d_n$ are constants.
 We accomplish this by first transforming $u_n$ to coefficients of $a_n \upmu^n$,
@@ -1138,7 +1138,7 @@ We rewrite $I(\upmu)$ in terms of these three expansions
 \end{eqnarray}
 Note that $a_0 \equiv 1-\sum_{n=1}^N a_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
 The transformation between $u_n$ and $a_n$ is straightforward based on
-looping over the binomial expansion of each of the $u_n$ terms (equation \ref{eq:polynomialld}),
+looping over the binomial expansion of each of the $u_n$ terms (Equation \ref{eq:polynomialld}),
 for example $a_1 = \sum_{n=1}^N n u_n$, while in general
 \begin{equation}\label{eq:an_of_un}
 a_n = -\sum_{i=n}^N u_i \binom{i}{n}(-1)^n,
@@ -1243,9 +1243,9 @@ $d_n$ are then computed as
 where the last line is for $2 \le n \le N$.
 
 The derivatives of the coefficients, $\frac{\partial d_j}{\partial u_i}$, are
-computed by differentiating each term in equation \ref{eq:an_of_un} to obtain
-$\frac{\partial a_n}{\partial u_i}$, and differentiating each term in equation
-\ref{eq:dn_of_an} to obtain $\frac{\partial d_j}{\partial a_n}$, and propagating 
+computed by differentiating each term in Equation~(\ref{eq:an_of_un}) to obtain
+$\frac{\partial a_n}{\partial u_i}$, and differentiating each term in Equation~(\ref{eq:dn_of_an})
+ to obtain $\frac{\partial d_j}{\partial a_n}$, and propagating 
 the derivatives via the chain rule.  Then, the light curve derivatives are given by
 \begin{eqnarray}\label{eq:dFdu}
 \frac{\partial \mathcal{F}}{\partial u_i} =  \sum_{j} \frac{\partial d_j}{\partial u_i}\frac{\partial \mathcal{F}}{\partial d_j}.
@@ -1352,7 +1352,7 @@ In addition, once $N$ is specified, then the transformation matrix for
 the Jacobian from $d_i$ to $u_j$, $\frac{\partial d_i}{\partial u_j}$,  
 remains the same throughout the light curve 
 computation, so we compute this matrix only once, and then compute the
-flux derivative (equation \ref{eq:dFdu}) with matrix multiplication.
+flux derivative (Equation \ref{eq:dFdu}) with matrix multiplication.
 In fact, since the Jacobian matrix for transforming the derivatives from $d_i$
 to $u_j$ can be expensive to apply, we can carry out the gradient of the 
 likelihood function with respect to $d_i$, and then apply the Jacobian 
@@ -1822,10 +1822,10 @@ and Cooperative Agreement Number NNA13AA93A.
 
 Here are a list of errata for \citet{MandelAgol2002}:
 \begin{enumerate}
-\item In equation 7, $\lambda_3$ and $\lambda_4$ should have $2k \rightarrow
+\item In Equation (7), $\lambda_3$ and $\lambda_4$ should have $2k \rightarrow
 2p$ in arguments of the elliptic integrals.
 
-\item In equation 7, $\lambda_5$ should have $- \frac{2}{3}\Theta(p-1/2)$
+\item In Equation (7), $\lambda_5$ should have $- \frac{2}{3}\Theta(p-1/2)$
 at the end.
 
 \item For Case 11 in Table 1, $\eta^d$ should be 1/2, not 1, and
@@ -1837,7 +1837,7 @@ stars since $p<1$.  This typo was discussed in \citet{Eastman2013}.
 Pal 2008).
 
 \item There is a $\pi$ missing in the denominator of the second term
-on the right hand side of equation (8).
+on the right hand side of Equation (8).
 \end{enumerate}
 
 With the exception of 3, none of these errors affected the publicly
