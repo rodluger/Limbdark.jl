@@ -19,6 +19,8 @@ Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomia
 \author[0000-0002-0296-3826]{Rodrigo Luger}
 \affil{Center~for~Computational~Astrophysics, Flatiron~Institute, New~York, NY}
 \affil{Virtual~Planetary~Laboratory, University~of~Washington, Seattle, WA}
+\author[0000-0002-0296-3826]{Daniel Foreman-Mackey}
+\affil{Center~for~Computational~Astrophysics, Flatiron~Institute, New~York, NY}
 
 \keywords{methods: analytic --- techniques: photometric}
 
@@ -321,6 +323,8 @@ rather than the obscured area, $A_{lens}$.  So, instead of computing $\kappa_1$,
 we compute $\pi-\kappa_1 = -\mathrm{atan2}(\sin{\kappa_1},\cos{\kappa_1})$.
 We find that this leads to machine-precision as well.  Note that $S_0=s_0$,
 the first basis function in the \starry implementation from \citet{starry}.
+
+\subsection{Derivatives}
 
 The partial derivatives of this formula with respect to the radius
 ratio, $r$, and impact parameter, $b$, turn out to be straightforward:
@@ -643,10 +647,11 @@ where
 and $F_0$ is the total unocculted flux.  % Note:  I'm not using this in
 % transit_poly since it is not as precise as the starry expressions.
 
-\subsection{Derivatives of linear limb-darkening}
+\subsection{Derivatives}
 
-It turns out that the expressions for the derivatives of the linear limb-darkening
-light curve with respect to $r,b$ are particularly simple:
+The expressions for the derivatives of the linear limb-darkening
+light curve with respect to $r$ and $b$ are particularly simple:
+%
 \begin{align}
     \label{eq:dbiglam_dr}
     \frac{\partial \Lambda}{\partial r} &=
@@ -713,6 +718,8 @@ We summarize here the formulae for quadratic limb-darkening with $I(1)=1$, $u_1=
 $u_2=-1$, so that $I(\mu)=\mu^2$, along with the derivatives, using the transformed 
 expressions described above.  The general quadratic case may be computed as
 a linear combination with the foregoing uniform and linear cases.
+
+\todo{Split this into a separate section on derivatives, similar to the previous two cases.}
 
 We first give the formula for the function $\eta(r,b)$, which is used in \citet{MandelAgol2002}, in
 terms of quantities we have defined above for the uniform case:
@@ -1052,12 +1059,12 @@ in terms of which the primitive integral takes the particulary simple form
 \mathcal{P}(\bvec{G}_n) = (1+r^2-b^2)\mathcal{M}_n - \mathcal{M}_{n+2}.
 \end{proof}
 
-The integrals $\mathcal{M}_n$ obey a straightforward recursion relation,
+The integrals $\mathcal{M}_n$ obey a straightforward recursion relations
 \begin{proof}{Mn_recursion}\label{eq:Mn_recursion}
 %\begin{eqnarray}
-\mathcal{M}_n &=& \frac{1}{n} \left[ 2(n-1) (1-r^2-b^2) \mathcal{M}_{n-2} \right.\\ 
-  &+& \left. (n-2) (1-(b-r)^2)((b+r)^2-1) M_{n-4}\right],\\
-\mathcal{M}_n &=& \frac{(n+4)\mathcal{M}_{m+4} - 2(n+3)(1-r^2-b^2)\mathcal{M}_{n+2}}{(n+2)(1-(b-r)^2)((b+r)^2-1)},
+\mathcal{M}_n &= \frac{1}{n} \left[ 2(n-1) (1-r^2-b^2) \mathcal{M}_{n-2} \right.\nonumber\\ 
+  &+ \left. (n-2) (1-(b-r)^2)((b+r)^2-1) M_{n-4}\right],\\[1em]
+\mathcal{M}_n &= \frac{(n+4)\mathcal{M}_{m+4} - 2(n+3)(1-r^2-b^2)\mathcal{M}_{n+2}}{(n+2)(1-(b-r)^2)((b+r)^2-1)},
 %\end{eqnarray}
 \end{proof}
 where the first relation may be used for upwards recursion in $n$ for $k^2 > \frac{1}{2}$, 
@@ -1071,27 +1078,29 @@ the recursion relation to obtain a more stable expression for $\mathcal{P}(\bvec
 Note that these recursion relations involve every fourth term, so we need to compute
 the first four terms analytically.  These are given by:
 \begin{proof}{Mn_initial}
-\mathcal{M}_0 &=& \kappa_0,\\
-\mathcal{M}_1 &=& 2 (4br)^{1/2} \left[E(k^2)-(1-k^2)K(k^2)\right],\\
-\mathcal{M}_2 &=& 4br\left[(k^2-\tfrac{1}{2}) \kappa_0 + k\sqrt{1-k^2}\right],\\
-\mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} \left[(4k^2-2)E(k^2)+(3k^2-2)(k^2-1)K(k^2)\right],
+\mathcal{M}_0 &= \kappa_0,\nonumber\\
+\mathcal{M}_1 &= 2 (4br)^{1/2} \left[E(k^2)-(1-k^2)K(k^2)\right],\nonumber\\
+\mathcal{M}_2 &= 4br\left[(k^2-\tfrac{1}{2}) \kappa_0 + k\sqrt{1-k^2}\right],\nonumber\\
+\mathcal{M}_3 &= \tfrac{2}{3}(4br)^{3/2} \left[(4k^2-2)E(k^2)+(3k^2-2)(k^2-1)K(k^2)\right],
 \end{proof}
 for $k^2 \le 1$, while for $k^2 > 1$,
 \begin{proof}{Mn_initial}
-\mathcal{M}_0 &=& \pi,\\
-\mathcal{M}_1 &=& 2(1-(r-b)^2)^{1/2}E(k^{-2}),\\
-\mathcal{M}_2 &=& \pi(1-b^2-r^2),\\
-\mathcal{M}_3 &=& \tfrac{2}{3}(4br)^{3/2} k^3\left[2(2-k^{-2})E(k^{-2})-(1-k^{-2})K(k^{-2})\right].
+\mathcal{M}_0 &= \pi,\nonumber\\
+\mathcal{M}_1 &= 2(1-(r-b)^2)^{1/2}E(k^{-2}),\nonumber\\
+\mathcal{M}_2 &= \pi(1-b^2-r^2),\nonumber\\
+\mathcal{M}_3 &= \tfrac{2}{3}(4br)^{3/2} k^3\left[2(2-k^{-2})E(k^{-2})-(1-k^{-2})K(k^{-2})\right].
 \end{proof}
-We re-express the elliptic integrals for $n=1$ and $3$ in terms of the cel integrals which
+%
+%
+We re-express the elliptic integrals for $n=1$ and $n=3$ in terms of the cel integrals which
 were already computed for the linear limb-darkening case,
 \begin{proof}{Mn_cel}
-\mathcal{M}_1 &= 2 (4br)^{1/2} k^2 \mathrm{cel}(k_c,1,1,0),\\
-\mathcal{M}_3 &= \tfrac{2}{3}(4br)^{3/2}k^2 \left[ \mathrm{cel}(k_c,1,1,k_c^2)+(3k^2-2) \mathrm{cel}(k_c,1,1,0)\right],\\
+\mathcal{M}_1 &= 2 (4br)^{1/2} k^2 \mathrm{cel}(k_c,1,1,0),\nonumber\\
+\mathcal{M}_3 &= \tfrac{2}{3}(4br)^{3/2}k^2 \left[ \mathrm{cel}(k_c,1,1,k_c^2)+(3k^2-2) \mathrm{cel}(k_c,1,1,0)\right],
 \end{proof}
 for $k^2 \le 1$, while for $k^2 > 1$,
 \begin{proof}{Mn_cel}
-\mathcal{M}_1 &= 2(1-(r-b)^2)^{1/2} \mathrm{cel}(k_c,1,1,k_c^2),\\
+\mathcal{M}_1 &= 2(1-(r-b)^2)^{1/2} \mathrm{cel}(k_c,1,1,k_c^2),\nonumber\\
 \mathcal{M}_3 &= \tfrac{2}{3}(1-(b-r)^2)^{3/2} \left[(3-2k^{-2}) \mathrm{cel}(k_c,1,1,k_c^2)+k^{-2} \mathrm{cel}(k_c,1,1,0\right].
 \end{proof}
 where, as before, $k_c = \sqrt{1-k^2}$ for $k^2 \le 1$, and $k_c = \sqrt{1-k^{-2}}$ for $k^2 > 1$.
@@ -1101,9 +1110,9 @@ in terms of series expansions.
 When $k^2 \le 1$, the integrals may be expressed in terms of the following
 Hypergeometric functions and infinite series,
 \begin{proof}{Mn_series}
-\mathcal{M}_n &= (4br)^{n/2} k^{n+1} \pi^{1/2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+\tfrac{n}{2};k^2),\\
-&= (1-(r-b)^2)^{n/2} k \sum_{j=0}^{j_{max}} \alpha_j k^{2j},\\
-\alpha_0 &= \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})},\\
+\mathcal{M}_n &= (4br)^{n/2} k^{n+1} \pi^{1/2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{1}{2};\tfrac{3}{2}+\tfrac{n}{2};k^2),\nonumber\\
+&= (1-(r-b)^2)^{n/2} k \sum_{j=0}^{j_{max}} \alpha_j k^{2j},\nonumber\\
+\alpha_0 &= \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})},\nonumber\\
 \alpha_j &= \alpha_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)}.
 \end{proof}
 %while for $k^2 > 1$,
@@ -1135,8 +1144,8 @@ and then transforming from $a_n$ to $d_n$.
 
 We rewrite $I(\upmu)$ in terms of these three expansions
 \begin{eqnarray}
-\frac{I(\upmu)}{I(1)} &=& 1 - \sum_{i=1}^N u_i \sum_{j=0}^i \binom{i}{j} (-1)^j \upmu^j,\\
-&=& \sum_{n=0}^N a_n \upmu^n,\\
+\frac{I(\upmu)}{I(1)} &=& 1 - \sum_{i=1}^N u_i \sum_{j=0}^i \binom{i}{j} (-1)^j \upmu^j,\nonumber\\
+&=& \sum_{n=0}^N a_n \upmu^n,\nonumber\\
 &=& d_0 + d_1 \upmu + \sum_{n=2}^N d_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right].
 \end{eqnarray}
 Note that $a_0 \equiv 1-\sum_{n=1}^N a_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
@@ -1194,22 +1203,22 @@ which obeys the recursion relation
 Since this recursion relation involves every other term, we only need the two lowest terms,
 which are given by:
 \begin{proof}{Nn_cel}
-\mathcal{N}_0 &= \tfrac{1}{2}\kappa_0 - k k_c,\\
+\mathcal{N}_0 &= \tfrac{1}{2}\kappa_0 - k k_c,\nonumber\\
 \mathcal{N}_1 &= \tfrac{2}{3}(4br)^{1/2} k^2 \left[-\mathrm{cel}(k_c,1,1,k_c^2) + 2 \mathrm{cel}(k_c,1,1,0)\right],
 \end{proof}
 for $k^2 \le 1$ and
 \begin{proof}{Nn_cel}
-\mathcal{N}_0 &=& \frac{\pi}{2},\\
-\mathcal{N}_1 &=&  \tfrac{2}{3}(4br)^{1/2} k \left[2\mathrm{cel}(k_c,1,1,k_c^2) - \mathrm{cel}(k_c,1,1,0)\right],
+\mathcal{N}_0 &= \frac{\pi}{2},\nonumber\\
+\mathcal{N}_1 &=  \tfrac{2}{3}(4br)^{1/2} k \left[2\mathrm{cel}(k_c,1,1,k_c^2) - \mathrm{cel}(k_c,1,1,0)\right],
 \end{proof}
 for $k^2 > 1$.
 
 In the $k^2 < \tfrac{1}{2}$ limit, we find the upward recursion to be unstable, and so we evaluate the expressions for $\mathcal{N}_{N}$ and $\mathcal{N}_{N-1}$
 with a series solution (as we did for $\mathcal{M}_{N-3}-\mathcal{M}_N$),
 \begin{proof}{Nn_series}
-\mathcal{N}_n &= (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\\
-&= (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\\
-\gamma_0 &= \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\\
+\mathcal{N}_n &= (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\nonumber\\
+&= (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\nonumber\\
+\gamma_0 &= \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\nonumber\\
 \gamma_j &= \gamma_{j-1} \frac{(4j^2-1)}{2j(3+n+2j)}.
 \end{proof}
 We then use downward recursion with the relation
