@@ -543,20 +543,19 @@ expression for the linear limb-darkening flux, $S_1(r,b)$, in which
 \end{proof}
 where
 \begin{eqnarray}
-q &=& 3\frac{b-r}{(b+r)(1-(b-r)^2)}\\
+q &=& 3\frac{b-r}{(b+r)(1-(b-r)^2)}\nonumber\\
 p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
 \end{eqnarray}
 in the $k^2 > 1$ case.  Note that in this equation the conditions
 should be evaluated in the order they appear.
+\todo{There seems to be an error in $b = r > 0.5$ term above.}
 
-{\color{red} NOTE: Error in $b = r > 0.5$ term above.}
-
-The $S_1(r,b)$ function is plotted in Figure \ref{s2_plot}.  The
+The $S_1(r,b)$ function is plotted in Figure \ref{transit_linear}.  The
 function varies smoothly from the lower right where the disk is
 unocculted to the upper left where it is completely occulted.
 There are several points which need to be handled separately as
 the Equation~(\ref{eq:biglam}) expressions become singular or are
-no longer valid;  the solid lines in Figure \ref{s2_plot} show
+no longer valid;  the solid lines in Figure \ref{transit_linear} show
 these points.  When $b=0$, the integral over the center of the
 disk simplifies greatly.  When $b=r=1/2$, at the intersection of
 $b=r$ and $b=1-r$, another simplification occurs.  For $b=r$,
@@ -617,7 +616,7 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     \end{centering}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[p!]
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/s2_machine.pdf}
     \caption{The accuracy of $S_1(r,b)$ near $b=r$ (left panel) and
@@ -631,6 +630,8 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     \end{centering}
 \end{figure}
 
+\todo{This appears to be a dangling paragraph... Should this expression be in
+terms of $S_0$ and $S_1$?}
 From \citet{MandelAgol2002}, the total flux visible during the occultation of a
 body whose surface map is given by $I(\upmu)/I(1) = 1 - u_1(1 - \upmu)$ may be computed
 as
