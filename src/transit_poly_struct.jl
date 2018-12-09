@@ -206,7 +206,7 @@ flux = t.d_n[1]*t.sn[1]+t.d_n[2]*t.sn[2]+t.d_n[3]*t.sn[3]
 # boundary for n > 0.
 # Compute sn[n]:
   t.sn[n+1] = -pofgn_M
-  flux += t.d_n[n+1]*t.sn[n+1]
+     flux += t.d_n[n+1]*t.sn[n+1]
 end
 # That's it!
 # flux = sum(t.d_n.*t.sn)/(pi*(t.d_n[1]+t.twothird*t.d_n[2]))  # for d_2 and above, the flux is zero.
