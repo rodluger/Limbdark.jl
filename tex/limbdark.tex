@@ -191,6 +191,12 @@ We turn now towards presenting formulae for more accurate limb-darkening transit
 occultation, and eclipse models, starting with the simplest case:  a source
 of uniform surface brightness.
 
+\todo{Before we begin defining the $S_0$, $S_1$, ... functions, we need to
+explain how they relate to the total flux. I know we do this later in equation
+66, but I think we'll really confuse the reader if we make them wait that long.
+We should dedicate a paragraph to explaining how we're doing the same thing as
+in starry: expressing the flux as the dot product between a polynomial
+basis and a vector of integral solutions.}
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -704,6 +710,8 @@ and the general elliptic integral.
 % then the derivatives with respect to the radius of the star yield the
 % transit light curve of a uniform, thin emission shell \citep{Schlawin2010}.
 
+\todo{We need an equation here explicitly stating the derivatives of the $S_2$ term.}
+
 We have tested these formulae with finite-difference derivatives evaluated at
 256-bit precision, and, as with the total flux term, we find that these are accurate
 to $\la 2 \times 10^{-15}$, close to machine precision.
@@ -723,7 +731,7 @@ a linear combination with the foregoing uniform and linear cases.
 
 We first give the formula for the function $\eta(r,b)$, which is used in \citet{MandelAgol2002}, in
 terms of quantities we have defined above for the uniform case:
-\begin{align}
+\begin{proof}{Eta}
     \label{eq:eta}
     \eta(r,b) &=
     \begin{dcases}
@@ -737,11 +745,11 @@ terms of quantities we have defined above for the uniform case:
           %
           & \qquad k^2 > 1\\
     \end{dcases}
-\end{align}
+\end{proof}
 As $\kappa_0$, $\kappa_1$, and $A_{kite}$ were already computed in the
 uniform case, these quantities are reused in the quadratic computation.
 The derivatives are given by:
-\begin{align}
+\begin{proof}{Eta}
     \label{eq:detadr}
     \frac{\partial \eta}{\partial r} &=
     \begin{dcases}
@@ -755,9 +763,9 @@ The derivatives are given by:
           %
           & \qquad k^2 > 1\\
     \end{dcases}
-\end{align}
+\end{proof}
 and
-\begin{align}
+\begin{proof}{Eta}
     \label{eq:detadb}
     \frac{\partial \eta}{\partial b} &=
     \begin{dcases}
@@ -771,7 +779,7 @@ and
           %
           & \qquad k^2 > 1\\
     \end{dcases}
-\end{align}
+\end{proof}
 
 With this definition, then the quadratic term, $S_2(r,b)$ is given by
 \begin{eqnarray}
