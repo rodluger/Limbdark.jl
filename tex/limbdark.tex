@@ -552,7 +552,6 @@ p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
 \end{eqnarray}
 in the $k^2 > 1$ case.  Note that in this equation the conditions
 should be evaluated in the order they appear.
-\todo{There seems to be an error in $b = r > 0.5$ term above.}
 
 The $S_1(r,b)$ function is plotted in Figure \ref{transit_linear}.  The
 function varies smoothly from the lower right where the disk is
@@ -652,7 +651,7 @@ and $F_0$ is the total unocculted flux.  % Note:  I'm not using this in
 The expressions for the derivatives of the linear limb-darkening
 light curve with respect to $r$ and $b$ are particularly simple:
 %
-\begin{align}
+\begin{proof}{biglam_deriv}
     \label{eq:dbiglam_dr}
     \frac{\partial \Lambda}{\partial r} &=
     \begin{dcases}
@@ -673,9 +672,9 @@ light curve with respect to $r$ and $b$ are particularly simple:
                     &\\ \phantom{XX}
           = \frac{4r}{\pi}\sqrt{1-(b-r)^2} \mathrm{cel}(k_c,1,1,k_c^2)& \qquad k^2 > 1\\
     \end{dcases}
-\end{align}
+\end{proof}
 and
-\begin{align}
+\begin{proof}{biglam_deriv}
     \label{eq:dbiglam_db}
     \frac{\partial \Lambda}{\partial b} &=
     \begin{dcases}
@@ -696,9 +695,10 @@ and
                     &\\ \phantom{XX}
           =\frac{4r}{3\pi}\sqrt{1-(b-r)^2}\mathrm{cel}(k_c,1,-1,k_c^2) & \qquad k^2 > 1,\\
     \end{dcases}
-\end{align}
+\end{proof}
 where we have given some of the expressions in terms of both the standard elliptic integrals
 and the general elliptic integral.
+\todo{I think the expression for $\dd\Lambda/\dd b$ for $b = r < 1/2$ is slightly wrong.}
 
 % Note that if we had included the radius of the source star in these formulae,
 % then the derivatives with respect to the radius of the star yield the
