@@ -191,7 +191,7 @@ We turn now towards presenting formulae for more accurate limb-darkening transit
 occultation, and eclipse models, starting with the simplest case:  a source
 of uniform surface brightness.
 
-\todo{Before we begin defining the $S_0$, $S_1$, ... functions, we need to
+\todo{Before we begin defining the $\mathfrak{s}_0$, $\mathfrak{s}_1$, ... functions, we need to
 explain how they relate to the total flux. I know we do this later in equation
 66, but I think we'll really confuse the reader if we make them wait that long.
 We should dedicate a paragraph to explaining how we're doing the same thing as
@@ -320,25 +320,26 @@ even higher precision is achieved since the area of overlap approaches
 zero, as shown in the right hand panels of Figure \ref{fig:overlap_precision}.
 
 The final modification we make when computing the uniform light
-curve is that our computations make use of the visible area of the disk, $S_0$, defined as
+curve is that our computations make use of the visible area of the disk, $\mathfrak{s}_0$, defined as
 \begin{eqnarray} \label{eq:uniform}
-S_0(r,b) &=& \pi-A_{lens}\nonumber\\
+\mathfrak{s}_0(r,b) &=& \pi-A_{lens}\nonumber\\
 &=&\pi -\kappa_1 - r^2\kappa_0 + A_{kite},
 \end{eqnarray}
 rather than the obscured area, $A_{lens}$.  So, instead of computing $\kappa_1$,
 we compute $\pi-\kappa_1 = -\mathrm{atan2}(\sin{\kappa_1},\cos{\kappa_1})$.
-We find that this leads to machine-precision as well.  Note that $S_0=s_0$,
-the first basis function in the \starry implementation from \citet{starry}.
+We find that this leads to machine-precision as well.  Note that $\mathfrak{s}_0$ is
+identical to the first basis function ($s_0$) in the \starry implementation 
+from \citet{starry}.
 
 \subsection{Derivatives}
 
 The partial derivatives of this formula with respect to the radius
 ratio, $r$, and impact parameter, $b$, turn out to be straightforward:
 \begin{proof}{dS0drb}\label{eq:dS0_drb}
-\frac{\partial S_0(r,b)}{\partial r} &= -2r \kappa_0,\nonumber\\
-\frac{\partial S_0(r,b)}{\partial b} &= \frac{2A_{kite}}{b},
+\frac{\partial \mathfrak{s}_0(r,b)}{\partial r} &= -2r \kappa_0,\nonumber\\
+\frac{\partial \mathfrak{s}_0(r,b)}{\partial b} &= \frac{2A_{kite}}{b},
 \end{proof}
-which can be computed from the quantities already used in calculating $S_0$.
+which can be computed from the quantities already used in calculating $\mathfrak{s}_0$.
 At the contact points, when $b = \vert 1\pm r\vert$, the derivatives are undefined.
 In practice this can be a problen when taking finite-differences across
 the discontinuous boundary, but with the analytic formulae, these points
@@ -395,7 +396,7 @@ $I(x, y) = \sqrt{1 - \x^2 -\y^2}$ may be computed as
 %
 \begin{align}
     \label{eq:s2}
-    S_1 = \frac{2\pi}{3} \left(1 - \frac{3\Lambda(r,b)}{2} - \Theta(r - b) \right)
+    \mathfrak{s}_1 = \frac{2\pi}{3} \left(1 - \frac{3\Lambda(r,b)}{2} - \Theta(r - b) \right)
 \end{align}
 %
 where $\Theta(\bigdot)$ is the Heaviside step function and
@@ -456,7 +457,7 @@ with
     k^2 &= \frac{1 - r^2 - b^2 + 2 b r}{4 b r}
     \quad.
 \end{align}
-Note that $S_1(r,b) = s_2(r,b)$ in the spherical harmonic expansion used in \starry as
+Note that $\mathfrak{s}_1(r,b) = s_2(r,b)$ in the spherical harmonic expansion used in \starry as
 described in \citet{starry}.
 For the cases $b=r$, $b=1-r$, $b=0$, $r=0$, or $\vert r-b\vert \ge 1$, there are special
 expressions for $\Lambda(r,b)$ given below.
@@ -519,7 +520,7 @@ with the approach of \citet{Bartky1938}, which uses recursion to approximate the
 integral to a specified precision.
 
 These elliptic integral transformations lead to the following numerically-stable
-expression for the linear limb-darkening flux, $S_1(r,b)$, in which
+expression for the linear limb-darkening flux, $\mathfrak{s}_1(r,b)$, in which
 \begin{proof}{biglam_stable}
     \label{eq:biglam_stable}
     \Lambda &=
@@ -559,7 +560,7 @@ p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
 in the $k^2 > 1$ case.  Note that in this equation the conditions
 should be evaluated in the order they appear.
 
-The $S_1(r,b)$ function is plotted in Figure \ref{transit_linear}.  The
+The $\mathfrak{s}_1(r,b)$ function is plotted in Figure \ref{transit_linear}.  The
 function varies smoothly from the lower right where the disk is
 unocculted to the upper left where it is completely occulted.
 There are several points which need to be handled separately as
@@ -571,7 +572,7 @@ $b=r$ and $b=1-r$, another simplification occurs.  For $b=r$,
 the disk of the occultor crosses the center of the source;
 this needs to be computed separately in the $r<1/2$, $r=1/2$,
 and $r>1/2$ limits.  The first and fourth contacts occur at
-$b=1+r$, where $S_1=1$;  this is the upper bound to the $k^2 < 1$
+$b=1+r$, where $\mathfrak{s}_1=1$;  this is the upper bound to the $k^2 < 1$
 region for $b+r >1$.
 For $r \ge 1$, the second and third contacts (at the start and
 end of complete occultation) occur when $b=1-r$, which is the
@@ -596,9 +597,9 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     \begin{centering}
     \includegraphics[width=0.8\linewidth]{figures/julia/transit_linear.pdf}
     \caption{The intensity of a linearly limb-darkened star ($u_1=1$) being
-    eclipsed, $S_1(r,b)$.
-    In the limit $b > r+1$, no eclipse occurs, so $S_1=1$.  For $b < r-1$, the star
-    is completely eclipsed and $S_1=0$.  In the limits $b=r$ and $b=1-r$, special
+    eclipsed, $\mathfrak{s}_1(r,b)$.
+    In the limit $b > r+1$, no eclipse occurs, so $\mathfrak{s}_1=1$.  For $b < r-1$, the star
+    is completely eclipsed and $\mathfrak{s}_1=0$.  In the limits $b=r$ and $b=1-r$, special
     expressions must be used.
     \jlcodelink{transit_linear}\label{transit_linear}}
     \end{centering}
@@ -617,7 +618,7 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
     \begin{centering}
     \includegraphics[width=0.8\linewidth]{figures/julia/s2_residuals.pdf}
     \caption{The numerical error in computing the flux of an eclipsed, linearly
-    limb-darkened star ($u_1=1$) using the $S_1(r,b)$ formalism introduced in this
+    limb-darkened star ($u_1=1$) using the $\mathfrak{s}_1(r,b)$ formalism introduced in this
     paper. Compare to Figure~\ref{s2_plot_MA2002}, noting the change in the color
     scale. The new method is eight orders of magnitude more precise on average,
     approaching machine epsilon everywhere in the domain. 
@@ -628,24 +629,24 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
 \begin{figure}[p!]
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/s2_machine.pdf}
-    \caption{The accuracy of $S_1(r,b)$ near $b=r$ (left panel) and
+    \caption{The accuracy of $\mathfrak{s}_1(r,b)$ near $b=r$ (left panel) and
     $b=1-r$ (right panel) for $\epsilon = 10^{-8}$. The $x$-axes are impact parameter $b$,
-    while the $y$ axes in the top panels show $S_1(r,b)$, with $r$
+    while the $y$ axes in the top panels show $\mathfrak{s}_1(r,b)$, with $r$
     given in the legend of each panel. The middle panels plot
-    the difference $(S_1(b,b\pm\epsilon)-S_1(b,b))/\epsilon$
-    and $(S_1(b,1-b\pm\epsilon)-S_1(b,1-b))/\epsilon$. The bottom
+    the difference $(\mathfrak{s}_1(b,b\pm\epsilon)-\mathfrak{s}_1(b,b))/\epsilon$
+    and $(\mathfrak{s}_1(b,1-b\pm\epsilon)-\mathfrak{s}_1(b,1-b))/\epsilon$. The bottom
     panels show the numerical precision by the comparing double precision
     computation with \texttt{BigFloat} precision (256-bit). \jlcodelink{s2_machine}\label{s2_machine}}
     \end{centering}
 \end{figure}
 
 \todo{This appears to be a dangling paragraph... Should this expression be in
-terms of $S_0$ and $S_1$?}
+terms of $\mathfrak{s}_0$ and $\mathfrak{s}_1$?}
 From \citet{MandelAgol2002}, the total flux visible during the occultation of a
 body whose surface map is given by $I(\upmu)/I(1) = 1 - u_1(1 - \upmu)$ may be computed
 as
 \begin{eqnarray}
-\frac{F(u_1,r,b)}{F_0} &=& \frac{\pi(1-u_1)(1-\Lambda^e)+ u_1 S_1(r,b)}{\frac{2\pi}{3}u_1 + \pi(1-u_1)},\\
+\frac{F(u_1,r,b)}{F_0} &=& \frac{\pi(1-u_1)(1-\Lambda^e)+ u_1 \mathfrak{s}_1(r,b)}{\frac{2\pi}{3}u_1 + \pi(1-u_1)},\\
 &=& 1-(1-u_1/3)^{-1}\left[(1-u_1)\Lambda^e(r,b) + u_1\left(\Lambda(r,b)+\tfrac{2}{3}\Theta(r-b)\right)\right],
 \end{eqnarray}
 where
@@ -710,7 +711,7 @@ and the general elliptic integral.
 % then the derivatives with respect to the radius of the star yield the
 % transit light curve of a uniform, thin emission shell \citep{Schlawin2010}.
 
-\todo{We need an equation here explicitly stating the derivatives of the $S_2$ term.}
+\todo{We need an equation here explicitly stating the derivatives of the $\mathfrak{s}_2$ term.}
 
 We have tested these formulae with finite-difference derivatives evaluated at
 256-bit precision, and, as with the total flux term, we find that these are accurate
@@ -781,24 +782,23 @@ and
     \end{dcases}
 \end{proof}
 
-With this definition, then the quadratic term, $S_2(r,b)$ is given by
+With this definition, then the quadratic term, $\mathfrak{s}_2(r,b)$ is given by
 \begin{eqnarray}
-S_2 &=& 2 S_0 + 4\pi \eta - 2\pi,\\
-\frac{\partial S_2}{\partial r} &=& 2 \frac{\partial S_0}{\partial r} + 4\pi \frac{\partial \eta}{\partial r},\\
-\frac{\partial S_2}{\partial b} &=& 2 \frac{\partial S_0}{\partial b} + 4\pi \frac{\partial \eta}{\partial b},\\
+\mathfrak{s}_2 &=& 2 \mathfrak{s}_0 + 4\pi \eta - 2\pi,\\
+\frac{\partial \mathfrak{s}_2}{\partial r} &=& 2 \frac{\partial \mathfrak{s}_0}{\partial r} + 4\pi \frac{\partial \eta}{\partial r},\\
+\frac{\partial \mathfrak{s}_2}{\partial b} &=& 2 \frac{\partial \mathfrak{s}_0}{\partial b} + 4\pi \frac{\partial \eta}{\partial b},
 \end{eqnarray}
-where $S_0$ and its derivatives are defined in Equations (\ref{eq:uniform})--(\ref{eq:dS0_drb}).
-With the formulae for $S_0$, $S_1$, and $S_2$, the light curve and derivatives
+where $\mathfrak{s}_0$ and its derivatives are defined in Equations (\ref{eq:uniform})--(\ref{eq:dS0_drb}).
+With the formulae for $\mathfrak{s}_0$, $\mathfrak{s}_1$, and $\mathfrak{s}_2$, the light curve and derivatives
 of quadratic limb-darkening may be computed with Equations (\ref{eq:flux}) and 
 (\ref{eq:derivatives}) given below.
 
 Finally, we turn our attention to the general polynomial limb-darkening case,
-$\upmu^n$ with $n > 2$.  These terms may be expressed as the sum of
-spherical harmonics with $m=0$, and thus they are a special case of the \starry
-computation (written in C and Python), which we describe next in \S \ref{sec:poly}.
-Subsequently, we exploit the azimuthal symmetry of the limb-darkening problem to 
-derive more efficient and accurate formulae, which we describe below in \S \ref{sec:power_law},
-which is implemented in \starry and in \texttt{Julia}.
+$\upmu^n$ with $n > 2$.  As discussed in \citet{starry},
+these terms may be expressed exactly as the sum of
+spherical harmonics with $m=0$. However, it is possible to explot
+the azimuthal symmetry of the limb darkening problem to 
+derive far more efficient and accurate formulae, which we describe in the following section.
 
 %\begin{eqnarray}
 %\frac{\partial \Lambda}{\partial r} &=& \frac{8br^2 E(k^2) + 2r(1-(b+r)^2)K(k^2)}{\pi\sqrt{br}}\\
@@ -811,181 +811,203 @@ which is implemented in \starry and in \texttt{Julia}.
 %&=& \frac{4r}{3\pi}\sqrt{1-(b-r)^2}\mathrm{cel}(k_c,1,-1,k_c^2)
 %\end{eqnarray}
 
+% % STARRY EQUATIONS
+%\section{Polynomial Limb-Darkening}
+%\label{sec:poly}
+% For convenience, this can be expressed as the matrix equation
+% %
+% \begin{align}
+%     \label{eq:polynomialldmatrix}
+%     \frac{I(\upmu)}{I(1)} &= \bvec{u}^\top \, \bvec{L} \, \pmb{\upmu}
+%     \quad,
+% \end{align}
+% %
+% where $\bvec{u}^\top$ is a row vector whose value at index
+% $l$ is $u_l$, $\pmb{\upmu}$ is a column vector whose value at index $j$ is $\upmu^j$,
+% and $\bvec{L}$ is the lower triangular matrix with components given by
+% %
+% \begin{align}
+%     \label{eq:Llk}
+%     L_{lk} = {l \choose j} (-1)^j
+%     \quad.
+% \end{align}
+% %
+% It is straightforward to show that this law can be
+% expressed exactly as a sum over the $m = 0$ spherical harmonics, which also
+% form a complete basis of radially symmetric functions on the sphere.
+% %
+% Based on the relations in \citet{starry} for the spherical harmonics in Cartesian
+% form, the spherical harmonics of order $m = 0$ may be written
+% %
+% \begin{align}
+%     \label{eq:Ylzero}
+%     Y_{l,0}(\upmu) = \sqrt{\frac{2l + 1}{4\pi}}
+%               \sum_{j=0}^l {l \choose j} \frac{(j + l - 1)!!}{(j - l - 1)!!} \upmu^j
+% \end{align}
+% %
+% where $\upmu = z = \sqrt{1 - x^2 - y^2}$, $\binom{\bigdot}{\bigdot}$ is a binomial
+% coefficient, and $!!$ denotes the double factorial.
+
+% Our task now is to express the specific intensity function (\ref{eq:polynomialldmatrix})
+% in the basis of spherical harmonics (\ref{eq:Ylzero}). We therefore wish to find
+% the coefficients $c_l$ for which we may write
+% %
+% \begin{align}
+%     \label{eq:sphharmld}
+%     \frac{I(\upmu)}{I(1)} &= \sum_{l=0}^{l_\mathrm{lmax}} c_l Y_{l,0}(\upmu)
+%     \quad.
+% \end{align}
+% %
+% As before, we can write this as the matrix equation
+% %
+% \begin{align}
+%     \label{eq:sphharmldmatrix}
+%     \frac{I(\upmu)}{I(1)} &= \bvec{c}^\top \, \bvec{M} \, \pmb{\upmu}
+%     \quad,
+% \end{align}
+% %
+% where $\bvec{c}^\top$ is a row vector whose value at index
+% $l$ is $c_l$ and $\bvec{M}$ is the lower triangular matrix with components given by
+% %
+% \begin{align}
+%     \label{eq:Mlk}
+%     M_{lk} = \sqrt{\frac{2l + 1}{4\pi}} {l \choose j} \frac{(j + l - 1)!!}{(j - l - 1)!!}
+%     \quad.
+% \end{align}
+% %
+% Equating Equations~(\ref{eq:polynomialldmatrix}) and (\ref{eq:sphharmldmatrix}), we see
+% that we must have
+% %
+% \begin{align}
+%     \bvec{c}^\top \, \bvec{M} = \bvec{u}^\top \, \bvec{L} \quad,
+% \end{align}
+% %
+% or
+% %
+% \begin{align}
+%     \bvec{c} = (\bvec{M}^{-1} \, \bvec{L})^\top \bvec{u} \quad.
+% \end{align}
+% %
+% In \citet{starry} we described how to compute analytic transit and occultation light curves
+% for bodies whose surfaces are expressed as a sum over spherical harmonic coefficients. We
+% defined a body's surface map as the vector of spherical harmonic coefficients $\bvec{y}$.
+% The vector $\bvec{y}$ corresponding to our coefficients for the $Y_{l,0}$ harmonics is
+% related to $\bvec{c}$ via
+% %
+% \begin{align}
+%     y_{l(l + 1)} &= c_l
+% \end{align}
+% %
+% for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\bvec{y}$ are zero.
+
+% \begin{figure}[t!]
+%     \begin{centering}
+%     \includegraphics[width=\linewidth]{figures/python/high_order_ld.pdf}
+%     \caption{\label{fig:high_order_ld} Tenth order limb-darkening example with \starry. \pycodelink{high_order_ld}}
+%     \end{centering}
+% \end{figure}
+
+% %\begin{align}
+% %    \label{eq:PGnI}
+% %    \mathcal{P}(\bvec{G}_n) &=
+% %    \begin{dcases}
+% %        %
+% %        r^{l+2} \sum\displaylimits_{i=0}^{\frac{l}{2}}
+% %                {\frac{l}{2} \choose i}
+% %                \left(\frac{b}{r}\right)^{\frac{l-2i}{2}}
+% %                \mathcal{I}_{\frac{l+4}{2}, i}
+% %            %
+% %            & \qquad \frac{l}{2} \, \mathrm{even}
+% %        \\[1em]
+% %        %
+% %        -r^{l-2} \left( b \mathcal{J}_{l-3,1} + r \mathcal{J}_{l-3,2} \right)
+% %        %
+% %        & \qquad l = 1
+% %        \\[1em]
+% %        %
+% %        r^{l-1} \sum\displaylimits_{i=0}^{\frac{l-1}{2}}
+% %                {\frac{l-1}{2} \choose i}
+% %                \left(\frac{b}{r}\right)^{\frac{l-2i-1}{2}}
+% %                \mathcal{J}_{\frac{l-1}{2}, i}
+% %            & \qquad \frac{l-1}{2} \, \mathrm{even}
+% %        \\[1em]
+% %        %
+% %        0 & \qquad \mathrm{otherwise}
+% %    \end{dcases}
+% %%
+% %\end{align}
+% %%
+% %\begin{align}
+% %%
+% %    \nonumber \\
+% %    \label{eq:QGnI}
+% %    \mathcal{Q}(\bvec{G}_n) &=
+% %    \begin{dcases}
+% %        \mathcal{H}_{\frac{l+4}{2}, \frac{l}{2}}
+% %        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \frac{l}{2} \, \mathrm{even}
+% %        \\[1em]
+% %        %
+% %        0
+% %        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \mathrm{otherwise} \quad.
+% %    \end{dcases}
+% %\end{align}
+
+% We have computed derivatives of these expressions using automatic
+% differentiation within the \starry code base.
+
 % ==============================================================================
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 %
 %\clearpage
-\section{Polynomial Limb-Darkening}
-\label{sec:poly}
+\section{Higher Order Limb Darkening}
+\label{sec:power_law}
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 % ==============================================================================
 
 In analogy with the linear and quadratic
 limb-darkening laws, let us define the polynomial limb-darkening law of
-order $l_\mathrm{max}$ as
+order $N$ as
 %
 %
 \begin{align}
     \label{eq:polynomialld}
-    \frac{I(\upmu)}{I(1)} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - ... - u_{l_\mathrm{lmax}}(1 - \upmu)^{l_\mathrm{lmax}} \nonumber \\
-                          &= \sum_{l=0}^{l_\mathrm{lmax}} \sum_{j=0}^l u_l {l \choose j} (-1)^j \upmu^j
-    \quad,
+    \frac{I(\upmu)}{I(1)} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - ... - u_{N}(1 - \upmu)^{N} \nonumber \\
+                          &= 1 - \sum_{i=1}^N u_i \sum_{j=0}^i \binom{i}{j} (-1)^j \upmu^j .
 \end{align}
-%
-where $u_0 \equiv 1$. For convenience, this can be expressed as the matrix equation
-%
-\begin{align}
-    \label{eq:polynomialldmatrix}
-    \frac{I(\upmu)}{I(1)} &= \bvec{u}^\top \, \bvec{L} \, \pmb{\upmu}
-    \quad,
-\end{align}
-%
-where $\bvec{u}^\top$ is a row vector whose value at index
-$l$ is $u_l$, $\pmb{\upmu}$ is a column vector whose value at index $j$ is $\upmu^j$,
-and $\bvec{L}$ is the lower triangular matrix with components given by
-%
-\begin{align}
-    \label{eq:Llk}
-    L_{lk} = {l \choose j} (-1)^j
-    \quad.
-\end{align}
-%
-It is straightforward to show that this law can be
-expressed exactly as a sum over the $m = 0$ spherical harmonics, which also
-form a complete basis of radially symmetric functions on the sphere.
-%
-Based on the relations in \citet{starry} for the spherical harmonics in Cartesian
-form, the spherical harmonics of order $m = 0$ may be written
-%
-\begin{align}
-    \label{eq:Ylzero}
-    Y_{l,0}(\upmu) = \sqrt{\frac{2l + 1}{4\pi}}
-              \sum_{j=0}^l {l \choose j} \frac{(j + l - 1)!!}{(j - l - 1)!!} \upmu^j
-\end{align}
-%
-where $\upmu = z = \sqrt{1 - x^2 - y^2}$, $\binom{\bigdot}{\bigdot}$ is a binomial
-coefficient, and $!!$ denotes the double factorial.
 
-Our task now is to express the specific intensity function (\ref{eq:polynomialldmatrix})
-in the basis of spherical harmonics (\ref{eq:Ylzero}). We therefore wish to find
-the coefficients $c_l$ for which we may write
-%
-\begin{align}
-    \label{eq:sphharmld}
-    \frac{I(\upmu)}{I(1)} &= \sum_{l=0}^{l_\mathrm{lmax}} c_l Y_{l,0}(\upmu)
-    \quad.
-\end{align}
-%
-As before, we can write this as the matrix equation
-%
-\begin{align}
-    \label{eq:sphharmldmatrix}
-    \frac{I(\upmu)}{I(1)} &= \bvec{c}^\top \, \bvec{M} \, \pmb{\upmu}
-    \quad,
-\end{align}
-%
-where $\bvec{c}^\top$ is a row vector whose value at index
-$l$ is $c_l$ and $\bvec{M}$ is the lower triangular matrix with components given by
-%
-\begin{align}
-    \label{eq:Mlk}
-    M_{lk} = \sqrt{\frac{2l + 1}{4\pi}} {l \choose j} \frac{(j + l - 1)!!}{(j - l - 1)!!}
-    \quad.
-\end{align}
-%
-Equating Equations~(\ref{eq:polynomialldmatrix}) and (\ref{eq:sphharmldmatrix}), we see
-that we must have
-%
-\begin{align}
-    \bvec{c}^\top \, \bvec{M} = \bvec{u}^\top \, \bvec{L} \quad,
-\end{align}
-%
-or
-%
-\begin{align}
-    \bvec{c} = (\bvec{M}^{-1} \, \bvec{L})^\top \bvec{u} \quad.
-\end{align}
-%
-In \citet{starry} we described how to compute analytic transit and occultation light curves
-for bodies whose surfaces are expressed as a sum over spherical harmonic coefficients. We
-defined a body's surface map as the vector of spherical harmonic coefficients $\bvec{y}$.
-The vector $\bvec{y}$ corresponding to our coefficients for the $Y_{l,0}$ harmonics is
-related to $\bvec{c}$ via
-%
-\begin{align}
-    y_{l(l + 1)} &= c_l
-\end{align}
-%
-for $0 \leq l \leq l_\mathrm{max}$, where the values at all other indices in $\bvec{y}$ are zero.
+%Although the foregoing analysis takes advantage of the existing formalism
+%in \starry developed for occultation of spheres with arbitrary spherical harmonic
+%brightness, the problem can be simplified significantly for the limb-darkening
+%case due to the azimuthal symmetry assumed for a star.  This simplification
+%leads to analytic expressions for the derivatives, which we find can be
+%evaluated with greater speed and accuracy compared with automatic differentiation.
 
-\begin{figure}[t!]
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/python/high_order_ld.pdf}
-    \caption{\label{fig:high_order_ld} Tenth order limb-darkening example with \starry. \pycodelink{high_order_ld}}
-    \end{centering}
-\end{figure}
+\todo{This can be written as the dot product of the mu basis with the u coefficients,
+or as the dot product of the g basis, a change of basis matrix, and the u coefficients.
+This makes integrating easier. Show some math here.}
 
-%\begin{align}
-%    \label{eq:PGnI}
-%    \mathcal{P}(\bvec{G}_n) &=
-%    \begin{dcases}
-%        %
-%        r^{l+2} \sum\displaylimits_{i=0}^{\frac{l}{2}}
-%                {\frac{l}{2} \choose i}
-%                \left(\frac{b}{r}\right)^{\frac{l-2i}{2}}
-%                \mathcal{I}_{\frac{l+4}{2}, i}
-%            %
-%            & \qquad \frac{l}{2} \, \mathrm{even}
-%        \\[1em]
-%        %
-%        -r^{l-2} \left( b \mathcal{J}_{l-3,1} + r \mathcal{J}_{l-3,2} \right)
-%        %
-%        & \qquad l = 1
-%        \\[1em]
-%        %
-%        r^{l-1} \sum\displaylimits_{i=0}^{\frac{l-1}{2}}
-%                {\frac{l-1}{2} \choose i}
-%                \left(\frac{b}{r}\right)^{\frac{l-2i-1}{2}}
-%                \mathcal{J}_{\frac{l-1}{2}, i}
-%            & \qquad \frac{l-1}{2} \, \mathrm{even}
-%        \\[1em]
-%        %
-%        0 & \qquad \mathrm{otherwise}
-%    \end{dcases}
-%%
-%\end{align}
-%%
-%\begin{align}
-%%
-%    \nonumber \\
-%    \label{eq:QGnI}
-%    \mathcal{Q}(\bvec{G}_n) &=
-%    \begin{dcases}
-%        \mathcal{H}_{\frac{l+4}{2}, \frac{l}{2}}
-%        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \frac{l}{2} \, \mathrm{even}
-%        \\[1em]
-%        %
-%        0
-%        & \qquad \qquad \qquad \qquad \quad \quad \quad \quad \mathrm{otherwise} \quad.
-%    \end{dcases}
-%\end{align}
+Our task is to compute the flux $F$ observed during an occultation by
+integrating this function over the visible area of the disk:
+%
+\begin{align}
+    \label{eq:occint}
+    F &=
+    \oiint I(\upmu) \, \dd S
+    \nonumber \\
+    &= 
+    \oiint \gbasis^\mathsf{T} (\upmu) \, \dd S \, A (\bvec{u}) \quad.
+\end{align}
 
-We have computed derivatives of these expressions using automatic
-differentiation within the \starry code base.
-
-\section{Alternative Green's function expansion} \label{sec:power_law}
-
-Although the foregoing analysis takes advantage of the existing formalism
-in \starry developed for occultation of spheres with arbitrary spherical harmonic
-brightness, the problem can be simplified significantly for the limb-darkening
-case due to the azimuthal symmetry assumed for a star.  This simplification
-leads to analytic expressions for the derivatives, which we find can be
-evaluated with greater speed and accuracy compared with automatic differentiation.
+\todo{The notation in this section needs work. I need to go through this
+and carefully explain all symbols, define the Greens basis, the Greens
+functions, and make it clear to the reader what all this math is! We
+should make sure this section stands by itself, not relying too much on the
+definitions/explanations in starry.}
 
 Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2-y^2}$,
-where $(x,y,z)$ are the coordinates of the unit sphere, then we only require
+where $(x,y,z)$ are the coordinates of the unit sphere, we only require
 Green's functions whose curl has dependence on $z$ for axially-symmetric
 limb-darkening.  Following \citet{starry}, we choose a Green's function
 of the form
@@ -1022,10 +1044,10 @@ We choose the functions $f_n(z) = z^n$, so that
 \gbasisn(x,y) =  (n+2)z^n-n z^{n-2},
 \end{equation}
 for $2 \le n \le N$ is the basis set for the surface brightness of the polynomial limb-darkening,
-along with the uniform, $\tilde{g}_0 = z^0$,
-and linear, $\tilde{g}_1 = z^1$, terms which we have derived in \SS \ref{sec:uniform} and 
-\ref{sec:reparam}.
-Note that the total flux of each term in this basis set, $\tilde{g}_n$, integrates
+along with the uniform, $\tilde{\mathfrak{g}}_0 = z^0$,
+and linear, $\tilde{\mathfrak{g}}_1 = z^1$, terms which we have derived in \S~\ref{sec:uniform} and 
+\S~\ref{sec:reparam}.
+Note that the total flux of each term in this basis set, $\tilde{\mathfrak{g}}_n$, integrates
 to zero for $2 \le n \le N$.
 
 Also, with this choice of basis, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for
@@ -1051,11 +1073,11 @@ reuse the value of $\kappa_0$ which was computed in the uniform limb-darkening
 case (\S \ref{sec:uniform}).
 
 With these integrals defined, the basis functions for the lightcurve are given
-by $S_n$, where $S_0$ is given for uniform limb-darkening
-in section \ref{eq:uniform}, $S_1$ is given by the linear limb-darkened
-solution from section \ref{sec:reparam}, and  $S_n = \mathcal{Q}(\bvec{G}_n)
+by $\mathfrak{s}_n$, where $\mathfrak{s}_0$ is given for uniform limb-darkening
+in section \ref{eq:uniform}, $\mathfrak{s}_1$ is given by the linear limb-darkened
+solution from section \ref{sec:reparam}, and  $\mathfrak{s}_n = \mathcal{Q}(\bvec{G}_n)
 - \mathcal{P}(\bvec{G}_n) = -\mathcal{P}(\bvec{G}_n)$ for $2 \le n \le N$;
-we have already given an alternate expression for $S_2$ in section \ref{sec:quadratic}.
+we have already given an alternate expression for $\mathfrak{s}_2$ in section \ref{sec:quadratic}.
 
 We can express $\mathcal{P}(\bvec{G}_n)$ in terms of a sequence of integrals,
 $\mathcal{M}_n(r,b)$, given by:
@@ -1138,7 +1160,7 @@ We find that upward recursion in $n$ is more stable for $k^2 > \tfrac{1}{2} $,
 while downward recursion is more stable for $k^2 < \tfrac{1}{2}$.  Note that
 this differs from \starry for which downward recusion was also required for $k^2 > 2$.
 
-With the computation of the light curves for the basis functions, $S_n$, the final step is to
+With the computation of the light curves for the basis functions, $\mathfrak{s}_n$, the final step is to
 combine these to make the full light curve with limb-darkening coefficients, which we describe
 next.
 
@@ -1173,14 +1195,14 @@ starting with $n=N$, with $d_{N+1}=d_{N+2}=0$.
 
 The total light curve is computed from
 \begin{eqnarray}\label{eq:flux}
-\mathcal{F} &=& \frac{F}{F_0} = \frac{1}{F_0}\sum_{n=0}^N d_n S_n,\\
+\mathcal{F} &=& \frac{F}{F_0} = \frac{1}{F_0}\sum_{n=0}^N d_n \mathfrak{s}_n,\\
 F_0 &=& \pi(d_0+ \tfrac{2}{3} d_1),
 \end{eqnarray}
 where $F_0$ is the unobscured flux, and $\mathcal{F}$ is the flux normalized
 such that the unobscured flux is unity.
 
 Note that the unobscured flux for each basis function (for $b \ge 1+r$ or $r=0$) is zero for
-all $S_n(r,b)$ with $2 \le n \le N$, which is why the total unobscured flux,
+all $\mathfrak{s}_n(r,b)$ with $2 \le n \le N$, which is why the total unobscured flux,
 $F_0$, only depends upon $d_0$ and $d_1$.
 
 \subsection{Analytic derivatives}
@@ -1240,11 +1262,11 @@ practice we only need to compute it for $b < b_0 = 10^{-3}$ to obtain similar ac
 to the other expressions.  This is encountered rarely as it only applies when the
 occultor is nearly aligned with the source.
 
-With the computation of $S_n = -\mathcal{P}(\bvec{G}_n)$, we then
+With the computation of $\mathfrak{s}_n = -\mathcal{P}(\bvec{G}_n)$, we then
 compute the derivatives of the light curve as
 \begin{eqnarray}
-\frac{\partial S_n}{\partial r} &= & -\frac{\partial \mathcal{P}(\bvec{G}_n)}{\partial r},\\
-\frac{\partial S_n}{\partial b} &= & -\frac{\partial \mathcal{P}(\bvec{G}_n)}{\partial b},
+\frac{\partial \mathfrak{s}_n}{\partial r} &= & -\frac{\partial \mathcal{P}(\bvec{G}_n)}{\partial r},\\
+\frac{\partial \mathfrak{s}_n}{\partial b} &= & -\frac{\partial \mathcal{P}(\bvec{G}_n)}{\partial b},
 \end{eqnarray}
 for $2 \le n \le N$, while the $n=0$ and $n=1$ terms are handled separately as in
 section \ref{sec:reparam}.
@@ -1252,13 +1274,13 @@ section \ref{sec:reparam}.
 The derivatives of the normalized flux, $\mathcal{F}$, as a function of $r$, $b$, and
 $d_n$ are then computed as
 \begin{eqnarray}\label{eq:derivatives}
-\frac{\partial \mathcal{F}}{\partial r} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial r},\\
-\frac{\partial \mathcal{F}}{\partial b} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial S_n}{\partial b},\\
-\frac{\partial \mathcal{F}}{\partial d_0} &=&  -\frac{\pi \mathcal{F}}{F_0} + \frac{S_0}{F_0},
+\frac{\partial \mathcal{F}}{\partial r} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial \mathfrak{s}_n}{\partial r},\\
+\frac{\partial \mathcal{F}}{\partial b} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial \mathfrak{s}_n}{\partial b},\\
+\frac{\partial \mathcal{F}}{\partial d_0} &=&  -\frac{\pi \mathcal{F}}{F_0} + \frac{\mathfrak{s}_0}{F_0},
 \end{eqnarray}
 \begin{eqnarray}
-\frac{\partial \mathcal{F}}{\partial d_1} &=&  -\frac{2\pi \mathcal{F}}{3F_0} +\frac{S_1}{F_0},\\
-\frac{\partial \mathcal{F}}{\partial d_n} &=&  \frac{S_n}{F_0},
+\frac{\partial \mathcal{F}}{\partial d_1} &=&  -\frac{2\pi \mathcal{F}}{3F_0} +\frac{\mathfrak{s}_1}{F_0},\\
+\frac{\partial \mathcal{F}}{\partial d_n} &=&  \frac{\mathfrak{s}_n}{F_0},
 \end{eqnarray}
 where the last line is for $2 \le n \le N$.
 
@@ -1390,11 +1412,11 @@ in terms of these transformed parameters.
 
 In computing the elliptic integrals, cel, we found that several terms
 which appear in the Bartky formalism are repeated amongst all three elliptic 
-integrals which appear in the expressions for $S_1$.  Consequently, we carry 
+integrals which appear in the expressions for $\mathfrak{s}_1$.  Consequently, we carry 
 out a parallel computation of these elliptic integrals such that these
 repeated terms are only computed once;  this improves the efficiency of
 the elliptic integral computation.  Once these elliptic integrals
-are computed for $S_1$, the elliptic integrals $\mathrm{cel}(k_c,1,1,k_c^2)=E(m_k)$
+are computed for $\mathfrak{s}_1$, the elliptic integrals $\mathrm{cel}(k_c,1,1,k_c^2)=E(m_k)$
 and $\mathrm{cel}(k_c,1,1,0)=(E(m_k)-(1-m_k)K(m_k))/m_k $ are
 stored in the structure and reused for computing $\mathcal{M}_n$
 and $\mathcal{N}_n$.
