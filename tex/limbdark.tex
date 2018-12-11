@@ -978,8 +978,8 @@ order $N$ as
                                 \binom{i}{j} (-1)^{j + 1} \upmu^j
 \end{align}
 %
-where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu = \cos\theta$, where
-$\theta$ is the angle between the line of sight and the vector normal to 
+where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu$
+is the cosine of the angle between the line of sight and the vector normal to 
 the body's surface. In a right-handed Cartesian coordinate system centered 
 on the body, with the $z$-axis pointing to the observer, 
 $\upmu(x, y) = z(x, y) = \sqrt{1 - x^2 - y^2}$.
@@ -1066,8 +1066,8 @@ the occulted body's disk:
     \quad,
 \end{align}
 %
-where $\bvec{G}$ is a vector whose $n^{\mathrm{th}}$ component is the
-vector field
+where $\bvec{G}$ is a matrix whose $n^{\mathrm{th}}$ row is the
+vector
 %
 \begin{align}
     \label{eq:greens_n}
@@ -1083,7 +1083,7 @@ The components $G_{n,x}$ and $G_{n,y}$ are chosen such that
                                &= \gbasisn(z) \quad.
 \end{align}
 %
-As in \citet{Pal2008} and \citet{starry}, the operation 
+As in \citet{Pal2012} and \citet{starry}, the operation 
 $\bvec{D} \wedge \bvec{G}_n$ denotes the
 \emph{exterior derivative} of $\bvec{G}_n$.
 %
@@ -1097,7 +1097,7 @@ Following \citet{starry}, we choose the following form for
 Equation~(\ref{eq:greens_n}):
 %
 \begin{equation}
-\mathbf{G}_n = z^n (-y \xhat + x \yhat) \quad,
+\mathbf{G}_n(z) = z^n (-y \xhat + x \yhat) \quad,
 \end{equation}
 %
 yielding the following expression for the components of the Green's basis:
@@ -1113,29 +1113,71 @@ for $2 \le n \le N$. For the first two terms, we choose $\tilde{\mathfrak{g}}_0 
 (uniform limb darkening) and $\tilde{\mathfrak{g}}_1 = z$ (linear limb darkening),
 which we previously discussed in \S\ref{sec:uniform} and \S\ref{sec:reparam}.
 
-Note that the total flux of each term in this basis set, $\tilde{\mathfrak{g}}_n$, integrates
-to zero for $2 \le n \le N$.
+% MENTION THIS LATER: Note that the total flux of each term in this basis set, $\tilde{\mathfrak{g}}_n$, integrates
+% to zero for $2 \le n \le N$.
 
-
-
-\todo{TRANSITION HERE}
-
-The two dimensional integral of this surface brightness, $\gbasisn$, is converted into
-two one dimensional ``primitive" integrals of $f_n \propto \mathbf{G}_n \cdot d\mathbf{r}$ 
-over the boundary arcs of the two intersecting circles, one for the occultor, 
-$\mathcal{P}(\mathbf{G}_n)$, and one for the source, $\mathcal{Q}(\mathbf{G}_n)$.
-
-This choice of Green's function yields particularly simple form for the primitive integrals of
+Returning to \eq{greens}, we may write the $n^\mathrm{th}$ component of 
+the solution vector as
+%
+\begin{align}
+    \label{eq:sn}
+    \mathfrak{s}_n &= \mathcal{Q}(\bvec{G}_n) - \mathcal{P}(\bvec{G}_n)
+    \quad,
+\end{align}
+%
+where, as in \citet{Pal2012} and \citet{starry}, we define the \emph{primitive integrals}
+%
 \begin{align}
     \label{eq:primitiveP}
     \mathcal{P}(\bvec{G}_n) &=
-    \int\displaylimits_{\pi-\phi}^{2\pi + \phi} f_n(z) (r+b \sin{\varphi}) r d\varphi
+    \int\displaylimits_{\pi-\phi}^{2\pi + \phi}
+        \big[ G_{n,y}(r c_\varphi, b + r s_\varphi) c_\varphi -
+              G_{n,x}(r c_\varphi, b + r s_\varphi) s_\varphi \big] r \dd \varphi
+    \\
     %
 \intertext{and}
     %
     \label{eq:primitiveQ}
     \mathcal{Q}(\bvec{G}_n) &=
-    \int\displaylimits_{\pi-\lambda}^{2\pi + \lambda} f_n(z) d \varphi
+    \int\displaylimits_{\pi-\lambda}^{2\pi + \lambda}
+        \big[ G_{n,y}(c_\varphi, s_\varphi) c_\varphi -
+              G_{n,x}(c_\varphi, s_\varphi) s_\varphi \big] \dd \varphi
+    \quad,
+\end{align}
+%
+%
+where we defined
+$c_\varphi \equiv \cos \varphi$
+and
+$s_\varphi \equiv \sin \varphi$
+and we used the fact that along the arc of a circle,
+%
+\begin{align}
+    \label{eq:dr}
+    \dd \bvec{r} &= -r s_\varphi \, \dd \varphi \, \xhat +
+                     r c_\varphi \, \dd \varphi \, \yhat
+    \quad.
+\end{align}
+%
+In Equations~(\ref{eq:primitiveP}) and (\ref{eq:primitiveQ}), $\mathcal{P}(\bvec{G}_n)$
+is the line integral along the arc of the occultor of radius $r$,
+and $\mathcal{Q}(\bvec{G}_n)$ is the line integral along the arc of the occulted
+body of radius one.
+
+\todo{Work on the transition here. This section still doesn't flow well.}
+
+
+This choice of Green's function yields particularly simple form for the primitive integrals of
+\begin{align}
+    \label{eq:primitiveP}
+    \mathcal{P}(\bvec{G}_n) &=
+    \int\displaylimits_{\pi-\phi}^{2\pi + \phi} z^n (r+b \sin{\varphi}) r d\varphi
+    %
+\intertext{and}
+    %
+    \label{eq:primitiveQ}
+    \mathcal{Q}(\bvec{G}_n) &=
+    \int\displaylimits_{\pi-\lambda}^{2\pi + \lambda} z^n d \varphi
 \end{align}
 
 Also, with this choice of basis, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for
