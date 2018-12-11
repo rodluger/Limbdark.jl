@@ -966,45 +966,127 @@ derive far more efficient and accurate formulae, which we describe in the follow
 % ==============================================================================
 
 In analogy with the linear and quadratic
-limb-darkening laws, let us define the polynomial limb-darkening law of
+limb darkening laws, let us define the polynomial limb darkening law of
 order $N$ as
 %
 %
 \begin{align}
     \label{eq:polynomialld}
-    \frac{I(\upmu)}{I(1)} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - ... - u_{N}(1 - \upmu)^{N} \nonumber \\
-                          &= 1 - \sum_{i=1}^N u_i \sum_{j=0}^i \binom{i}{j} (-1)^j \upmu^j .
+    \frac{I(\upmu)}{I_0} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - 
+                                ... - u_{N}(1 - \upmu)^{N} \nonumber \\
+                          &= \sum_{i=0}^N u_i \sum_{j=0}^i 
+                                \binom{i}{j} (-1)^{j + 1} \upmu^j
 \end{align}
-
+%
+where $I_0 \equiv I(\upmu=1)$ and we defined $u_0 \equiv -1$.
+%
 %Although the foregoing analysis takes advantage of the existing formalism
 %in \starry developed for occultation of spheres with arbitrary spherical harmonic
 %brightness, the problem can be simplified significantly for the limb-darkening
 %case due to the azimuthal symmetry assumed for a star.  This simplification
 %leads to analytic expressions for the derivatives, which we find can be
 %evaluated with greater speed and accuracy compared with automatic differentiation.
+%
+If we let $\bvec{u}$ be the column vector of limb darkening coefficients
+$\bvec{u} \equiv (u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$ 
+and $\mubasis$ be the polynomial basis
+$\mubasis \equiv (1 \ \upmu \ \upmu^2 \ ... \ \upmu^N)^\mathsf{T}$, we may 
+express Equation~(\ref{eq:polynomialld}) more compactly as the
+dot product
+%
+\begin{align}
+    \label{eq:polynomialld_vec}
+    \frac{I(\upmu)}{I_0} &= \mubasis^\mathsf{T} \bvec{u} .
+\end{align}
 
-\todo{This can be written as the dot product of the mu basis with the u coefficients,
-or as the dot product of the g basis, a change of basis matrix, and the u coefficients.
-This makes integrating easier. Show some math here.}
-
-Our task is to compute the flux $F$ observed during an occultation by
+Our task is to compute the flux $\mathcal{F}$ observed during an occultation by
 integrating this function over the visible area of the disk:
 %
 \begin{align}
     \label{eq:occint}
-    F &=
+    \mathcal{F} &=
     \oiint I(\upmu) \, \dd S
     \nonumber \\
     &= 
-    \oiint \gbasis^\mathsf{T} (\upmu) \, \dd S \, A (\bvec{u}) \quad.
+    I_0 \oiint \mubasis^\mathsf{T} \, \dd S \, \bvec{u} \quad.
 \end{align}
+%
+In general, the surface integral in Equation~(\ref{eq:occint}) is difficult---if not
+impossible---to solve directly. As in \citet{starry}, we note that the problem
+is made significantly more tractable if we first perform a change of basis
+operation:
+%
+\begin{align}
+    \label{eq:greensbasis}
+    \gbasis \equiv \bvec{A} \mubasis
+\end{align}
+%
+where, as in \citet{starry}, we refer to $\gbasis$ as the \emph{Green's basis},
+which we define below. The matrix $\bvec{A}$ is a yet-to-be-defined 
+linear transformation of the coefficients $\bvec{u}$.
+%
+%\todo{The notation in this section needs work. I need to go through this
+%and carefully explain all symbols, define the Greens basis, the Greens
+%functions, and make it clear to the reader what all this math is! We
+%should make sure this section stands by itself, not relying too much on the
+%definitions/explanations in starry.}
+%
+The total flux may now be written as
+%
+\begin{align}
+    \label{eq:occint_greens}
+    \mathcal{F} &= I_0 \oiint \gbasis^\mathsf{T} (\upmu) \, \dd S \, \bvec{A} \bvec{u} \nonumber \\
+                &= I_0 \, \mathfrak{s}^\mathsf{T} \bvec{A} \bvec{u} \quad ,
+\end{align}
+%
+where 
+%
+\begin{align}
+    \label{eq:solution_vector}
+    \mathfrak{s}^\mathsf{T} \equiv \oiint \gbasis^\mathsf{T} (\upmu) \, \dd S
+\end{align}
+%
+is the \emph{solution vector} first introduced in \S \ref{sec:uniform}.
+Our task is now to find solutions to the integral (\ref{eq:solution_vector})
+where $\gbasis$ is some complete basis of polynomials in $\upmu$.
 
-\todo{The notation in this section needs work. I need to go through this
-and carefully explain all symbols, define the Greens basis, the Greens
-functions, and make it clear to the reader what all this math is! We
-should make sure this section stands by itself, not relying too much on the
-definitions/explanations in starry.}
+As in \citet{starry}, we use Green's theorem to re-express the surface
+integral as a line integral over the boundary of the visible portion of
+the occulted body's disk:
+%
+%
+\begin{align}
+    \label{eq:greens}
+    \mathfrak{s} &=
+    \oint \bvec{G} (\upmu) \cdot \dd \bvec{r}
+    \quad,
+\end{align}
+%
+where $\bvec{G}$ is a vector whose $n^{\mathrm{th}}$ component is the
+vector field
+%
+\begin{align}
+    \label{eq:greens_n}
+    \bvec{G}_n (\upmu) = {G_n}_x (\upmu) \, \xhat + {G_n}_y (\upmu) \, \yhat \quad.
+\end{align}
+%
+The components ${G_n}_x$ and ${G_n}_y$ are chosen such that
+%
+\begin{align}
+    \label{eq:DGg}
+    \bvec{D} \wedge \bvec{G}_n &\equiv \frac{\dd {G_n}_y}{\dd \x}
+                                     - \frac{\dd {G_n}_x}{\dd \y} \nonumber \\
+                               &= \gbasisn(\upmu) \quad.
+\end{align}
+%
+As in \citet{Pal2008} and \citet{starry}, the operation 
+$\bvec{D} \wedge \bvec{G}_n$ denotes the
+\emph{exterior derivative} of $\bvec{G}_n$.
 
+
+\todo{TRANSITION HERE}
+
+%
 Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2-y^2}$,
 where $(x,y,z)$ are the coordinates of the unit sphere, we only require
 Green's functions whose curl has dependence on $z$ for axially-symmetric
