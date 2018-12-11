@@ -978,7 +978,11 @@ order $N$ as
                                 \binom{i}{j} (-1)^{j + 1} \upmu^j
 \end{align}
 %
-where $I_0 \equiv I(\upmu=1)$ and we defined $u_0 \equiv -1$.
+where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu = \cos\theta$, where
+$\theta$ is the angle between the line of sight and the vector normal to 
+the body's surface. In a right-handed Cartesian coordinate system centered 
+on the body, with the $z$-axis pointing to the observer, 
+$\upmu(x, y) = z(x, y) = \sqrt{1 - x^2 - y^2}$.
 %
 %Although the foregoing analysis takes advantage of the existing formalism
 %in \starry developed for occultation of spheres with arbitrary spherical harmonic
@@ -990,13 +994,13 @@ where $I_0 \equiv I(\upmu=1)$ and we defined $u_0 \equiv -1$.
 If we let $\bvec{u}$ be the column vector of limb darkening coefficients
 $\bvec{u} \equiv (u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$ 
 and $\mubasis$ be the polynomial basis
-$\mubasis \equiv (1 \ \upmu \ \upmu^2 \ ... \ \upmu^N)^\mathsf{T}$, we may 
+$\mubasis \equiv (1 \ z \ z^2 \ ... \ z^N)^\mathsf{T}$, we may 
 express Equation~(\ref{eq:polynomialld}) more compactly as the
 dot product
 %
 \begin{align}
     \label{eq:polynomialld_vec}
-    \frac{I(\upmu)}{I_0} &= \mubasis^\mathsf{T} \bvec{u} .
+    \frac{I(z)}{I_0} &= \mubasis^\mathsf{T} \bvec{u} .
 \end{align}
 
 Our task is to compute the flux $\mathcal{F}$ observed during an occultation by
@@ -1005,10 +1009,10 @@ integrating this function over the visible area of the disk:
 \begin{align}
     \label{eq:occint}
     \mathcal{F} &=
-    \oiint I(\upmu) \, \dd S
+    \oiint I(z) \, \dd S
     \nonumber \\
     &= 
-    I_0 \oiint \mubasis^\mathsf{T} \, \dd S \, \bvec{u} \quad.
+    I_0 \oiint \mubasis^\mathsf{T}(z) \, \dd S \, \bvec{u} \quad.
 \end{align}
 %
 In general, the surface integral in Equation~(\ref{eq:occint}) is difficult---if not
@@ -1035,7 +1039,7 @@ The total flux may now be written as
 %
 \begin{align}
     \label{eq:occint_greens}
-    \mathcal{F} &= I_0 \oiint \gbasis^\mathsf{T} (\upmu) \, \dd S \, \bvec{A} \bvec{u} \nonumber \\
+    \mathcal{F} &= I_0 \oiint \gbasis^\mathsf{T} (z) \, \dd S \, \bvec{A} \bvec{u} \nonumber \\
                 &= I_0 \, \mathfrak{s}^\mathsf{T} \bvec{A} \bvec{u} \quad ,
 \end{align}
 %
@@ -1043,12 +1047,12 @@ where
 %
 \begin{align}
     \label{eq:solution_vector}
-    \mathfrak{s}^\mathsf{T} \equiv \oiint \gbasis^\mathsf{T} (\upmu) \, \dd S
+    \mathfrak{s}^\mathsf{T} \equiv \oiint \gbasis^\mathsf{T} (z) \, \dd S
 \end{align}
 %
 is the \emph{solution vector} first introduced in \S \ref{sec:uniform}.
 Our task is now to find solutions to the integral (\ref{eq:solution_vector})
-where $\gbasis$ is some complete basis of polynomials in $\upmu$.
+where $\gbasis$ is some complete basis of polynomials in $z$.
 
 As in \citet{starry}, we use Green's theorem to re-express the surface
 integral as a line integral over the boundary of the visible portion of
@@ -1058,7 +1062,7 @@ the occulted body's disk:
 \begin{align}
     \label{eq:greens}
     \mathfrak{s} &=
-    \oint \bvec{G} (\upmu) \cdot \dd \bvec{r}
+    \oint \bvec{G} (z) \cdot \dd \bvec{r}
     \quad,
 \end{align}
 %
@@ -1067,16 +1071,16 @@ vector field
 %
 \begin{align}
     \label{eq:greens_n}
-    \bvec{G}_n (\upmu) = {G_n}_x (\upmu) \, \xhat + {G_n}_y (\upmu) \, \yhat \quad.
+    \bvec{G}_n (z) = G_{n,x} (z) \, \xhat + G_{n,y} (z) \, \yhat \quad.
 \end{align}
 %
-The components ${G_n}_x$ and ${G_n}_y$ are chosen such that
+The components $G_{n,x}$ and $G_{n,y}$ are chosen such that
 %
 \begin{align}
     \label{eq:DGg}
-    \bvec{D} \wedge \bvec{G}_n &\equiv \frac{\dd {G_n}_y}{\dd \x}
-                                     - \frac{\dd {G_n}_x}{\dd \y} \nonumber \\
-                               &= \gbasisn(\upmu) \quad.
+    \bvec{D} \wedge \bvec{G}_n &\equiv \frac{\dd G_{n,y}}{\dd \x}
+                                     - \frac{\dd G_{n,x}}{\dd \y} \nonumber \\
+                               &= \gbasisn(z) \quad.
 \end{align}
 %
 As in \citet{Pal2008} and \citet{starry}, the operation 
