@@ -1082,26 +1082,40 @@ The components ${G_n}_x$ and ${G_n}_y$ are chosen such that
 As in \citet{Pal2008} and \citet{starry}, the operation 
 $\bvec{D} \wedge \bvec{G}_n$ denotes the
 \emph{exterior derivative} of $\bvec{G}_n$.
+%
+%
+%Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2-y^2}$,
+%where $(x,y,z)$ are the coordinates of the unit sphere, we only require
+%Green's functions whose curl has dependence on $z$ for axially-symmetric
+%limb-darkening.  
+%
+Following \citet{starry}, we choose the following form for 
+Equation~(\ref{eq:greens_n}):
+%
+\begin{equation}
+\mathbf{G}_n = z^n (-y \xhat + x \yhat) \quad,
+\end{equation}
+%
+yielding the following expression for the components of the Green's basis:
+%
+\begin{align}
+\gbasisn(z)   &= \frac{\dd {G_n}_y}{\dd \x} - \frac{\dd {G_n}_x}{\dd \y} \nonumber \\[0.5em]
+              &= 2 z^n + \frac{dz^n}{dz} \frac{z^2-1}{z} \nonumber \\[0.5em]
+              &= \frac{1}{z} \frac{d}{dz}\left[ z^n(z^2-1)\right] \nonumber \\[0.5em]
+              &= (n+2)z^n-n z^{n-2}
+\end{align}
+%
+for $2 \le n \le N$. For the first two terms, we choose $\tilde{\mathfrak{g}}_0 = 1$
+(uniform limb darkening) and $\tilde{\mathfrak{g}}_1 = z$ (linear limb darkening),
+which we previously discussed in \S\ref{sec:uniform} and \S\ref{sec:reparam}.
+
+Note that the total flux of each term in this basis set, $\tilde{\mathfrak{g}}_n$, integrates
+to zero for $2 \le n \le N$.
+
 
 
 \todo{TRANSITION HERE}
 
-%
-Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2-y^2}$,
-where $(x,y,z)$ are the coordinates of the unit sphere, we only require
-Green's functions whose curl has dependence on $z$ for axially-symmetric
-limb-darkening.  Following \citet{starry}, we choose a Green's function
-of the form
-\begin{equation}
-\mathbf{G}_n = f_n(z) (-y \xhat + x \yhat)
-\end{equation}
-giving
-\begin{eqnarray}
-\gbasisn(x,y) &=& \frac{\dd {G_n}_y}{\dd \x} - \frac{\dd {G_n}_x}{\dd \y}\\
-&=& 2 f_n(z) + \frac{df_n}{dz} \frac{z^2-1}{z},\\
-&=& \frac{1}{z} \frac{d}{dz}\left[ f_n(z)(z^2-1)\right],
-\end{eqnarray}
-where $\gbasisn$ is the basis function for the limb-darkening surface brightness.
 The two dimensional integral of this surface brightness, $\gbasisn$, is converted into
 two one dimensional ``primitive" integrals of $f_n \propto \mathbf{G}_n \cdot d\mathbf{r}$ 
 over the boundary arcs of the two intersecting circles, one for the occultor, 
@@ -1119,17 +1133,6 @@ This choice of Green's function yields particularly simple form for the primitiv
     \mathcal{Q}(\bvec{G}_n) &=
     \int\displaylimits_{\pi-\lambda}^{2\pi + \lambda} f_n(z) d \varphi
 \end{align}
-
-We choose the functions $f_n(z) = z^n$, so that
-\begin{equation}
-\gbasisn(x,y) =  (n+2)z^n-n z^{n-2},
-\end{equation}
-for $2 \le n \le N$ is the basis set for the surface brightness of the polynomial limb-darkening,
-along with the uniform, $\tilde{\mathfrak{g}}_0 = z^0$,
-and linear, $\tilde{\mathfrak{g}}_1 = z^1$, terms which we have derived in \S~\ref{sec:uniform} and 
-\S~\ref{sec:reparam}.
-Note that the total flux of each term in this basis set, $\tilde{\mathfrak{g}}_n$, integrates
-to zero for $2 \le n \le N$.
 
 Also, with this choice of basis, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for
 $1 \le n \le N$ since $z=0$ at the boundary of the star.   The $n=0$ case we have already
