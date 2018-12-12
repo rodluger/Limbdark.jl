@@ -2,7 +2,8 @@
 # Computes derivatives over the timestep.
 using PyPlot
 
-include("../../../src/integrate_transit.jl")
+#include("../../../src/integrate_transit.jl")
+include("../../../src/integrate_transit_cubature.jl")
 
 # Test it out:
 
@@ -33,7 +34,7 @@ param = [0.0,1.0,b0]   # [t_0,v,b_0]
 function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64,tol::T,maxdepth::Int64) where {T <: Real}
 dtinv = inv(dt)
 for i=1:nt
-  ftmp = integrate_timestep_gradient(param,trans,t[i],dt,tol*trans.r^2,maxdepth)*dtinv
+  ftmp = integrate_timestep_gradient(param,trans,t[i]-0.5*dt,t[i]+0.5*dt,tol*trans.r^2,maxdepth)*dtinv
   favg1[i,1:5]=ftmp[1:5]
   # Convert from d_n to u_n derivatives:
   favg1[i,6:5+nu]=BLAS.gemv('T',1.0,trans.dddu,ftmp[6:6+nu])
