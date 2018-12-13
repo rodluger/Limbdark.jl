@@ -2,13 +2,14 @@
 # Computes derivatives over the timestep.
 using PyPlot
 
-include("../src/integrate_transit_cubature.jl")
+#include("../src/integrate_transit_cubature.jl")
+include("../src/integrate_transit_simpson.jl")
 
 # Test it out:
 
 include("../test/loglinspace.jl")
 
-t1 = -1.5; t2 = 1.5; nt = 2000; dt = 0.3
+t1 = -1.5; t2 = 1.5; nt = 10000; dt = 0.3
 t = zeros(nt)
 t .= linearspace(t1,t2,nt)
 #t = [t[1235]] ; nt =1
@@ -85,9 +86,9 @@ end
 return
 end
 
-integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-2,8)
-@time integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-2,8)
-@time integrate_lightcurve!(trans,param,t,dt,favg2,nt,1e-5,128)
+integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,3)
+@time integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,8)
+@time integrate_lightcurve!(trans,param,t,dt,favg2,nt,1e-6,128)
 @time integrate_lightcurve!(trans,param,t,dt,favg3,nt,1e-8,128)
 
 #@time for i=1:nt
@@ -146,3 +147,12 @@ ax[:legend](loc="upper center")
 #b = sqrt.(param[3]^2+(param[2]*(t-param[1])).^2)
 #plot(dt^2*(d2fdb2.*(param[2]*(t-param[1])./b).^2+dfdb.*param[2]^2./b)/24.0)
 savefig("integrate_transit_gradient.pdf", bbox_inches="tight")
+
+read(STDIN,Char)
+
+for i=1:7
+#  clf(); plot(t,favg1[:,i]); plot(t,favg2[:,i]); plot(t,favg3[:,i]); read(STDIN,Char); clf(); plot(t,abs.(favg1[:,i]-favg3[:,i]));semilogy(t,abs.(favg2[:,i]-favg3[:,i])); read(STDIN,Char)
+  clf(); plot(t,favg1[:,i]); plot(t,favg2[:,i]); plot(t,favg3[:,i]); read(STDIN,Char); clf(); plot(t,favg1[:,i]-favg3[:,i]);plot(t,favg2[:,i]-favg3[:,i]); read(STDIN,Char)
+end
+
+
