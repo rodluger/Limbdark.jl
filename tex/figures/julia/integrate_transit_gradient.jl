@@ -2,8 +2,8 @@
 # Computes derivatives over the timestep.
 using PyPlot
 
-#include("../../../src/integrate_transit.jl")
-include("../../../src/integrate_transit_cubature.jl")
+include("../../../src/integrate_transit.jl")
+#include("../../../src/integrate_transit_cubature.jl")
 
 # Test it out:
 
