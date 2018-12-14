@@ -321,7 +321,7 @@ else
     println("negative k2: ",t.k2," r: ",r," b: ",b)
     t.k2 = 0.0; t.k = 0.0
   end
-  if t.k2 > 1
+  if t.k2 >= 1
     if t.k2 > 2.0
       t.kc2 = 1.0-inv(t.k2)
       t.kc = sqrt(t.kc2)

@@ -1,13 +1,19 @@
 # This is code for computing a transit model and derivatives integrated over
-# a time step, giving the fluence in units of time (since 
-# flux is normalized to unity).
+# a time step, giving the fluence in units of time (since flux is normalized to unity).
 
 include("transit_poly_struct.jl")
 
 # Now the version with derivatives:
 function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T},t1::T,t2::T,tol::T,maxdepth::Int64,fint::Array{T,1}) where {T <: Real}
+  # Keep track of maximum number of depths for recursion:
+  depthmax = 0
+  # Define third to save time in division:
   third = inv(3)
+  # Keep track of how many evaluations of the transit function are carried out:
   neval = 0
+  
+  # When transit computation is carried out, we need to fill in the vector for the flux and derivatives
+  # at the midpoint of the current refinement time range:
   function fill_flux!(tmid::T,fmid0::T,trans_mid::Transit_Struct{T},fmid::Array{T,1}) where {T <: Real}
 #  fmid = Array{T}(undef,6+trans_mid.n)
   fmid[1] = fmid0   # flux
@@ -22,6 +28,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   return fmid
   end
 
+  # This routine gives a simple model for the impact parameter versus time:
   function solver(time::T) where {T <: Real}
   # This predicts the impact parameter as a function of time in
   # terms of the transit_struct.
@@ -40,28 +47,31 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   else
     fmid = Array{T}(6+trans.n)
   end
+  # Add the impact parameter to the transit structure:
   trans.b = solver(tmid)
+  # Carry out the transit computation:
   fmid0 = transit_poly_d!(trans); neval += 1
+  # Then, fillin the flux and derivatives in the fmid vector:
   fill_flux!(tmid,fmid0,trans,fmid)
 #  println("b: ",trans.b," f/df: ",fmid)
   return fmid
   end
 
-  # Inner integrator:  
+  # Inner integrator which uses adaptive Simpson's method thanks to DFM:
   function inner(func::Function,x0::T,dx::T,ym::Array{T,1},y0::Array{T,1},yp::Array{T,1},tol::T,max_depth::Int64,min_depth::Int64,depth::Int64) where {T <: Real}
+  # For each depth we need a left and a right copy of: x_m, val_m; x_p, val_p, int_mp, pred
   x_m = x0 - 0.5*dx; val_m = func(x_m)
   x_p = x0 + 0.5*dx; val_p = func(x_p)
   int_mp = 0.5*dx * (2*y0+ ym + yp + 4*(val_m+val_p))*third
   pred   =     dx * (4*y0+ ym + yp)*third
   if (depth < min_depth || (depth < max_depth && maximum(abs,pred-int_mp)> tol))
-#    int_mp = inner!(func, x_m, 0.5*dx, ym, val_m, y0, tol, max_depth, min_depth, depth+1)+
     return inner(func, x_m, 0.5*dx, ym, val_m, y0, tol, max_depth, min_depth, depth+1) +
            inner(func, x_p, 0.5*dx, y0, val_p, yp, tol, max_depth, min_depth, depth+1)
   end
   return int_mp
   end
 
-#  # Inner integrator:  
+#  # Inner integrator (this version avoids broadcast operations; however, we don't need this for now).
 #  function inner(func::Function,x0::T,dx::T,ym::Array{T,1},y0::Array{T,1},yp::Array{T,1},tol::T,max_depth::Int64,min_depth::Int64,depth::Int64) where {T <: Real}
 #  if VERSION >= v"0.7"
 #    int_p = Array{T}(undef,6+trans.n); int_m = Array{T}(undef,6+trans.n); pred = Array{T}(undef,6+trans.n)
@@ -92,13 +102,15 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
 #  return int_m::Array{T,1}
 #  end
 
-  # Outer integrators:
+  # Outer integrators - this dispatch computes function at upper and lower limits:
   function outer!(func::Function,lower::T,upper::T,tol::T;max_depth=50,min_depth=0) where {T <: Real}
   ym = func(lower)
   yp = func(upper)
   return outer!(func,lower,upper,ym,yp,tol,max_depth,min_depth)
   end
  
+  # This version first compares trapzoid and Simpson's rule - if they are not precise
+  # enough in comparison, then it begins refinement in inner recursion:
   function outer!(func::Function,lower::T,upper::T,ym::Array{T,1},yp::Array{T,1},tol::T,max_depth::Int64,min_depth::Int64) where {T <: Real}
   x0 = 0.5 * (upper + lower);
   dx = 0.5 * (upper - lower);
@@ -126,6 +138,8 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   end
 
 #  fint,ferr = hquadrature(trans.n+6,transit_flux_derivative,t1,t2,abstol=tol)
+  # fint contains time-integrated flux (fluence) and derivatives:
   fint .= outer!(transit_flux_derivative,t1,t2,tol)
-return neval::Int64
+  # Return the number of evalutions and maximum depth for record-keeping:
+return neval::Int64,depthmax::Int64
 end

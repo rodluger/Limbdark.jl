@@ -18,10 +18,13 @@ r = 0.1; b0 = 0.5; u_n = [0.3,0.3]; nu = length(u_n)
 favg0 = zeros(nt,5+nu)
 favg1 = zeros(nt,5+nu)
 neval1= zeros(Int64,nt)
+depthmax1= zeros(Int64,nt)
 favg2 = zeros(nt,5+nu)
 neval2= zeros(Int64,nt)
+depthmax2= zeros(Int64,nt)
 favg3 = zeros(nt,5+nu)
 neval3= zeros(Int64,nt)
+depthmax3= zeros(Int64,nt)
 trans = transit_init(r,b0,u_n,true)
 param = [0.0,1.0,b0]   # [t_0,v,b_0]
 
@@ -43,7 +46,7 @@ end
 compute_lightcurve!(trans,param,t,favg0,nt)
 @time compute_lightcurve!(trans,param,t,favg0,nt)
 
-function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64,tol::T,maxdepth::Int64,neval_t::Array{Int64,1}) where {T <: Real}
+function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64,tol::T,maxdepth::Int64,neval_t::Array{Int64,1},depthmax::Array{Int64,1}) where {T <: Real}
 # First, find the points of contact:
 b0 = abs(param[3]); r = trans.r; t0 = param[1]; v = param[2]
 if b0 > (1.0+r)
@@ -64,6 +67,7 @@ dtinv = inv(dt)
 fint  = zeros(T,6+trans.n)
 @inbounds for i=1:nt
   neval_t[i] = 0
+  depthmax[i] = 0
   t1 = t[i]-0.5*dt ; t2 = t[i]+0.5*dt
   if t2 < tc[1] || t1 > tc[nc]
     # No points lie within the transit:
@@ -80,7 +84,11 @@ fint  = zeros(T,6+trans.n)
     push!(tlim,t2)
     ftmp=zeros(T,6+trans.n)
     for j=1:length(tlim)-1
-      neval_t[i] += integrate_timestep_gradient!(param,trans,tlim[j],tlim[j+1],tol,maxdepth,fint)
+      nevali,depthmaxi =  integrate_timestep_gradient!(param,trans,tlim[j],tlim[j+1],tol,maxdepth,fint)
+      neval_t[i] += nevali
+      if depthmaxi > depthmax[i]
+        depthmax[i] = depthmaxi
+      end
       ftmp += fint
     end
     ftmp *= dtinv
@@ -118,14 +126,14 @@ for k=1:K
   t_nobin1 = time_ns()
   compute_lightcurve!(trans,param,t,favg0,nt)
   t_nobin = time_ns()-t_nobin1
-  integrate_lightcurve!(trans,param,t,texp,favg2,nt,1e-14,3,neval2)
+  integrate_lightcurve!(trans,param,t,texp,favg2,nt,1e-14,3,neval2,depthmax2)
   for j=1:ntol
     t_bin1 = time_ns()
-    integrate_lightcurve!(trans,param,t,texp,favg1,nt,tol[j],3,neval1)
+    integrate_lightcurve!(trans,param,t,texp,favg1,nt,tol[j],3,neval1,depthmax1)
     t_bin = time_ns()-t_bin1
     precision[k,j] += maximum(abs.(favg1-favg2))
     neval_mean[k,j] += mean(neval1) 
-    println("k: ",k," j: ",j," tol: ",tol[j]," neval: ",mean(neval1)," relative time: ",t_bin/t_nobin/mean(neval1))
+    println("k: ",k," j: ",j," tol: ",tol[j]," neval: ",mean(neval1)," relative time: ",t_bin/t_nobin/mean(neval1)," max depth: ",maximum(depthmax1))
   end
 #  clf()
 #  plot(t,favg2[:,1])
