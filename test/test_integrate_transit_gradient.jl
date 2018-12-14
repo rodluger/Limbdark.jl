@@ -17,8 +17,11 @@ t .= linearspace(t1,t2,nt)
 r = 0.1; b0 = 0.5; u_n = [0.3,0.3]; nu = length(u_n)
 favg0 = zeros(nt,5+nu)
 favg1 = zeros(nt,5+nu)
+neval1= zeros(Int64,nt)
 favg2 = zeros(nt,5+nu)
+neval2= zeros(Int64,nt)
 favg3 = zeros(nt,5+nu)
+neval3= zeros(Int64,nt)
 trans = transit_init(r,b0,u_n,true)
 param = [0.0,1.0,b0]   # [t_0,v,b_0]
 
@@ -40,7 +43,7 @@ end
 compute_lightcurve!(trans,param,t,favg0,nt)
 @time compute_lightcurve!(trans,param,t,favg0,nt)
 
-function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64,tol::T,maxdepth::Int64) where {T <: Real}
+function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64,tol::T,maxdepth::Int64,neval_t::Array{Int64,1}) where {T <: Real}
 # First, find the points of contact:
 b0 = abs(param[3]); r = trans.r; t0 = param[1]; v = param[2]
 if b0 > (1.0+r)
@@ -58,7 +61,9 @@ else
   nc = 4
 end
 dtinv = inv(dt)
+fint  = zeros(T,6+trans.n)
 @inbounds for i=1:nt
+  neval_t[i] = 0
   t1 = t[i]-0.5*dt ; t2 = t[i]+0.5*dt
   if t2 < tc[1] || t1 > tc[nc]
     # No points lie within the transit:
@@ -75,8 +80,10 @@ dtinv = inv(dt)
     push!(tlim,t2)
     ftmp=zeros(T,6+trans.n)
     for j=1:length(tlim)-1
-      ftmp += integrate_timestep_gradient(param,trans,tlim[j],tlim[j+1],tol*trans.r^2,maxdepth)*dtinv
+      neval_t[i] += integrate_timestep_gradient!(param,trans,tlim[j],tlim[j+1],tol*trans.r^2,maxdepth,fint)
+      ftmp += fint
     end
+    ftmp *= dtinv
   end
   favg1[i,1:5]=ftmp[1:5]
   # Convert from d_n to u_n derivatives:
@@ -86,10 +93,10 @@ end
 return
 end
 
-integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,3)
-@time integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,8)
-@time integrate_lightcurve!(trans,param,t,dt,favg2,nt,1e-6,128)
-@time integrate_lightcurve!(trans,param,t,dt,favg3,nt,1e-8,128)
+integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,3,neval1)
+@time integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,8,neval1)
+@time integrate_lightcurve!(trans,param,t,dt,favg2,nt,1e-6,128,neval2)
+@time integrate_lightcurve!(trans,param,t,dt,favg3,nt,1e-8,128,neval3)
 
 #@time for i=1:nt
 #        ftmp = integrate_timestep_gradient(param,trans,t[i],dt,1e-6*r^2,32)*dtinv
