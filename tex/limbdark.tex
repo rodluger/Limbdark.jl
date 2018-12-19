@@ -254,7 +254,7 @@ the kite has an area that is twice the area of the triangle connecting the cente
 of both circles and one of the intersection points.  \cite{Goldberg1991} gives a
 formula for precisely computing the area of a triangle, based on a method developed
 by \citet{Kahan2000}, which we use to compute the area of the kite-shaped region,
-\begin{eqnarray}
+\begin{eqnarray}\label{eq:Kite_area}
 A_{kite} &=& \frac{1}{2}\sqrt{(A+(B+C))(C-(A-B))(C+(A-B))(A+(B-C))},
 \end{eqnarray}
 for $A \ge B \ge C$, where the tuple $\{A,B,C\}$ equals $\{1,r,b\}$ sorted from from greatest to least.
@@ -1889,6 +1889,9 @@ $a_n$           & Gim\'enez coefficients                & \eq{gimenez}\\
 $\bvec{A}$      & Change of basis matrix:
                  $Y_{lm}$s to Green's
                  polynomials                           & \eq{A} \\
+$A_{lens}$      & Lens-shaped area of overlap of two circles & \eq{MAuniform}\\
+$A_{kite}$      & Kite-shaped area between center of circles
+                  and points of contact			& \eq{Kite_area}\\
 $b$             & Impact parameter in units of occulted
                  body's radius                         &  \\
 $\bvec{D}\,\wedge$
@@ -1942,8 +1945,10 @@ $\gamma_j$      & Coefficient in series for $\mathcal{N}_n$ & \eq{Nn_series} \\
 $\Gamma$        & Gamma function                        & \\
 $\theta$        & Polar angle on star with respect to observer & \\
 $\Theta$        & Heaviside step function               & \eq{biglam} \\
-$\kappa_0$      & Angular position of
-                 occultor/occulted intersection point  & \eq{cosine_formulation} \\
+$\kappa_0$      & Angular position of on occultor of 
+                  occultor/occulted intersection point  & \eq{cosine_formulation} \\
+$\kappa_1$      & Angular position of on occulted of 
+                  occultor/occulted intersection point  & \eq{cosine_formulation} \\
 $\lambda$       & Angular position of
                  occultor/occulted intersection point  & \eq{lambda} \\
                & Term in cel identities                & \eq{cel_identities} \\
