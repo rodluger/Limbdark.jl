@@ -1856,105 +1856,107 @@ available code.
 
 Table of notation:
 
-%\clearpage
-%\begin{center}
-%\renewcommand*{\arraystretch}{1.08}
-%\begin{longtable}{cll}
-%\caption{Symbols used in this paper} \label{tab:symbols} \\
-%%
-%\toprule
-%\multicolumn{1}{c}{\textbf{Symbol}} &
-%\multicolumn{1}{c}{\textbf{Definition}} &
-%\multicolumn{1}{c}{\textbf{Reference}} \\
-%\midrule
-%\endfirsthead
-%%
-%\multicolumn{3}{c}%
-%{{\bfseries \tablename\ \thetable{} --} continued from previous page} \\
-%\toprule
-%\multicolumn{1}{c}{\textbf{Symbol}} &
-%\multicolumn{1}{c}{\textbf{Definition}} &
-%\multicolumn{1}{c}{\textbf{Reference}} \\
-%\midrule
-%\endhead
-%\bottomrule
-%%
-%\endfoot
-%%
-%\bottomrule
-%\endlastfoot
-%%
-%$a_n$           & Gim\'enez coefficients                & \eq{gimenez}\\
-%$\bvec{A}$      & Change of basis matrix:
-%                  $Y_{lm}$s to Green's
-%                  polynomials                           & \eq{A} \\
-%$b$             & Impact parameter in units of occulted
-%                  body's radius                         &  \\
-%$\bvec{D}\,\wedge$
-%                & Exterior derivative                   & \eq{DGg} \\
-%$E(\bigdot)$    & Complete elliptic integral of the
-%                  second kind                           & \eq{elliptic} \\
-%$F$             & Total flux seen by observer           & \eq{occint} \\ 
-%$F_0$           & Total non-transiting flux             & \eq{flux} \\ 
-%$\mathcal{F}$   & Normalized flux seen by observer      & \eq{flux} \\ 
-%$_2F_1$         & Generalized Hypergeometric function   & \eq{Mn_series} \\
-%%$_2\tilde{F}_1$ & Regularized Hypergeometric function   & \eq{Jlargek} \\
-%$\gbasis$       & Green's basis                         & \eq{greensbasis} \\
-%%$\bvec{g}$      & Vector in the basis $\gbasis$         & \\
-%$\bvec{G}_n$    & Anti-exterior derivative of the
-%                  $n^\mathrm{th}$
-%                  term in the Green's basis             & \eq{greens_n} \\
-%$i$             & Dummy index                           & \\
-%$I$             & Specific intensity, $I(\x, \y)$       & \\
-%$j$             & Dummy index                           & \\
-%$k$             & Elliptic parameter                    & \eq{k2} \\
-%                & Dummy index                           & \\
-%$k_c$           & $\sqrt{1 - k^2}$                      & \eq{cel} \\
-%$K(\bigdot)$    & Complete Elliptic integral of the
-%                  first kind                            & \eq{elliptic} \\
-%%$l$             & Spherical harmonic degree             & \eq{lm} \\
-%%$m$             & Spherical harmonic order              & \eq{lm} \\
-%$n$             & Order of limb-darkening              & \\
-%$p$             & Cofficient of $cel$			& \eq{cel}\\
-%$q$             & Term in cel identities                & \eq{cel_identities}
-%$\mathcal{P}$   & Primitive integral along perimiter
-%                  of occultor                           & \eq{primitiveP} \\
-%%$q$             & Dummy index                           & \\
-%$\mathcal{Q}$   & Primitive integral along perimiter
-%                  of occulted body                      & \eq{primitiveQ} \\
-%$r$             & Occultor radius in units of occulted
-%                  body's radius                         & \S\ref{sec:intro} \\
-%$\bvec{r}$      & Vector for integration over boundary of
-%                  visible disk                          & \eq{greens} \\
-%$\mathfrak{s}$  & Occultation light curve solution
-%                  vector                                & \eq{greens} \\
-%$u$             & Dummy index                           & \\
-%$u_1, u_2$      & Quadratic limb darkening coefficients & \eq{quadraticld} \\
-%$\bvec{u}$      & Vector of limb-darkenig coefficients  & \S\ref{sec:higher_order} \\
-%$\x$            & Cartesian coordinate                  & \eq{xyz} \\
-%$\y$            & Cartesian coordinate                  & \eq{xyz} \\
-%$\z$            & Cartesian coordinate,
-%                  $z = \sqrt{1 - \x^2 - \y^2}$          & \eq{xyz} \\
-%%
-%$\alpha_j$      & Coefficient in series for $\mathcal{M}_n$ & \eq{Mn_series} \\
-%$\gamma_j$      & Coefficient in series for $\mathcal{N}_n$ & \eq{Nn_series} \\
-%$\Gamma$        & Gamma function                        & \\
-%$\theta$        & Polar angle on star with respect to observer & \\
-%$\Theta$        & Heaviside step function               & \eq{biglam} \\
-%$\kappa_0$      & Angular position of
-%                  occultor/occulted intersection point  & \eq{cosine_formulation} \\
-%$\lambda$       & Angular position of
-%                  occultor/occulted intersection point  & \eq{lambda} \\
-%                & Term in cel identities                & \eq{cel_identities} \\
-%$\Lambda$       & \citet{MandelAgol2002} function       & \eq{biglam} \\
-%$\upmu$         & Cosine of polar angle on star         & \eq{quadraticld} \\
-%$\Pi(\bigdot,\bigdot)$
-%                & Complete elliptic integral of the
-%                  third kind                            & \eq{elliptic} \\
-%%$\phi$          & Angular position of
-%%                  occultor/occulted intersection point  & \eq{phi} \\
-%$\varphi$       & Dummy integration variable            & \\
-%%
-%\end{longtable}
-%\end{center}
+\clearpage
+
+\begin{center}
+\renewcommand*{\arraystretch}{1.08}
+\begin{longtable}{cll}
+\caption{Symbols used in this paper} \label{tab:symbols} \\
+%
+\toprule
+\multicolumn{1}{c}{\textbf{Symbol}} &
+\multicolumn{1}{c}{\textbf{Definition}} &
+\multicolumn{1}{c}{\textbf{Reference}} \\
+\midrule
+\endfirsthead
+%
+\multicolumn{3}{c}%
+{{\bfseries \tablename\ \thetable{} --} continued from previous page} \\
+\toprule
+\multicolumn{1}{c}{\textbf{Symbol}} &
+\multicolumn{1}{c}{\textbf{Definition}} &
+\multicolumn{1}{c}{\textbf{Reference}} \\
+\midrule
+\endhead
+\bottomrule
+%
+\endfoot
+%
+\bottomrule
+\endlastfoot
+%
+$a_n$           & Gim\'enez coefficients                & \eq{gimenez}\\
+$\bvec{A}$      & Change of basis matrix:
+                 $Y_{lm}$s to Green's
+                 polynomials                           & \eq{A} \\
+$b$             & Impact parameter in units of occulted
+                 body's radius                         &  \\
+$\bvec{D}\,\wedge$
+               & Exterior derivative                   & \eq{DGg} \\
+$E(\bigdot)$    & Complete elliptic integral of the
+                 second kind                           & \eq{elliptic} \\
+$F$             & Total flux seen by observer           & \eq{occint} \\ 
+$F_0$           & Total non-transiting flux             & \eq{flux} \\ 
+$\mathcal{F}$   & Normalized flux seen by observer      & \eq{flux} \\ 
+$_2F_1$         & Generalized Hypergeometric function   & \eq{Mn_series} \\
+%$_2\tilde{F}_1$ & Regularized Hypergeometric function   & \eq{Jlargek} \\
+$\gbasis$       & Green's basis                         & \eq{greensbasis} \\
+%$\bvec{g}$      & Vector in the basis $\gbasis$         & \\
+$\bvec{G}_n$    & Anti-exterior derivative of the
+                 $n^\mathrm{th}$
+                 term in the Green's basis             & \eq{greens_n} \\
+$i$             & Dummy index                           & \\
+$I$             & Specific intensity, $I(\x, \y)$       & \\
+$j$             & Dummy index                           & \\
+$k$             & Elliptic parameter                    & \eq{k2} \\
+               & Dummy index                           & \\
+$k_c$           & $\sqrt{1 - k^2}$                      & \eq{cel} \\
+$K(\bigdot)$    & Complete Elliptic integral of the
+                 first kind                            & \eq{elliptic} \\
+%$l$             & Spherical harmonic degree             & \eq{lm} \\
+%$m$             & Spherical harmonic order              & \eq{lm} \\
+$n$             & Order of limb-darkening              & \\
+$p$             & Cofficient of $cel$			& \eq{cel}\\
+$q$             & Term in cel identities                & \eq{cel_identities}\\
+$\mathcal{P}$   & Primitive integral along perimiter
+                 of occultor                           & \eq{primitiveP} \\
+%$q$             & Dummy index                           & \\
+$\mathcal{Q}$   & Primitive integral along perimiter
+                 of occulted body                      & \eq{primitiveQ} \\
+$r$             & Occultor radius in units of occulted
+                 body's radius                         & \S\ref{sec:intro} \\
+$\bvec{r}$      & Vector for integration over boundary of
+                 visible disk                          & \eq{greens} \\
+$\mathfrak{s}$  & Occultation light curve solution
+                 vector                                & \eq{greens} \\
+$u$             & Dummy index                           & \\
+$u_1, u_2$      & Quadratic limb darkening coefficients & \eq{quadraticld} \\
+$\bvec{u}$      & Vector of limb-darkenig coefficients  & \S\ref{sec:higher_order} \\
+$\x$            & Cartesian coordinate                  & \eq{xyz} \\
+$\y$            & Cartesian coordinate                  & \eq{xyz} \\
+$\z$            & Cartesian coordinate,
+                 $z = \sqrt{1 - \x^2 - \y^2}$          & \eq{xyz} \\
+%
+$\alpha_j$      & Coefficient in series for $\mathcal{M}_n$ & \eq{Mn_series} \\
+$\gamma_j$      & Coefficient in series for $\mathcal{N}_n$ & \eq{Nn_series} \\
+$\Gamma$        & Gamma function                        & \\
+$\theta$        & Polar angle on star with respect to observer & \\
+$\Theta$        & Heaviside step function               & \eq{biglam} \\
+$\kappa_0$      & Angular position of
+                 occultor/occulted intersection point  & \eq{cosine_formulation} \\
+$\lambda$       & Angular position of
+                 occultor/occulted intersection point  & \eq{lambda} \\
+               & Term in cel identities                & \eq{cel_identities} \\
+$\Lambda$       & \citet{MandelAgol2002} function       & \eq{biglam} \\
+$\upmu$         & Cosine of polar angle on star         & \eq{quadraticld} \\
+$\Pi(\bigdot,\bigdot)$
+               & Complete elliptic integral of the
+                 third kind                            & \eq{elliptic} \\
+%$\phi$          & Angular position of
+%                  occultor/occulted intersection point  & \eq{phi} \\
+$\varphi$       & Dummy integration variable            & \\
+%
+\end{longtable}
+\end{center}
+
 \end{document}
