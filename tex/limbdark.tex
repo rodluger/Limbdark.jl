@@ -814,8 +814,7 @@ order $N$ as
     \label{eq:polynomialld}
     \frac{I(\upmu)}{I_0} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - 
                                 ... - u_{N}(1 - \upmu)^{N} \nonumber \\
-                          &= \sum_{i=0}^N u_i \sum_{j=0}^i 
-                                \binom{i}{j} (-1)^{j + 1} \upmu^j
+                          &= \sum_{i=0}^N u_i (1 - \upmu)^i
 \end{align}
 %
 where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu$
@@ -835,41 +834,163 @@ on the body, with the $z$-axis pointing to the observer,
 %
 If we let $\bvec{u}$ be the column vector of limb darkening coefficients
 $\bvec{u} \equiv (u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$ 
-and $\mubasis$ be the polynomial basis
-$\mubasis \equiv (1 \ z \ z^2 \ ... \ z^N)^\mathsf{T}$, we may 
+and $\ubasis$ be the \emph{limb darkening basis}
+%
+\begin{align}
+    \label{eq:ldbasis}
+    \ubasis = \begin{pmatrix}
+        1 & &
+        (1 - z) & &
+        (1 - z)^2 & &
+        ... & &
+        (1 - z)^N
+    \end{pmatrix}^\mathsf{T} \quad,
+\end{align}
+%
+we may 
 express Equation~(\ref{eq:polynomialld}) more compactly as the
 dot product
 %
 \begin{align}
     \label{eq:polynomialld_vec}
-    \frac{I(z)}{I_0} &= \mubasis^\mathsf{T} \bvec{u} .
+    \frac{I(z)}{I_0} &= \ubasis^\mathsf{T} \bvec{u} \quad .
 \end{align}
 
-Our task is to compute the flux, $F$, observed during an occultation by
+Our task now is to compute the flux, $F$, observed during an occultation by
 integrating this function over the visible area of the disk:
 %
 \begin{align}
     \label{eq:occint}
     F &=
-    \oiint I(z) \, \dd S
-    \nonumber \\
-    &= 
-    I_0 \oiint \mubasis^\mathsf{T}(z) \, \dd S \, \bvec{u} \quad.
+    \oiint I(z) \, \dd S \quad .
 \end{align}
 %
 In general, the surface integral in Equation~(\ref{eq:occint}) is difficult---if not
-impossible---to solve directly. As in \citet{starry}, we note that the problem
-is made significantly more tractable if we first perform a change of basis
-operation:
+impossible---to solve directly with $I(z)$ given by Equation~(\ref{eq:polynomialld_vec}). 
+However, as in \citet{starry}, we note that the problem
+is made significantly more tractable if we first perform a couple change of basis
+operations.
+
+\subsection{Change of basis}
+\label{sec:higher_order}
+We wish to find a basis in which to express the limb darkening profile that
+makes evaluating Equation~(\ref{eq:occint}) easy. This section follows
+closely the discussion in \citet{starry}, in which the authors first transform
+to a \emph{polynomial basis}, whose terms are simple powers of the coordinates,
+and then to a \emph{Green's basis}, whose terms make application of Green's
+theorem convenient in reducing the surface integral to a one-dimensional line
+integral.
+
+Let us define the transformation to the polynomial basis by the linear equation
 %
 \begin{align}
-    \label{eq:greensbasis}
-    \gbasis \equiv \bvec{A} \mubasis
+    \label{eq:pbasis}
+    \mathfrak{p} \equiv \mathcal{A}_1 \bvec{u}
 \end{align}
 %
-where, as in \citet{starry}, we refer to $\gbasis$ as the \emph{Green's basis},
-which we define below. The matrix $\bvec{A}$ is a yet-to-be-defined 
-linear transformation of the coefficients $\bvec{u}$.
+where $\mathfrak{p}$ is the vector of limb darkening coefficients in the
+polynomial basis $\pbasis$ and $\bvec{A}_1$ is a change of basis matrix.
+We define the polynomial basis to be the power series in $z$,
+%
+\begin{align}
+    \label{eq:polybasis}
+    \pbasis = \begin{pmatrix}
+        1 & z & z^2 & z^3 & ... & z^N
+    \end{pmatrix}^\mathsf{T}
+\end{align}
+%
+
+
+%Note that $\mathfrak{p}_0 \equiv 1-\sum_{n=1}^N \mathfrak{p}_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
+
+
+The transformation between vectors in $\ubasis$ and vectors in
+$\pbasis$ is straightforward. By the binomial theorem, we may write
+the $i^\mathrm{th}$ coefficient of $\mathfrak{p}$ as
+%
+\begin{equation}
+    \label{eq:an_of_un}
+    \mathfrak{p}_i = \sum_{j=i}^N \binom{j}{i}(-1)^{i + 1} u_j.
+\end{equation}
+%
+The elements of the matrix $\bvec{A}_1$ are thus given by
+%
+\begin{align}
+    \label{eq:A1}
+    \mathcal{A}_{1_{i, j}} = \binom{j}{i}(-1)^{i + 1} \quad .
+\end{align}
+%
+Note that, as with the limb darkening basis, 
+the specific intensity at a point may be written
+%
+\begin{align}
+    \label{eq:pbasis_intensity}
+    \frac{I(z)}{I_0} &= \pbasis^\mathsf{T} \mathfrak{p} \quad .
+\end{align}
+%
+Next, we transform to the Green's basis via the equation
+%
+\begin{align}
+    \label{eq:gbasis}
+    \mathfrak{g} = \mathcal{A}_2 \mathfrak{p}
+\end{align}
+%
+where $\mathfrak{g}$ is the vector of limb darkening coefficients in the
+Green's basis $\gbasis$ and $\mathcal{A}_2$ is another change of basis matrix.
+For reasons that will become clear in the following section,
+we define the Green's basis to be
+%
+\begin{align}
+    \gbasis_n &=
+    \begin{dcases}
+        1 & \qquad n = 0
+        \\
+        z & \qquad n = 1
+        \\
+        (n+2)z^n-n z^{n-2} & \qquad n \ge 2
+    \end{dcases}
+    \nonumber\\[0.5em]
+    \gbasis &=
+    \begin{pmatrix}
+        1 & &
+        z & &
+        4z^2 - 2 &&
+        5z^3 - 3z
+        ...
+    \end{pmatrix}^\mathsf{T}
+    \quad,
+    \label{eq:greensbasis}
+\end{align}
+%
+Given this definition, the columns of the change of basis matrix
+$\mathcal{A}_2$ are the Green's basis vectors corresponding to each
+of the polynomial termms in Equation~(\ref{eq:polybasis}). Note that 
+in practice, it is more efficient to transform from $\pbasis$ to $\gbasis$ via the
+downward recursion relation
+%
+\begin{equation} 
+    \label{eq:dn_of_an}
+    \mathfrak{g}_n = \frac{\mathfrak{p}_n}{n+2} + \mathfrak{g}_{n+2},
+\end{equation}
+%
+starting with $n=N$, with $\mathfrak{g}_{N+1}=\mathfrak{g}_{N+2}=0$.
+
+As before, the specific intensity at a point may be written
+%
+\begin{align}
+    \label{eq:pbasis_intensity}
+    \frac{I(z)}{I_0} &= \gbasis^\mathsf{T} \mathfrak{g} \quad .
+\end{align}
+
+\todo{transition}
+
+
+
+
+
+\subsection{Whatup}
+\label{sec:whatup}
+
 %
 %\todo{The notation in this section needs work. I need to go through this
 %and carefully explain all symbols, define the Greens basis, the Greens
@@ -881,7 +1002,7 @@ The total flux may now be written as
 %
 \begin{align}
     \label{eq:occint_greens}
-    F &= I_0 \oiint \gbasis^\mathsf{T} (z) \, \dd S \, \bvec{A} \bvec{u} \nonumber \\
+    F &= I_0 \bigg( \oiint \gbasis^\mathsf{T} (z) \, \dd S \bigg) \, \bvec{A} \bvec{u} \nonumber \\
                 &= I_0 \, \mathfrak{s}^\mathsf{T} \bvec{A} \bvec{u} \quad ,
 \end{align}
 %
@@ -946,19 +1067,36 @@ yielding the following expression for the components of the Green's basis:
 %
 \begin{align}
 \gbasisn(z)   &= \frac{\dd {G_n}_y}{\dd \x} - \frac{\dd {G_n}_x}{\dd \y} \nonumber \\[0.5em]
-              &= 2 z^n + \frac{dz^n}{dz} \frac{z^2-1}{z} \nonumber \\[0.5em]
-              &= \frac{1}{z} \frac{d}{dz}\left[ z^n(z^2-1)\right] \nonumber \\[0.5em]
+%              &= 2 z^n + \frac{dz^n}{dz} \frac{z^2-1}{z} \nonumber \\[0.5em]
+%              &= \frac{1}{z} \frac{d}{dz}\left[ z^n(z^2-1)\right] \nonumber \\[0.5em]
               &= (n+2)z^n-n z^{n-2}
 \end{align}
 %
-for $2 \le n \le N$. For the first two terms, we choose $\tilde{\mathfrak{g}}_0 = 1$
-(uniform limb darkening) and $\tilde{\mathfrak{g}}_1 = z$ (linear limb darkening),
-which we previously discussed in \S\ref{sec:uniform} and \S\ref{sec:reparam}.
+for $2 \le n \le N$. We already introduced the first two terms, $\tilde{\mathfrak{g}}_0 = 1$
+(uniform limb darkening) and $\tilde{\mathfrak{g}}_1 = z$ (linear limb darkening).
+Since we already know how to integrate them (\S\ref{sec:uniform} and \S\ref{sec:reparam}),
+we treat them separately from the higher order terms.
+
 
 % MENTION THIS LATER: Note that the total flux of each term in this basis set, $\tilde{\mathfrak{g}}_n$, integrates
 % to zero for $2 \le n \le N$.
 
-\todo{The contents of section 5.1 should go here.}
+
+
+The total light curve is computed from
+\begin{eqnarray}\label{eq:flux}
+\mathcal{F} &=& \frac{F}{F_0} = \frac{1}{F_0}\sum_{n=0}^N d_n \mathfrak{s}_n,\\
+F_0 &=& \pi(d_0+ \tfrac{2}{3} d_1),
+\end{eqnarray}
+where $F_0$ is the unobscured flux, and $\mathcal{F}$ is the flux normalized
+such that the unobscured flux is unity.
+
+Note that the unobscured flux for each basis function (for $b \ge 1+r$ or $r=0$) is zero for
+all $\mathfrak{s}_n(r,b)$ with $2 \le n \le N$, which is why the total unobscured flux,
+$F_0$, only depends upon $d_0$ and $d_1$.
+
+
+\todo{transition}
 
 Returning to \eq{greens}, we may write the $n^\mathrm{th}$ component of 
 the solution vector as
@@ -1129,52 +1267,9 @@ We find that upward recursion in $n$ is more stable for $k^2 > \tfrac{1}{2} $,
 while downward recursion is more stable for $k^2 < \tfrac{1}{2}$.  Note that
 this differs from \starry for which downward recusion was also required for $k^2 > 2$.
 
-With the computation of the light curves for the basis functions, $\mathfrak{s}_n$, the final step is to
-combine these to make the full light curve with limb-darkening coefficients, which we describe
-next.
-
-\subsection{Limb-darkening coefficients}
-
-Our expansion for limb-darkening in terms of $u_n(1-\upmu)^n$ (Equation \ref{eq:polynomialld}) needs to
-be re-expressed in terms of the Green's basis terms $d_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right]$,
-where $d_n$ are constants.
-We accomplish this by first transforming $u_n$ to coefficients of $a_n \upmu^n$,
-and then transforming from $a_n$ to $d_n$.
-
-\todo{Rodrigo, you wanted to change notation from $d_n$ to $g_n$?}
-
-We rewrite $I(\upmu)$ in terms of these three expansions
-\begin{eqnarray}
-\frac{I(\upmu)}{I(1)} &=& 1 - \sum_{i=1}^N u_i \sum_{j=0}^i \binom{i}{j} (-1)^j \upmu^j,\nonumber\\
-&=& \sum_{n=0}^N a_n \upmu^n,\nonumber\\
-&=& d_0 + d_1 \upmu + \sum_{n=2}^N d_n \left[(n+2)\upmu^n -n \upmu^{n-2}\right].
-\end{eqnarray}
-Note that $a_0 \equiv 1-\sum_{n=1}^N a_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
-The transformation between $u_n$ and $a_n$ is straightforward based on
-looping over the binomial expansion of each of the $u_n$ terms (Equation \ref{eq:polynomialld}),
-for example $a_1 = \sum_{n=1}^N n u_n$, while in general
-\begin{equation}\label{eq:an_of_un}
-a_n = -\sum_{i=n}^N u_i \binom{i}{n}(-1)^n,
-\end{equation}
-for $1 \le n \le N$.
-Then, with the computed $a_n$ values, we can find $d_n$ from downward recursion
-using the relation
-\begin{equation} \label{eq:dn_of_an}
-d_n = \frac{a_n}{n+2} + d_{n+2},
-\end{equation}
-starting with $n=N$, with $d_{N+1}=d_{N+2}=0$.
-
-The total light curve is computed from
-\begin{eqnarray}\label{eq:flux}
-\mathcal{F} &=& \frac{F}{F_0} = \frac{1}{F_0}\sum_{n=0}^N d_n \mathfrak{s}_n,\\
-F_0 &=& \pi(d_0+ \tfrac{2}{3} d_1),
-\end{eqnarray}
-where $F_0$ is the unobscured flux, and $\mathcal{F}$ is the flux normalized
-such that the unobscured flux is unity.
-
-Note that the unobscured flux for each basis function (for $b \ge 1+r$ or $r=0$) is zero for
-all $\mathfrak{s}_n(r,b)$ with $2 \le n \le N$, which is why the total unobscured flux,
-$F_0$, only depends upon $d_0$ and $d_1$.
+%With the computation of the light curves for the basis functions, $\mathfrak{s}_n$, the final step is to
+%combine these to make the full light curve with limb-darkening coefficients, which we describe
+%next.
 
 \subsection{Analytic derivatives}\label{sec:analytic_derivatives}
 
