@@ -1008,7 +1008,8 @@ is the line integral along the arc of the occultor of radius $r$,
 and $\mathcal{Q}(\bvec{G}_n)$ is the line integral along the arc of the occulted
 body of radius one.
 
-\todo{Define $\lambda$ and $\phi$.}
+\todo{Define $\lambda$ and $\phi$.  These are given by $\phi = \kappa_0-\pi/2$ and
+$\lambda = \pi/2 - \kappa_1$.
 
 \todo{Work on the transition here. This section still doesn't flow well.}
 
@@ -1038,34 +1039,34 @@ $\mathcal{P}(\bvec{G}_n)$ can be rewritten as
 \end{equation}
 where $s_\varphi = \sin{\varphi}$.
 We make the transformation $\xi = \tfrac{1}{2} \left(\varphi - \tfrac{3\pi}{2}\right)$, yielding
-\begin{equation}
+\begin{equation}\label{eq:greens_transformed}
 \mathcal{P}(\bvec{G}_n) =
-2r (4br)^{\frac{n}{2}}\int\displaylimits_{-\tfrac{\kappa}{2}}^{\tfrac{\kappa}{2}}
+2r (4br)^{\frac{n}{2}}\int\displaylimits_{-\tfrac{\kappa_0}{2}}^{\tfrac{\kappa_0}{2}}
 (k^2-\sin^2\xi)^{\tfrac{n}{2}} (r-b + 2b \sin^2 \xi) d\xi,
 \end{equation}
-for $2 \le n \le N$, where $\kappa = 2 \sin^{-1}k$ for $k^2 \le 1$ and
-$\kappa = \pi$ for $k^2 > 1$.  Note that $\kappa = \kappa_0$, so in practice we
+for $2 \le n \le N$, where $\kappa_0 = 2 \sin^{-1}k$ for $k^2 \le 1$ and
+$\kappa_0 = \pi$ for $k^2 > 1$.  We
 reuse the value of $\kappa_0$ which was computed in the uniform limb-darkening
 case (\S \ref{sec:uniform}).
 
 With these integrals defined, the basis functions for the lightcurve are given
 by $\mathfrak{s}_n$, where $\mathfrak{s}_0$ is given for uniform limb-darkening
-in section \ref{eq:uniform}, $\mathfrak{s}_1$ is given by the linear limb-darkened
+in section \ref{sec:uniform}, $\mathfrak{s}_1$ is given by the linear limb-darkened
 solution from section \ref{sec:reparam}, and  $\mathfrak{s}_n = \mathcal{Q}(\bvec{G}_n)
 - \mathcal{P}(\bvec{G}_n) = -\mathcal{P}(\bvec{G}_n)$ for $2 \le n \le N$;
 we have already given an alternate expression for $\mathfrak{s}_2$ in section \ref{sec:quadratic}.
 
 We can express $\mathcal{P}(\bvec{G}_n)$ in terms of a sequence of integrals,
 $\mathcal{M}_n(r,b)$, given by:
-\begin{equation}
-\mathcal{M}_n(r,b) = (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} d\xi,
+\begin{equation}\label{eq:M_of_n}
+\mathcal{M}_n(r,b) = (4br)^{n/2} \int_{-\kappa_0/2}^{\kappa_0/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} d\xi,
 \end{equation}
 in terms of which the primitive integral takes the particulary simple form
 \begin{proof}{pofgn_v01}\label{eq:primitive}
 \mathcal{P}(\bvec{G}_n) = (1+r^2-b^2)\mathcal{M}_n - \mathcal{M}_{n+2}.
 \end{proof}
 
-The integrals $\mathcal{M}_n$ obey a straightforward recursion relations
+The integrals $\mathcal{M}_n$ obey straightforward recursion relations
 \begin{proof}{Mn_recursion}\label{eq:Mn_recursion}
 %\begin{eqnarray}
 \mathcal{M}_n &= \frac{1}{n} \left[ 2(n-1) (1-r^2-b^2) \mathcal{M}_{n-2} \right.\nonumber\\ 
@@ -1111,7 +1112,7 @@ for $k^2 \le 1$, while for $k^2 > 1$,
 \end{proof}
 where, as before, $k_c = \sqrt{1-k^2}$ for $k^2 \le 1$, and $k_c = \sqrt{1-k^{-2}}$ for $k^2 > 1$.
 
-For downward recursion, we compute the top four $\mathcal{M}_n$ expressions, $n-3 \le n \le N$,
+For downward recursion, we compute the top four $\mathcal{M}_n$ expressions, $N-3 \le n \le N$,
 in terms of series expansions.
 When $k^2 \le 1$, the integrals may be expressed in terms of the following
 Hypergeometric functions and infinite series,
@@ -1139,6 +1140,8 @@ be re-expressed in terms of the Green's basis terms $d_n \left[(n+2)\upmu^n -n \
 where $d_n$ are constants.
 We accomplish this by first transforming $u_n$ to coefficients of $a_n \upmu^n$,
 and then transforming from $a_n$ to $d_n$.
+
+\todo{Rodrigo, you wanted to change notation from $d_n$ to $g_n$?}
 
 We rewrite $I(\upmu)$ in terms of these three expansions
 \begin{eqnarray}
@@ -1173,7 +1176,7 @@ Note that the unobscured flux for each basis function (for $b \ge 1+r$ or $r=0$)
 all $\mathfrak{s}_n(r,b)$ with $2 \le n \le N$, which is why the total unobscured flux,
 $F_0$, only depends upon $d_0$ and $d_1$.
 
-\subsection{Analytic derivatives}
+\subsection{Analytic derivatives}\label{sec:analytic_derivatives}
 
 The derivatives of $\mathcal{P}(\bvec{G}_n)$ may be expressed simply as functions
 of $\mathcal{M}_n$:
@@ -1186,13 +1189,13 @@ We find that the derivative with respect to impact parameter becomes numerically
 unstable for small values of $b$ due to cancellation between the two
 terms, followed by division by $b$.  To avoid this problem
 for small $b$, we have derived an alternative expression which we utilize when
-$b < b_0$, where $b_0$ is a (small) cutoff value, which avoids division by $b$:
+$b < b_c$, where $b_c$ is a (small) cutoff value, which avoids division by $b$:
 \begin{eqnarray}
 \frac{\partial \mathcal{P}}{\partial b} = n \left[b\mathcal{M}_n +(2r^3+b^3-3r^2b-b-3) \mathcal{M}_{n-2}-4r^3\mathcal{N}_{n-2}\right],
 \end{eqnarray}
 where we have defined a new integral, $\mathcal{N}_n$,
-\begin{equation}
-\mathcal{N}_n(r,b) = (4br)^{n/2} \int_{-\kappa/2}^{\kappa/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} \sin^2{\xi} d\xi,
+\begin{equation}\label{eq:N_of_n}
+\mathcal{N}_n(r,b) = (4br)^{n/2} \int_{-\kappa_0/2}^{\kappa_/2} (k^2-\sin^2\xi)^{\tfrac{n}{2}} \sin^2{\xi} d\xi,
 \end{equation}
 which obeys the recursion relation
 \begin{proof}{Nn_recursion}
@@ -1212,7 +1215,7 @@ for $k^2 \le 1$ and
 for $k^2 > 1$.
 
 In the $k^2 < \tfrac{1}{2}$ limit, we find the upward recursion to be unstable, and so we evaluate the expressions for $\mathcal{N}_{N}$ and $\mathcal{N}_{N-1}$
-with a series solution (as we did for $\mathcal{M}_{N-3}-\mathcal{M}_N$),
+with a series solution (as we did for $\mathcal{M}_{N-3}$,...,$\mathcal{M}_N$),
 \begin{proof}{Nn_series}\label{eq:Nn_series}
 \mathcal{N}_n &= (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\nonumber\\
 &= (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\nonumber\\
@@ -1226,7 +1229,7 @@ We then use downward recursion with the relation
 to iterate down to $n=3$, while finally computing $n=1$ and $n=2$ exactly.
 
 Evaluating this additional integral adds further computational expense, but in
-practice we only need to compute it for $b < b_0 = 10^{-3}$ to obtain similar accuracy
+practice we only need to compute it for $b < b_c = 10^{-3}$ to obtain similar accuracy
 to the other expressions.  This is encountered rarely as it only applies when the
 occultor is nearly aligned with the source.
 
@@ -1264,7 +1267,7 @@ the derivatives via the chain rule.  Then, the light curve derivatives are given
 With the description of the light curve computation complete, we next discuss
 the integration of the light curve over a finite time step.
 
-\section{Time integration}
+\section{Time integration} \label{sec:time}
 
 Given that most observations are made over a finite exposure time,
 the integration of the light curve over time is necessary for representing
@@ -1286,7 +1289,7 @@ To compute the derivatives of the light curve with respect to $\bvec{x}$, the
 derivatives of the dynamical model must be computed as well.
 
 The time-averaged flux, $\overline{\mathcal{F}}$, and its derivatives, are given by 
-\begin{eqnarray}
+\begin{eqnarray}\label{eq:avg_flux}
 \overline{\mathcal{F}} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \mathcal{F}(t^\prime) dt^\prime,\\
 \frac{\partial \overline{\mathcal{F}}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t^\prime)}{\partial r} dt^\prime,\\
 %\frac{\partial \overline{\mathcal{F}}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t^\prime)}{\partial b} dt^\prime,\\
@@ -1301,9 +1304,10 @@ As an example, we choose the approximate transit model $b(t) = (b_0^2 + v^2(t-t_
 which ignores acceleration and curvature during a transit, and thus is valid in the
 limit of large orbital separation.  We compute the time-averaged flux and derivatives 
 with respect to $\bvec{x} = \{t_0,v,b_0\}$ for a length of integration time $\Delta t$.
+\todo{Update this description of the time-integration.}
 The integration is carried out with an adaptive refinement of the exposure time interval by
 factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
-of the mean of the start and end (Foreman-Mackey, priv.\ comm.) with a maximum
+of the mean of the start and end with a maximum
 number of refinement depths of 32.  Figure \ref{fig:integrated_derivs} shows a
 comparison of the derivatives of the time-integrated light curve for this
 impact parameter model.  
@@ -1445,7 +1449,7 @@ about the same with different numbers of points in the light curve.
     \end{centering}
 \end{figure}
 
-\section{Non-linear limb-darkening}
+\section{Non-linear limb-darkening}\label{sec:nonlinear}
 
 \citet{Claret2000} introduced a ``non-linear" limb-darkening model which
 was found to be an effective model for describing the limb-darkening functions
@@ -1644,6 +1648,8 @@ as accurate and 25 times faster to evaluate compared with \texttt{batman}.
     \end{centering}
 \end{figure}
 
+\todo{Describe comparison with the Gimenez computation.}
+
 \begin{itemize}
 \item Compare with Gimenez for speed and accuracy for higher order limb-darkening. [x]
 \item Compare with Batman for speed and accuracy. [x]
@@ -1675,7 +1681,7 @@ and to either fix these at the tabulated values given an observing band and an
 estimate of stellar parameters \citep{Claret2011,Howarth2011}, or at least to place 
 a prior that the limb-darkening parameters should nearly match these values.
 This approach can have several pitfalls:  the limb-darkening model may not be
-sufficiently precise,  the stellar atmosphere model may not be precise, and
+sufficiently precise,  the stellar atmosphere model may not be accurate, and
 the stellar parameters may not be precise.
 In computing limb-darkening from stellar atmosphere models, 
 the spherical nature of limb-darkening can affect the transit light curve
@@ -1710,8 +1716,8 @@ the discrepancies of an azimuthally-symmetric limb-darkened model can be
 treated as a source of noise.
 The deviation of the star from the model can be absorbed into noise models that
 account for outliers, account for correlations in the noise, or actually
-try to model the deviations of the star from azimuthal symmetry
-\citep[e.g.][]{SanchisOjeda2011}.
+try to model the deviations of the star from azimuthal symmetry, such as
+induced by star spots \citep[e.g.][]{SanchisOjeda2011}.
 
 % In addition to the variability and inhomogeneity of stars, the limb-darkening model
 % can only describe the variation of surface brightness with a limited accuracy.
@@ -1770,8 +1776,8 @@ This limit will be encountered as more precise measurements are made by gatherin
 more photons during a transit.  For example, for some targets, one can expect to 
 obtain $\sim 10^2$ times as many photons with JWST as collected with Kepler.
 With such higher precision, as well as the wavelength-dependence afforded
-by several JWST observing modes, once can expect that high fidelity transit
-models will be required for making precise observations.
+by several JWST observing modes, one can expect that high fidelity transit
+models will be required for making precise measurements of transit parameters.
 
 The detection of transit-timing variations with low-amplitude sinusoidal
 variations can make use of the fact that small variations in transit time
@@ -1854,7 +1860,8 @@ With the exception of 3, none of these errors affected the publicly
 available code.
 
 
-Table of notation:
+Table \ref{tab:symbols} gives a list of the notation used throughout
+the main paper.
 
 \clearpage
 
@@ -1894,13 +1901,19 @@ $A_{kite}$      & Kite-shaped area between center of circles
                   and points of contact			& \eq{Kite_area}\\
 $b$             & Impact parameter in units of occulted
                  body's radius                         &  \\
+$b_c$           & Cutoff impact parameter for using alternative
+                  expression for $d\mathcal{P}/db$     & \S\ref{sec:analytic_derivatives}\\
+$c_1-c_4$       & Non-linear limb-darkening coefficients &  \S\ref{sec:nonlinear}\\
 $\bvec{D}\,\wedge$
                & Exterior derivative                   & \eq{DGg} \\
+$\mathrm{cel}(k_c,p,a,b)$ & General complete elliptic
+                integral \citep{Bulirsch1969}          & \eq{cel}\\
 $E(\bigdot)$    & Complete elliptic integral of the
                  second kind                           & \eq{elliptic} \\
 $F$             & Total flux seen by observer           & \eq{occint} \\ 
 $F_0$           & Total non-transiting flux             & \eq{flux} \\ 
 $\mathcal{F}$   & Normalized flux seen by observer      & \eq{flux} \\ 
+$\overline\mathcal{F}$& Time-averaged normalized flux        & \eq{avg_flux} \\ 
 $_2F_1$         & Generalized Hypergeometric function   & \eq{Mn_series} \\
 %$_2\tilde{F}_1$ & Regularized Hypergeometric function   & \eq{Jlargek} \\
 $\gbasis$       & Green's basis                         & \eq{greensbasis} \\
@@ -1918,7 +1931,11 @@ $K(\bigdot)$    & Complete Elliptic integral of the
                  first kind                            & \eq{elliptic} \\
 %$l$             & Spherical harmonic degree             & \eq{lm} \\
 %$m$             & Spherical harmonic order              & \eq{lm} \\
-$n$             & Order of limb-darkening              & \\
+$m_k$           & Elliptic integral parameter          & \S\ref{sec:reparam}\\
+$n$             & Order of limb-darkening/Green's basis& \\
+$\mathcal{M}_n(r,b)$ & Integral computed recursively    & \eq{M_of_n}\\
+$N$             & Highest order of limb-darkening polynomial & \\
+$\mathcal{N}_n(r,b)$ & Integral computed recursively    & \eq{N_of_n}\\
 $p$             & Cofficient of $cel$			& \eq{cel}\\
 $q$             & Term in cel identities                & \eq{cel_identities}\\
 $\mathcal{P}$   & Primitive integral along perimiter
@@ -1932,9 +1949,12 @@ $\bvec{r}$      & Vector for integration over boundary of
                  visible disk                          & \eq{greens} \\
 $\mathfrak{s}$  & Occultation light curve solution
                  vector                                & \eq{greens} \\
+$t$             & Time variable                        & \S\ref{sec:time}\\
+$t_0$           & Central time of transit              & \S\ref{sec:time}\\
 $u$             & Dummy index                           & \\
 $u_1, u_2$      & Quadratic limb darkening coefficients & \eq{quadraticld} \\
 $\bvec{u}$      & Vector of limb-darkenig coefficients  & \S\ref{sec:higher_order} \\
+$\bvec{x}$      & Parameters used in time integration   & \S\ref{sec:time}\\
 $\x$            & Cartesian coordinate                  & \eq{xyz} \\
 $\y$            & Cartesian coordinate                  & \eq{xyz} \\
 $\z$            & Cartesian coordinate,
@@ -1943,6 +1963,7 @@ $\z$            & Cartesian coordinate,
 $\alpha_j$      & Coefficient in series for $\mathcal{M}_n$ & \eq{Mn_series} \\
 $\gamma_j$      & Coefficient in series for $\mathcal{N}_n$ & \eq{Nn_series} \\
 $\Gamma$        & Gamma function                        & \\
+$\eta$          & Parameter in quadratic limb-darkening term & \eq{eta}\\
 $\theta$        & Polar angle on star with respect to observer & \\
 $\Theta$        & Heaviside step function               & \eq{biglam} \\
 $\kappa_0$      & Angular position of on occultor of 
@@ -1959,7 +1980,8 @@ $\Pi(\bigdot,\bigdot)$
                  third kind                            & \eq{elliptic} \\
 %$\phi$          & Angular position of
 %                  occultor/occulted intersection point  & \eq{phi} \\
-$\varphi$       & Dummy integration variable            & \\
+$\varphi$      & Dummy integration variable            & \\
+$\xi$          & Transformed integration variable      & \eq{greens_transformed}\\
 %
 \end{longtable}
 \end{center}
