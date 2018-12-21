@@ -4,7 +4,7 @@ using PyPlot
 
 #include("../src/integrate_transit_cubature.jl")
 #include("../src/integrate_transit_simpson_vec.jl")
-include("integrate_transit_simpson_vec.jl")
+include("integrate_transit_simpson.jl")
 
 # Test it out:
 
@@ -16,30 +16,25 @@ t .= linearspace(t1,t2,nt)
 #t = [t[1235]] ; nt =1
 # The following compares different tolerances and maxdepths:
 r = 0.1; b0 = 0.5; u_n = [0.3,0.3]; nu = length(u_n)
-favg0 = zeros(nt,5+nu)
-favg1 = zeros(nt,5+nu)
+favg0 = zeros(nt)
+favg1 = zeros(nt)
 neval1= zeros(Int64,nt)
 depthmax1= zeros(Int64,nt)
-favg2 = zeros(nt,5+nu)
+favg2 = zeros(nt)
 neval2= zeros(Int64,nt)
 depthmax2= zeros(Int64,nt)
-favg3 = zeros(nt,5+nu)
+favg3 = zeros(nt)
 neval3= zeros(Int64,nt)
 depthmax3= zeros(Int64,nt)
-trans = transit_init(r,b0,u_n,true)
+trans = transit_init(r,b0,u_n,false)
 param = [0.0,1.0,b0]   # [t_0,v,b_0]
 
 # Now, carry out speed test:
 
-function compute_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},favg0::Array{T,2},nt::Int64) where {T <: Real}
+function compute_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},favg0::Array{T,1},nt::Int64) where {T <: Real}
 @inbounds for i=1:nt
   trans.b = sqrt(param[3]^2+(param[2]*(t[i]-param[1]))^2)
-  favg0[i,1] =  transit_poly!(trans)
-  favg0[i,2] =  trans.dfdrb[1]
-  favg0[i,3] =  trans.dfdrb[2]/trans.b*param[2]^2*(param[1]-t[i])
-  favg0[i,4] =  trans.dfdrb[2]*param[2]/trans.b*(t[i]-param[1])^2
-  favg0[i,5] =  trans.dfdrb[2]*param[3]/trans.b
-  favg0[i,6:5+trans.n] = trans.dfdu
+  favg0[i] =  transit_poly!(trans)
 end
 return
 end
@@ -47,13 +42,12 @@ end
 compute_lightcurve!(trans,param,t,favg0,nt)
 @time compute_lightcurve!(trans,param,t,favg0,nt)
 
-function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64,tol::T,maxdepth::Int64,neval_t::Array{Int64,1},depthmax::Array{Int64,1}) where {T <: Real}
+function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,1},nt::Int64,tol::T,maxdepth::Int64,neval_t::Array{Int64,1},depthmax::Array{Int64,1}) where {T <: Real}
 # First, find the points of contact:
 b0 = abs(param[3]); r = trans.r; t0 = param[1]; v = param[2]
 if b0 > (1.0+r)
   println("No transit")
-  favg1[:,1] = one(T)
-  favg1[:,2:5+trans.n] = zero(T)
+  favg1 .= one(T)
   return
 elseif (b0+r) > 1.0
   # Two points of contact:
@@ -83,10 +77,10 @@ fint  = zeros(T,6+trans.n)
       end
     end
     push!(tlim,t2)
-    ftmp=zeros(T,6+trans.n)
+    ftmp=zero(T)
     for j=1:length(tlim)-1
-      nevali,depthmaxi =  integrate_timestep_gradient!(param,trans,tlim[j],tlim[j+1],tol,maxdepth,fint)
-      println("r: ",trans.r," b: ",trans.b," fint: ",fint[1]," dt: ",tlim[j+1]-tlim[j])
+      fint,nevali,depthmaxi =  integrate_timestep_gradient!(param,trans,tlim[j],tlim[j+1],tol,maxdepth)
+      println("r: ",trans.r," b: ",trans.b," fint: ",fint," dt: ",tlim[j+1]-tlim[j])
       neval_t[i] += nevali
       if depthmaxi > depthmax[i]
         depthmax[i] = depthmaxi
@@ -96,9 +90,8 @@ fint  = zeros(T,6+trans.n)
     ftmp *= dtinv
 #    println("ftmp: ",ftmp)
   end
-  favg1[i,1:5]=ftmp[1:5]
+  favg1[i]=ftmp
   # Convert from d_n to u_n derivatives:
-  favg1[i,6:5+trans.n]=BLAS.gemv('T',1.0,trans.dddu,ftmp[6:6+trans.n])
 #  println("i: ",i," t: ",t[i]," result: ",ftmp)
 end
 return

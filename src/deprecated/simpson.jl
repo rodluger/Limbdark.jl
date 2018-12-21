@@ -31,6 +31,7 @@ m=0; n=0
 g[1] = f(a)
 g[3] = f(0.5*(a+b))
 g[5] = f(b)
+ println("g[1]: ",g[1]," g[3]: ",g[3]," g[5]: ",g[5])
 bma = b-a
 A[1] = 0.5*bma*(g[1]+4*g[3]+g[5])
 @label AA
@@ -55,10 +56,11 @@ if abs(((A[2]+A[3])-A[1])/(A[2]+A[3])) > eps/d
   @goto AA
 else
   I_of_f += (A[2]+A[3])/3
+#  println("I(f): ",I_of_f)
   m += 1
   i = a+m*bma/d
   @label BB
-  if m == 2*div(m,2)
+  if iseven(m)
     m = div(m,2)
     n -= 1
     @goto BB
@@ -72,5 +74,6 @@ else
   end
 end
 @label CC
+#println("I(f): ",I_of_f)
 return I_of_f
 end

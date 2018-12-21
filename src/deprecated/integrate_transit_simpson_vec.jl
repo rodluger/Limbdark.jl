@@ -2,7 +2,7 @@
 # a time step, giving the fluence in units of time (since flux is normalized to unity).
 
 using Cubature
-include("transit_poly_struct.jl")
+include("../transit_poly_struct.jl")
 include("simpson_vec.jl")
 
 # Now the version with derivatives:
@@ -86,9 +86,13 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
 # simpson(a::T, b::T, f::Function, I_of_f::Array{T,1}, i::T, eps::T, N::Int64, nf::Int64) where {T <: Real}
   tend = zero(T)
   fint .= simpson_vec(t1,t2,transit_flux_derivative,fint,tend,tol,maxdepth,trans.n+6)
-  println("itg, r: ",trans.r," b: ",trans.b," f/df: ",fint," tol: ",tol)
-  fint,ferr = hquadrature(trans.n+6,transit_flux_derivative,t1,t2,abstol=tol)
-  println("cub, r: ",trans.r," b: ",trans.b," f/df: ",fint)
+  fint2,ferr = hquadrature(trans.n+6,transit_flux_derivative,t1,t2,abstol=tol)
+  if maximum(abs,fint-fint2) > 1e-8
+    println("itg, r: ",trans.r," b: ",trans.b," f/df: ",fint," tol: ",tol," t2-t1: ",t2-t1)
+    println("cub, r: ",trans.r," b: ",trans.b," f/df: ",fint2)
+    println("f[t1]: ",transit_flux_derivative(t1)," f[t2]: ",transit_flux_derivative(t2))
+    read(STDIN,Char)
+  end
   # Return the number of evalutions and maximum depth for record-keeping:
 return neval::Int64,depthmax::Int64
 end
