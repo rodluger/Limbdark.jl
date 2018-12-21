@@ -85,6 +85,7 @@ fint  = zeros(T,6+trans.n)
     ftmp=zeros(T,6+trans.n)
     for j=1:length(tlim)-1
       nevali,depthmaxi =  integrate_timestep_gradient!(param,trans,tlim[j],tlim[j+1],tol,maxdepth,fint)
+#      println("r: ",trans.r," b: ",trans.b," fint: ",fint[1]," dt: ",tlim[j+1]-tlim[j])
       neval_t[i] += nevali
       if depthmaxi > depthmax[i]
         depthmax[i] = depthmaxi
@@ -126,7 +127,7 @@ for k=1:K
   t_nobin1 = time_ns()
   compute_lightcurve!(trans,param,t,favg0,nt)
   t_nobin = time_ns()-t_nobin1
-  integrate_lightcurve!(trans,param,t,texp,favg2,nt,1e-14,50,neval2,depthmax2)
+  integrate_lightcurve!(trans,param,t,texp,favg2,nt,1e-12,50,neval2,depthmax2)
   for j=1:ntol
     t_bin1 = time_ns()
     integrate_lightcurve!(trans,param,t,texp,favg1,nt,tol[j],50,neval1,depthmax1)

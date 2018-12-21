@@ -1,6 +1,7 @@
 # This is code for computing a transit model and derivatives integrated over
 # a time step, giving the fluence in units of time (since flux is normalized to unity).
 
+using Cubature
 include("transit_poly_struct.jl")
 include("simpson_vec.jl")
 
@@ -23,6 +24,19 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   fmid[3] = trans_mid.dfdrb[2]*binv*param[2]^2*(param[1]-tmid)  # t0 derivative
   fmid[4] = trans_mid.dfdrb[2]*param[2]*binv*(tmid-param[1])^2  # v derivative
   fmid[5] = trans_mid.dfdrb[2]*param[3]*binv  # b0 derivative
+  @inbounds for i=1:trans_mid.n+1
+    fmid[5+i] = trans_mid.dfdd[i]  # d_i derivatives
+  end
+  return fmid
+  end
+
+  function fill_flux!(tmid::T,fmid0::T,trans_mid::Transit_Struct{T}) where {T <: Real}
+  fmid = Array{T}(6+trans_mid.n)
+  fmid[1] = fmid0   # flux
+  fmid[2] = trans_mid.dfdrb[1]  # r derivative
+  fmid[3] = trans_mid.dfdrb[2]/trans_mid.b*param[2]^2*(param[1]-tmid)  # t0 derivative
+  fmid[4] = trans_mid.dfdrb[2]*param[2]/trans_mid.b*(tmid-param[1])^2  # v derivative
+  fmid[5] = trans_mid.dfdrb[2]*param[3]/trans_mid.b  # b0 derivative
   @inbounds for i=1:trans_mid.n+1
     fmid[5+i] = trans_mid.dfdd[i]  # d_i derivatives
   end
@@ -54,8 +68,17 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   fmid0 = transit_poly_d!(trans); neval += 1
   # Then, fillin the flux and derivatives in the fmid vector:
   fill_flux!(tmid,fmid0,trans,fmid)
-#  println("b: ",trans.b," f/df: ",fmid)
+#  println("tfd, r: ",trans.r," b: ",trans.b," f/df: ",fmid)
   return fmid
+  end
+
+  # Function to define the vector integration in cubature:
+  function transit_flux_derivative(tmid::T,fmid::Array{T,1}) where {T <: Real}
+  trans.b = solver(tmid)
+  fmid0 = transit_poly_d!(trans)
+  fmid .= fill_flux!(tmid,fmid0,trans)
+#  println("b: ",trans.b," f/df: ",fmid)
+  return
   end
 
 #  fint,ferr = hquadrature(trans.n+6,transit_flux_derivative,t1,t2,abstol=tol)
@@ -63,6 +86,9 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
 # simpson(a::T, b::T, f::Function, I_of_f::Array{T,1}, i::T, eps::T, N::Int64, nf::Int64) where {T <: Real}
   tend = zero(T)
   fint .= simpson_vec(t1,t2,transit_flux_derivative,fint,tend,tol,maxdepth,trans.n+6)
+  println("itg, r: ",trans.r," b: ",trans.b," f/df: ",fint," tol: ",tol)
+  fint,ferr = hquadrature(trans.n+6,transit_flux_derivative,t1,t2,abstol=tol)
+  println("cub, r: ",trans.r," b: ",trans.b," f/df: ",fint)
   # Return the number of evalutions and maximum depth for record-keeping:
 return neval::Int64,depthmax::Int64
 end

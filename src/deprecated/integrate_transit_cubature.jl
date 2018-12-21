@@ -7,7 +7,7 @@ using Cubature
 include("transit_poly_struct.jl")
 
 # Now the version with derivatives:
-function integrate_timestep_gradient(param::Array{T,1},trans::Transit_Struct{T},time::T,dt::T,tol::T,maxdepth::Int64) where {T <: Real}
+function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T},t1::T,t2::T,tol::T,maxdepth::Int64) where {T <: Real}
 
   function fill_flux!(tmid::T,fmid0::T,trans_mid::Transit_Struct{T}) where {T <: Real}
   fmid = Array{T}(6+trans_mid.n)
@@ -41,8 +41,6 @@ function integrate_timestep_gradient(param::Array{T,1},trans::Transit_Struct{T},
   return
   end
   
-  t1 = time - 0.5*dt
-  t2 = time + 0.5*dt
-  fint,ferr = hquadrature(trans.n+6,transit_flux_derivative,t1,t2,reltol=tol)
+  fint,ferr = hquadrature(trans.n+6,transit_flux_derivative,t1,t2,abstol=tol)
 return fint
 end

@@ -39,9 +39,12 @@ d = 2^n
 h = 0.25*bma/d
 g[2,:] = f(a+h*(4*m+1))
 g[4,:] = f(a+h*(4*m+3))
+#println("g: ",g[:,1])
 A[2,:] = h*(g[1,:]+4*g[2,:]+g[3,:])
 A[3,:] = h*(g[3,:]+4*g[4,:]+g[5,:])
-if maximum(abs,(((A[2,:]+A[3,:])-A[1,:])./(A[2,:]+A[3,:]))) > eps/d
+mask = A[2,:]+A[3,:] != zero(T)
+#if maximum(abs,(((A[2,:]+A[3,:])-A[1,:])./(A[2,:]+A[3,:]))) > eps/d
+if maximum(abs,(((A[2,mask]+A[3,mask])-A[1,mask])./(A[2,mask]+A[3,mask]))) > eps/d
   m *=2
   n +=1
   if n > N
@@ -56,6 +59,7 @@ if maximum(abs,(((A[2,:]+A[3,:])-A[1,:])./(A[2,:]+A[3,:]))) > eps/d
   @goto AA
 else
   I_of_f += (A[2,:]+A[3,:])/3
+#  println("I_of_f: ",I_of_f[1]," b-a: ",b-a," A: ",A," h: ",h," n: ",n)
   m += 1
   i = a+m*bma/d
   @label BB
@@ -73,5 +77,6 @@ else
   end
 end
 @label CC
+#println("I_of_f: ",I_of_f[1]," b-a: ",b-a)
 return I_of_f
 end
