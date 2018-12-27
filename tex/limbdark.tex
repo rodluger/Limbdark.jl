@@ -1375,16 +1375,29 @@ compute the derivatives of the solution vector as
 for $2 \le n \le N$, while the $n=0$ and $n=1$ terms are handled separately as in
 section \S\ref{sec:reparam}.
 %
-The derivatives of the normalized flux, $F$, as a function of $r$, $b$, and
-$\mathfrak{g}_n$ are then computed as
+The derivatives of the normalized flux, $F$, with respect to $r$ and $b$
+are then computed as
+%
 \begin{eqnarray}\label{eq:derivatives}
 \frac{\partial F}{\partial r} &=& I_0 \sum_{n=0}^N \mathfrak{g}_n \frac{\partial \mathfrak{s}_n}{\partial r},\\[0.5em]
-\frac{\partial F}{\partial b} &=& I_0 \sum_{n=0}^N \mathfrak{g}_n \frac{\partial \mathfrak{s}_n}{\partial b},\\[0.5em]
-\frac{\partial F}{\partial \mathfrak{g}_0} &=&  -\pi I_0 F + I_0 \mathfrak{s}_0,\\[0.5em]
-\frac{\partial F}{\partial \mathfrak{g}_1} &=&  -\frac{2\pi}{3} I_0 F + I_0 \mathfrak{s}_1,\\[0.5em]
-\frac{\partial F}{\partial \mathfrak{g}_n} &=&  I_0 \mathfrak{s}_n,
+\frac{\partial F}{\partial b} &=& I_0 \sum_{n=0}^N \mathfrak{g}_n \frac{\partial \mathfrak{s}_n}{\partial b} \quad.
 \end{eqnarray}
-where the last line is for $2 \le n \le N$.
+%
+We will see in the following section that the normalization constant, $I_0$,
+is independent of $\mathfrak{g}$ for $n \ge 2$, so the derivative of $F$
+with respect to $\mathfrak{g}$ is trivial:
+%
+\begin{eqnarray}
+    \frac{\partial F}{\partial \mathfrak{g}_n} &=&  I_0 \mathfrak{s}_n
+\end{eqnarray}
+%
+for $n \ge 2$. For the first two terms, we differentiate
+Equation~(\ref{eq:normalization}) in the following section to obtain
+%
+\begin{eqnarray}
+\frac{\partial F}{\partial \mathfrak{g}_0} &=&  I_0 \mathfrak{s}_0 - \pi \frac{F}{I_0^2},\\[0.5em]
+\frac{\partial F}{\partial \mathfrak{g}_1} &=&  I_0 \mathfrak{s}_1 - \frac{2\pi}{3} \frac{F}{I_0^2}\quad.
+\end{eqnarray}
 
 The derivatives of the coefficients, $\frac{\partial \mathfrak{g}_j}{\partial u_i}$, are
 computed by differentiating each term in Equation~(\ref{eq:an_of_un}) to obtain
