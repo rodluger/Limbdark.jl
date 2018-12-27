@@ -789,7 +789,7 @@ With this definition, then the quadratic term, $\mathfrak{s}_2(r,b)$ is given by
 \end{eqnarray}
 where $\mathfrak{s}_0$ and its derivatives are defined in Equations (\ref{eq:uniform})--(\ref{eq:dS0_drb}).
 With the formulae for $\mathfrak{s}_0$, $\mathfrak{s}_1$, and $\mathfrak{s}_2$, the light curve and derivatives
-of quadratic limb darkening may be computed with Equations (\ref{eq:flux}) and 
+of quadratic limb darkening may be computed with Equations (\ref{eq:occint_greens}) and 
 (\ref{eq:derivatives}) given below.
 
 Finally, we turn our attention to the general polynomial limb darkening case,
@@ -2116,7 +2116,7 @@ $\bvec{A}_1$    & Change of basis matrix:
                  $\mathbf{u}$ to
                  polynomials                            & \eq{A1} \\
 $\bvec{A}_2$    & Change of basis matrix:
-                polynonials to Green's polynomials      & \eq{A2} \\
+                polynonials to Green's polynomials      & \eq{gbasis} \\
 $A_{lens}$      & Lens-shaped area of overlap of 
                   two circles                           & \eq{MAuniform}\\
 $A_{kite}$      & Kite-shaped area b/w center 
@@ -2134,8 +2134,7 @@ $\mathrm{cel}(k_c,p,a,b)$
                  integral \citep{Bulirsch1969}          & \eq{cel}\\
 $E(\bigdot)$    & Complete elliptic integral of the
                  second kind                            & \eq{elliptic} \\
-$F$             & Total flux seen by observer           & \eq{occint} \\ 
-$F$             & Normalized flux seen by observer      & \eq{flux} \\ 
+$F$             & Normalized flux seen by observer      & \eq{occint} \\ 
 $\overline{F}$  & Time-averaged normalized flux         & \eq{avg_flux} \\ 
 $_2F_1$         & Generalized Hypergeometric function   & \eq{Mn_series} \\
 $\gbasis$       & Green's basis                         & \eq{greensbasis} \\
@@ -2160,6 +2159,8 @@ $N$             & Highest order of limb darkening polynomial & \\
 $\mathcal{N}_n(r,b)$ 
                 & Integral computed recursively         & \eq{N_of_n}\\
 $p$             & Cofficient of $cel$			        & \eq{cel}\\
+$\pbasis$       & Polynomial basis                      & \eq{polybasis} \\
+$\mathfrak{p}$  & Vector in the basis $\pbasis$         & \\
 $q$             & Term in cel identities                & \eq{cel_identities}\\
 $\mathcal{P}$   & Primitive integral along perimiter
                  of occultor                            & \eq{primitiveP} \\
@@ -2175,7 +2176,9 @@ $t$             & Time variable                         & \S\ref{sec:time}\\
 $t_0$           & Central time of transit               & \S\ref{sec:time}\\
 $u$             & Dummy index                           & \\
 $u_1, u_2$      & Quadratic limb darkening coefficients & \eq{quadraticld} \\
-$\bvec{u}$      & Vector of limb-darkenig coefficients  & \S\ref{sec:higher_order} \\
+$\ubasis$       & Limb darkening basis                  & \eq{ldbasis} \\
+$\bvec{u}$      & Vector of limb darkening coefficients
+                 in the basis $\ubasis$                 & \S\ref{sec:higher_order} \\
 $\bvec{x}$      & Parameters used in time integration   & \S\ref{sec:time}\\
 $\x$            & Cartesian coordinate                  & \eq{xyz} \\
 $\y$            & Cartesian coordinate                  & \eq{xyz} \\
@@ -2197,15 +2200,16 @@ $\kappa_0$      & Angular position of occultor/occulted
 $\kappa_1$      & Angular position of occultor/occulted 
                   intersection point                    & \eq{cosine_formulation} \\
 $\lambda$       & Angular position of occultor/occulted 
-                  intersection point                    & \eq{lambda} \\
+                  intersection point                    & \eq{primitiveQdef} \\
                 & Term in cel identities                & \eq{cel_identities} \\
 $\Lambda$       & \citet{MandelAgol2002} function       & \eq{biglam} \\
-$\upmu$         & Cosine of polar angle on star         & \eq{quadraticld} \\
+$\upmu$         & Cosine of polar angle on star,
+                  $\upmu = z$                           & \eq{quadraticld} \\
 $\Pi(\bigdot,\bigdot)$
                 & Complete elliptic integral of the
                  third kind                             & \eq{elliptic} \\
 $\phi$          & Angular position of occultor/occulted 
-                  intersection point                    & \eq{phi} \\
+                  intersection point                    & \eq{primitivePdef} \\
 $\varphi$      & Dummy integration variable             & \\
 $\xi$          & Transformed integration variable       & \eq{greens_transformed}\\
 %
