@@ -1265,112 +1265,11 @@ truncated when a term goes below a tolerance specified by the numerical precisio
 
 We find that upward recursion in $n$ is more stable for $k^2 > \tfrac{1}{2} $,
 while downward recursion is more stable for $k^2 < \tfrac{1}{2}$.  Note that
-this differs from \starry for which downward recusion was also required for $k^2 > 2$.
+this differs from \citet{starry}, for which downward recusion was also required for $k^2 > 2$.
 
 %With the computation of the light curves for the basis functions, $\mathfrak{s}_n$, the final step is to
 %combine these to make the full light curve with limb darkening coefficients, which we describe
 %next.
-
-\subsection{Normalization}
-\label{sec:normalization}
-
-We now know how to compute the flux during an occultation (Equation~\ref{eq:occint_greens}), 
-but only up to an unknown normalization constant $I_0$. It is convenient to 
-choose a normalization such that the total unocculted flux is unity, regardless
-of the value of the limb darkening coefficients. We therefore require that
-%
-\begin{align}
-    \label{eq:normalization1}
-    F &= \oiint I(z) \, \dd S \nonumber \\
-      &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \mathbf{u} \nonumber \\
-      &= 1
-\end{align}
-%
-when the integral is taken over the entire disk of the body. We must thus have
-%
-\begin{align}
-    \label{eq:normalization2}
-    I_0 &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathcal{A} \mathbf{u}} \nonumber \\[0.5em]
-        &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathfrak{g}} \quad,
-\end{align}
-%
-where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no 
-occultor (i.e., $r = 0$). We could compute $I_0$ using
-the formalism from the previous section, but it is easier to evaluate the integral
-directly. When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$ 
-corresponds to the double integral in polar coordinates
-%
-\begin{align}
-    \mathfrak{s}_n (r=0) &= \int_0^{2\pi}\int_0^1 \gbasisn(z) \, r \, \dd r \, \dd\theta \nonumber \\[0.5em]
-                         &= 2\pi \int_0^1 \gbasisn(z) \, r \, \dd r \quad,
-\end{align}
-%
-From Equation~(\ref{eq:greensbasis}), we may write
-%
-\begin{align}
-    \mathfrak{s}_n (r=0) &=
-    2\pi
-    \begin{dcases}
-        \int_0^1 r \, \dd r & \qquad n = 0
-        \\
-        \int_0^1 z \, r \, \dd r & \qquad n = 1
-        \\
-        (n+2) \int_0^1 z^n \, r \, \dd r 
-        - n \int_0^1 z^{n-2} \, r \, \dd r 
-        & \qquad n \ge 2 \quad.
-    \end{dcases}
-\end{align}
-%
-The first case is trivial and integrates to $\mathfrak{s}_0(r = 0) = \pi$.
-The remaining cases involve integrands of the form $z^n r$,
-where $z = \sqrt{1 - r^2}$. We may evaluate
-these integrals by substituting $u = z^2 = 1 - r^2$ and $\dd u = -2r \, \dd r$:
-%
-\begin{align}
-    \int_0^1 z^n \, r \, \dd r &= \frac{1}{2} \int_0^1 u^\frac{n}{2} \, \dd u \nonumber \\[0.5em]
-                               &= \frac{1}{2 + n} \quad.
-\end{align}
-%
-The solution vector then simplifies to
-%
-\begin{align}
-    \mathfrak{s}_n (r=0) &=
-    \begin{dcases}
-        \pi & \qquad n = 0
-        \\
-        \frac{2\pi}{3} & \qquad n = 1
-        \\
-        0 & \qquad n \ge 2 \quad.
-    \end{dcases}
-\end{align}
-%
-Interestingly, the net flux contribution for all terms in the Green's basis with
-$n \ge 2$ is exactly zero. We may finally evaluate our normalization constant:
-%
-\begin{eqnarray}
-    \label{eq:flux}
-    I_0 &=& \frac{1}{\pi(\mathfrak{g}_0+ \tfrac{2}{3} \mathfrak{g}_1)}.
-\end{eqnarray}
-%
-
-\subsection{Summary}
-\label{sec:summary}
-
-We showed in \S\ref{sec:theintegral} that the total flux observed during 
-an occultation is given by
-%
-\begin{align}
-    \label{eq:occint_greens_summary}
-    F &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \bvec{u} \quad ,
-\end{align}
-%
-where
-
-
-
-
-\todo{summary}
-
 
 \subsection{Analytic derivatives}\label{sec:analytic_derivatives}
 
@@ -1411,16 +1310,17 @@ for $k^2 \le 1$ and
 for $k^2 > 1$.
 
 In the $k^2 < \tfrac{1}{2}$ limit, we find the upward recursion to be unstable, and so we evaluate the expressions for $\mathcal{N}_{N}$ and $\mathcal{N}_{N-1}$
-with a series solution (as we did for $\mathcal{M}_{N-3}$,...,$\mathcal{M}_N$),
-\begin{proof}{Nn_series}\label{eq:Nn_series}
-\mathcal{N}_n &= (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2),\nonumber\\
-&= (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j},\nonumber\\
-\gamma_0 &= \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\nonumber\\
-\gamma_j &= \gamma_{j-1} \frac{(4j^2-1)}{2j(3+n+2j)}.
+with a series solution (as we did for $\mathcal{M}_{N-3}$,\, ...,\, $\mathcal{M}_N$):
+\begin{proof}{Nn_series}
+    \label{eq:Nn_series}
+    \mathcal{N}_n &= (4br)^{n/2} k^{n+3} \frac{\pi^{1/2}}{2} \frac{\Gamma{(1+\tfrac{n}{2})}}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})} \,_2F_1(\tfrac{1}{2},\tfrac{3}{2};\tfrac{5}{2}+\tfrac{n}{2};k^2) \nonumber\\[0.5em]
+                  &= (1-(r-b)^2)^{n/2} k^3 \sum_{j=0}^{j_{max}} \gamma_j k^{2j}, \nonumber\\[0.5em]
+    \gamma_0 &= \frac{\sqrt{\pi}}{2} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{5}{2}+\tfrac{n}{2})},\nonumber\\[0.5em]
+    \gamma_j &= \gamma_{j-1} \frac{(4j^2-1)}{2j(3+n+2j)}.
 \end{proof}
 We then use downward recursion with the relation
 \begin{equation}
-\mathcal{N}_n = \frac{(n+4)\mathcal{N}_{n+2} - \mathcal{M}_{n+2}}{(n+2)(1-(b+r)^2)},
+\mathcal{N}_n = \frac{(n+4)\mathcal{N}_{n+2} - \mathcal{M}_{n+2}}{(n+2)(1-(b+r)^2)}
 \end{equation}
 to iterate down to $n=3$, while finally computing $n=1$ and $n=2$ exactly.
 
@@ -1430,38 +1330,157 @@ to the other expressions.  This is encountered rarely as it only applies when th
 occultor is nearly aligned with the source.
 
 With the computation of $\mathfrak{s}_n = -\mathcal{P}(\bvec{G}_n)$, we then
-compute the derivatives of the light curve as
+compute the derivatives of the solution vector as
 \begin{eqnarray}
-\frac{\partial \mathfrak{s}_n}{\partial r} &= & -\frac{\partial \mathcal{P}(\bvec{G}_n)}{\partial r},\\
+\frac{\partial \mathfrak{s}_n}{\partial r} &= & -\frac{\partial \mathcal{P}(\bvec{G}_n)}{\partial r},\\[0.5em]
 \frac{\partial \mathfrak{s}_n}{\partial b} &= & -\frac{\partial \mathcal{P}(\bvec{G}_n)}{\partial b},
 \end{eqnarray}
 for $2 \le n \le N$, while the $n=0$ and $n=1$ terms are handled separately as in
-section \ref{sec:reparam}.
-
-The derivatives of the normalized flux, $\mathcal{F}$, as a function of $r$, $b$, and
-$d_n$ are then computed as
+section \S\ref{sec:reparam}.
+%
+The derivatives of the normalized flux, $F$, as a function of $r$, $b$, and
+$\mathfrak{g}_n$ are then computed as
 \begin{eqnarray}\label{eq:derivatives}
-\frac{\partial \mathcal{F}}{\partial r} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial \mathfrak{s}_n}{\partial r},\\
-\frac{\partial \mathcal{F}}{\partial b} &=& \sum_{n=0}^N\frac{ d_n}{F_0} \frac{\partial \mathfrak{s}_n}{\partial b},\\
-\frac{\partial \mathcal{F}}{\partial d_0} &=&  -\frac{\pi \mathcal{F}}{F_0} + \frac{\mathfrak{s}_0}{F_0},
-\end{eqnarray}
-\begin{eqnarray}
-\frac{\partial \mathcal{F}}{\partial d_1} &=&  -\frac{2\pi \mathcal{F}}{3F_0} +\frac{\mathfrak{s}_1}{F_0},\\
-\frac{\partial \mathcal{F}}{\partial d_n} &=&  \frac{\mathfrak{s}_n}{F_0},
+\frac{\partial F}{\partial r} &=& I_0 \sum_{n=0}^N \mathfrak{g}_n \frac{\partial \mathfrak{s}_n}{\partial r},\\[0.5em]
+\frac{\partial F}{\partial b} &=& I_0 \sum_{n=0}^N \mathfrak{g}_n \frac{\partial \mathfrak{s}_n}{\partial b},\\[0.5em]
+\frac{\partial F}{\partial \mathfrak{g}_0} &=&  -\pi I_0 F + I_0 \mathfrak{s}_0,\\[0.5em]
+\frac{\partial F}{\partial \mathfrak{g}_1} &=&  -\frac{2\pi}{3} I_0 F + I_0 \mathfrak{s}_1,\\[0.5em]
+\frac{\partial F}{\partial \mathfrak{g}_n} &=&  I_0 \mathfrak{s}_n,
 \end{eqnarray}
 where the last line is for $2 \le n \le N$.
 
-The derivatives of the coefficients, $\frac{\partial d_j}{\partial u_i}$, are
+The derivatives of the coefficients, $\frac{\partial \mathfrak{g}_j}{\partial u_i}$, are
 computed by differentiating each term in Equation~(\ref{eq:an_of_un}) to obtain
-$\frac{\partial a_n}{\partial u_i}$, and differentiating each term in Equation~(\ref{eq:dn_of_an})
- to obtain $\frac{\partial d_j}{\partial a_n}$, and propagating 
+$\frac{\partial \mathfrak{p}_n}{\partial u_i}$, and differentiating each term in Equation~(\ref{eq:dn_of_an})
+ to obtain $\frac{\partial \mathfrak{g}_j}{\partial \mathfrak{p}_n}$, and propagating 
 the derivatives via the chain rule.  Then, the light curve derivatives are given by
 \begin{eqnarray}\label{eq:dFdu}
-\frac{\partial \mathcal{F}}{\partial u_i} =  \sum_{j} \frac{\partial d_j}{\partial u_i}\frac{\partial \mathcal{F}}{\partial d_j}.
+\frac{\partial F}{\partial u_i} =  \sum_{j} \frac{\partial \mathfrak{g}_j}{\partial u_i}\frac{\partial F}{\partial \mathfrak{g}_j}.
 \end{eqnarray}
+
+
+\subsection{Normalization}
+\label{sec:normalization}
+%
+We now know how to compute the flux and all its derivatives during an occultation,
+but only up to an unknown normalization constant $I_0$. It is convenient to 
+choose a normalization such that the total unocculted flux is unity, regardless
+of the value of the limb darkening coefficients. We therefore require that
+%
+\begin{align}
+    \label{eq:normalization1}
+    F &= \oiint I(z) \, \dd S \nonumber \\
+      &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \mathbf{u} \nonumber \\
+      &= 1
+\end{align}
+%
+when the integral is taken over the entire disk of the body. We must thus have
+%
+\begin{align}
+    \label{eq:normalization2}
+    I_0 &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathcal{A} \mathbf{u}} \nonumber \\[0.5em]
+        &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathfrak{g}} \quad,
+\end{align}
+%
+where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no 
+occultor (i.e., $r = 0$). We could compute $I_0$ using
+the formalism from the previous section, but it is easier to evaluate the integral
+directly. When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$ 
+corresponds to the double integral in polar coordinates
+%
+\begin{align}
+    \label{eq:normalization3}
+    \mathfrak{s}_n (r=0) &= \int_0^{2\pi}\int_0^1 \gbasisn(z) \, r \, \dd r \, \dd\theta \nonumber \\[0.5em]
+                         &= 2\pi \int_0^1 \gbasisn(z) \, r \, \dd r \quad,
+\end{align}
+%
+From Equation~(\ref{eq:greensbasis}), we may write
+%
+\begin{align}
+    \label{eq:normalization4}
+    \mathfrak{s}_n (r=0) &=
+    2\pi
+    \begin{dcases}
+        \int_0^1 r \, \dd r & \qquad n = 0
+        \\
+        \int_0^1 z \, r \, \dd r & \qquad n = 1
+        \\
+        (n+2) \int_0^1 z^n \, r \, \dd r 
+        - n \int_0^1 z^{n-2} \, r \, \dd r 
+        & \qquad n \ge 2 \quad.
+    \end{dcases}
+\end{align}
+%
+The first case is trivial and integrates to $\mathfrak{s}_0(r = 0) = \pi$.
+The remaining cases involve integrands of the form $z^n r$,
+where $z = \sqrt{1 - r^2}$. We may evaluate
+these integrals by substituting $u = z^2 = 1 - r^2$ and $\dd u = -2r \, \dd r$:
+%
+\begin{align}
+    \label{eq:normalization5}
+    \int_0^1 z^n \, r \, \dd r &= \frac{1}{2} \int_0^1 u^\frac{n}{2} \, \dd u \nonumber \\[0.5em]
+                               &= \frac{1}{2 + n} \quad.
+\end{align}
+%
+The solution vector then simplifies to
+%
+\begin{align}
+    \label{eq:normalization6}
+    \mathfrak{s}_n (r=0) &=
+    \begin{dcases}
+        \pi & \qquad n = 0
+        \\
+        \frac{2\pi}{3} & \qquad n = 1
+        \\
+        0 & \qquad n \ge 2 \quad.
+    \end{dcases}
+\end{align}
+%
+Interestingly, the net flux contribution for all terms in the Green's basis with
+$n \ge 2$ is exactly zero. We may finally evaluate our normalization constant:
+%
+\begin{eqnarray}
+    \label{eq:normalization}
+    I_0 &=& \frac{1}{\pi(\mathfrak{g}_0+ \tfrac{2}{3} \mathfrak{g}_1)}.
+\end{eqnarray}
+%
+
+
+\subsection{Summary}
+\label{sec:summary}
+In this section, we showed that if we express the specific intensity distribution
+on the surface of a spherical body as the series
+%
+\begin{align}
+\frac{I(\upmu)}{I_0} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - ... - u_{N}(1 - \upmu)^{N} \quad,
+\end{align}
+%
+(see Equation~\ref{eq:polynomialld}),
+the total flux observed during an occultation is given by the analytic and closed form
+expression
+%
+\begin{align}
+    \label{eq:occint_greens_summary}
+    F &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \bvec{u} \quad ,
+\end{align}
+%
+where $I_0$ is a normalizing constant (Equation~\ref{eq:normalization}),
+$\mathfrak{s}$ is the solution vector (Equation~\ref{eq:sn}), 
+a function of only the impact parameter
+$b$ and radius $r$ of the occultor, $\mathcal{A}$ is a change of basis
+matrix (Equation~\ref{eq:A}), and $\mathbf{u}$ is the vector of limb
+darkening coefficients $(u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$.
+
+%
+\todo{More detailed summary? Emphasize how the uniform and linear
+terms are computed separately. Emphasize how the change of basis
+matrix is pre-computed.}
+%
 
 With the description of the light curve computation complete, we next discuss
 the integration of the light curve over a finite time step.
+
+
 
 \section{Time integration} \label{sec:time}
 
@@ -1474,7 +1493,7 @@ posterior of model parameters, we would like to compute the derivatives
 of the time-averaged flux with respect to the model parameters.
 
 The instantaneous flux is a function of $3+n$ parameters in the Green's basis, 
-$\{r,b,d_n\}$, or $2+n$ parameters in the polynomial in $1-\upmu$ basis, and of
+$\{r,b,\mathfrak{g}_n\}$, or $2+n$ parameters in the polynomial in $1-\upmu$ basis, and of
 these, only one varies with time, $b(t)$.  Thus, we can compute the time-
 dependent flux with a model for $b(t)=b(\bvec{x},t)$, where
 where $b(\bvec{x},t)$ is a model for the impact parameter as a function of time
@@ -1484,14 +1503,14 @@ with respect to one another, or a full dynamical model of an n-body system.
 To compute the derivatives of the light curve with respect to $\bvec{x}$, the
 derivatives of the dynamical model must be computed as well.
 
-The time-averaged flux, $\overline{\mathcal{F}}$, and its derivatives, are given by 
+The time-averaged flux, $\overline{F}$, and its derivatives, are given by 
 \begin{eqnarray}\label{eq:avg_flux}
-\overline{\mathcal{F}} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \mathcal{F}(t^\prime) dt^\prime,\\
-\frac{\partial \overline{\mathcal{F}}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t^\prime)}{\partial r} dt^\prime,\\
-%\frac{\partial \overline{\mathcal{F}}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t^\prime)}{\partial b} dt^\prime,\\
-\frac{\partial \overline{\mathcal{F}}}{\partial d_i}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}(t^\prime)}{\partial d_i} dt^\prime,\\
-\frac{\partial \overline{\mathcal{F}}}{\partial \bvec{x}} &=& \frac{1}{\Delta t}
-\int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial \mathcal{F}}{\partial b}\frac{\partial b(t^\prime)}{\partial \bvec{x}} dt^\prime,
+\overline{F} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} F(t^\prime) dt^\prime,\\
+\frac{\partial \overline{F}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial r} dt^\prime,\\
+%\frac{\partial \overline{F}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial b} dt^\prime,\\
+\frac{\partial \overline{F}}{\partial \mathfrak{g}_i}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial \mathfrak{g}_i} dt^\prime,\\
+\frac{\partial \overline{F}}{\partial \bvec{x}} &=& \frac{1}{\Delta t}
+\int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F}{\partial b}\frac{\partial b(t^\prime)}{\partial \bvec{x}} dt^\prime,
 \end{eqnarray}
 where $t$ is taken to be the mid-point of the transit exposure time, and
 $\Delta t$ is the exposure time.
@@ -1559,14 +1578,14 @@ for $k^2 \le 1$, separately for $N-3$ to $N$ for $\mathcal{M}_n$, and for
 $N-1$ and $N$ for $\mathcal{N}_n$.
 
 In addition, once $N$ is specified, then the transformation matrix for
-the Jacobian from $d_i$ to $u_j$, $\frac{\partial d_i}{\partial u_j}$,  
+the Jacobian from $\mathfrak{g}_i$ to $u_j$, $\frac{\partial \mathfrak{g}_i}{\partial u_j}$,  
 remains the same throughout the light curve 
 computation, so we compute this matrix only once, and then compute the
 flux derivative (Equation \ref{eq:dFdu}) with matrix multiplication.
-In fact, since the Jacobian matrix for transforming the derivatives from $d_i$
+In fact, since the Jacobian matrix for transforming the derivatives from $\mathfrak{g}_i$
 to $u_j$ can be expensive to apply, we can carry out the gradient of the 
-likelihood function with respect to $d_i$, and then apply the Jacobian 
-transformation from $d_i$ to $u_j$ only once to obtain the gradient
+likelihood function with respect to $\mathfrak{g}_i$, and then apply the Jacobian 
+transformation from $\mathfrak{g}_i$ to $u_j$ only once to obtain the gradient
 of the likelihood with respect to the limb darkening parameterization.
 In practice, we are usually only concerned with optimizing a likelihood
 or computing gradients of a likelihood for Hamiltonian Markov Chain
@@ -1591,11 +1610,11 @@ and $\mathcal{N}_n$.
 
 We find that the precision of the computation begins to degrade for
 $N \approx 25-30$.  For large values of $N$, the computing time for
-propagating the derivatives from $d_i$ to $u_i$ scales as $N^2$, and
+propagating the derivatives from $\mathfrak{g}_i$ to $u_i$ scales as $N^2$, and
 thus can dominate the computation time.  We utilize the BLAS linear
 algebra library (specifically, the routine \texttt{gemv}) for efficient 
 multiplication of this matrix times the derivative of the light curve with 
-respect to $d_i$ in order to obtain the derivatives with respect to $u_i$.
+respect to $\mathfrak{g}_i$ in order to obtain the derivatives with respect to $u_i$.
 However, as we note above, an even more efficient approach is to
 simply apply this transformation once to the gradient of the likelihood.
 
@@ -1611,7 +1630,8 @@ parameters, we carried out nine measurements  of the timing, and
 we use the median of these for plotting purposes.  The benchmarking
 for the \texttt{Julia} code was carried out with \texttt{v0.7} of
 Julia on a MacBook Pro with 2.8 GHz Intel Core i7.
-No sub-sampling was carried out in this computation.
+No sub-sampling was carried out in this computation. \todo{Update this
+sentence with the Travis CPU specs.}
 
 Figure \ref{fig:ncoeff} shows that the time dependence is linear with the
 number of $b$ values (which is equivalent to the number of data points
@@ -1647,7 +1667,7 @@ about the same with different numbers of points in the light curve.
 
 \section{Non-linear limb darkening}\label{sec:nonlinear}
 
-\citet{Claret2000} introduced a ``non-linear" limb darkening model which
+\citet{Claret2000} introduced a ``non-linear'' limb darkening model which
 was found to be an effective model for describing the limb darkening functions
 which are produced by models of stellar atmospheres.
 Although we can only model limb darkening which is integer powers of $\upmu$,
@@ -1937,7 +1957,7 @@ Criterion).  A high-order limb darkening model can be chosen, with the
 coefficients regularized to favor small values;  should the data require
 a higher-order model, then the coefficients will increase to accommodate
 the data.  The parameterization of the limb darkening with terms with
-$d_n ((n+2)\upmu^n-\upmu^{n-2})$ for $2 \le n \le N$ may be particularly
+$\mathfrak{g}_n ((n+2)\upmu^n-\upmu^{n-2})$ for $2 \le n \le N$ may be particularly
 convenient for this model in that these terms do not contribute to the
 total flux of the star.  A third possibility is to fit stellar atmosphere
 models with the polynomial limb darkening model until a sufficient precision
@@ -2090,63 +2110,69 @@ the main paper.
 %
 $a_n$           & Gim\'enez coefficients                & \eq{gimenez}\\
 $\bvec{A}$      & Change of basis matrix:
-                 $Y_{lm}$s to Green's
-                 polynomials                           & \eq{A} \\
-$A_{lens}$      & Lens-shaped area of overlap of two circles & \eq{MAuniform}\\
-$A_{kite}$      & Kite-shaped area between center of circles
-                  and points of contact			& \eq{Kite_area}\\
+                 $\mathbf{u}$ to Green's
+                 polynomials                            & \eq{A} \\
+$\bvec{A}_1$    & Change of basis matrix:
+                 $\mathbf{u}$ to
+                 polynomials                            & \eq{A1} \\
+$\bvec{A}_2$    & Change of basis matrix:
+                polynonials to Green's polynomials      & \eq{A2} \\
+$A_{lens}$      & Lens-shaped area of overlap of 
+                  two circles                           & \eq{MAuniform}\\
+$A_{kite}$      & Kite-shaped area b/w center 
+                  of circles and points of contact		& \eq{Kite_area}\\
 $b$             & Impact parameter in units of occulted
-                 body's radius                         &  \\
-$b_c$           & Cutoff impact parameter for using alternative
-                  expression for $d\mathcal{P}/db$     & \S\ref{sec:analytic_derivatives}\\
-$c_1-c_4$       & Non-linear limb darkening coefficients &  \S\ref{sec:nonlinear}\\
+                 body's radius                          &  \\
+$b_c$           & Cutoff for using alternative
+                  expression for $d\mathcal{P}/db$      & \S\ref{sec:analytic_derivatives}\\
+$c_1-c_4$       & Non-linear limb darkening 
+                  coefficients                          &  \S\ref{sec:nonlinear}\\
 $\bvec{D}\,\wedge$
-               & Exterior derivative                   & \eq{DGg} \\
-$\mathrm{cel}(k_c,p,a,b)$ & General complete elliptic
-                integral \citep{Bulirsch1969}          & \eq{cel}\\
+                & Exterior derivative                   & \eq{DGg} \\
+$\mathrm{cel}(k_c,p,a,b)$ 
+                & General complete elliptic
+                 integral \citep{Bulirsch1969}          & \eq{cel}\\
 $E(\bigdot)$    & Complete elliptic integral of the
-                 second kind                           & \eq{elliptic} \\
+                 second kind                            & \eq{elliptic} \\
 $F$             & Total flux seen by observer           & \eq{occint} \\ 
-$F_0$           & Total non-transiting flux             & \eq{flux} \\ 
-$\mathcal{F}$   & Normalized flux seen by observer      & \eq{flux} \\ 
-$\overline{\mathcal{F}}$ & Time-averaged normalized flux        & \eq{avg_flux} \\ 
+$F$             & Normalized flux seen by observer      & \eq{flux} \\ 
+$\overline{F}$  & Time-averaged normalized flux         & \eq{avg_flux} \\ 
 $_2F_1$         & Generalized Hypergeometric function   & \eq{Mn_series} \\
-%$_2\tilde{F}_1$ & Regularized Hypergeometric function   & \eq{Jlargek} \\
 $\gbasis$       & Green's basis                         & \eq{greensbasis} \\
-%$\bvec{g}$      & Vector in the basis $\gbasis$         & \\
+$\mathfrak{g}$  & Vector in the basis $\gbasis$         & \\
 $\bvec{G}_n$    & Anti-exterior derivative of the
                  $n^\mathrm{th}$
-                 term in the Green's basis             & \eq{greens_n} \\
+                 term in the Green's basis              & \eq{greens_n} \\
 $i$             & Dummy index                           & \\
 $I$             & Specific intensity, $I(\x, \y)$       & \\
+$I_0$           & Intensity normalization constant      & \eq{normalization} \\
 $j$             & Dummy index                           & \\
 $k$             & Elliptic parameter                    & \eq{k2} \\
-               & Dummy index                           & \\
+                & Dummy index                           & \\
 $k_c$           & $\sqrt{1 - k^2}$                      & \eq{cel} \\
 $K(\bigdot)$    & Complete Elliptic integral of the
-                 first kind                            & \eq{elliptic} \\
-%$l$             & Spherical harmonic degree             & \eq{lm} \\
-%$m$             & Spherical harmonic order              & \eq{lm} \\
-$m_k$           & Elliptic integral parameter          & \S\ref{sec:reparam}\\
-$n$             & Order of limb darkening/Green's basis& \\
-$\mathcal{M}_n(r,b)$ & Integral computed recursively    & \eq{M_of_n}\\
+                  first kind                            & \eq{elliptic} \\
+$m_k$           & Elliptic integral parameter           & \S\ref{sec:reparam}\\
+$n$             & Order of limb darkening/Green's basis	& \\
+$\mathcal{M}_n(r,b)$ 
+                & Integral computed recursively         & \eq{M_of_n}\\
 $N$             & Highest order of limb darkening polynomial & \\
-$\mathcal{N}_n(r,b)$ & Integral computed recursively    & \eq{N_of_n}\\
-$p$             & Cofficient of $cel$			& \eq{cel}\\
+$\mathcal{N}_n(r,b)$ 
+                & Integral computed recursively         & \eq{N_of_n}\\
+$p$             & Cofficient of $cel$			        & \eq{cel}\\
 $q$             & Term in cel identities                & \eq{cel_identities}\\
 $\mathcal{P}$   & Primitive integral along perimiter
-                 of occultor                           & \eq{primitiveP} \\
-%$q$             & Dummy index                           & \\
+                 of occultor                            & \eq{primitiveP} \\
 $\mathcal{Q}$   & Primitive integral along perimiter
-                 of occulted body                      & \eq{primitiveQ} \\
+                 of occulted body                       & \eq{primitiveQ} \\
 $r$             & Occultor radius in units of occulted
-                 body's radius                         & \S\ref{sec:intro} \\
-$\bvec{r}$      & Vector for integration over boundary of
-                 visible disk                          & \eq{greens} \\
+                 body's radius                          & \S\ref{sec:intro} \\
+$\bvec{r}$      & Vector for integration over 
+                 boundary of visible disk               & \eq{greens} \\
 $\mathfrak{s}$  & Occultation light curve solution
-                 vector                                & \eq{greens} \\
-$t$             & Time variable                        & \S\ref{sec:time}\\
-$t_0$           & Central time of transit              & \S\ref{sec:time}\\
+                 vector                                 & \eq{greens} \\
+$t$             & Time variable                         & \S\ref{sec:time}\\
+$t_0$           & Central time of transit               & \S\ref{sec:time}\\
 $u$             & Dummy index                           & \\
 $u_1, u_2$      & Quadratic limb darkening coefficients & \eq{quadraticld} \\
 $\bvec{u}$      & Vector of limb-darkenig coefficients  & \S\ref{sec:higher_order} \\
@@ -2154,30 +2180,34 @@ $\bvec{x}$      & Parameters used in time integration   & \S\ref{sec:time}\\
 $\x$            & Cartesian coordinate                  & \eq{xyz} \\
 $\y$            & Cartesian coordinate                  & \eq{xyz} \\
 $\z$            & Cartesian coordinate,
-                 $z = \sqrt{1 - \x^2 - \y^2}$          & \eq{xyz} \\
+                 $z = \sqrt{1 - \x^2 - \y^2}$           & \eq{xyz} \\
 %
-$\alpha_j$      & Coefficient in series for $\mathcal{M}_n$ & \eq{Mn_series} \\
-$\gamma_j$      & Coefficient in series for $\mathcal{N}_n$ & \eq{Nn_series} \\
+$\alpha_j$      & Coefficient in series for 
+                  $\mathcal{M}_n$                       & \eq{Mn_series} \\
+$\gamma_j$      & Coefficient in series for 
+                  $\mathcal{N}_n$                       & \eq{Nn_series} \\
 $\Gamma$        & Gamma function                        & \\
-$\eta$          & Parameter in quadratic limb darkening term & \eq{eta}\\
-$\theta$        & Polar angle on star with respect to observer & \\
+$\eta$          & Parameter in quadratic limb 
+                  darkening term                        & \eq{eta}\\
+$\theta$        & Polar angle on star with 
+                  respect to observer                   & \\
 $\Theta$        & Heaviside step function               & \eq{biglam} \\
-$\kappa_0$      & Angular position of on occultor of 
-                  occultor/occulted intersection point  & \eq{cosine_formulation} \\
-$\kappa_1$      & Angular position of on occulted of 
-                  occultor/occulted intersection point  & \eq{cosine_formulation} \\
-$\lambda$       & Angular position of
-                 occultor/occulted intersection point  & \eq{lambda} \\
-               & Term in cel identities                & \eq{cel_identities} \\
+$\kappa_0$      & Angular position of occultor/occulted 
+                  intersection point                    & \eq{cosine_formulation} \\
+$\kappa_1$      & Angular position of occultor/occulted 
+                  intersection point                    & \eq{cosine_formulation} \\
+$\lambda$       & Angular position of occultor/occulted 
+                  intersection point                    & \eq{lambda} \\
+                & Term in cel identities                & \eq{cel_identities} \\
 $\Lambda$       & \citet{MandelAgol2002} function       & \eq{biglam} \\
 $\upmu$         & Cosine of polar angle on star         & \eq{quadraticld} \\
 $\Pi(\bigdot,\bigdot)$
-               & Complete elliptic integral of the
-                 third kind                            & \eq{elliptic} \\
-%$\phi$          & Angular position of
-%                  occultor/occulted intersection point  & \eq{phi} \\
-$\varphi$      & Dummy integration variable            & \\
-$\xi$          & Transformed integration variable      & \eq{greens_transformed}\\
+                & Complete elliptic integral of the
+                 third kind                             & \eq{elliptic} \\
+$\phi$          & Angular position of occultor/occulted 
+                  intersection point                    & \eq{phi} \\
+$\varphi$      & Dummy integration variable             & \\
+$\xi$          & Transformed integration variable       & \eq{greens_transformed}\\
 %
 \end{longtable}
 \end{center}
