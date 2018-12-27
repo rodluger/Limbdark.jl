@@ -1187,12 +1187,12 @@ $\kappa_0 = \pi$ for $k^2 > 1$.  We
 reuse the value of $\kappa_0$ which was computed in the uniform limb darkening
 case (\S \ref{sec:uniform}).
 
-With these integrals defined, the basis functions for the lightcurve are given
-by $\mathfrak{s}_n$, where $\mathfrak{s}_0$ is given for uniform limb darkening
-in section \ref{sec:uniform}, $\mathfrak{s}_1$ is given by the linear limb-darkened
-solution from section \ref{sec:reparam}, and  $\mathfrak{s}_n = \mathcal{Q}(\bvec{G}_n)
-- \mathcal{P}(\bvec{G}_n) = -\mathcal{P}(\bvec{G}_n)$ for $2 \le n \le N$;
-we have already given an alternate expression for $\mathfrak{s}_2$ in section \ref{sec:quadratic}.
+%With these integrals defined, the basis functions for the lightcurve are given
+%by $\mathfrak{s}_n$, where $\mathfrak{s}_0$ is given for uniform limb darkening
+%in section \ref{sec:uniform}, $\mathfrak{s}_1$ is given by the linear limb-darkened
+%solution from section \ref{sec:reparam}, and  $\mathfrak{s}_n = \mathcal{Q}(\bvec{G}_n)
+%- \mathcal{P}(\bvec{G}_n) = -\mathcal{P}(\bvec{G}_n)$ for $2 \le n \le N$;
+%we have already given an alternate expression for $\mathfrak{s}_2$ in section \ref{sec:quadratic}.
 
 We can express $\mathcal{P}(\bvec{G}_n)$ in terms of a sequence of integrals,
 $\mathcal{M}_n(r,b)$, given by:
@@ -1271,23 +1271,102 @@ this differs from \starry for which downward recusion was also required for $k^2
 %combine these to make the full light curve with limb darkening coefficients, which we describe
 %next.
 
-\todo{transition}
+\subsection{Normalization}
+\label{sec:normalization}
 
-The total light curve is computed from
+We now know how to compute the flux during an occultation (Equation~\ref{eq:occint_greens}), 
+but only up to an unknown normalization constant $I_0$. It is convenient to 
+choose a normalization such that the total unocculted flux is unity, regardless
+of the value of the limb darkening coefficients. We therefore require that
+%
+\begin{align}
+    \label{eq:normalization1}
+    F &= \oiint I(z) \, \dd S \nonumber \\
+      &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \mathbf{u} \nonumber \\
+      &= 1
+\end{align}
+%
+when the integral is taken over the entire disk of the body. We must thus have
+%
+\begin{align}
+    \label{eq:normalization2}
+    I_0 &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathcal{A} \mathbf{u}} \nonumber \\[0.5em]
+        &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathfrak{g}} \quad,
+\end{align}
+%
+where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no 
+occultor (i.e., $r = 0$). We could compute $I_0$ using
+the formalism from the previous section, but it is easier to evaluate the integral
+directly. When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$ 
+corresponds to the double integral in polar coordinates
+%
+\begin{align}
+    \mathfrak{s}_n (r=0) &= \int_0^{2\pi}\int_0^1 \gbasisn(z) \, r \, \dd r \, \dd\theta \nonumber \\[0.5em]
+                         &= 2\pi \int_0^1 \gbasisn(z) \, r \, \dd r \quad,
+\end{align}
+%
+From Equation~(\ref{eq:greensbasis}), we may write
+%
+\begin{align}
+    \mathfrak{s}_n (r=0) &=
+    2\pi
+    \begin{dcases}
+        \int_0^1 r \, \dd r & \qquad n = 0
+        \\
+        \int_0^1 z \, r \, \dd r & \qquad n = 1
+        \\
+        (n+2) \int_0^1 z^n \, r \, \dd r 
+        - n \int_0^1 z^{n-2} \, r \, \dd r 
+        & \qquad n \ge 2 \quad.
+    \end{dcases}
+\end{align}
+%
+The first case is trivial and integrates to $\mathfrak{s}_0(r = 0) = \pi$.
+The remaining cases involve integrands of the form $z^n r$,
+where $z = \sqrt{1 - r^2}$. We may evaluate
+these integrals by substituting $u = z^2 = 1 - r^2$ and $\dd u = -2r \, \dd r$:
+%
+\begin{align}
+    \int_0^1 z^n \, r \, \dd r &= \frac{1}{2} \int_0^1 u^\frac{n}{2} \, \dd u \nonumber \\[0.5em]
+                               &= \frac{1}{2 + n} \quad.
+\end{align}
+%
+The solution vector then simplifies to
+%
+\begin{align}
+    \mathfrak{s}_n (r=0) &=
+    \begin{dcases}
+        \pi & \qquad n = 0
+        \\
+        \frac{2\pi}{3} & \qquad n = 1
+        \\
+        0 & \qquad n \ge 2 \quad.
+    \end{dcases}
+\end{align}
+%
+Interestingly, the net flux contribution for all terms in the Green's basis with
+$n \ge 2$ is exactly zero. We may finally evaluate our normalization constant:
 %
 \begin{eqnarray}
     \label{eq:flux}
-    I_0 &=& \pi(\mathfrak{g}_0+ \tfrac{2}{3} \mathfrak{g}_1),
+    I_0 &=& \frac{1}{\pi(\mathfrak{g}_0+ \tfrac{2}{3} \mathfrak{g}_1)}.
 \end{eqnarray}
 %
-where $F_0$ is the unobscured flux, and $\mathcal{F}$ is the flux normalized
-such that the unobscured flux is unity.
 
-Note that the unobscured flux for each basis function 
-%(for $b \ge 1+r$ or $r=0$) 
-is zero for
-all $\mathfrak{s}_n(r,b)$ with $2 \le n \le N$, which is why the total unobscured flux,
-$F_0$, only depends upon $\mathfrak{g}_0$ and $mathfrak{g}_1$.
+\subsection{Summary}
+\label{sec:summary}
+
+We showed in \S\ref{sec:theintegral} that the total flux observed during 
+an occultation is given by
+%
+\begin{align}
+    \label{eq:occint_greens_summary}
+    F &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \bvec{u} \quad ,
+\end{align}
+%
+where
+
+
 
 
 \todo{summary}
