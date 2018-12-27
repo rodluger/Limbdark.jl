@@ -13,7 +13,7 @@ s2diff(b,r) = s2(r,b)-convert(Float64,s2(big(r),big(b)))
 using PyPlot
 
 nb = 1024; nr = 1024
-fig,axes = subplots(3,2, figsize=(9, 10))
+fig,axes = subplots(3,2, figsize=(13, 8))
 
 # Compute r = b+-\epsilon
 epsilon = 1e-8
