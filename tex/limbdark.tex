@@ -908,14 +908,14 @@ the $i^\mathrm{th}$ coefficient of $\mathfrak{p}$ as
 %
 \begin{equation}
     \label{eq:an_of_un}
-    \mathfrak{p}_i = \sum_{j=i}^N \binom{j}{i}(-1)^{i + 1} u_j.
+    \mathfrak{p}_i = \sum_{j=0}^N \binom{i}{j}(-1)^{j} u_j.
 \end{equation}
 %
 The elements of the matrix $\bvec{A}_1$ are thus given by
 %
 \begin{align}
     \label{eq:A1}
-    \mathcal{A}_{1_{i, j}} = \binom{j}{i}(-1)^{i + 1} \quad .
+    \mathcal{A}_{1_{i, j}} = \binom{i}{j}(-1)^{j} \quad .
 \end{align}
 %
 Note that, as with the limb darkening basis, 
@@ -1926,10 +1926,10 @@ interacting planets \citep{Carter2012}, triple stars \citep{Carter2011}, and
 transiting circumbinary planets \citep{Doyle2011}.
 
 The code is open source, and has two versions:  one of which is a part
-of the \starry package, \texttt{http://github.com/luger/starry/}, written
+of the \starry package, \texttt{http://github.com/rodluger/starry/}, written
 in a combination of C++ and Python, and a new code written in Julia as
 part of the development of the equations in this paper,
-\texttt{http://github.com/luger/limbdark/}.  We welcome usage of these
+\texttt{http://github.com/rodluger/limbdark/}.  We welcome usage of these
 codes, and contributions to further develop and enhance their capabilities.
 
 \acknowledgements
