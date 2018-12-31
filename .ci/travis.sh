@@ -25,6 +25,14 @@ cd pytransit
 python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
 popd
 
+# Install the dev version of starry
+pushd $HOME
+git clone https://github.com/rodluger/starry.git
+cd starry
+git checkout -b dev origin/dev
+STARRY_BITSUM=1 STARRY_KEEP_DFDU_AS_DFDG=1 python setup.py develop
+popd
+
 # Attempt to resolve issues with SSL certificate expiring for purl.org:
 # https://tectonic.newton.cx/t/how-to-use-tectonic-if-you-can-t-access-purl-org/44
 mkdir -p $HOME/.config/Tectonic
