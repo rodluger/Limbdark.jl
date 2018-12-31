@@ -26,6 +26,7 @@ python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fop
 popd
 
 # Install the dev version of starry
+pip install pybind11
 pushd $HOME
 git clone https://github.com/rodluger/starry.git
 cd starry
