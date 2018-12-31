@@ -1,5 +1,5 @@
 #!/bin/bash -x
-set -e
+# DEBUG set -e
 
 # Only build the paper with Julia 0.7
 if [ $TRAVIS_JULIA_VERSION == "0.7.0" ]
@@ -10,6 +10,9 @@ then
     echo "Generating julia figures..."
     cd $TRAVIS_BUILD_DIR/tex/figures/julia
 	f2py -c occultquad.f -m occultquad
+    which f2py
+    which python
+    python -c "import occultquad; print('ALL GOOD')"
     for f in *.jl; do
         echo "Running $f..."
         julia "$f"
