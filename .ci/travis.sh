@@ -1,8 +1,8 @@
 # Miniconda (cached)
-export PATH="$HOME/miniconda-limbdark/bin:$PATH"
-if [ ! -f $HOME/miniconda-limbdark/bin/conda ]; then
+export PATH="$HOME/miniconda-cache/bin:$PATH"
+if [ ! -f $HOME/miniconda-cache/bin/conda ]; then
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      bash miniconda.sh -b -p $HOME/miniconda -u;
+      bash miniconda.sh -b -p $HOME/miniconda-cache -u;
       conda config --add channels conda-forge;
       conda config --set always_yes yes;
       conda update --all;
