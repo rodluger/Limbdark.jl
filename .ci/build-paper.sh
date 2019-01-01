@@ -10,9 +10,6 @@ then
     echo "Generating julia figures..."
     cd $TRAVIS_BUILD_DIR/tex/figures/julia
 	f2py -c occultquad.f -m occultquad
-    which f2py
-    which python
-    python -c "import occultquad; print('ALL GOOD')"
     for f in *.jl; do
         echo "Running $f..."
         julia "$f"
