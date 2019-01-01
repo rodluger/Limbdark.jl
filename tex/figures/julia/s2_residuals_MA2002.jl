@@ -4,26 +4,24 @@
 include("../../../src/s2.jl")
 include("../../../src/define_constants.jl")
 
-# Import occultquad as python function
-using PyCall
-pushfirst!(PyVector(pyimport("sys")["path"]), "")
-@pyimport s2_MA2002
-
+if VERSION >= v"0.7"
+  using DelimitedFiles
+end
 
 using PyPlot
 nb = 1001; nr = 1001
 b=range(0.0,stop=2,length=nr)
 r=range(0.0,stop=2,length=nr)
-fgrid = zeros(Float64,nr,nb)
+
+# We compute the `occultquad` flux in
+# a separate Python call
+fgrid = readdlm("s2_MA2002.txt")
+
 fgrid_old = zeros(Float64,nr,nb)
 fgrid_big = zeros(Float64,nr,nb)
 resid = zeros(Float64,nr,nb)
 for ib=1:nb
-#  if mod(ib,10) == 0
-#    println("Finished: ",ib/nr*100,"%")
-#  end
   for ir=1:nr
-    fgrid[ir,ib]=s2_MA2002.s2(r[ir],b[ib])
     fgrid_big[ir,ib]=convert(Float64,s2(big(r[ir]),big(b[ib])))
     resid[ir,ib] = abs.(fgrid[ir,ib]-fgrid_big[ir,ib])
     if resid[ir,ib] < 1e-15

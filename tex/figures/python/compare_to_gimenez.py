@@ -4,13 +4,15 @@ import matplotlib.pyplot as pl
 import numpy as np
 import subprocess
 import pytransit
+import starry
+import starry2
 from scipy.optimize import curve_fit
 np.random.seed(43)
 
 
 # Marker size is proportional to log error
 def ms(error):
-    return 18 + np.log10(error)
+    return 18 + np.log10(max(1.e-16, error))
 
 
 def Polynomial(mu, *u):
@@ -59,14 +61,19 @@ def GetGimenezPolynomialCoeffs(u):
     return g, err
 
 
-Narr = [1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 50]
+Narr = [1, 3, 5, 10, 15, 20, 30, 40, 50]
 b = np.linspace(0.0, 1.1, 1000)
 
 agol_time = np.empty(len(Narr))
 agol_grad_time = np.empty(len(Narr))
+starry_ylm_time = np.empty(len(Narr))
+starry2_time = np.empty(len(Narr))
+starry2_grad_time = np.empty(len(Narr))
 pytransit_time = np.empty(len(Narr))
 err_pytransit = np.empty(len(Narr))
 err_agol = np.empty(len(Narr))
+err_starry2 = np.empty(len(Narr))
+err_starry_ylm = np.empty(len(Narr))
 
 # Loop over polynomial degree
 for i, N in enumerate(Narr):
@@ -93,9 +100,47 @@ for i, N in enumerate(Narr):
         pytransit_flux = m(b, 0.1, u_g)
     pytransit_time[i] = (time.time() - tstart) / 10
 
+    # starry
+    # Using the dense spherical harmonic
+    # integration algorithm (slow, since we don't
+    # actually need the majority of the terms!)
+    if N < 30:
+        map = starry.Map(N + 1)
+        map[0, 0] = 1
+        # HACK: This forces the code to compute the flux
+        # as a limb-darkened Ylm map; our point here is
+        # to show how much faster we can do with the
+        # efficient formulation in this paper!
+        map[1, 0] = 1e-15
+        map[:N] = u
+        tstart = time.time()
+        for k in range(10):
+            starry_ylm_flux = map.flux(xo=b, ro=0.1)
+        starry_ylm_time[i] = (time.time() - tstart) / 10
+        tstart = time.time()
+    else:
+        # Let's not even bother computing these!
+        starry_ylm_flux = np.zeros_like(b) * np.nan
+        starry_ylm_time[i] = np.nan
+
+    # starry2
+    map = starry2.Map(N)
+    map[0, 0] = 1
+    map[:] = u
+    tstart = time.time()
+    for k in range(10):
+        starry2_flux = map.flux(xo=b, ro=0.1)
+    starry2_time[i] = (time.time() - tstart) / 10
+    tstart = time.time()
+    for k in range(10):
+        starry2_flux, _ = map.flux(xo=b, ro=0.1, gradient=True)
+    starry2_grad_time[i] = (time.time() - tstart) / 10
+
     # Multiprecision
     err_agol[i] = np.nanmedian(np.abs(agol_flux - flux_multi))
     err_pytransit[i] = np.nanmedian(np.abs(pytransit_flux - flux_multi))
+    err_starry2[i] = np.nanmedian(np.abs(starry2_flux - flux_multi))
+    err_starry_ylm[i] = np.nanmedian(np.abs(starry_ylm_flux - flux_multi))
 
 # Plot
 fig = pl.figure(figsize=(7, 4))
@@ -111,6 +156,18 @@ ax.plot(Narr, agol_time, '-', lw=0.75, color='C0')
 for i in range(len(Narr)):
     ax.plot(Narr[i], agol_grad_time[i], 'o', ms=ms(err_agol[i]), color='C0')
 ax.plot(Narr, agol_grad_time, '--', lw=0.75, color='C0')
+
+for i in range(len(Narr)):
+    ax.plot(Narr[i], starry2_time[i], 'o', ms=ms(err_starry2[i]), color='C2')
+ax.plot(Narr, starry2_time, '-', lw=0.75, color='C2')
+for i in range(len(Narr)):
+    ax.plot(Narr[i], starry2_grad_time[i], 'o', ms=ms(err_starry2[i]), color='C2')
+ax.plot(Narr, starry2_grad_time, '--', lw=0.75, color='C2')
+
+for i in range(len(Narr)):
+    ax.plot(Narr[i], starry_ylm_time[i], 'o', ms=ms(err_starry_ylm[i]), color='C3')
+ax.plot(Narr, starry_ylm_time, '-', lw=0.75, color='C3')
+
 for i in range(len(Narr)):
     ax.plot(Narr[i], pytransit_time[i], 'o', ms=ms(err_pytransit[i]), color='C4')
 ax.plot(Narr, pytransit_time, '-', lw=0.75, color='C4')
@@ -119,10 +176,14 @@ ax.plot(Narr, pytransit_time, '-', lw=0.75, color='C4')
 ax.set_ylabel("Time [s]", fontsize=10)
 ax.set_xlabel("Degree of limb darkening", fontsize=10)
 ax.set_yscale('log')
+#ax.set_ylim(5e-5, 1e-1)
 
 # Legend
-axleg1.plot([0, 1], [0, 1], color='C0', label='this work', lw=1.5)
-axleg1.plot([0, 1], [0, 1], '--', color='C0', label='this work\n(+ gradients)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], color='C0', label='limbdark', lw=1.5)
+axleg1.plot([0, 1], [0, 1], '--', color='C0', label='limbdark\n(+ gradients)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], color='C2', label='starry', lw=1.5)
+axleg1.plot([0, 1], [0, 1], '--', color='C2', label='starry\n(+ gradients)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], color='C3', label='starry\n(dense)', lw=1.5)
 axleg1.plot([0, 1], [0, 1], color='C4', label='PyTransit', lw=1.5)
 axleg1.set_xlim(2, 3)
 leg = axleg1.legend(loc='center', frameon=False, fontsize=8)

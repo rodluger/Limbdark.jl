@@ -1,8 +1,8 @@
 # Miniconda (cached)
-export PATH="$HOME/miniconda/bin:$PATH"
-if ! command -v conda > /dev/null; then
+export PATH="$HOME/miniconda-cache/bin:$PATH"
+if [ ! -f $HOME/miniconda-cache/bin/conda ]; then
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-      bash miniconda.sh -b -p $HOME/miniconda -u;
+      bash miniconda.sh -b -p $HOME/miniconda-cache -u;
       conda config --add channels conda-forge;
       conda config --set always_yes yes;
       conda update --all;
@@ -23,6 +23,15 @@ pushd $HOME
 git clone https://github.com/hpparvi/pytransit.git
 cd pytransit
 python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
+popd
+
+# Install the dev version of starry
+pip install pybind11
+pushd $HOME
+git clone https://github.com/rodluger/starry.git
+cd starry
+git checkout -b dev origin/dev
+STARRY_BITSUM=1 STARRY_KEEP_DFDU_AS_DFDG=1 python setup.py develop
 popd
 
 # Attempt to resolve issues with SSL certificate expiring for purl.org:

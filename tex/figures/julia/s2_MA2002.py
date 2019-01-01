@@ -19,17 +19,12 @@ def s2(r, b):
 
 
 if __name__ == "__main__":
-    # Sanity checks
-    import starry
-    import numpy as np
-    import matplotlib.pyplot as pl
-    map = starry.Map()
-    map[0, 0] = 0
-    map[1, 0] = np.pi / np.sqrt(3)
-    xo = np.linspace(-1.5, 1.5, 100)
-    ro = 0.1
-    flux_starry = map.flux(xo=xo, ro=ro)
-    flux_ma = [s2(ro, np.abs(b)) for b in xo]
-    pl.plot(xo, flux_starry)
-    pl.plot(xo, flux_ma, '--')
-    pl.show()
+    nb = 1001
+    nr = 1001
+    b = np.linspace(0.0, 2.0, nb, endpoint=True)
+    r = np.linspace(0.0, 2.0, nr, endpoint=True)
+    fgrid = np.zeros((nr, nb))
+    for ib in range(nb):
+        for ir in range(nr):
+            fgrid[ir, ib] = s2(r[ir], b[ib])
+    np.savetxt("s2_MA2002.txt", X=fgrid)
