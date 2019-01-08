@@ -30,7 +30,8 @@ pip install pybind11
 pushd $HOME
 git clone https://github.com/rodluger/starry.git
 cd starry
-git checkout 8cea59fa71acfcf4bd6265d6b21c38e82971436d
+#git checkout 8cea59fa71acfcf4bd6265d6b21c38e82971436d
+git checkout fb8462b762c03566168579a35d87abf6996df77c
 STARRY_BITSUM=1 STARRY_KEEP_DFDU_AS_DFDG=1 python setup.py develop
 popd
 
