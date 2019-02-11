@@ -1,5 +1,6 @@
 """Starry speed tests."""
 from starry.kepler import Primary, Secondary, System
+import starry2
 import time
 import matplotlib.pyplot as pl
 import numpy as np
@@ -178,6 +179,8 @@ agol_time = np.zeros(nN) * np.nan
 agol_grad_time = np.zeros(nN) * np.nan
 pytransit_time = np.zeros(nN)
 batman_time = np.zeros(nN)
+starry2_time = np.zeros(nN) * np.nan
+starry2_grad_time = np.zeros(nN) * np.nan
 
 # Loop over number of cadences
 for i, N in enumerate(Narr):
@@ -224,6 +227,19 @@ for i, N in enumerate(Narr):
         batman_flux = m.light_curve(params)
     batman_time[i] = (time.time() - tstart) / number
 
+    # starry2
+    map = starry2.Map(len(u))
+    map[0, 0] = 1
+    map[:] = u
+    tstart = time.time()
+    for k in range(10):
+        starry2_flux = map.flux(xo=b, ro=0.1)
+    starry2_time[i] = (time.time() - tstart) / 10
+    tstart = time.time()
+    for k in range(10):
+        starry2_flux, _ = map.flux(xo=b, ro=0.1, gradient=True)
+    starry2_grad_time[i] = (time.time() - tstart) / 10
+
     # pytransit
     if (N < 100000):
         m = pytransit.Gimenez(nldc=len(u_g), interpolate=False, nthr=0)
@@ -243,6 +259,7 @@ for i, N in enumerate(Narr):
         err_agol = np.nanmedian(np.abs(agol_flux - flux_multi))
         err_pytransit = np.nanmedian(np.abs(pytransit_flux - flux_multi))
         err_batman = np.nanmedian(np.abs(batman_flux - flux_multi))
+        err_starry2 = np.nanmedian(np.abs(starry2_flux - flux_multi))
 
 # Plot
 fig = pl.figure(figsize=(7, 4))
@@ -256,6 +273,10 @@ ax.plot(Narr, agol_time, 'o', ms=ms(err_agol), color='C0')
 ax.plot(Narr, agol_time, '-', lw=0.75, color='C0')
 ax.plot(Narr, agol_grad_time, 'o', ms=ms(err_agol), color='C0')
 ax.plot(Narr, agol_grad_time, '--', lw=0.75, color='C0')
+ax.plot(Narr, starry2_time, 'o', ms=ms(err_agol), color='C2')
+ax.plot(Narr, starry2_time, '-', lw=0.75, color='C2')
+ax.plot(Narr, starry2_grad_time, 'o', ms=ms(err_starry2), color='C2')
+ax.plot(Narr, starry2_grad_time, '--', lw=0.75, color='C2')
 ax.plot(Narr, pytransit_time, 'o', ms=ms(err_pytransit), color='C4')
 ax.plot(Narr, pytransit_time, '-', lw=0.75, color='C4')
 ax.plot(Narr, batman_time, 'o', ms=ms(err_batman), color='C1')
@@ -268,8 +289,10 @@ ax.set_xscale('log')
 ax.set_yscale('log')
 
 # Legend
-axleg1.plot([0, 1], [0, 1], color='C0', label='this work', lw=1.5)
-axleg1.plot([0, 1], [0, 1], '--', color='C0', label='this work\n(+ gradients)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], color='C0', label='limbdark', lw=1.5)
+axleg1.plot([0, 1], [0, 1], '--', color='C0', label='limbdark\n(+ gradients)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], color='C2', label='starry', lw=1.5)
+axleg1.plot([0, 1], [0, 1], '--', color='C2', label='starry\n(+ gradients)', lw=1.5)
 axleg1.plot([0, 1], [0, 1], color='C4', label='PyTransit', lw=1.5)
 axleg1.plot([0, 1], [0, 1], color='C1', label='batman', lw=1.5)
 axleg1.set_xlim(2, 3)
