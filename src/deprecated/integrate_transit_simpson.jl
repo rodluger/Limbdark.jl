@@ -49,12 +49,12 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   fint = zero(T)
   fint = simpson(t1,t2,transit_flux,fint,tend,tol,maxdepth)
   fint2,ferr = hquadrature(transit_flux,t1,t2,abstol=tol)
-  if abs(fint-fint2) > 1e-8
-    println("itg, r: ",trans.r," b: ",trans.b," f/df: ",fint," tol: ",tol," t2-t1: ",t2-t1)
-    println("cub, r: ",trans.r," b: ",trans.b," f/df: ",fint2)
-    println("f[t1]: ",transit_flux(t1)," f[t2]: ",transit_flux(t2))
-    read(STDIN,Char)
-  end
+#  if abs(fint-fint2) > 1e-8
+#    println("itg, r: ",trans.r," b: ",trans.b," f/df: ",fint," tol: ",tol," t2-t1: ",t2-t1)
+#    println("cub, r: ",trans.r," b: ",trans.b," f/df: ",fint2)
+#    println("f[t1]: ",transit_flux(t1)," f[t2]: ",transit_flux(t2))
+#    read(STDIN,Char)
+#  end
   # Return the number of evalutions and maximum depth for record-keeping:
 return fint::T,neval::Int64,depthmax::Int64
 end

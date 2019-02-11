@@ -9,7 +9,7 @@ include("../src/integrate_transit_simpson.jl")
 
 include("../test/loglinspace.jl")
 
-t1 = -1.5; t2 = 1.5; nt = 1000; dt = 0.3
+t1 = -1.5; t2 = 1.5; nt = 100000; dt = 0.3
 t = zeros(nt)
 t .= linearspace(t1,t2,nt)
 #t = [t[1235]] ; nt =1
@@ -107,7 +107,8 @@ end
 
 ntol = 12
 tol = logarithmspace(-13.0,-2.0,ntol)
-K = 50
+#K = 50
+K = 1
 neval_mean = zeros(K,ntol)
 precision = zeros(K,ntol)
 timing = zeros(K,ntol)
@@ -147,3 +148,4 @@ for j=1:ntol
 end
 clf()
 loglog(precision_tol,neval_tol)
+loglog(tol,neval_tol)

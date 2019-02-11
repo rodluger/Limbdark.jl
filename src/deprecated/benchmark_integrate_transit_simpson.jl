@@ -80,7 +80,7 @@ fint  = zeros(T,6+trans.n)
     ftmp=zero(T)
     for j=1:length(tlim)-1
       fint,nevali,depthmaxi =  integrate_timestep_gradient!(param,trans,tlim[j],tlim[j+1],tol,maxdepth)
-      println("r: ",trans.r," b: ",trans.b," fint: ",fint," dt: ",tlim[j+1]-tlim[j])
+#      println("r: ",trans.r," b: ",trans.b," fint: ",fint," dt: ",tlim[j+1]-tlim[j])
       neval_t[i] += nevali
       if depthmaxi > depthmax[i]
         depthmax[i] = depthmaxi
@@ -121,10 +121,10 @@ for k=1:K
   t_nobin1 = time_ns()
   compute_lightcurve!(trans,param,t,favg0,nt)
   t_nobin = time_ns()-t_nobin1
-  integrate_lightcurve!(trans,param,t,texp,favg2,nt,1e-12,50,neval2,depthmax2)
+  integrate_lightcurve!(trans,param,t,texp,favg2,nt,1e-15,16,neval2,depthmax2)
   for j=1:ntol
     t_bin1 = time_ns()
-    integrate_lightcurve!(trans,param,t,texp,favg1,nt,tol[j],50,neval1,depthmax1)
+    integrate_lightcurve!(trans,param,t,texp,favg1,nt,tol[j],16,neval1,depthmax1)
     t_bin = time_ns()-t_bin1
     precision[k,j] += maximum(abs.(favg1-favg2))
     neval_mean[k,j] += mean(neval1) 

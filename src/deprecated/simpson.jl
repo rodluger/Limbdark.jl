@@ -5,7 +5,7 @@ function simpson(a::T, b::T, f::Function, I_of_f::T, i::T, eps::T, N::Int64) whe
 # integer N;
 # real a, b, I_of_f, i, eps; 
 # real procedure f;
-# comment This procedure integrates the function fix) using a modified 
+# comment This procedure integrates the function f(x) using a modified 
 # Simpson's Rule quadrature formula. The quadrature is performed over j 
 # subintervals of [a,b] forming the total area I_of_f. Convergence in each 
 # subinterval of length (b-a)/2^n is indicated when the relative difference 
@@ -31,7 +31,7 @@ m=0; n=0
 g[1] = f(a)
 g[3] = f(0.5*(a+b))
 g[5] = f(b)
- println("g[1]: ",g[1]," g[3]: ",g[3]," g[5]: ",g[5])
+# println("g[1]: ",g[1]," g[3]: ",g[3]," g[5]: ",g[5])
 bma = b-a
 A[1] = 0.5*bma*(g[1]+4*g[3]+g[5])
 @label AA
@@ -41,7 +41,10 @@ g[2] = f(a+h*(4*m+1))
 g[4] = f(a+h*(4*m+3))
 A[2] = h*(g[1]+4*g[2]+g[3])
 A[3] = h*(g[3]+4*g[4]+g[5])
-if abs(((A[2]+A[3])-A[1])/(A[2]+A[3])) > eps/d
+#if abs(((A[2]+A[3])-A[1])/(A[2]+A[3])) > eps/d
+#if abs((A[2]+A[3])-A[1]) > eps/d
+if abs((A[2]+A[3])-A[1]) > 3*eps
+#  println("A[2]+A[3])-A[1]: ",A[2]+A[3]-A[1]," 3*eps: ",3*eps," d: ",d)
   m *=2
   n +=1
   if n > N

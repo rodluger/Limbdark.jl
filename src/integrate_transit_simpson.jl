@@ -1,4 +1,4 @@
-# This is code for computing a transit model and derivatives integrated over
+# This is code for computing a transit model and derivatives integrated ove2
 # a time step, giving the fluence in units of time (since flux is normalized to unity).
 
 include("transit_poly_struct.jl")
@@ -40,13 +40,13 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   end
 
   # Function to define the vector integration in integrator:
-#  function transit_flux_derivative(tmid::T,fmid::Array{T,1}) where {T <: Real}
-  function transit_flux_derivative(tmid::T) where {T <: Real}
-  if VERSION >=  v"0.7"
-    fmid = Array{T}(undef,6+trans.n)
-  else
-    fmid = Array{T}(6+trans.n)
-  end
+  function transit_flux_derivative(tmid::T,fmid::Array{T,1}) where {T <: Real}
+#  function transit_flux_derivative(tmid::T) where {T <: Real}
+#  if VERSION >=  v"0.7"
+#    fmid = Array{T}(undef,6+trans.n)
+#  else
+#    fmid = Array{T}(6+trans.n)
+#  end
   # Add the impact parameter to the transit structure:
   trans.b = solver(tmid)
   # Carry out the transit computation:
@@ -57,55 +57,62 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   return fmid
   end
 
-  # Inner integrator which uses adaptive Simpson's method thanks to DFM:
-  function inner(func::Function,x0::T,dx::T,ym::Array{T,1},y0::Array{T,1},yp::Array{T,1},tol::T,max_depth::Int64,min_depth::Int64,depth::Int64) where {T <: Real}
-  # For each depth we need a left and a right copy of: x_m, val_m; x_p, val_p, int_mp, pred
-  x_m = x0 - 0.5*dx; val_m = func(x_m)
-  x_p = x0 + 0.5*dx; val_p = func(x_p)
-  int_mp = 0.5*dx * (2*y0+ ym + yp + 4*(val_m+val_p))*third
-  pred   =     dx * (4*y0+ ym + yp)*third
-  if (depth < min_depth || (depth < max_depth && maximum(abs,pred-int_mp)> tol))
-    return inner(func, x_m, 0.5*dx, ym, val_m, y0, tol, max_depth, min_depth, depth+1) +
-           inner(func, x_p, 0.5*dx, y0, val_p, yp, tol, max_depth, min_depth, depth+1)
-  end
-  return int_mp
-  end
-
-#  # Inner integrator (this version avoids broadcast operations; however, we don't need this for now).
+#  # Inner integrator which uses adaptive Simpson's method thanks to DFM:
 #  function inner(func::Function,x0::T,dx::T,ym::Array{T,1},y0::Array{T,1},yp::Array{T,1},tol::T,max_depth::Int64,min_depth::Int64,depth::Int64) where {T <: Real}
-#  if VERSION >= v"0.7"
-#    int_p = Array{T}(undef,6+trans.n); int_m = Array{T}(undef,6+trans.n); pred = Array{T}(undef,6+trans.n)
-#  else
-#    int_p = Array{T}(6+trans.n); int_m = Array{T}(6+trans.n); pred = Array{T}(6+trans.n)
+#  # For each depth we need a left and a right copy of: x_m, val_m; x_p, val_p, int_mp, pred
+#  x_m = x0 - 0.5*dx; val_m = func(x_m)
+#  x_p = x0 + 0.5*dx; val_p = func(x_p)
+#  int_mp = 0.5*dx * (2*y0+ ym + yp + 4*(val_m+val_p))*third
+#  pred   =     dx * (4*y0+ ym + yp)*third
+#  if (depth < min_depth || (depth < max_depth && maximum(abs,pred-int_mp)> tol))
+#    return inner(func, x_m, 0.5*dx, ym, val_m, y0, tol, max_depth, min_depth, depth+1) +
+#           inner(func, x_p, 0.5*dx, y0, val_p, yp, tol, max_depth, min_depth, depth+1)
 #  end
-#  x_m = x0 - 0.5*dx;
+#  return int_mp
+#  end
+
+  # Inner integrator (this version avoids broadcast operations; however, we don't need this for now).
+  function inner(func::Function,x0::T,dx::T,ym::Array{T,1},y0::Array{T,1},yp::Array{T,1},tol::T,max_depth::Int64,min_depth::Int64,depth::Int64) where {T <: Real}
+  if VERSION >= v"0.7"
+    int_p = Array{T}(undef,6+trans.n); int_m = Array{T}(undef,6+trans.n); pred = Array{T}(undef,6+trans.n)
+  else
+    int_p = Array{T}(6+trans.n); int_m = Array{T}(6+trans.n); pred = Array{T}(6+trans.n)
+  end
+  x_m = x0 - 0.5*dx;
+  val_m = Array{T}(6+trans.n)
 #  val_m = func(x_m);
-#  x_p = x0 + 0.5*dx;
+  func(x_m,val_m)
+  x_p = x0 + 0.5*dx;
 #  val_p = func(x_p);
-#  maxdiff = zero(T)
-#  @inbounds for i=1:6+trans.n
-#    int_m[i] = 0.5*dx * (4*val_m[i] + ym[i] + y0[i])*third 
-#    int_p[i] = 0.5*dx * (4*val_p[i] + yp[i] + y0[i])*third
-#    pred[i]  =     dx * (4*y0[i]    + ym[i] + yp[i])*third
-#    diffabs = abs(pred[i]-int_m[i]-int_p[i])
-#    if  diffabs > maxdiff
-#      maxdiff = diffabs
-#    end
-#  end
-#  if (depth < min_depth || (depth < max_depth && maxdiff > tol))
-#    int_m = inner(func, x_m, 0.5*dx, ym, val_m, y0, tol, max_depth, min_depth, depth+1);
-#    int_p = inner(func, x_p, 0.5*dx, y0, val_p, yp, tol, max_depth, min_depth, depth+1);
-#  end
-#  @inbounds for i=1:6+trans.n
-#     int_m[i] += int_p[i]
-#  end
-#  return int_m::Array{T,1}
-#  end
+  val_p = Array{T}(6+trans.n)
+  func(x_p,val_p)
+  maxdiff = zero(T)
+  @inbounds for i=1:6+trans.n
+    int_m[i] = 0.5*dx * (4*val_m[i] + ym[i] + y0[i])*third 
+    int_p[i] = 0.5*dx * (4*val_p[i] + yp[i] + y0[i])*third
+    pred[i]  =     dx * (4*y0[i]    + ym[i] + yp[i])*third
+    diffabs = abs(pred[i]-int_m[i]-int_p[i])
+    if  diffabs > maxdiff
+      maxdiff = diffabs
+    end
+  end
+  if (depth < min_depth || (depth < max_depth && maxdiff > tol))
+    int_m = inner(func, x_m, 0.5*dx, ym, val_m, y0, tol, max_depth, min_depth, depth+1);
+    int_p = inner(func, x_p, 0.5*dx, y0, val_p, yp, tol, max_depth, min_depth, depth+1);
+  end
+  @inbounds for i=1:6+trans.n
+     int_m[i] += int_p[i]
+  end
+  return int_m::Array{T,1}
+  end
 
   # Outer integrators - this dispatch computes function at upper and lower limits:
   function outer!(func::Function,lower::T,upper::T,tol::T;max_depth=50,min_depth=0) where {T <: Real}
-  ym = func(lower)
-  yp = func(upper)
+#  ym = func(lower)
+  ym = Array{T}(6+trans.n)
+  yp = Array{T}(6+trans.n)
+  func(lower,ym)
+  func(upper,yp)
   return outer!(func,lower,upper,ym,yp,tol,max_depth,min_depth)
   end
  
@@ -114,7 +121,9 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   function outer!(func::Function,lower::T,upper::T,ym::Array{T,1},yp::Array{T,1},tol::T,max_depth::Int64,min_depth::Int64) where {T <: Real}
   x0 = 0.5 * (upper + lower);
   dx = 0.5 * (upper - lower);
-  y0 = func(x0);
+#  y0 = func(x0);
+  y0 = Array{T}(6+trans.n)
+  func(x0,y0);
   if VERSION >= v"0.7"
     int_trap = Array{T}(undef,6+trans.n)
     int_simp = Array{T}(undef,6+trans.n)
@@ -126,7 +135,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   @inbounds for i=1:6+trans.n
     int_trap[i] = 0.5 * dx * (ym[i] + 2 * y0[i] + yp[i]);
     int_simp[i] = dx * (ym[i] + 4 * y0[i] + yp[i]) / 3;
-    diffabs = int_trap[i]-int_simp[i]
+    diffabs = abs(int_trap[i]-int_simp[i])
     if diffabs > maxdiff
       maxdiff = diffabs
     end
