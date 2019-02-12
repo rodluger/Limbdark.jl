@@ -90,13 +90,13 @@ algorithm \citep{Feroz2008}, or for computing the Fisher information matrix.
 In some cases, MCMC can be slow to converge, and derivatives can accelerate
 convergence by adding an artificial momentum term to the log likelihood,
 and then allowing the sampler to follow contours of constant ``energy.''
-This so-called ``hybrid'' or ``Hamiltonian'' MCMC approach holds great promise,
+This so-called ``hybrid'' or ``Hamiltonian'' MCMC approach holds great promise \citep{Girolami2011,Betancourt2017},
 but its application has been hampered by the lack of models with derivatives,
-as derivatives are in general more difficult to compute \citep{Girolami2011,Betancourt2017}.
+as derivatives are in general more difficult to compute.
 
 Finally, the analytic computation of transit light curves with quadratic
-limb darkening is limited by numerical round-off error for limiting
-values near some special cases.  In
+limb darkening has a precision which can be limited by numerical round-off 
+error for parameters near some special cases.  In
 particular, when the radius equals the impact-parameter, which corresponds to
 the edge of the planet crossing the center of the star, the computation of the
 elliptic integrals becomes unstable.  At the second and third points of
@@ -112,7 +112,7 @@ be encountered with some frequency.
 Based on these considerations, the primary goals of the current paper are
 threefold:
 \begin{enumerate}
-\item To extend the analytic quadratic limb-darkened transit model to higher order.
+\item To extend the analytic quadratic transit model to higher order limb-darkening.
 \item To compute the derivatives of the model analytically.
 \item To stabilize the analytic light curve computation (and its derivatives)
 in all limits near special cases.
@@ -130,11 +130,13 @@ polar angle on the photosphere, with $\theta=0$ at the center of the observed
 stellar disk, and $\theta=\pi/2$ at the limb.  In a coordinate system in which 
 the projected disk of the star lies in the $x-y$ plane, and the $z$ coordinate 
 points towards the observer, then $\upmu = z$, where $z$ is measured in units 
-of the stellar radius.  In terms of $b$, the normalized radius projected onto 
+of the stellar radius.  The variable $\upmu=z$ is then the elevation on the
+surface of the star where the highest point is taken to be closest to the observer.
+In terms of $b$, the normalized radius projected onto 
 the sky, this parameter is given by $\upmu = \cos{\theta} =\sqrt{1-b^2}$, where
 $0\le b \le 1$ within the stellar disk.  We also introduce the radius ratio,
 $r$, which is the radius of the occultor divided by the radius of the source.
-In general, we will closely follow the notation
+In general, we will follow the notation
 introduced by \citet{starry} for the \starry code package.
 
 Uniform limb darkening scales as $I(\upmu) \propto \upmu^0$, first-order 
@@ -144,14 +146,15 @@ that can be integrated analytically, which we describe in detail below
 in sections \ref{sec:uniform}, \ref{sec:reparam}, and \ref{sec:quadratic}.
 These are typically combined to yield the quadratic limb darkening law,
 \begin{equation} \label{eq:quadraticld}
-I(\upmu) = I(1) [1-u_1 (1-\upmu) - u_2 (1-\upmu)^2].
+I(\upmu) = I(1) [1-u_1 (1-\upmu) - u_2 (1-\upmu)^2],
 \end{equation}
+where $u_1$ and $u_2$ are the limb-darkening parameters.
 In this paper, we will show that higher order powers of $\upmu^n$ with integer
 $n$ can be integrated analytically when expressed as recursion relations.
 Linear combinations of these laws can be constructed,
 with various parameterizations, to describe stellar limb darkening more precisely.
 
-The first goal, of modelling higher-order limb darkening, was accomplished
+The first goal of modelling higher-order limb darkening was accomplished
 by \citet{Gimenez2006}, who derived transit light curves for a limb darkening
 function
 \begin{equation} \label{eq:gimenez}
@@ -159,9 +162,10 @@ I(\upmu) = I(1) \left[1-\sum_{n=1}^N a_n (1-\upmu^n) \right],
 \end{equation}
 where $a_n$ is a limb darkening coefficient.  \cite{Gimenez2006}
 found an infinite series expansion for computing the limb-darkened light curve
-for each $a_n$ term.  Here we present closed-form expressions for these terms
+for each $a_n$ term.  Here we instead present closed-form expressions for these terms
 which can be easily computed with recursion relations, although for purposes
-of numerical stability we need to revert to series solutions in some limits.
+of numerical stability we need to revert to series solutions in some limits
+which we find to be rapid to evaluate.
 
 The second goal, of computing dervatives of the light curve with respect to
 the model parameters, was accomplished by \cite{Pal2008} for the quadratic
@@ -175,8 +179,8 @@ to higher order limb darkening.
 The third goal, of numerical stability, has yet to be addressed in the literature.
 Although some numerical approaches are numerically stable, such as \cite{Gimenez2006},
 \cite{Kreidberg2015}, and \cite{Parviainen2015}, these approaches tend to be 
-slower, they have precisions which may depend upon the tolerance of the computation, 
-and, in addition, they do not yield derivatives of the light curves.
+slower, they have precisions which may depend upon the tolerance of the computation
+which is specified, and, in addition, they do not yield derivatives of the light curves.
 
 A disadvantage of our approach is that it requires integer powers of the limb darkening
 expansion.  \citet{Claret2000} has shown that a non-linear limb darkening law,
@@ -189,7 +193,16 @@ laws, but we will compare with these models below in \S \ref{sec:comparison}.
 
 We turn now towards presenting formulae for more accurate limb darkening transit,
 occultation, and eclipse models, starting with the simplest case:  a source
-of uniform surface brightness.
+of uniform surface brightness.  Before we proceed, however we need to
+introduce some more notation.  For the quadratic limb-darkening case, the
+flux is defined as
+\begin{eqnarray}
+F = I(1) \mathfrak{s}^T \mathfrak{g},
+\end{eqnarray}
+where $\mathfrack{s} = \left(\mathfrak{s}_0(r,b),\mathfrak{s}_1(r,b),\mathfrak{s}_2(r,b)\right)^T$ is 
+a vector in which each element depends solely on $b$ and $r$, 
+while $\mathfrak{g} = \left(1-u_1-\tfrac{3}{2}u_2,u_1+2u_2,-\tfrac{1}{4}u_2\right)^T$
+is a vector which just depends upon the limb-darkening coefficients.
 
 \eric{Before we begin defining the $\mathfrak{s}_0$, $\mathfrak{s}_1$, ... functions, we need to
 explain how they relate to the total flux. I know we do this later on, 
@@ -773,6 +786,9 @@ uniform case, these quantities are reused in the quadratic computation.
 
 
 With this definition, the quadratic term, $\mathfrak{s}_2(r,b)$ is given simply by
+\rodrigo{This definition doesn't agree with that given in the next section.
+I'm thinking of changing this section to reflect the Green's basis defined in
+the next section.}
 %
 \begin{eqnarray}
 \mathfrak{s}_2 &=& 2 \mathfrak{s}_0 + 4\pi \eta - 2\pi,\\
@@ -854,6 +870,7 @@ order $N$ as
                           &= \sum_{i=0}^N u_i (1 - \upmu)^i
 \end{align}
 %
+\rodrigo{I think $u_0=1$, not $-1$, right?}
 where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu$
 is the cosine of the angle between the line of sight and the vector normal to 
 the body's surface. In a right-handed Cartesian coordinate system centered 
