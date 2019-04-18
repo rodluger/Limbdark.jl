@@ -508,7 +508,9 @@ elliptic integrals into a general complete elliptic integral defined by \citet{B
 {\rm cel}(k_c,p,a,b) = \int_0^{\pi/2} \frac{a\cos^2{\phi} + b\sin^2{\phi}}{\cos^2{\phi}+p\sin^2{\phi}} \frac{d\phi}{\sqrt{\cos^2{\phi}+k_c^2\sin^2{\phi}}},
 \end{equation}
 where $k_c = \sqrt{1-m_k}$, and for $b+r \ge 1$,
-$m_k=k^2$, while for $b+r \le 1$, $m_k=1/k^2$.  Although $k_c$ can be computed from
+$m_k=k^2$, while for $b+r \le 1$, $m_k=1/k^2$.  The derivatives of
+${\rm cel}$ with respect to the model parameters are given in Appendix \ref{app:cel_derivative}.
+Although $k_c$ can be computed from
 $m_k$, we have found better numerical stability in computing $k_c$ analytically
 from $b$ and $r$:
 \begin{align}
@@ -2142,6 +2144,21 @@ on the right hand side of Equation (8).
 With the exception of 3, none of these errors affected the publicly
 available code.
 
+\appendix
+\label{app:cel_derivatives}
+
+In this appendix, we give the derivatives of $cel$ with respect to
+the input parameters.
+
+\begin{eqnarray}
+\frac{\partial {\rm cel}()}{\partial k_c} &=& \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial k_c} = \frac{-k_c}{p-k_c^2}\left[\mathrm{cel}(k_c,k_c^2,a,b)-\mathrm{cel}(k_c,p,a,b)\right],\\
+\frac{\partial {\rm cel}()}{\partial p} &=& \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial p} &= \frac{\mathrm{cel}(k_c,p,0,\lambda) +(b-ap)\mathrm{cel}(k_c,1,1-p,k_c^2-p)}{2p(1-p)(p-k_c^2)},\\ 
+\lambda & =& k_c^2(b+ap-2bp)+p(3bp-ap^2-2b),\\
+\frac{\partial {\rm cel}()}{\partial a } &=& {\rm cel}(k_c,p,1,0),\\
+\frac{\partial {\rm cel}()}{\partial b} &=&{\rm cel}(k_c,p,0,1).
+\end{eqnarray}
+
+\appendix
 
 Table \ref{tab:symbols} gives a list of the notation used throughout
 the main paper.
