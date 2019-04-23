@@ -1,3 +1,6 @@
+# Make errors fatal
+set -e
+
 # Miniconda (cached)
 export PATH="$HOME/miniconda-cache/bin:$PATH"
 if [ ! -f $HOME/miniconda-cache/bin/conda ]; then
@@ -22,7 +25,8 @@ pip install batman-package
 pushd $HOME
 git clone https://github.com/hpparvi/pytransit.git
 cd pytransit
-python setup.py install
+git checkout 054435eb35129d5793257ca55a763aec1a904065 # last commit prior to v2
+python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
 popd
 
 # Install the dev version of starry
