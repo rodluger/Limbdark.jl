@@ -22,7 +22,7 @@ pip install batman-package
 pushd $HOME
 git clone https://github.com/hpparvi/pytransit.git
 cd pytransit
-python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
+python setup.py install
 popd
 
 # Install the dev version of starry
