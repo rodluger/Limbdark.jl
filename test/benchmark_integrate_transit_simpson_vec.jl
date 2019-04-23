@@ -7,7 +7,8 @@ if VERSION >= v"0.7"
 end
 
 #include("../src/integrate_transit_cubature.jl")
-include("../src/integrate_transit_simpson_vec.jl")
+#include("../src/integrate_transit_simpson_vec.jl")
+include("../src/integrate_lightcurve.jl")
 #include("integrate_transit_simpson_vec.jl")
 
 # Test it out:
@@ -59,62 +60,6 @@ end
 compute_lightcurve!(trans,param,t,favg0,nt,neval0)
 @time compute_lightcurve!(trans,param,t,favg0,nt,neval0)
 
-function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64,tol::T,maxdepth::Int64,neval_t::Array{Int64,1},depthmax::Array{Int64,1}) where {T <: Real}
-# First, find the points of contact:
-b0 = abs(param[3]); r = trans.r; t0 = param[1]; v = param[2]
-if b0 > (1.0+r)
-  println("No transit")
-  favg1[1,:] = one(T)
-  favg1[2:5+trans.n,:] = zero(T)
-  return
-elseif (b0+r) > 1.0
-  # Two points of contact:
-  tc = [t0 - sqrt((1.0+r)^2-b0^2)/v,t0 + sqrt((1.0+r)^2-b0^2)/v]
-  nc = 2
-else
-  # Four points of contact:
-  tc = [t0 - sqrt((1.0+r)^2-b0^2)/v,t0 - sqrt((1.0-r)^2-b0^2)/v,t0 + sqrt((1.0-r)^2-b0^2)/v,t0 + sqrt((1.0+r)^2-b0^2)/v]
-  nc = 4
-end
-dtinv = inv(dt)
-fint  = zeros(T,6+trans.n)
-@inbounds for i=1:nt
-  neval_t[i] = 0
-  depthmax[i] = 0
-  t1 = t[i]-0.5*dt ; t2 = t[i]+0.5*dt
-  if t2 < tc[1] || t1 > tc[nc]
-    # No points lie within the transit:
-    ftmp=zeros(T,6+trans.n)
-    ftmp[1]=one(T)
-  else
-    # Loop over points of conjunction:
-    tlim = [t1]
-    for j=1:nc
-      if t1 < tc[j] && tc[j] < t2
-        push!(tlim,tc[j])
-      end
-    end
-    push!(tlim,t2)
-    ftmp=zeros(T,6+trans.n)
-    for j=1:length(tlim)-1
-      nevali,depthmaxi =  integrate_timestep_gradient!(param,trans,tlim[j],tlim[j+1],tol,maxdepth,fint)
-#      println("r: ",trans.r," b: ",trans.b," fint: ",fint," dt: ",tlim[j+1]-tlim[j])
-      neval_t[i] += nevali
-      if depthmaxi > depthmax[i]
-        depthmax[i] = depthmaxi
-      end
-      ftmp += fint
-    end
-    ftmp *= dtinv
-#    println("ftmp: ",ftmp)
-  end
-  favg1[1:5,i]=ftmp[1:5]
-  # Convert from d_n to u_n derivatives:
-  favg1[6:5+trans.n,i]=BLAS.gemv('T',1.0,trans.dddu,ftmp[6:6+trans.n])
-#  println("i: ",i," t: ",t[i]," result: ",ftmp)
-end
-return
-end
 
 #integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,3,neval1)
 #@time integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,8,neval1)

@@ -18,3 +18,6 @@ include("test_transit_poly.jl")
 skip_plots = false
 #skip_plots = true
 include("test_transit_poly_gradient2.jl")
+include("test_integrate_transit_simpson_vec.jl")
+
+
