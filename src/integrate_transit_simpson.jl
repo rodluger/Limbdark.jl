@@ -51,7 +51,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   trans.b = solver(tmid)
   # Carry out the transit computation:
   fmid0 = transit_poly_d!(trans); neval += 1
-  # Then, fillin the flux and derivatives in the fmid vector:
+  # Then, fill in the flux and derivatives in the fmid vector:
   fill_flux!(tmid,fmid0,trans,fmid)
 #  println("b: ",trans.b," f/df: ",fmid)
   return fmid
@@ -116,7 +116,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   return outer!(func,lower,upper,ym,yp,tol,max_depth,min_depth)
   end
  
-  # This version first compares trapzoid and Simpson's rule - if they are not precise
+  # This version first compares trapezoid and Simpson's rule - if they are not precise
   # enough in comparison, then it begins refinement in inner recursion:
   function outer!(func::Function,lower::T,upper::T,ym::Array{T,1},yp::Array{T,1},tol::T,max_depth::Int64,min_depth::Int64) where {T <: Real}
   x0 = 0.5 * (upper + lower);

@@ -33,7 +33,7 @@ param = [0.0,1.0,b0]   # [t_0,v,b_0]
 function compute_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},favg0::Array{T,2},nt::Int64) where {T <: Real}
 @inbounds for i=1:nt
   trans.b = sqrt(param[3]^2+(param[2]*(t[i]-param[1]))^2)
-  favg0[i,1] =  transit_poly!(trans)
+  favg0[i,1] =  transit_poly_d!(trans)
   favg0[i,2] =  trans.dfdrb[1]
   favg0[i,3] =  trans.dfdrb[2]/trans.b*param[2]^2*(param[1]-t[i])
   favg0[i,4] =  trans.dfdrb[2]*param[2]/trans.b*(t[i]-param[1])^2
@@ -43,6 +43,7 @@ end
 return
 end
 
+trans = transit_init(r,b0,u_n,true)
 compute_lightcurve!(trans,param,t,favg0,nt)
 @time compute_lightcurve!(trans,param,t,favg0,nt)
 
@@ -132,7 +133,8 @@ for k=1:K
     t_bin1 = time_ns()
     integrate_lightcurve!(trans,param,t,texp,favg1,nt,tol[j],3,neval1,depthmax1)
     t_bin = time_ns()-t_bin1
-    precision[k,j] += maximum(abs.(favg1-favg2))
+#    precision[k,j] += maximum(abs.(favg1-favg2))
+    precision[k,j] += std(favg1-favg2)
     neval_mean[k,j] += mean(neval1) 
     println("k: ",k," j: ",j," tol: ",tol[j]," neval: ",mean(neval1)," relative time: ",t_bin/t_nobin/mean(neval1)," max depth: ",maximum(depthmax1))
   end
