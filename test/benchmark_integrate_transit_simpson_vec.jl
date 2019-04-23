@@ -2,13 +2,18 @@
 # Computes derivatives over the timestep.
 using PyPlot
 
+if VERSION >= v"0.7"
+  using Statistics
+end
+
 #include("../src/integrate_transit_cubature.jl")
-#include("../src/integrate_transit_simpson_vec.jl")
-include("integrate_transit_simpson_vec.jl")
+include("../src/integrate_transit_simpson_vec.jl")
+#include("integrate_transit_simpson_vec.jl")
 
 # Test it out:
 
-include("../../test/loglinspace.jl")
+#include("../../test/loglinspace.jl")
+include("loglinspace.jl")
 
 t1 = -1.5; t2 = 1.5; nt = 10000; dt = 0.3
 t = zeros(nt)
@@ -152,7 +157,11 @@ for k=1:K
   clf()
   plot(t,favg2[1,:])
   plot(reverse(t),favg2[1,:])
-  read(STDIN,Char)
+  if VERSION >= v"0.7"
+    read(stdin,Char)
+  else
+    read(STDIN,Char)
+  end
 end
 precision_tol = zeros(ntol)
 neval_tol = zeros(ntol)
