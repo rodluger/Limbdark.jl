@@ -26,7 +26,7 @@ pushd $HOME
 git clone https://github.com/hpparvi/pytransit.git
 cd pytransit
 git checkout 7ce6eb238a64b29dc2001ff8b61311342820dfec # last stable commit for gimenez model
-python setup.py build install
+python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
 popd
 
 # Install the dev version of starry
