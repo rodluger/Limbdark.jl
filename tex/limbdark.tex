@@ -2160,6 +2160,14 @@ the input parameters.
 %\frac{\partial {\rm cel}()}{\partial b} &=&{\rm cel}(k_c,p,0,1).
 %\end{eqnarray}
 
+\begin{eqnarray}
+\frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial k_c} &=& \frac{-k_c}{p-k_c^2}\left[\mathrm{cel}(k_c,k_c^2,a,b)-\mathrm{cel}(k_c,p,a,b)\right],\\
+\frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial p} &=& \frac{\mathrm{cel}(k_c,p,0,\lambda) +(b-ap)\mathrm{cel}(k_c,1,1-p,k_c^2-p)}{2p(1-p)(p-k_c^2)},\\ 
+\lambda &=& k_c^2(b+ap-2bp)+p(3bp-ap^2-2b),\\
+\frac{\partial {\rm cel}(k_c,p,a,b)}{\partial a } &=& {\rm cel}(k_c,p,1,0),\\
+\frac{\partial {\rm cel}(k_c,p,a,b)}{\partial b} &=&{\rm cel}(k_c,p,0,1).
+\end{eqnarray}
+
 \appendix
 
 Table \ref{tab:symbols} gives a list of the notation used throughout
