@@ -25,7 +25,7 @@ pip install batman-package
 pushd $HOME
 git clone https://github.com/hpparvi/pytransit.git
 cd pytransit
-git checkout 054435eb35129d5793257ca55a763aec1a904065 # last commit prior to v2
+git checkout 7ce6eb238a64b29dc2001ff8b61311342820dfec # last stable commit for gimenez model
 python setup.py build install
 popd
 
