@@ -1,3 +1,4 @@
+
 # This computes a straight-line transit lightcurve, integrated over a timestep.
 
 include("integrate_transit_simpson_vec.jl")
