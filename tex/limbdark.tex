@@ -274,16 +274,13 @@ computing the area of a triangle in which two of the sides are of similar length
 the kite has an area that is twice the area of the triangle connecting the centers
 of both circles and one of the intersection points.  \cite{Goldberg1991} gives a
 formula for precisely computing the area of a triangle, based on a method developed
-by \citet{Kahan2000}, which we use to compute the area of the kite-shaped region,
+by William Kahan \citep[later described in][]{Kahan2000}, which we use to compute 
+the area of the kite-shaped region,
 \begin{eqnarray}\label{eq:Kite_area}
 A_{kite} &=& \frac{1}{2}\sqrt{(A+(B+C))(C-(A-B))(C+(A-B))(A+(B-C))},
 \end{eqnarray}
 for $A \ge B \ge C$, where the tuple $\{A,B,C\}$ equals $\{1,r,b\}$ 
-sorted from from greatest to least. \eric{The previous sentence states that
-the 1991 formula is based on a method published in 2000; please check.} 
-\rodrigo{Yeah, I'm not sure what is going on, but I think that Goldberg published
-the idea based Kahan's lectures, and then Kahan wrote up a summary many years
-later.}
+sorted from from greatest to least. 
 
 Next, the inverse cosine formulae are also imprecise when $\cos{\kappa_0} = x_0 \approx
 1$ or $\cos{\kappa_1} = x_1 \approx 1$.  The approximate solutions in this limit
@@ -759,6 +756,9 @@ and the general elliptic integral.
 % transit light curve of a uniform, thin emission shell \citep{Schlawin2010}.
 
 \eric{We need an equation here explicitly stating the derivatives of the $\mathfrak{s}_2$ term.}
+\rodrigo{The $\mathfrak{s}_2$ term isn't introduced until the next section;  do you mean
+$\mathfrak{s}_1$?}
+
 The derivatives of $\mathfrak{s}_1$ are given by
 \begin{eqnarray}
 \frac{\partial \mathfrak{s}_1}{\partial r} &=& -\pi \frac{\partial \Lambda}{\partial r},\\
