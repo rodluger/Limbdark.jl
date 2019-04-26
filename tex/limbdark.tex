@@ -194,7 +194,12 @@ laws, but we will compare with these models below in \S \ref{sec:comparison}.
 We turn now towards presenting formulae for more accurate limb darkening transit,
 occultation, and eclipse models, starting with the simplest case:  a source
 of uniform surface brightness.  Before we proceed, however we need to
-introduce some more notation.  For the quadratic limb-darkening case, the
+introduce some additional notation.  The flux of the star, $F$, we express as a linear
+combination of basis functions, $\mathfrak{s}_i(r,b)$, where $0 \le i \le N$, where
+$N$ is the order of the limb-darkening.  The total flux is given by the inner product
+of a vector of coefficients, $\mathfrak{g}$, with the set of basis vectors, where
+$\mathfrak{g}$ depends upon only upon the limb-darkening coefficients, but is
+independent of time.  For example, in the quadratic limb-darkening case, the
 flux is defined as
 \begin{eqnarray}
 F = I(1) \mathfrak{s}^T \mathfrak{g},
@@ -210,6 +215,9 @@ but I think we'll really confuse the reader if we make them wait that long.
 We should dedicate a paragraph to explaining how we're doing the same thing as
 in starry: expressing the flux as the dot product between a polynomial
 basis and a vector of integral solutions.}
+
+\rodrigo{Rodrigo: I took a stab at this in the paragraph above.  I don't yet make
+reference to starry, though.}
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -509,7 +517,7 @@ elliptic integrals into a general complete elliptic integral defined by \citet{B
 \end{equation}
 where $k_c = \sqrt{1-m_k}$, and for $b+r \ge 1$,
 $m_k=k^2$, while for $b+r \le 1$, $m_k=1/k^2$.  The derivatives of
-${\rm cel}$ with respect to the model parameters are given in Appendix \ref{app:cel_derivative}.
+${\rm cel}$ with respect to the input parameters are given in Appendix \ref{app:cel_derivative}.
 Although $k_c$ can be computed from
 $m_k$, we have found better numerical stability in computing $k_c$ analytically
 from $b$ and $r$:
@@ -2121,6 +2129,8 @@ and Cooperative Agreement Number NNA13AA93A.
 
 \appendix
 
+\section{Errata for Mandel \& Agol (2002)}
+
 Here are a list of errata for \citet{MandelAgol2002}:
 \begin{enumerate}
 \item In Equation (7), $\lambda_3$ and $\lambda_4$ should have $2k \rightarrow
@@ -2144,13 +2154,11 @@ on the right hand side of Equation (8).
 With the exception of 3, none of these errors affected the publicly
 available code.
 
-\appendix
+\section{Derivatives of general complete elliptic integral}
 \label{app:cel_derivatives}
 
 In this appendix, we give the derivatives of $cel$ with respect to
 the input parameters.
-
-\todo{Eric: The following equation is breaking the compile on Travis.}
 
 %\begin{eqnarray}
 %\frac{\partial {\rm cel}()}{\partial k_c} &=& \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial k_c} = \frac{-k_c}{p-k_c^2}\left[\mathrm{cel}(k_c,k_c^2,a,b)-\mathrm{cel}(k_c,p,a,b)\right],\\
@@ -2164,11 +2172,11 @@ the input parameters.
 \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial k_c} &=& \frac{-k_c}{p-k_c^2}\left[\mathrm{cel}(k_c,k_c^2,a,b)-\mathrm{cel}(k_c,p,a,b)\right],\\
 \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial p} &=& \frac{\mathrm{cel}(k_c,p,0,\lambda) +(b-ap)\mathrm{cel}(k_c,1,1-p,k_c^2-p)}{2p(1-p)(p-k_c^2)},\\ 
 \lambda &=& k_c^2(b+ap-2bp)+p(3bp-ap^2-2b),\\
-\frac{\partial {\rm cel}(k_c,p,a,b)}{\partial a } &=& {\rm cel}(k_c,p,1,0),\\
-\frac{\partial {\rm cel}(k_c,p,a,b)}{\partial b} &=&{\rm cel}(k_c,p,0,1).
+\frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial a } &=& \mathrm{cel}(k_c,p,1,0),\\
+\frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial b} &=& \mathrm{cel}(k_c,p,0,1).
 \end{eqnarray}
 
-\appendix
+\section{Listing of symbols used in the paper}
 
 Table \ref{tab:symbols} gives a list of the notation used throughout
 the main paper.
