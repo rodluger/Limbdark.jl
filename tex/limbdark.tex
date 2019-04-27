@@ -885,10 +885,11 @@ order $N$ as
     \label{eq:polynomialld}
     \frac{I(\upmu)}{I_0} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - 
                                 ... - u_{N}(1 - \upmu)^{N} \nonumber \\
-                          &= \sum_{i=0}^N u_i (1 - \upmu)^i
+                          &= -\sum_{i=0}^N u_i (1 - \upmu)^i
 \end{align}
 %
 \rodrigo{I think $u_0=1$, not $-1$, right?}
+\eric{There was a sign missing in front of the second line of the equation.}
 where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu$
 is the cosine of the angle between the line of sight and the vector normal to 
 the body's surface. In a right-handed Cartesian coordinate system centered 
