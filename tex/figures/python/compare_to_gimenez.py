@@ -5,7 +5,7 @@ import numpy as np
 import subprocess
 import pytransit
 import starry
-import starry2
+import exoplanet
 from scipy.optimize import curve_fit
 np.random.seed(43)
 
@@ -67,12 +67,12 @@ b = np.linspace(0.0, 1.1, 1000)
 agol_time = np.empty(len(Narr))
 agol_grad_time = np.empty(len(Narr))
 starry_ylm_time = np.empty(len(Narr))
-starry2_time = np.empty(len(Narr))
-starry2_grad_time = np.empty(len(Narr))
+starry_time = np.empty(len(Narr))
+starry_grad_time = np.empty(len(Narr))
 pytransit_time = np.empty(len(Narr))
 err_pytransit = np.empty(len(Narr))
 err_agol = np.empty(len(Narr))
-err_starry2 = np.empty(len(Narr))
+err_starry = np.empty(len(Narr))
 err_starry_ylm = np.empty(len(Narr))
 
 # Loop over polynomial degree
@@ -100,19 +100,13 @@ for i, N in enumerate(Narr):
         pytransit_flux = m(b, 0.1, u_g)
     pytransit_time[i] = (time.time() - tstart) / 10
 
-    # starry
+    # starry (sph)
     # Using the dense spherical harmonic
     # integration algorithm (slow, since we don't
     # actually need the majority of the terms!)
     if N < 30:
-        map = starry.Map(N + 1)
-        map[0, 0] = 1
-        # HACK: This forces the code to compute the flux
-        # as a limb-darkened Ylm map; our point here is
-        # to show how much faster we can do with the
-        # efficient formulation in this paper!
-        map[1, 0] = 1e-15
-        map[:N] = u
+        map = starry.Map(ydeg=1, udeg=N)
+        map[1:] = u
         tstart = time.time()
         for k in range(10):
             starry_ylm_flux = map.flux(xo=b, ro=0.1)
@@ -123,23 +117,22 @@ for i, N in enumerate(Narr):
         starry_ylm_flux = np.zeros_like(b) * np.nan
         starry_ylm_time[i] = np.nan
 
-    # starry2
-    map = starry2.Map(N)
-    map[0, 0] = 1
-    map[:] = u
+    # starry (ld)
+    map = starry.Map(ydeg=0, udeg=N)
+    map[1:] = u
     tstart = time.time()
     for k in range(10):
-        starry2_flux = map.flux(xo=b, ro=0.1)
-    starry2_time[i] = (time.time() - tstart) / 10
+        starry_flux = map.flux(b=b, ro=0.1)
+    starry_time[i] = (time.time() - tstart) / 10
     tstart = time.time()
     for k in range(10):
-        starry2_flux, _ = map.flux(xo=b, ro=0.1, gradient=True)
-    starry2_grad_time[i] = (time.time() - tstart) / 10
+        map.flux(b=b, ro=0.1, bf=np.ones_like(b))
+    starry_grad_time[i] = (time.time() - tstart) / 10
 
     # Multiprecision
     err_agol[i] = np.nanmedian(np.abs(agol_flux - flux_multi))
     err_pytransit[i] = np.nanmedian(np.abs(pytransit_flux - flux_multi))
-    err_starry2[i] = np.nanmedian(np.abs(starry2_flux - flux_multi))
+    err_starry[i] = np.nanmedian(np.abs(starry_flux - flux_multi))
     err_starry_ylm[i] = np.nanmedian(np.abs(starry_ylm_flux - flux_multi))
 
 # Plot
@@ -158,11 +151,11 @@ for i in range(len(Narr)):
 ax.plot(Narr, agol_grad_time, '--', lw=0.75, color='C0')
 
 for i in range(len(Narr)):
-    ax.plot(Narr[i], starry2_time[i], 'o', ms=ms(err_starry2[i]), color='C2')
-ax.plot(Narr, starry2_time, '-', lw=0.75, color='C2')
+    ax.plot(Narr[i], starry_time[i], 'o', ms=ms(err_starry[i]), color='C2')
+ax.plot(Narr, starry_time, '-', lw=0.75, color='C2')
 for i in range(len(Narr)):
-    ax.plot(Narr[i], starry2_grad_time[i], 'o', ms=ms(err_starry2[i]), color='C2')
-ax.plot(Narr, starry2_grad_time, '--', lw=0.75, color='C2')
+    ax.plot(Narr[i], starry_grad_time[i], 'o', ms=ms(err_starry[i]), color='C2')
+ax.plot(Narr, starry_grad_time, '--', lw=0.75, color='C2')
 
 for i in range(len(Narr)):
     ax.plot(Narr[i], starry_ylm_time[i], 'o', ms=ms(err_starry_ylm[i]), color='C3')

@@ -12,32 +12,35 @@ if [ ! -f $HOME/miniconda-cache/bin/conda ]; then
       conda create --yes -n test python=$PYTHON_VERSION
       conda activate test
       conda install tectonic;
-      conda install -c conda-forge numpy=$NUMPY_VERSION scipy matplotlib setuptools pytest pytest-cov pip starry
+      conda install -c conda-forge numpy=$NUMPY_VERSION scipy matplotlib setuptools pytest pytest-cov pip
+
+      # Install exoplanet
+      pip install exoplanet
+
+      # Install batman
+      pip install batman-package
+
+      # Install a stable version of pytransit
+      pushd $HOME
+      git clone https://github.com/hpparvi/pytransit.git
+      cd pytransit
+      git checkout 7ce6eb238a64b29dc2001ff8b61311342820dfec # last stable commit for gimenez model
+      python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
+      popd
+
+      # Install the dev version of starry (29-04-2019)
+      pip install pybind11
+      pushd $HOME
+      git clone https://github.com/rodluger/starry.git
+      cd starry
+      git checkout c38c984593dd9e02f2dadc8ee11119852781b36e
+      STARRY_BITSUM=515 python setup.py develop
+      popd
+
 fi
 
 # Display some info
 conda info -a
-
-# Install batman
-pip install batman-package
-
-# Install pytransit
-pushd $HOME
-git clone https://github.com/hpparvi/pytransit.git
-cd pytransit
-git checkout 7ce6eb238a64b29dc2001ff8b61311342820dfec # last stable commit for gimenez model
-python setup.py config_fc --fcompiler=gnu95 --opt="-Ofast" --f90flags="-cpp -fopenmp -march=native" build install
-popd
-
-# Install the dev version of starry
-pip install pybind11
-pushd $HOME
-git clone https://github.com/rodluger/starry.git
-cd starry
-#git checkout 8cea59fa71acfcf4bd6265d6b21c38e82971436d
-git checkout fb8462b762c03566168579a35d87abf6996df77c
-STARRY_BITSUM=1 STARRY_KEEP_DFDU_AS_DFDG=1 python setup.py develop
-popd
 
 # Attempt to resolve issues with SSL certificate expiring for purl.org:
 # https://tectonic.newton.cx/t/how-to-use-tectonic-if-you-can-t-access-purl-org/44

@@ -1,6 +1,6 @@
 """Starry speed tests."""
-from starry.kepler import Primary, Secondary, System
-import starry2
+import exoplanet as exo
+import starry
 import time
 import matplotlib.pyplot as pl
 import numpy as np
@@ -174,13 +174,13 @@ print("Polynomial fit error (Gimenez): %.3e" % err)
 number = 30
 nN = 8
 Nmax = 5
-Narr = np.logspace(1, Nmax, nN)
+Narr = np.array(np.logspace(1, Nmax, nN), dtype=int)
 agol_time = np.zeros(nN) * np.nan
 agol_grad_time = np.zeros(nN) * np.nan
 pytransit_time = np.zeros(nN)
 batman_time = np.zeros(nN)
-starry2_time = np.zeros(nN) * np.nan
-starry2_grad_time = np.zeros(nN) * np.nan
+starry_time = np.zeros(nN) * np.nan
+starry_grad_time = np.zeros(nN) * np.nan
 
 # Loop over number of cadences
 for i, N in enumerate(Narr):
@@ -188,17 +188,12 @@ for i, N in enumerate(Narr):
     # Time array
     t = np.linspace(-0.15, 0.15, N)
 
-    # Use starry to compute b(t)
-    star = Primary()
-    planet = Secondary()
-    planet.r = rplanet
-    planet.inc = inc
-    planet.porb = P
-    planet.a = a
-    planet.lambda0 = 90
-    system = System(star, planet)
-    system.compute(t)
-    b = np.sqrt(planet.X ** 2 + planet.Y ** 2)
+    # Use exoplanet to compute b(t)
+    orbit = exo.orbits.KeplerianOrbit(period=P, b=b0, a=a)
+    coords = orbit.get_relative_position(t)
+    x = coords[0].eval()
+    y = coords[1].eval()
+    b = np.sqrt(x * x + y * y)
 
     # Feed b(t) to julia
     # HACK: PyJulia is currently broken, so this is how we have to do this...
@@ -227,18 +222,17 @@ for i, N in enumerate(Narr):
         batman_flux = m.light_curve(params)
     batman_time[i] = (time.time() - tstart) / number
 
-    # starry2
-    map = starry2.Map(len(u))
-    map[0, 0] = 1
-    map[:] = u
+    # starry
+    map = starry.Map(ydeg=0, udeg=len(u))
+    map[1:] = u
     tstart = time.time()
-    for k in range(10):
-        starry2_flux = map.flux(xo=b, ro=0.1)
-    starry2_time[i] = (time.time() - tstart) / 10
+    for k in range(number):
+        starry_flux = map.flux(b=b, ro=0.1)
+    starry_time[i] = (time.time() - tstart) / number
     tstart = time.time()
-    for k in range(10):
-        starry2_flux, _ = map.flux(xo=b, ro=0.1, gradient=True)
-    starry2_grad_time[i] = (time.time() - tstart) / 10
+    for k in range(number):
+        starry_flux, _ = map.flux(b=b, ro=0.1, bf=np.ones_like(b))
+    starry_grad_time[i] = (time.time() - tstart) / number
 
     # pytransit
     if (N < 100000):
@@ -259,7 +253,7 @@ for i, N in enumerate(Narr):
         err_agol = np.nanmedian(np.abs(agol_flux - flux_multi))
         err_pytransit = np.nanmedian(np.abs(pytransit_flux - flux_multi))
         err_batman = np.nanmedian(np.abs(batman_flux - flux_multi))
-        err_starry2 = np.nanmedian(np.abs(starry2_flux - flux_multi))
+        err_starry = np.nanmedian(np.abs(starry_flux - flux_multi))
 
 # Plot
 fig = pl.figure(figsize=(7, 4))
@@ -273,10 +267,10 @@ ax.plot(Narr, agol_time, 'o', ms=ms(err_agol), color='C0')
 ax.plot(Narr, agol_time, '-', lw=0.75, color='C0')
 ax.plot(Narr, agol_grad_time, 'o', ms=ms(err_agol), color='C0')
 ax.plot(Narr, agol_grad_time, '--', lw=0.75, color='C0')
-ax.plot(Narr, starry2_time, 'o', ms=ms(err_agol), color='C2')
-ax.plot(Narr, starry2_time, '-', lw=0.75, color='C2')
-ax.plot(Narr, starry2_grad_time, 'o', ms=ms(err_starry2), color='C2')
-ax.plot(Narr, starry2_grad_time, '--', lw=0.75, color='C2')
+ax.plot(Narr, starry_time, 'o', ms=ms(err_agol), color='C2')
+ax.plot(Narr, starry_time, '-', lw=0.75, color='C2')
+ax.plot(Narr, starry_grad_time, 'o', ms=ms(err_starry), color='C2')
+ax.plot(Narr, starry_grad_time, '--', lw=0.75, color='C2')
 ax.plot(Narr, pytransit_time, 'o', ms=ms(err_pytransit), color='C4')
 ax.plot(Narr, pytransit_time, '-', lw=0.75, color='C4')
 ax.plot(Narr, batman_time, 'o', ms=ms(err_batman), color='C1')

@@ -30,16 +30,16 @@ r = 0.1
 b = np.linspace(-1.5, 1.5, npts)
 
 # Second-order
-map = starry.Map()
+map = starry.Map(0, 2)
 map[1] = u[1]
 map[2] = u[2]
-flux = map.flux(xo=b, yo=0, ro=r)
+flux = map.flux(b=b, ro=r)
 
 # Tenth-order
-map10 = starry.Map(10)
+map10 = starry.Map(0, 10)
 for l in range(1, len(u10)):
     map10[l] = u10[l]
-flux10 = map10.flux(xo=b, yo=0, ro=r)
+flux10 = map10.flux(b=b, ro=r)
 
 # Plot
 fig = pl.figure(figsize=(10, 4))
