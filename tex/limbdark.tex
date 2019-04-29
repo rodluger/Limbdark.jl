@@ -132,7 +132,7 @@ the projected disk of the star lies in the $x-y$ plane, and the $z$ coordinate
 points towards the observer, then $\upmu = z$, where $z$ is measured in units 
 of the stellar radius.  The variable $\upmu=z$ is then the elevation on the
 surface of the star where the highest point is taken to be closest to the observer.
-In terms of $b$, the normalized radius projected onto 
+In terms of $b$, the normalized separation projected onto 
 the sky, this parameter is given by $\upmu = \cos{\theta} =\sqrt{1-b^2}$, where
 $0\le b \le 1$ within the stellar disk.  We also introduce the radius ratio,
 $r$, which is the radius of the occultor divided by the radius of the source.
@@ -150,7 +150,7 @@ I(\upmu) = I(1) [1-u_1 (1-\upmu) - u_2 (1-\upmu)^2],
 \end{equation}
 where $u_1$ and $u_2$ are the limb-darkening parameters.
 In this paper, we will show that higher order powers of $\upmu^n$ with integer
-$n$ can be integrated analytically when expressed as recursion relations.
+$n$ can be integrated analytically for $n > 2$ when expressed as recursion relations.
 Linear combinations of these laws can be constructed,
 with various parameterizations, to describe stellar limb darkening more precisely.
 
@@ -258,7 +258,7 @@ r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\
 \cos{\kappa_1} &=& \left(\frac{(1-r)(1+r)+b^2}{2b}\right),
 \end{eqnarray}
 where $\kappa_0$ and $\kappa_1$ are the angles defined in Figure \ref{fig:circle_overlap}.
-The second term is the same as the standard formula for the area of overlap of two 
+The second term in equation \ref{eq:MAuniform} is the same as the standard formula for the area of overlap of two 
 partially overlapping circles, with one of the circles scaled to a radius of unity 
 \citep{Weisstein2018}.  This term corresponds to ingress (and egress), it is the most 
 expensive to compute, and it is most subject to numerical inaccuracy;  we focus on this 
@@ -330,7 +330,7 @@ the error of the standard formula approaches $10^{-8}$, with the
 error exceeding the value of the area of overlap for $1+r-10^{-8} <
 b < 1+r$.
 
-In contrast, Euation~(\ref{eq:area_of_overlap}) gives a precision
+In contrast, Equation~(\ref{eq:area_of_overlap}) gives a precision
 that is double-precision in both limits.  Figure
 \ref{fig:overlap_precision} shows that Equation~(\ref{eq:area_of_overlap})
 gives a precision of $\approx 10^{-17}$ in the limit $b \rightarrow
@@ -407,7 +407,7 @@ for linear limb darkening.
 % ==============================================================================
 
 In this section we turn to the case of linear limb darkening, $I(\upmu)/I(1) = 1-u_1(1-\upmu)$
-\citep{Russell1912a,Russell1912b}.  In this section we set $I(1)=u_1=1$, so 
+\citep{Russell1912a,Russell1912b}.  In this section we set $I(1)=1$ and $u_1=1$, so 
 that $I(\upmu)=\upmu$;  the general case can be computed as a linear
 combination with the uniform case.
 Note that since $\upmu = \sqrt{1-x^2-y^2}$, this problem is equivalent to
@@ -776,13 +776,14 @@ We next increase the power of limb darkening by one, $\upmu^2$.
 
 The next order of limb darkening has been widely studied due to its
 accurate description of stellar atmospheres \citep{Claret2000,MandelAgol2002,Pal2008}.
-We summarize here the formulae for quadratic limb darkening with $I(1)=1$, $u_1=2$ and
-$u_2=-1$, so that $I(\mu)=\mu^2$, along with the derivatives, using the transformed 
+We summarize here the formulae for quadratic limb darkening with 
+so that $\mathfrak{s}_2 = 4\mu^2-2$, along with the derivatives, using the transformed 
 expressions described above.  The general quadratic case may be computed as
 a linear combination with the foregoing uniform and linear cases.
 
-We first give the formula for the function $\eta(r,b)$, which is used in \citet{MandelAgol2002}, in
-terms of quantities we have defined above for the uniform case:
+We first give the formula for the function $\eta(r,b)$, which is the term which appears 
+in the quadratic limb-darkening model only when $u_2 \ne 0$
+\citep{MandelAgol2002}. In terms of quantities we have defined above for the uniform case:
 \begin{proof}{Eta}
     \label{eq:eta}
     \eta(r,b) &=
@@ -926,7 +927,7 @@ dot product
 %
 \begin{align}
     \label{eq:polynomialld_vec}
-    \frac{I(z)}{I_0} &= \ubasis^\mathsf{T} \bvec{u} \quad .
+    \frac{I(z)}{I_0} &= -\ubasis^\mathsf{T} \bvec{u} \quad .
 \end{align}
 
 Our task now is to compute the flux, $F$, observed during an occultation by
