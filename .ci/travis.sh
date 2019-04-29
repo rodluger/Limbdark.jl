@@ -10,6 +10,7 @@ if [ ! -f $HOME/miniconda-cache/bin/conda ]; then
       conda config --set always_yes yes;
       conda update --all;
       conda create --yes -n test python=$PYTHON_VERSION
+      conda init bash
       conda activate test
       conda install tectonic;
       conda install -c conda-forge numpy=$NUMPY_VERSION scipy matplotlib setuptools pytest pytest-cov pip
