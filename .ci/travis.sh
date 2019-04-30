@@ -30,6 +30,7 @@ popd
 
 # Install the dev version of starry (29-04-2019)
 pip install pillow
+pip install ipython
 pip install pybind11
 pushd $HOME
 git clone https://github.com/rodluger/starry.git
