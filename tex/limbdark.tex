@@ -39,7 +39,7 @@ Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomia
  derivatives of exposure-time averaged transit light curves with respect to all 
  model parameters.  An additional application is modeling eclipsing binary or
  eclipsing multiple star systems in cases where the stars may be treated as spherically 
- symmetric.  We provide code which implements these formulae in C++, Python, and Julia, 
+ symmetric.  We provide code which implements these formulae in C++, Python, IDL, and Julia, 
  with tests and examples of usage.
 \end{abstract}
 
@@ -890,7 +890,7 @@ order $N$ as
 \end{align}
 %
 \rodrigo{I think $u_0=1$, not $-1$, right?}
-\eric{There was a sign missing in front of the second line of the equation.}
+\eric{There was a minus sign missing in front of the second line of the equation.}
 where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu$
 is the cosine of the angle between the line of sight and the vector normal to 
 the body's surface. In a right-handed Cartesian coordinate system centered 
@@ -1037,7 +1037,7 @@ we define the Green's basis to be
 %
 Given this definition, the columns of the change of basis matrix
 $\mathcal{A}_2$ are the Green's basis vectors corresponding to each
-of the polynomial termms in Equation~(\ref{eq:polybasis}). Note that 
+of the polynomial terms in Equation~(\ref{eq:polybasis}). Note that 
 in practice, it is more efficient to transform vectors in the $\pbasis$ 
 basis to vectors in the $\gbasis$ basis via the
 downward recursion relation
@@ -1605,13 +1605,23 @@ As an example, we choose the approximate transit model $b(t) = (b_0^2 + v^2(t-t_
 which ignores acceleration and curvature during a transit, and thus is valid in the
 limit of large orbital separation.  We compute the time-averaged flux and derivatives 
 with respect to $\bvec{x} = \{t_0,v,b_0\}$ for a length of integration time $\Delta t$.
-\eric{Update this description of the time-integration.}
-The integration is carried out with an adaptive refinement of the exposure time interval by
-factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
-of the mean of the start and end with a maximum
-number of refinement depths of 32.  Figure \ref{fig:integrated_derivs} shows a
+%The integration is carried out with an adaptive refinement of the exposure time interval by
+%factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
+%of the mean of the start and end with a maximum
+%number of refinement depths of 32.  
+The integration is carried out with an adaptive Simpson quadrature routine 
+\citep{Kuncir1962}.  Since at each point we compute the flux along with
+its derivatives, we have developed a vectorized version of this routine
+which keeps track of the quadrature separately for each component of the
+flux and its partial derivatives.  The convergence check for the adaptive
+Simpson rule is applied to each component, and when all satisfy the
+convergence criterion, the adaptive refinement is terminated.  
+In practice this algorithm requires specifying a convergence tolerance,
+$\epsilon_{tol}$, as well as a maximum number of depths, $D_{max}$, to 
+allocate memory to store the intermediate results.
+Figure \ref{fig:integrated_derivs} shows a
 comparison of the derivatives of the time-integrated light curve for this
-impact parameter model.  
+impact parameter model.
 
 The time-integration smooths both the features of
 the light curve, as well as the features of the derivative curves.  The similarity of
@@ -1716,7 +1726,7 @@ parameters, we carried out nine measurements  of the timing, and
 we use the median of these for plotting purposes.  The benchmarking
 for the \texttt{Julia} code was carried out with \texttt{v0.7} of
 Julia on a MacBook Pro with 2.8 GHz Intel Core i7.
-No sub-sampling was carried out in this computation. \rodrigo{Update this
+No time-integration/sub-sampling was carried out in this computation. \rodrigo{Update this
 sentence with the Travis CPU specs.}
 
 Figure \ref{fig:ncoeff} shows that the time dependence is linear with the
@@ -1768,8 +1778,8 @@ We have computed an example non-linear light curve with $r=0.1$ and
 $c_1=c_2=c_3=c_4=0.2$, and then fit it with successive orders of the
 polynomial approximation.  The non-linear light curve model model
 we computed numerically as the analytic expressions in \citet{MandelAgol2002}
-are in terms of hypergeomtric functions which are expensive to evaluate.  
-We compute the light curve with a ``layer-cake" model in which sums of 
+are in terms of hypergeometric functions which are expensive to evaluate.  
+We compute the light curve with a ``layer-cake'' model in which sums of 
 layers of surface brightness with a grid of increasing radii are added together 
 to approximate the lightcurve;  this
 is the approach taken in the numerical model used to compute the
@@ -1861,7 +1871,10 @@ the Julia implementation of these routines takes about 55\% of the CPU
 time as the IDL EXOFAST implementation without derivatives, and about 65\%
 of the computation time when including the derivatives.  Consequently, we
 conclude that our new implementation is both faster (by 35-45\%) and more 
-accurate than the Mandel \& Agol IDL implementation.
+accurate than the Mandel \& Agol IDL implementation.  We note that EXOFAST
+v2.0 now utilizes the numerically-stable quadratic limb-darkening expressions
+presented above, albeit without the computed derivatives (Eastman et al.,
+in preparation).
 
 \subsection{Derivative comparison with P\'al}
 
@@ -1964,7 +1977,7 @@ DobbsDixon2012};  limb darkening is treated as azimuthally-symmetric \citep[but 
 refraction and any relativistic effects are ignored \citep[but see][]{Sidis2010}; 
 and the edges of both bodies are assumed to have a sharp boundary.
 All of these assumptions are violated in every transit event to some extent,
-but in the majority of cases these assumptions can yield a precise model for 
+but in the majority of cases these assumptions can yield a sufficiently precise model for 
 a given signal-to-noise ratio.
 
 Given these assumptions, generally one next assumes a particular functional
@@ -1996,7 +2009,7 @@ orbital parameters \citep{Csizmadia2012,Espinoza2015}.
 
 Even so, this approach still assumes azimuthal symmetry for the star, while 
 any model for the surface brightness of a star can only be approximate:
-most stars are convective, rotationally-oblate, spotted, oscillating, flaring,
+to some extent most stars are convective, rotationally-oblate, spotted, oscillating, flaring,
 etc.  The model we have presented, then, will only resemble any given star to
 a precision which is limited by the lack of uniformity of the actual stellar
 surface.  This begs the question of why a numerically precise model is required
@@ -2042,7 +2055,15 @@ total flux of the star.  A third possibility is to fit stellar atmosphere
 models with the polynomial limb darkening model until a sufficient precision
 is reached given that warranted by the data, and then to place priors
 on the limb darkening parameters, informed by the stellar limb darkening
-models.  A limitation of our computational approach is that the precision
+models.  A fourth approach might be to choose a parameterization with
+a small number of free parameters, such as the non-linear ``power-2'' law advocated
+by \citet{Maxted2018}, and fit this parameterized limb-darkening model
+with a high-order polynomial for a given set.  Then, only the non-linear
+parameters need to be varied, while the polynomial coefficients will
+be a simple function of these non-linear parameters.  In this approach
+it should be straightforward to linearize the polynomial limb-darkening
+model fitting, which ought to yield good computational efficiency.  
+A limitation of our computational approach is that the precision
 begins to degrade for $N \approx 25-30$; however, we anticipate that such
 a high order will rarely be required.
 
@@ -2082,12 +2103,12 @@ times the derivative of the limb-darkened light curve \citep{Ofir2018}.
 This approach requires derivatives of the light curve with respect to
 time, for which the \citet{MandelAgol2002} computation is too
 imprecise near the points of contact, $b \approx r$ and $b \approx 1-r$,
-within an impact parameter distance of $10^{-4}$, as shown by \citet{Ofir2018}.
-They extrapolated over these regions with polynomials.
+within an impact parameter distance of $10^{-4}$, as shown by \citet{Ofir2018},
+who extrapolated over these regions with polynomials.
 However, our new precise formulae, with derivatives, will be useful
 for the perturbative approach to the detection of transit timing
 variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
-model.
+model over a narrow range of parameter space.
 
 \section{Conclusions}
 
@@ -2112,7 +2133,8 @@ The code is open source, and has two versions:  one of which is a part
 of the \starry package, \texttt{http://github.com/rodluger/starry/}, written
 in a combination of C++ and Python, and a new code written in Julia as
 part of the development of the equations in this paper,
-\texttt{http://github.com/rodluger/limbdark/}.  We welcome usage of these
+\texttt{http://github.com/rodluger/limbdark/}.  We have also implemented
+the flux model in IDL, without derivatives. We welcome usage of these
 codes, and contributions to further develop and enhance their capabilities.
 
 \acknowledgements
