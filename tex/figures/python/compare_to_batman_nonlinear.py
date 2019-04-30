@@ -1,5 +1,8 @@
 """Starry speed tests."""
 import exoplanet as exo
+import os
+import sys
+sys.path.insert(0, os.path.join(os.getenv("HOME", "~"), "starry"))
 import starry
 import time
 import matplotlib.pyplot as pl

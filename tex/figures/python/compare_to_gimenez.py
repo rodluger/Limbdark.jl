@@ -4,6 +4,9 @@ import matplotlib.pyplot as pl
 import numpy as np
 import subprocess
 import pytransit
+import os
+import sys
+sys.path.insert(0, os.path.join(os.getenv("HOME", "~"), "starry"))
 import starry
 import exoplanet
 from scipy.optimize import curve_fit
