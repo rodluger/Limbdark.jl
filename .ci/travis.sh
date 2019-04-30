@@ -15,6 +15,7 @@ if [ ! -f $HOME/miniconda-cache/bin/conda ]; then
       conda install -c conda-forge numpy=$NUMPY_VERSION scipy matplotlib setuptools pytest pytest-cov pip
 
       # Install exoplanet
+      pip install astropy
       pip install exoplanet
 
       # Install batman
@@ -41,9 +42,6 @@ fi
 
 # Display some info
 conda info -a
-
-# TODO: Move up
-pip install astropy
 
 # Attempt to resolve issues with SSL certificate expiring for purl.org:
 # https://tectonic.newton.cx/t/how-to-use-tectonic-if-you-can-t-access-purl-org/44
