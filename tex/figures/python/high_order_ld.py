@@ -1,4 +1,7 @@
 """High order limb-darkening with starry."""
+import os
+import sys
+sys.path.insert(0, os.path.join(os.getenv("HOME", "~"), "starry"))
 import starry
 import numpy as np
 import matplotlib.pyplot as pl
