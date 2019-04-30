@@ -890,7 +890,7 @@ order $N$ as
 \end{align}
 %
 \rodrigo{I think $u_0=1$, not $-1$, right?}
-\eric{There was a sign missing in front of the second line of the equation.}
+\eric{There was a minus sign missing in front of the second line of the equation.}
 where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu$
 is the cosine of the angle between the line of sight and the vector normal to 
 the body's surface. In a right-handed Cartesian coordinate system centered 
@@ -1037,7 +1037,7 @@ we define the Green's basis to be
 %
 Given this definition, the columns of the change of basis matrix
 $\mathcal{A}_2$ are the Green's basis vectors corresponding to each
-of the polynomial termms in Equation~(\ref{eq:polybasis}). Note that 
+of the polynomial terms in Equation~(\ref{eq:polybasis}). Note that 
 in practice, it is more efficient to transform vectors in the $\pbasis$ 
 basis to vectors in the $\gbasis$ basis via the
 downward recursion relation
@@ -1605,13 +1605,23 @@ As an example, we choose the approximate transit model $b(t) = (b_0^2 + v^2(t-t_
 which ignores acceleration and curvature during a transit, and thus is valid in the
 limit of large orbital separation.  We compute the time-averaged flux and derivatives 
 with respect to $\bvec{x} = \{t_0,v,b_0\}$ for a length of integration time $\Delta t$.
-\eric{Update this description of the time-integration.}
-The integration is carried out with an adaptive refinement of the exposure time interval by
-factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
-of the mean of the start and end with a maximum
-number of refinement depths of 32.  Figure \ref{fig:integrated_derivs} shows a
+%The integration is carried out with an adaptive refinement of the exposure time interval by
+%factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
+%of the mean of the start and end with a maximum
+%number of refinement depths of 32.  
+The integration is carried out with an adaptive Simpson quadrature routine 
+\citep{Kuncir1962}.  Since at each point we compute the flux along with
+its derivatives, we have developed a vectorized version of this routine
+which keeps track of the quadrature separately for each component of the
+flux and its partial derivatives.  The convergence check for the adaptive
+Simpson rule is applied to each component, and when all satisfy the
+convergence criterion, the adaptive refinement is terminated.  
+In practice this algorithm requires specifying a convergence tolerance,
+$\epsilon_{tol}$, as well as a maximum number of depths, $D_{max}$, to 
+allocate memory to store the intermediate results.
+Figure \ref{fig:integrated_derivs} shows a
 comparison of the derivatives of the time-integrated light curve for this
-impact parameter model.  
+impact parameter model.
 
 The time-integration smooths both the features of
 the light curve, as well as the features of the derivative curves.  The similarity of
