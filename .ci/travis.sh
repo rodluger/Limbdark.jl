@@ -42,6 +42,9 @@ fi
 # Display some info
 conda info -a
 
+# TODO: Move up
+pip install astropy
+
 # Attempt to resolve issues with SSL certificate expiring for purl.org:
 # https://tectonic.newton.cx/t/how-to-use-tectonic-if-you-can-t-access-purl-org/44
 mkdir -p $HOME/.config/Tectonic
