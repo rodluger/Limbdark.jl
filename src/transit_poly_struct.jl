@@ -324,18 +324,18 @@ else
   if t.k2 >= 1
     if t.k2 > 2.0
       t.kc2 = 1.0-inv(t.k2)
-      t.kc = sqrt(t.kc2)
+      t.kc = sqrt(abs(t.kc2))
     else
       t.kc2 = t.onembpr2/((1+r-b)*(1-r+b))
-      t.kc = sqrt(t.kc2)
+      t.kc = sqrt(abs(t.kc2))
     end
   else
     if t.k2 > 0.5
       t.kc2 = (r-1+b)*(b+r+1)*t.fourbrinv
-      t.kc = sqrt(t.kc2)
+      t.kc = sqrt(abs(t.kc2))
     else
       t.kc2 = (r-1+b)*(b+r+1)*t.fourbrinv
-      t.kc = sqrt(t.kc2)
+      t.kc = sqrt(abs(t.kc2))
     end
   end
 end

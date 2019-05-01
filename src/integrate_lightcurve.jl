@@ -28,6 +28,7 @@ function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Arr
 b0 = abs(param[3]); r = trans.r; t0 = param[1]; v = param[2]
 # Check to see whether the two bodies overlap:
 if b0 > (1.0+r)
+  println("b0: ",b0," r: ",r)
   println("No transit")
   # No transit occurs, so returns ones for lightcurves, and zeros for derivatives:
   favg1[1,:] = one(T)
