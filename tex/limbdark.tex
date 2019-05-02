@@ -313,8 +313,9 @@ partially overlapping circles:
 \begin{proof}{kite_area} \label{eq:area_of_overlap}
 A_{lens} &= \kappa_1 + r^2\kappa_0 - A_{kite},\nonumber\\
 \kappa_0 &= \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\nonumber\\
-\kappa_1 &= \mathrm{atan2}(2A_{kite},(1-r)(1+r)+b^2).
+\kappa_1 &= \mathrm{atan2}(2A_{kite},(1-r)(1+r)+b^2),
 \end{proof}
+with $A_{kite}$ given in equation \ref{eq:Kite_area}.
 
 The performance of this formula relative to the standard formula is profiled
 in Figure \ref{fig:overlap_precision} for $r=0.1$, a typical
@@ -410,7 +411,7 @@ for linear limb darkening.
 % ------------------------------------------------------------------------------
 % ==============================================================================
 
-In this section we turn to the case of linear limb darkening, $I(\upmu)/I(1) = 1-u_1(1-\upmu)$
+We now turn to the case of linear limb darkening, $I(\upmu)/I(1) = 1-u_1(1-\upmu)$
 \citep{Russell1912a,Russell1912b}.  In this section we set $I(1)=1$ and $u_1=1$, so 
 that $I(\upmu)=\upmu$;  the general case can be computed as a linear
 combination with the uniform case.
@@ -514,11 +515,11 @@ limit $k \rightarrow 0$.
 Through trial and error, we have found that these instabilities can be removed by combining
 elliptic integrals into a general complete elliptic integral defined by \citet{Bulirsch1969} as
 \begin{equation}\label{eq:cel}
-{\rm cel}(k_c,p,a,b) = \int_0^{\pi/2} \frac{a\cos^2{\phi} + b\sin^2{\phi}}{\cos^2{\phi}+p\sin^2{\phi}} \frac{d\phi}{\sqrt{\cos^2{\phi}+k_c^2\sin^2{\phi}}},
+\mathrm{cel}(k_c,p,a,b) = \int_0^{\pi/2} \frac{a\cos^2{\phi} + b\sin^2{\phi}}{\cos^2{\phi}+p\sin^2{\phi}} \frac{d\phi}{\sqrt{\cos^2{\phi}+k_c^2\sin^2{\phi}}},
 \end{equation}
 where $k_c = \sqrt{1-m_k}$, and for $b+r \ge 1$,
 $m_k=k^2$, while for $b+r \le 1$, $m_k=1/k^2$.  The derivatives of
-${\rm cel}$ with respect to the input parameters are given in Appendix \ref{app:cel_derivative}.
+$\mathrm{cel}$ with respect to the input parameters are given in Appendix \ref{app:cel_derivative}.
 Although $k_c$ can be computed from
 $m_k$, we have found better numerical stability in computing $k_c$ analytically
 from $b$ and $r$:
@@ -532,7 +533,7 @@ from $b$ and $r$:
 In practice, we let the subroutine that computes $\mathrm{cel}$ accept both
 $m_k$ and $k_c$ as input for numerical precision.
 
-To transform the elliptic integrals in Equation~(\ref{eq:biglam}),
+To transform the elliptic integrals in Equation~(\ref{eq:biglam}) to $\mathrm{cel}$,
 we used the following relations from \citet{Bulirsch1969}:
 \begin{eqnarray} \label{eq:cel_identities}
 \lambda K(m_k) + q E(m_k) &=& {\rm cel}(k_c,1,\lambda+q,\lambda+q k_c^2)\\
