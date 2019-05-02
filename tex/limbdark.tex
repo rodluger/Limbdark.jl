@@ -889,8 +889,8 @@ order $N$ as
                           &= -\sum_{i=0}^N u_i (1 - \upmu)^i
 \end{align}
 %
-\rodrigo{I think $u_0=1$, not $-1$, right?}
-\eric{There was a minus sign missing in front of the second line of the equation.}
+%\rodrigo{I think $u_0=1$, not $-1$, right?}
+%\eric{There was a minus sign missing in front of the second line of the equation.}
 where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu$
 is the cosine of the angle between the line of sight and the vector normal to 
 the body's surface. In a right-handed Cartesian coordinate system centered 
@@ -912,7 +912,7 @@ and $\ubasis$ be the \emph{limb darkening basis}
 %
 \begin{align}
     \label{eq:ldbasis}
-    \ubasis = \begin{pmatrix}
+    \ubasis = -\begin{pmatrix}
         1 & &
         (1 - z) & &
         (1 - z)^2 & &
@@ -927,7 +927,7 @@ dot product
 %
 \begin{align}
     \label{eq:polynomialld_vec}
-    \frac{I(z)}{I_0} &= -\ubasis^\mathsf{T} \bvec{u} \quad .
+    \frac{I(z)}{I_0} &= \ubasis^\mathsf{T} \bvec{u} \quad .
 \end{align}
 
 Our task now is to compute the flux, $F$, observed during an occultation by
@@ -982,14 +982,14 @@ the $i^\mathrm{th}$ coefficient of $\mathfrak{p}$ as
 %
 \begin{equation}
     \label{eq:an_of_un}
-    \mathfrak{p}_i = \sum_{j=0}^N \binom{i}{j}(-1)^{j} u_j.
+    \mathfrak{p}_i = (-1)^{i+1}\sum_{j=0}^N \binom{j}{i} u_j.
 \end{equation}
 %
 The elements of the matrix $\bvec{A}_1$ are thus given by
 %
 \begin{align}
     \label{eq:A1}
-    \mathcal{A}_{1_{i, j}} = \binom{i}{j}(-1)^{j} \quad .
+    \mathcal{A}_{1_{i, j}} = (-1)^{i+1}\binom{j}{i} \quad .
 \end{align}
 %
 Note that, as with the limb darkening basis, 
