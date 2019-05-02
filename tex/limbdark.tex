@@ -200,15 +200,16 @@ flux of the star, $F$, as a linear combination of basis functions, $\mathfrak{s}
 where $0 \le i \le N$, where $N$ is the order of the limb darkening.  Specifically,
 the flux during a transit or occultation
 is given by the inner product of $\mathfrak{s}(r,b)$ with a vector of coefficients
-$\mathfrak{g}$ that depend only on the limb darkening coefficients.
-%
-For example, in the quadratic limb darkening case, the flux is defined as
+$\mathfrak{g}$ that depend only on the limb darkening coefficients:
 %
 \begin{eqnarray}
-F = I(1) \mathfrak{s}^T \mathfrak{g},
+F = I(1) \mathfrak{s}^\top \mathfrak{g},
 \end{eqnarray}
 %
-where 
+where, as before, $I(1)$ is the normalization constant, equal to the 
+intensity at the center of the stellar disk.
+%
+As an example, in the quadratic limb darkening case, the flux is defined as
 %
 $\mathfrak{s} = \left(\mathfrak{s}_0(r,b) \,\,\,\,\,\, \mathfrak{s}_1(r,b) \,\,\,\,\,\, \mathfrak{s}_2(r,b)\right)^\top$ 
 %
@@ -597,7 +598,33 @@ p &=& \left(\frac{b-r}{b+r}\right)^2 \frac{1-(b+r)^2}{1-(b-r)^2}
 in the $k^2 > 1$ case.  Note that in this equation the conditions
 should be evaluated in the order they appear.
 
-The $\mathfrak{s}_1(r,b)$ function is plotted in Figure \ref{transit_linear}.  The
+\begin{figure}[p!]
+    \begin{centering}
+    \includegraphics[height=3in]{figures/julia/transit_linear.pdf}
+    \caption{The intensity of a linearly limb-darkened star ($u_1=1$) being
+    eclipsed, $\mathfrak{s}_1(r,b)$.
+    In the limit $b > r+1$, no eclipse occurs, so $\mathfrak{s}_1=1$.  For $b < r-1$, the star
+    is completely eclipsed and $\mathfrak{s}_1=0$.  In the limits $b=r$ and $b=1-r$, special
+    expressions must be used.
+    \jlcodelink{transit_linear}\label{transit_linear}}
+    \end{centering}
+\end{figure}
+
+\begin{figure}[p!]
+    \begin{centering}
+    \includegraphics[height=4in]{figures/julia/s2_machine.pdf}
+    \caption{The accuracy of $\mathfrak{s}_1(r,b)$ near $b=r$ (left panel) and
+    $b=1-r$ (right panel) for $\epsilon = 10^{-8}$. The $x$-axes are impact parameter $b$,
+    while the $y$ axes in the top panels show $\mathfrak{s}_1(r,b)$, with $r$
+    given in the legend of each panel. The middle panels plot
+    the difference $(\mathfrak{s}_1(b,b\pm\epsilon)-\mathfrak{s}_1(b,b))/\epsilon$
+    and $(\mathfrak{s}_1(b,1-b\pm\epsilon)-\mathfrak{s}_1(b,1-b))/\epsilon$. The bottom
+    panels show the numerical precision by the comparing double precision
+    computation with \texttt{BigFloat} precision (256-bit). \jlcodelink{s2_machine}\label{s2_machine}}
+    \end{centering}
+\end{figure}
+
+The $\mathfrak{s}_1(r,b)$ function is plotted in Figure \ref{transit_linear}. The
 function varies smoothly from the lower right where the disk is
 unocculted to the upper left where it is completely occulted.
 There are several points which need to be handled separately as
@@ -629,32 +656,6 @@ which has a termination test that scales as the square root of
 the machine precision.  We find that the transformed expressions
 are accurate to $\la \times 10^{-14}$ when computed in double precision
 within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
-
-\begin{figure}[p!]
-    \begin{centering}
-    \includegraphics[height=3in]{figures/julia/transit_linear.pdf}
-    \caption{The intensity of a linearly limb-darkened star ($u_1=1$) being
-    eclipsed, $\mathfrak{s}_1(r,b)$.
-    In the limit $b > r+1$, no eclipse occurs, so $\mathfrak{s}_1=1$.  For $b < r-1$, the star
-    is completely eclipsed and $\mathfrak{s}_1=0$.  In the limits $b=r$ and $b=1-r$, special
-    expressions must be used.
-    \jlcodelink{transit_linear}\label{transit_linear}}
-    \end{centering}
-\end{figure}
-
-\begin{figure}[p!]
-    \begin{centering}
-    \includegraphics[height=4in]{figures/julia/s2_machine.pdf}
-    \caption{The accuracy of $\mathfrak{s}_1(r,b)$ near $b=r$ (left panel) and
-    $b=1-r$ (right panel) for $\epsilon = 10^{-8}$. The $x$-axes are impact parameter $b$,
-    while the $y$ axes in the top panels show $\mathfrak{s}_1(r,b)$, with $r$
-    given in the legend of each panel. The middle panels plot
-    the difference $(\mathfrak{s}_1(b,b\pm\epsilon)-\mathfrak{s}_1(b,b))/\epsilon$
-    and $(\mathfrak{s}_1(b,1-b\pm\epsilon)-\mathfrak{s}_1(b,1-b))/\epsilon$. The bottom
-    panels show the numerical precision by the comparing double precision
-    computation with \texttt{BigFloat} precision (256-bit). \jlcodelink{s2_machine}\label{s2_machine}}
-    \end{centering}
-\end{figure}
 
 Finally, in Figures~\ref{fig:s2_plot_MA2002} and \ref{fig:s2_plot} we plot
 the relative numerical error in the flux of a linearly limb-darkened source
@@ -699,8 +700,10 @@ singular points.
 % Note:  I'm not using this in
 % transit_poly since it is not as precise as the starry expressions.
 
-\subsection{Derivatives}
+\pagebreak % DEBUG
 
+\subsection{Derivatives}%
+%
 The derivatives of $\Lambda$ with respect to $r$ and $b$ are:
 %
 \begingroup\makeatletter\def\f@size{10}\check@mathfonts
@@ -767,11 +770,7 @@ and the general elliptic integral.
 % then the derivatives with respect to the radius of the star yield the
 % transit light curve of a uniform, thin emission shell \citep{Schlawin2010}.
 
-\eric{We need an equation here explicitly stating the derivatives of the $\mathfrak{s}_2$ term.}
-\rodrigo{The $\mathfrak{s}_2$ term isn't introduced until the next section;  do you mean
-$\mathfrak{s}_1$?}
-
-The derivatives of $\mathfrak{s}_1$ are given by
+From these expressions, the derivatives of $\mathfrak{s}_1$ are given by
 \begin{eqnarray}
 \frac{\partial \mathfrak{s}_1}{\partial r} &=& -\pi \frac{\partial \Lambda}{\partial r},\\
 \frac{\partial \mathfrak{s}_1}{\partial b} &=& -\pi \frac{\partial \Lambda}{\partial b}.
