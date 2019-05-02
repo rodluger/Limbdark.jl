@@ -1562,6 +1562,10 @@ a function of only the impact parameter
 $b$ and radius $r$ of the occultor, $\mathcal{A}$ is a change of basis
 matrix (Equation~\ref{eq:A}), and $\mathbf{u}$ is the vector of limb
 darkening coefficients $(u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$.
+Note that in general $\mathfrak{s}^T$ is time-dependent, as it depends
+upon the relative positions of the bodies as a function of time, while
+$\mathcal{A}\mathbf{u}$ is time-independent, and thus the matrix
+multiplication only needs to be computed once per light curve.
 
 %
 \rodrigo{Write a slightly more detailed summary. Emphasize how the uniform and linear
@@ -1577,16 +1581,17 @@ the integration of the light curve over a finite time step.
 
 Given that most observations are made over a finite exposure time,
 the integration of the light curve over time is necessary for representing
-a transit light curve with high fidelity \citep{Kipping2010}.  For constructing
+a transit light curve to capture the change in brightness over the timestep
+with high fidelity \citep{Kipping2010}.  For constructing
 a light curve, usually one divides the fluence by the integration time
 to obtain the time-averaged flux.  For optimizing and inferring the 
 posterior of model parameters, we would like to compute the derivatives
 of the time-averaged flux with respect to the model parameters.
 
-The instantaneous flux is a function of $3+n$ parameters in the Green's basis, 
-$\{r,b,\mathfrak{g}_n\}$, or $2+n$ parameters in the polynomial in $1-\upmu$ basis, and of
-these, only one varies with time, $b(t)$.  Thus, we can compute the time-
-dependent flux with a model for $b(t)=b(\bvec{x},t)$, where
+The instantaneous flux is a function of $3+N$ parameters in the Green's basis, 
+$\{r,b,\mathfrak{g}_n\}$, or $2+N$ parameters in the polynomial in $1-\upmu$ basis, and of
+these, only one varies with time, $b(t)$.  Thus, we can compute the 
+time-dependent flux with a model for $b(t)=b(\bvec{x},t)$, where
 where $b(\bvec{x},t)$ is a model for the impact parameter as a function of time
 and model parameters $\bvec{x}$.  The set of model parameters need to be specified
 by a function, which, for example, might be a Keplerian orbit of the two bodies
@@ -1660,13 +1665,13 @@ which give further speedup of the computation, which we describe in this
 section.
 
 When a light curve is computed, there are some computations which only
-need to be carried out once, and then reused at each time step in the
+need to be carried out once, and then can be reused at each time step in the
 light curve computation.  
-We define a structure to hold the variables
+We define a structure to hold these variables
 which are reused throughout the light curve.  In addition, due to the greater 
 computational expense of square-roots and divisions, where possible we try 
 to only compute a square root or division once, storing these in a variable
-within the structure, and then reusing these with cheaper multiplication 
+within the structure, and then reuse these with cheaper multiplication 
 throughout the computation when needed.  For instance, for many formulae we 
 require the inverse of an integer, so an array of integer inverses is computed 
 once and stored, and then accessed as required rather than recomputed.
@@ -1679,7 +1684,7 @@ for $k^2 \le 1$, separately for $N-3$ to $N$ for $\mathcal{M}_n$, and for
 $N-1$ and $N$ for $\mathcal{N}_n$.
 
 In addition, once $N$ is specified, then the transformation matrix for
-the Jacobian from $\mathfrak{g}_i$ to $u_j$, $\frac{\partial \mathfrak{g}_i}{\partial u_j}$,  
+the Jacobian from $\mathfrak{g}_i$ to $u_j$, $\frac{\partial \mathfrak{g}_i}{\partial u_j}=\mathcal{A}$,  
 remains the same throughout the light curve 
 computation, so we compute this matrix only once, and then compute the
 flux derivative (Equation \ref{eq:dFdu}) with matrix multiplication.
@@ -1694,7 +1699,7 @@ Monte Carlo, so the derivatives of the particular points in the
 light curve with respect to $u_i$ aren't needed.  This results in a
 significant computational savings, especially for large $N$.
 Transformation to other parameterizations, such as $q_1$ and $q_2$
-defined by \citet{Kipping2013}, may also be accomplished after the
+defined by \citet{Kipping2013} for quadratic limb-darkening, may also be accomplished after the
 fact by applying the Jacobian to compute the gradient of the likelihood 
 in terms of these transformed parameters.
 
@@ -1703,7 +1708,7 @@ which appear in the Bartky formalism are repeated amongst all three elliptic
 integrals which appear in the expressions for $\mathfrak{s}_1$.  Consequently, we carry 
 out a parallel computation of these elliptic integrals such that these
 repeated terms are only computed once;  this improves the efficiency of
-the elliptic integral computation.  Once these elliptic integrals
+the elliptic integral computations.  Once these elliptic integrals
 are computed for $\mathfrak{s}_1$, the elliptic integrals $\mathrm{cel}(k_c,1,1,k_c^2)=E(m_k)$
 and $\mathrm{cel}(k_c,1,1,0)=(E(m_k)-(1-m_k)K(m_k))/m_k $ are
 stored in the structure and reused for computing $\mathcal{M}_n$
