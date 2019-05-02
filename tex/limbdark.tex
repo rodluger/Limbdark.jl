@@ -113,7 +113,7 @@ be encountered with some frequency.
 Based on these considerations, the primary goals of the current paper are
 threefold:
 \begin{enumerate}
-\item To extend the analytic quadratic transit model to higher order limb-darkening.
+\item To extend the analytic quadratic transit model to higher order limb darkening.
 \item To compute the derivatives of the model analytically.
 \item To stabilize the analytic light curve computation (and its derivatives)
 in all limits near special cases.
@@ -149,7 +149,7 @@ These are typically combined to yield the quadratic limb darkening law,
 \begin{equation} \label{eq:quadraticld}
 I(\upmu) = I(1) [1-u_1 (1-\upmu) - u_2 (1-\upmu)^2],
 \end{equation}
-where $u_1$ and $u_2$ are the limb-darkening parameters.
+where $u_1$ and $u_2$ are the limb darkening parameters.
 In this paper, we will show that higher order powers of $\upmu^n$ with integer
 $n$ can be integrated analytically for $n > 2$ when expressed as recursion relations.
 Linear combinations of these laws can be constructed,
@@ -172,7 +172,7 @@ The second goal, of computing dervatives of the light curve with respect to
 the model parameters, was accomplished by \cite{Pal2008} for the quadratic
 limb darkening case.  P\'al derived the partial derivatives of the quadratic
 limb darkening model with respect to $b$, $r$, and the two quadratic
-limb darkening coefficients.  In this work, we give modified expressions
+limb darkening coefficients. In this work, we give modified expressions
 for the quadratic limb-darkened flux and its derivatives which are
 more numerically stable, as well as extend the computation of derivatives
 to higher order limb darkening.
@@ -182,6 +182,9 @@ Although some numerical approaches are numerically stable, such as \cite{Gimenez
 \cite{Kreidberg2015}, and \cite{Parviainen2015}, these approaches tend to be 
 slower, they have precisions which may depend upon the tolerance of the computation
 which is specified, and, in addition, they do not yield derivatives of the light curves.
+The expressions presented in this work were derived with numerical stability in
+mind, and we show that for low order limb darkening our expressions are accurate
+to machine precision in nearly all cases.
 
 A disadvantage of our approach is that it requires integer powers of the limb darkening
 expansion.  \citet{Claret2000} has shown that a non-linear limb darkening law,
@@ -192,33 +195,35 @@ limb darkening law despite only using two parameters \citep{Morello2017,Maxted20
 We were unable to find an analytic solution for these limb darkening
 laws, but we will compare with these models below in \S \ref{sec:comparison}.
 
-Before we proceed we need to introduce some additional notation.  The flux of the star, 
-$F$, we express as a linear combination of basis functions, $\mathfrak{s}_i(r,b)$, 
-where $0 \le i \le N$, where $N$ is the order of the limb-darkening.  The total flux 
-is given by the inner product of a vector of coefficients, $\mathfrak{g}$, with 
-the set of basis vectors, where $\mathfrak{g}$ depends upon only upon the limb-darkening 
-coefficients, but is independent of time.  For example, in the quadratic limb-darkening case, 
-the flux is defined as
+Before we proceed we need to introduce some additional notation.  We express the
+flux of the star, $F$, as a linear combination of basis functions, $\mathfrak{s}_i(r,b)$, 
+where $0 \le i \le N$, where $N$ is the order of the limb darkening.  Specifically,
+the flux during a transit or occultation
+is given by the inner product of $\mathfrak{s}(r,b)$ with a vector of coefficients
+$\mathfrak{g}$ that depend only on the limb darkening coefficients.
+%
+For example, in the quadratic limb darkening case, the flux is defined as
+%
 \begin{eqnarray}
 F = I(1) \mathfrak{s}^T \mathfrak{g},
 \end{eqnarray}
-where $\mathfrak{s} = \left(\mathfrak{s}_0(r,b),\mathfrak{s}_1(r,b),\mathfrak{s}_2(r,b)\right)^T$ is 
-a vector in which each element depends solely on $b$ and $r$, 
-while $\mathfrak{g} = \left(1-u_1-\tfrac{3}{2}u_2,u_1+2u_2,-\tfrac{1}{4}u_2\right)^T$
-is a vector which just depends upon the limb-darkening coefficients.
+%
+where 
+%
+$\mathfrak{s} = \left(\mathfrak{s}_0(r,b) \,\,\,\,\,\, \mathfrak{s}_1(r,b) \,\,\,\,\,\, \mathfrak{s}_2(r,b)\right)^\top$ 
+%
+is a vector in which each element depends solely on $b$ and $r$, while 
+%
+$\mathfrak{g} = \left(1-u_1-\tfrac{3}{2}u_2 \,\,\,\,\,\, u_1+2u_2 \,\,\,\,\,\, -\tfrac{1}{4}u_2\right)^\top$
+%
+is a vector that depends only on the limb darkening coefficients. As we will see
+later, reparameterizing the limb darkening coefficients in terms of the
+$\mathfrak{g}$ functions greatly simplifies the surface integrals. This is
+analogous to the reparameterization in \cite{starry} in terms of the ``Green's basis''.
+
 We turn now towards presenting formulae for more accurate limb darkening transit,
 occultation, and eclipse models, starting with the simplest case:  a source
-of uniform surface brightness.  
-
-\eric{Before we begin defining the $\mathfrak{s}_0$, $\mathfrak{s}_1$, ... functions, we need to
-explain how they relate to the total flux. I know we do this later on, 
-but I think we'll really confuse the reader if we make them wait that long.
-We should dedicate a paragraph to explaining how we're doing the same thing as
-in starry: expressing the flux as the dot product between a polynomial
-basis and a vector of integral solutions.}
-
-\rodrigo{Rodrigo: I took a stab at this in the paragraph above.  I don't yet make
-reference to starry, though.}
+of uniform surface brightness.
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -787,7 +792,7 @@ expressions described above.  The general quadratic case may be computed as
 a linear combination with the foregoing uniform and linear cases.
 
 We first give the formula for the function $\eta(r,b)$, which is the term which appears 
-in the quadratic limb-darkening model only when $u_2 \ne 0$
+in the quadratic limb darkening model only when $u_2 \ne 0$
 \citep{MandelAgol2002}. In terms of quantities we have defined above for the uniform case:
 \begin{proof}{Eta}
     \label{eq:eta}
@@ -1882,7 +1887,7 @@ time as the IDL EXOFAST implementation without derivatives, and about 65\%
 of the computation time when including the derivatives.  Consequently, we
 conclude that our new implementation is both faster (by 35-45\%) and more 
 accurate than the Mandel \& Agol IDL implementation.  We note that EXOFAST
-v2.0 now utilizes the numerically-stable quadratic limb-darkening expressions
+v2.0 now utilizes the numerically-stable quadratic limb darkening expressions
 presented above, albeit without the computed derivatives (Eastman et al.,
 in preparation).
 
@@ -2067,11 +2072,11 @@ is reached given that warranted by the data, and then to place priors
 on the limb darkening parameters, informed by the stellar limb darkening
 models.  A fourth approach might be to choose a parameterization with
 a small number of free parameters, such as the non-linear ``power-2'' law advocated
-by \citet{Maxted2018}, and fit this parameterized limb-darkening model
+by \citet{Maxted2018}, and fit this parameterized limb darkening model
 with a high-order polynomial for a given set.  Then, only the non-linear
 parameters need to be varied, while the polynomial coefficients will
 be a simple function of these non-linear parameters.  In this approach
-it should be straightforward to linearize the polynomial limb-darkening
+it should be straightforward to linearize the polynomial limb darkening
 model fitting, which ought to yield good computational efficiency.  
 A limitation of our computational approach is that the precision
 begins to degrade for $N \approx 25-30$; however, we anticipate that such
@@ -2142,9 +2147,9 @@ transiting circumbinary planets \citep{Doyle2011}.
 During the preparation of this paper, a related paper appeared on
 the mutual eclipse of multiple bodies \citep{Short2018}.  Their
 approach is complementary to ours in that they utilize Green's theorem to
-carry out a numerical quadrature for mulitiple limb-darkening models.
+carry out a numerical quadrature for mulitiple limb darkening models.
 Their approach does not yet include the computation of derivatives, but 
-it allows for a wider range of limb-darkening models than polynomial, it
+it allows for a wider range of limb darkening models than polynomial, it
 allows for computation of the Rossiter-McLaughlin effect, and it 
 carries out the computation for multiple overlapping bodies.
 
