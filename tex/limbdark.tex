@@ -192,16 +192,13 @@ limb darkening law despite only using two parameters \citep{Morello2017,Maxted20
 We were unable to find an analytic solution for these limb darkening
 laws, but we will compare with these models below in \S \ref{sec:comparison}.
 
-We turn now towards presenting formulae for more accurate limb darkening transit,
-occultation, and eclipse models, starting with the simplest case:  a source
-of uniform surface brightness.  Before we proceed, however we need to
-introduce some additional notation.  The flux of the star, $F$, we express as a linear
-combination of basis functions, $\mathfrak{s}_i(r,b)$, where $0 \le i \le N$, where
-$N$ is the order of the limb-darkening.  The total flux is given by the inner product
-of a vector of coefficients, $\mathfrak{g}$, with the set of basis vectors, where
-$\mathfrak{g}$ depends upon only upon the limb-darkening coefficients, but is
-independent of time.  For example, in the quadratic limb-darkening case, the
-flux is defined as
+Before we proceed we need to introduce some additional notation.  The flux of the star, 
+$F$, we express as a linear combination of basis functions, $\mathfrak{s}_i(r,b)$, 
+where $0 \le i \le N$, where $N$ is the order of the limb-darkening.  The total flux 
+is given by the inner product of a vector of coefficients, $\mathfrak{g}$, with 
+the set of basis vectors, where $\mathfrak{g}$ depends upon only upon the limb-darkening 
+coefficients, but is independent of time.  For example, in the quadratic limb-darkening case, 
+the flux is defined as
 \begin{eqnarray}
 F = I(1) \mathfrak{s}^T \mathfrak{g},
 \end{eqnarray}
@@ -209,6 +206,9 @@ where $\mathfrak{s} = \left(\mathfrak{s}_0(r,b),\mathfrak{s}_1(r,b),\mathfrak{s}
 a vector in which each element depends solely on $b$ and $r$, 
 while $\mathfrak{g} = \left(1-u_1-\tfrac{3}{2}u_2,u_1+2u_2,-\tfrac{1}{4}u_2\right)^T$
 is a vector which just depends upon the limb-darkening coefficients.
+We turn now towards presenting formulae for more accurate limb darkening transit,
+occultation, and eclipse models, starting with the simplest case:  a source
+of uniform surface brightness.  
 
 \eric{Before we begin defining the $\mathfrak{s}_0$, $\mathfrak{s}_1$, ... functions, we need to
 explain how they relate to the total flux. I know we do this later on, 
@@ -281,7 +281,10 @@ the area of the kite-shaped region,
 A_{kite} &=& \frac{1}{2}\sqrt{(A+(B+C))(C-(A-B))(C+(A-B))(A+(B-C))},
 \end{eqnarray}
 for $A \ge B \ge C$, where the tuple $\{A,B,C\}$ equals $\{1,r,b\}$ 
-sorted from from greatest to least. 
+sorted from from greatest to least.  Note that the order of operations
+needs to be carried out as specified by the series of parentheses in
+the entry to the square root;  this sequence of operations preserves 
+numerical precision.
 
 Next, the inverse cosine formulae are also imprecise when $\cos{\kappa_0} = x_0 \approx
 1$ or $\cos{\kappa_1} = x_1 \approx 1$.  The approximate solutions in this limit
