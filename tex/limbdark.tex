@@ -247,8 +247,20 @@ the area of overlap, minus the area of a kite-shaped region which connects the
 centers of the circles with their points of intersection gives the area of the
 lens-shaped region of overlap of the two circles.
 
+\begin{figure}[t!]
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/python/overlap.pdf}
+    \caption{The area of overlap of two circles can be computed as the sum of
+    the area of the sectors formed by the centers of each circle and the
+    boundary between the points of intersection, minus the area of the kite-shaped
+    region formed by the centers of the circles and the intersection points.
+    \pycodelink{overlap}\label{fig:circle_overlap}}
+    \end{centering}
+\end{figure}
+
 Taking the radius of the larger circle to be unity, the standard formula for
 the lens-shaped overlap area is given by
+%
 \begin{proof}{lens_area} \label{eq:MAuniform}
 A_{lens} = \pi \Lambda^e(r,b) &=
 \begin{dcases}
@@ -263,8 +275,9 @@ r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\
 \cos{\kappa_0} &=& \left(\frac{(r-1)(r+1)+b^2}{2br}\right),\nonumber\\
 \cos{\kappa_1} &=& \left(\frac{(1-r)(1+r)+b^2}{2b}\right),
 \end{eqnarray}
+%
 where $\kappa_0$ and $\kappa_1$ are the angles defined in Figure \ref{fig:circle_overlap}.
-The second term in equation \ref{eq:MAuniform} is the same as the standard formula for the area of overlap of two 
+The second term in Equation~(\ref{eq:MAuniform}) is the same as the standard formula for the area of overlap of two 
 partially overlapping circles, with one of the circles scaled to a radius of unity 
 \citep{Weisstein2018}.  This term corresponds to ingress (and egress), it is the most 
 expensive to compute, and it is most subject to numerical inaccuracy;  we focus on this 
@@ -382,17 +395,6 @@ at these points.
 In the remainder of this paper we will need to use these formulae in computing
 the higher order limb-darkened light curves.  In the next section, we revisit the formulae
 for linear limb darkening.
-
-\begin{figure}[p!]
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/python/overlap.pdf}
-    \caption{The area of overlap of two circles can be computed as the sum of
-    the area of the sectors formed by the centers of each circle and the
-    boundary between the points of intersection, minus the area of the kite-shaped
-    region formed by the centers of the circles and the intersection points.
-    \pycodelink{overlap}\label{fig:circle_overlap}}
-    \end{centering}
-\end{figure}
 
 \begin{figure}[p!]
     \begin{centering}
