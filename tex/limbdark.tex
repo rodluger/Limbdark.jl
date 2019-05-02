@@ -335,6 +335,22 @@ A_{lens} &= \kappa_1 + r^2\kappa_0 - A_{kite},\nonumber\\
 \end{proof}
 with $A_{kite}$ given in equation \ref{eq:Kite_area}.
 
+\begin{figure}[p!]
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/area_of_overlap_r01.pdf}
+    \caption{Precision of formulae for the area of overlap of two circles with
+    radius ratio $r$.  Plotted are the regions near $b=1-r$ (second and third
+    points of contact) and $b=1+r$ (first and fourth points of contact) for
+    the standard formula (Equation \ref{eq:MAuniform}, blue) and our new formula
+    (Equation \ref{eq:area_of_overlap}, orange dots).
+    The high-precision calculation is shown in green dashed for comparison; this
+    is limited by the conversion of the result to double-precision. The
+    solid and empty circles (top) indicate the positions of the circles at the left
+    hand side of the axes.  In the left panels the horizontal dash-dotted grey line 
+    indicates the limiting precision for representing $\pi r^2$. \jlcodelink{area_of_overlap_r01}\label{fig:overlap_precision}}
+    \end{centering}
+\end{figure}
+
 The performance of this formula relative to the standard formula is profiled
 in Figure \ref{fig:overlap_precision} for $r=0.1$, a typical
 value for transiting exoplanets.  We have carried out
@@ -395,22 +411,6 @@ at these points.
 In the remainder of this paper we will need to use these formulae in computing
 the higher order limb-darkened light curves.  In the next section, we revisit the formulae
 for linear limb darkening.
-
-\begin{figure}[p!]
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/julia/area_of_overlap_r01.pdf}
-    \caption{Precision of formulae for the area of overlap of two circles with
-    radius ratio $r$.  Plotted are the regions near $b=1-r$ (second and third
-    points of contact) and $b=1+r$ (first and fourth points of contact) for
-    the standard formula (Equation \ref{eq:MAuniform}, blue) and our new formula
-    (Equation \ref{eq:area_of_overlap}, orange dots).
-    The high-precision calculation is shown in green dashed for comparison; this
-    is limited by the conversion of the result to double-precision. The
-    solid and empty circles (top) indicate the positions of the circles at the left
-    hand side of the axes.  In the left panels the horizontal dash-dotted grey line 
-    indicates the limiting precision for representing $\pi r^2$. \jlcodelink{area_of_overlap_r01}\label{fig:overlap_precision}}
-    \end{centering}
-\end{figure}
 
 \section{Linear limb darkening}
 \label{sec:reparam}
@@ -1877,7 +1877,7 @@ parameter space.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_MA2002.pdf}
-    \caption{Comparison of Mandel \& Agol (2002) with Agol \& Luger (2018).
+    \caption{Comparison of Mandel \& Agol (2002) with \thiswork.
     \jlcodelink{compare_MA2002}
     \label{fig:compareMA}}
     \end{centering}
@@ -1918,7 +1918,7 @@ giving our Julia code a 70\% speed advantage over the Fortran code.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_pal.pdf}
-    \caption{Comparison of \citet{Pal2008} with Agol \& Luger (2018).  The
+    \caption{Comparison of \citet{Pal2008} with \thiswork.  The
     coefficients are $u_1=0.2$ and $u_2=0.3$. \jlcodelink{compare_pal}
     \label{fig:Pal_comparison}}
     \end{centering}
@@ -1954,7 +1954,7 @@ as accurate and 25 times faster to evaluate compared with \texttt{batman}.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/compare_to_batman.pdf}
-    \caption{Comparison of \citet{Kreidberg2015} with Agol \& Luger (2018) for
+    \caption{Comparison of \citet{Kreidberg2015} with \thiswork for
              a transit across a quadratically limb-darkened star.
              \pycodelink{compare_to_batman}
     \label{fig:batman_comparison}}
@@ -1964,7 +1964,7 @@ as accurate and 25 times faster to evaluate compared with \texttt{batman}.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/compare_to_batman_nonlinear.pdf}
-    \caption{Comparison of \citet{Kreidberg2015} with Agol \& Luger (2018) for
+    \caption{Comparison of \citet{Kreidberg2015} with \thiswork for
              a transit across a nonlinearly limb-darkened star.
              \pycodelink{compare_to_batman_nonlinear}
     \label{fig:batman_nonlinear_comparison}}
@@ -1974,7 +1974,7 @@ as accurate and 25 times faster to evaluate compared with \texttt{batman}.
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/compare_to_gimenez.pdf}
-    \caption{Comparison of \citet{Gimenez2006} with Agol \& Luger (2018).
+    \caption{Comparison of \citet{Gimenez2006} with \thiswork.
              \pycodelink{compare_to_gimenez}
     \label{fig:gimenez_comparison}}
     \end{centering}
