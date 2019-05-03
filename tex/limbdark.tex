@@ -28,19 +28,19 @@ Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomia
 \begin{abstract}
  We derive analytic, closed-form solutions for the light curve of a planet
  transiting a star with a limb darkening profile which is a polynomial function
- of the stellar elevation, up to arbitrary integer order. 
+ of the stellar elevation, up to arbitrary integer order.
  We provide improved analytic expressions for the uniform, linear, and quadratic
- limb-darkened cases, as well as novel expressions for higher order integer powers 
- of limb darkening.  The formulae are crafted to be numerically stable over the 
+ limb-darkened cases, as well as novel expressions for higher order integer powers
+ of limb darkening.  The formulae are crafted to be numerically stable over the
  expected range of usage.  We additionally present analytic formulae for
  the partial derivatives of instantaneous flux with respect to the radius ratio,
  impact parameter, and limb darkening coefficients.  These expressions are rapid to
  evaluate, and compare quite favorably in speed and accuracy to existing transit light
- curve codes. We also use these expressions to numerically compute the first partial 
- derivatives of exposure-time averaged transit light curves with respect to all 
+ curve codes. We also use these expressions to numerically compute the first partial
+ derivatives of exposure-time averaged transit light curves with respect to all
  model parameters.  An additional application is modeling eclipsing binary or
- eclipsing multiple star systems in cases where the stars may be treated as spherically 
- symmetric.  We provide code which implements these formulae in C++, Python, IDL, and Julia, 
+ eclipsing multiple star systems in cases where the stars may be treated as spherically
+ symmetric.  We provide code which implements these formulae in C++, Python, IDL, and Julia,
  with tests and examples of usage.
 \end{abstract}
 
@@ -66,7 +66,7 @@ measurements, the bulk density of a planet can be inferred, yielding constraints
 on its bulk composition.
 
 And yet, all of these inferences are predicated on the precise computation of models
-of the planetary transit which may be used to infer the model parameters.  Stars 
+of the planetary transit which may be used to infer the model parameters.  Stars
 are non-uniform in brightness, with the general
 trend of growing dimmer towards the limb, and so limb darkening must be accounted
 for to accurately infer the planetary parameters \citep{Csizmadia2018}.  Indeed, fast
@@ -84,19 +84,19 @@ In addition to computing transit light curves, the derivatives of these light
 curves with respect to the model parameters are also beneficial for accurate
 characterization of exoplanets.   The derivatives enable fast and stable
 optimization of the transit light curve parameters, which is critical for
-obtaining initial estimates for a Markov Chain Monte Carlo simulation 
+obtaining initial estimates for a Markov Chain Monte Carlo simulation
 \citep[MCMC; e.g.][]{Ford2005,Ford2006},
 for looking for multi-modal solutions, for initializing the multi-nest
 algorithm \citep{Feroz2008}, or for computing the Fisher information matrix.
 In some cases, MCMC can be slow to converge, and derivatives can accelerate
 convergence by adding an artificial momentum term to the log likelihood,
 and then allowing the sampler to follow contours of constant ``energy.''
-This so-called ``hybrid'' or ``Hamiltonian'' MCMC approach holds great promise \citep{Girolami2011,Betancourt2017},
+This so-called ``hybrid'' or ``Hamiltonian'' MCMC approach holds great promise \citep{Girolami2011,Betancourt2017,Neal2011},
 but its application has been hampered by the lack of models with derivatives,
 as derivatives are in general more difficult to compute.
 
 Finally, the analytic computation of transit light curves with quadratic
-limb darkening has a precision which can be limited by numerical round-off 
+limb darkening has a precision which can be limited by numerical round-off
 error for parameters near some special cases.  In
 particular, when the radius equals the impact-parameter, which corresponds to
 the edge of the planet crossing the center of the star, the computation of the
@@ -124,26 +124,26 @@ derivatives, quickly and accurately over time to account for finite
 exposure times.
 
 Some progress has been made already towards these goals.  To describe this
-progress, we pause first to introduce some notation.  Limb darkening models 
-of spherical stars are parameterized with the cosine of the angle measured 
-from the sub-stellar point, $\upmu = \cos{\theta}$, where $\theta$ is the 
-polar angle on the photosphere, with $\theta=0$ at the center of the observed 
-stellar disk, and $\theta=\pi/2$ at the limb.  In a coordinate system in which 
-the projected disk of the star lies in the $x-y$ plane, and the $z$ coordinate 
-points towards the observer, then $\upmu = z$, where $z$ is measured in units 
+progress, we pause first to introduce some notation.  Limb darkening models
+of spherical stars are parameterized with the cosine of the angle measured
+from the sub-stellar point, $\upmu = \cos{\theta}$, where $\theta$ is the
+polar angle on the photosphere, with $\theta=0$ at the center of the observed
+stellar disk, and $\theta=\pi/2$ at the limb.  In a coordinate system in which
+the projected disk of the star lies in the $x-y$ plane, and the $z$ coordinate
+points towards the observer, then $\upmu = z$, where $z$ is measured in units
 of the stellar radius.  The variable $\upmu=z$ is then the elevation on the
 surface of the star where the highest point is taken to be closest to the observer.
-In terms of $b$, the normalized separation projected onto 
+In terms of $b$, the normalized separation projected onto
 the sky, this parameter is given by $\upmu = \cos{\theta} =\sqrt{1-b^2}$, where
 $0\le b \le 1$ within the stellar disk.  We also introduce the radius ratio,
 $r$, which is the radius of the occultor divided by the radius of the source.
 In general, we will follow the notation
 introduced by \citet{starry} for the \starry code package.
 
-Uniform limb darkening scales as $I(\upmu) \propto \upmu^0$, first-order 
-limb darkening as $I(\upmu) \propto \upmu^1$, and second-order limb darkening 
+Uniform limb darkening scales as $I(\upmu) \propto \upmu^0$, first-order
+limb darkening as $I(\upmu) \propto \upmu^1$, and second-order limb darkening
 as $I(\upmu)\propto \upmu^2$; these are the three most commonly used  terms
-that can be integrated analytically, which we describe in detail below 
+that can be integrated analytically, which we describe in detail below
 in sections \ref{sec:uniform}, \ref{sec:reparam}, and \ref{sec:quadratic}.
 These are typically combined to yield the quadratic limb darkening law,
 %
@@ -152,7 +152,7 @@ These are typically combined to yield the quadratic limb darkening law,
 \end{equation}
 %
 where $u_1$ and $u_2$ are the limb darkening parameters, and
-$I_0 \equiv I(1)$ is a normalization constant, equal to the 
+$I_0 \equiv I(1)$ is a normalization constant, equal to the
 intensity at the center of the stellar disk.
 In this paper, we will show that higher order powers of $\upmu^n$ with integer
 $n$ can be integrated analytically for $n > 2$ when expressed as recursion relations.
@@ -185,7 +185,7 @@ to higher order limb darkening.
 
 The third goal, of numerical stability, has yet to be addressed in the literature.
 Although some numerical approaches are numerically stable, such as \cite{Gimenez2006},
-\cite{Kreidberg2015}, and \cite{Parviainen2015}, these approaches tend to be 
+\cite{Kreidberg2015}, and \cite{Parviainen2015}, these approaches tend to be
 slower, they have precisions which may depend upon the tolerance of the computation
 which is specified, and, in addition, they do not yield derivatives of the light curves.
 The expressions presented in this work were derived with numerical stability in
@@ -197,13 +197,13 @@ expansion.  \citet{Claret2000} has shown that a non-linear limb darkening law,
 with half-integer powers of $\upmu$, gives an accurate description of stellar
 limb darkening models.  More recently, the power-law model, $I(\upmu) = 1-
 c_\alpha(1-\upmu^\alpha)$ \citep{Hestroffer1997} was shown to be an accurate
-limb darkening law despite only using two parameters \citep{Morello2017,Maxted2018}.  
+limb darkening law despite only using two parameters \citep{Morello2017,Maxted2018}.
 We were unable to find an analytic solution for these limb darkening
 laws, but we will compare with these models below in \S \ref{sec:comparison}.
 
 %%%%%% REDUNDANT WITH THE NEXT SECTION
 % Before we proceed we need to introduce some additional notation.  We express the
-% flux of the star, $F$, as a linear combination of basis functions, $\mathfrak{s}_i(r,b)$, 
+% flux of the star, $F$, as a linear combination of basis functions, $\mathfrak{s}_i(r,b)$,
 % where $0 \le i \le N$, where $N$ is the order of the limb darkening.  Specifically,
 % the flux during a transit or occultation
 % is given by the inner product of $\mathfrak{s}(r,b)$ with a vector of coefficients
@@ -213,14 +213,14 @@ laws, but we will compare with these models below in \S \ref{sec:comparison}.
 % F = I(1) \mathfrak{s}^\top \mathfrak{g},
 % \end{eqnarray}
 % %
-% where, as before, $I(1)$ is the normalization constant, equal to the 
+% where, as before, $I(1)$ is the normalization constant, equal to the
 % intensity at the center of the stellar disk.
 % %
 % As an example, in the quadratic limb darkening case, the flux is defined as
 % %
-% $\mathfrak{s} = \left(\mathfrak{s}_0(r,b) \,\,\,\,\,\, \mathfrak{s}_1(r,b) \,\,\,\,\,\, \mathfrak{s}_2(r,b)\right)^\top$ 
+% $\mathfrak{s} = \left(\mathfrak{s}_0(r,b) \,\,\,\,\,\, \mathfrak{s}_1(r,b) \,\,\,\,\,\, \mathfrak{s}_2(r,b)\right)^\top$
 % %
-% is a vector in which each element depends solely on $b$ and $r$, while 
+% is a vector in which each element depends solely on $b$ and $r$, while
 % %
 % $\mathfrak{g} = \left(1-u_1-\tfrac{3}{2}u_2 \,\,\,\,\,\, u_1+2u_2 \,\,\,\,\,\, -\tfrac{1}{4}u_2\right)^\top$
 % %
@@ -234,7 +234,7 @@ laws, but we will compare with these models below in \S \ref{sec:comparison}.
 % of uniform surface brightness.
 
 This paper is organized as follows. In \S\ref{sec:poly_limbdark}
-we introduce the general form for polynomial limb darkening 
+we introduce the general form for polynomial limb darkening
 and define the notation used throughout the paper. In \S\ref{sec:uniform}--\ref{sec:quadratic}
 we derive updated equations for the well-known cases of uniform, linear, and
 quadratic limb darkening, and in \S\ref{sec:higher_order} we generalize the
@@ -261,21 +261,21 @@ expressions to limb darkening of arbitrary order.
 \label{sec:poly_limbdark}
 
 In analogy with the quadratic
-limb darkening law (Equation~\ref{eq:quadraticld}), let us define the 
+limb darkening law (Equation~\ref{eq:quadraticld}), let us define the
 generalized polynomial limb darkening law of order $N$ as
 %
 %
 \begin{align}
     \label{eq:polynomialld}
-    \frac{I(\upmu)}{I_0} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - 
+    \frac{I(\upmu)}{I_0} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 -
                                 ... - u_{N}(1 - \upmu)^{N} \nonumber \\
                           &= -\sum_{i=0}^N u_i (1 - \upmu)^i
 \end{align}
 %
 %\rodrigo{I think $u_0=1$, not $-1$, right?}
 %\eric{There was a minus sign missing in front of the second line of the equation.}
-where we define $u_0 \equiv -1$. In a right-handed Cartesian coordinate system centered 
-on the body, with the $z$-axis pointing to the observer, 
+where we define $u_0 \equiv -1$. In a right-handed Cartesian coordinate system centered
+on the body, with the $z$-axis pointing to the observer,
 \begin{equation}\label{eq:xyz}
 \upmu(x, y) = z(x, y) = \sqrt{1 - x^2 - y^2}.
 \end{equation}
@@ -288,7 +288,7 @@ on the body, with the $z$-axis pointing to the observer,
 %evaluated with greater speed and accuracy compared with automatic differentiation.
 %
 If we let $\bvec{u}$ be the column vector of limb darkening coefficients
-$\bvec{u} \equiv (u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$ 
+$\bvec{u} \equiv (u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$
 and $\ubasis$ be the \emph{limb darkening basis}
 %
 \begin{align}
@@ -302,7 +302,7 @@ and $\ubasis$ be the \emph{limb darkening basis}
     \end{pmatrix}^\mathsf{T} \quad,
 \end{align}
 %
-we may 
+we may
 express Equation~(\ref{eq:polynomialld}) more compactly as the
 dot product
 %
@@ -321,7 +321,7 @@ integrating this function over the visible area of the disk:
 \end{align}
 %
 In general, the surface integral in Equation~(\ref{eq:occint}) is difficult---if not
-impossible---to solve directly with $I(z)$ given by Equation~(\ref{eq:polynomialld_vec}). 
+impossible---to solve directly with $I(z)$ given by Equation~(\ref{eq:polynomialld_vec}).
 However, as in \citet{starry}, we note that the problem
 is made significantly more tractable if we first perform a couple change of basis
 operations.
@@ -373,7 +373,7 @@ The elements of the matrix $\mathcal{A}_1$ are thus given by
     \mathcal{A}_{1_{i, j}} = (-1)^{i+1}\binom{j}{i} \quad .
 \end{align}
 %
-Note that, as with the limb darkening basis, 
+Note that, as with the limb darkening basis,
 the specific intensity at a point may be written
 %
 \begin{align}
@@ -418,12 +418,12 @@ we define the Green's basis to be
 %
 Given this definition, the columns of the change of basis matrix
 $\mathcal{A}_2$ are the Green's basis vectors corresponding to each
-of the polynomial terms in Equation~(\ref{eq:polybasis}). Note that 
-in practice, it is more efficient to transform vectors in the $\pbasis$ 
+of the polynomial terms in Equation~(\ref{eq:polybasis}). Note that
+in practice, it is more efficient to transform vectors in the $\pbasis$
 basis to vectors in the $\gbasis$ basis via the
 downward recursion relation
 %
-\begin{equation} 
+\begin{equation}
     \label{eq:dn_of_an}
     \mathfrak{g}_n = \frac{\mathfrak{p}_n}{n+2} + \mathfrak{g}_{n+2},
 \end{equation}
@@ -478,7 +478,7 @@ re-write Equation~(\ref{eq:occint}) as
       &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \bvec{u} \quad ,
 \end{align}
 %
-where 
+where
 %
 \begin{align}
     \label{eq:solution_vector}
@@ -489,7 +489,7 @@ is the \emph{solution vector}.
 If we can find the general solution to the integral in Equation (\ref{eq:solution_vector}),
 we can compute the occultation flux for arbitrary order limb darkening.
 The solutions for the case of uniform ($\mathfrak{s}_0$), linear ($\mathfrak{s}_1$),
-and quadratic ($\mathfrak{s}_2$) limb darkening have been studied in 
+and quadratic ($\mathfrak{s}_2$) limb darkening have been studied in
 the past, so we dedicate the next three sections
 (\S\ref{sec:uniform}--\ref{sec:quadratic})
 to revisiting existing
@@ -505,7 +505,7 @@ Evaluation of the transit light curve of a uniformly bright star amounts to comp
 area of overlap of two disks \citep{MandelAgol2002}.  This has a well-known
 analytic solution \citep[e.g.][]{Weisstein2018};  however, we find that the
 standard formula leads to round-off error that is larger than necessary
-or desirable.  In this section we present a new formula which we demonstrate 
+or desirable.  In this section we present a new formula which we demonstrate
 yields machine precision for the area of overlap, along with its derivatives.
 
 Figure \ref{fig:circle_overlap} shows how the area of overlap can be computed
@@ -544,10 +544,10 @@ r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\
 \end{eqnarray}
 %
 where $\kappa_0$ and $\kappa_1$ are the angles defined in Figure \ref{fig:circle_overlap}.
-The second term in Equation~(\ref{eq:MAuniform}) is the same as the standard formula for the area of overlap of two 
-partially overlapping circles, with one of the circles scaled to a radius of unity 
-\citep{Weisstein2018}.  This term corresponds to ingress (and egress), it is the most 
-expensive to compute, and it is most subject to numerical inaccuracy;  we focus on this 
+The second term in Equation~(\ref{eq:MAuniform}) is the same as the standard formula for the area of overlap of two
+partially overlapping circles, with one of the circles scaled to a radius of unity
+\citep{Weisstein2018}.  This term corresponds to ingress (and egress), it is the most
+expensive to compute, and it is most subject to numerical inaccuracy;  we focus on this
 term in what follows.
 
 We find that numerical round-off error limits the precision of the ingress formula when
@@ -560,15 +560,15 @@ computing the area of a triangle in which two of the sides are of similar length
 the kite has an area that is twice the area of the triangle connecting the centers
 of both circles and one of the intersection points.  \cite{Goldberg1991} gives a
 formula for precisely computing the area of a triangle, based on a method developed
-by William Kahan \citep[later described in][]{Kahan2000}, which we use to compute 
+by William Kahan \citep[later described in][]{Kahan2000}, which we use to compute
 the area of the kite-shaped region,
 \begin{eqnarray}\label{eq:Kite_area}
 A_{kite} &=& \frac{1}{2}\sqrt{(A+(B+C))(C-(A-B))(C+(A-B))(A+(B-C))},
 \end{eqnarray}
-for $A \ge B \ge C$, where the tuple $\{A,B,C\}$ equals $\{1,r,b\}$ 
+for $A \ge B \ge C$, where the tuple $\{A,B,C\}$ equals $\{1,r,b\}$
 sorted from from greatest to least.  Note that the order of operations
 needs to be carried out as specified by the series of parentheses in
-the entry to the square root;  this sequence of operations preserves 
+the entry to the square root;  this sequence of operations preserves
 numerical precision.
 
 Next, the inverse cosine formulae are also imprecise when $\cos{\kappa_0} = x_0 \approx
@@ -593,7 +593,7 @@ in the arctangent formula these denoninator terms cancel, which can improve
 numerical stability for small values of $b$ or $r$; this cancellation does not happen
 in the arccosine case given in Equation~(\ref{eq:cosine_formulation}).
 
-This results in the following equations for the overlap area, $A_{lens}$, of two 
+This results in the following equations for the overlap area, $A_{lens}$, of two
 partially overlapping circles:
 \begin{proof}{kite_area} \label{eq:area_of_overlap}
 A_{lens} &= \kappa_1 + r^2\kappa_0 - A_{kite},\nonumber\\
@@ -613,7 +613,7 @@ with $A_{kite}$ given in Equation~(\ref{eq:Kite_area}).
     The high-precision calculation is shown in green dashed for comparison; this
     is limited by the conversion of the result to double-precision. The
     solid and empty circles (top) indicate the positions of the circles at the left
-    hand side of the axes.  In the left panels the horizontal dash-dotted grey line 
+    hand side of the axes.  In the left panels the horizontal dash-dotted grey line
     indicates the limiting precision for representing $\pi r^2$. \jlcodelink{area_of_overlap_r01}\label{fig:overlap_precision}}
     \end{centering}
 \end{figure}
@@ -660,7 +660,7 @@ as
 We note that instead of computing $\kappa_1$,
 we compute $\pi-\kappa_1 = -\mathrm{atan2}(\sin{\kappa_1},\cos{\kappa_1})$,
 which leads to machine precision as well. Note also that $\mathfrak{s}_0$ is
-identical to the first basis function ($s_0$) in the \starry implementation 
+identical to the first basis function ($s_0$) in the \starry implementation
 from \citet{starry}.
 
 \subsection{Derivatives}
@@ -689,7 +689,7 @@ for linear limb darkening.
 % ==============================================================================
 
 We now turn to the case of linear limb darkening, $I(\upmu)/I_0 = 1-u_1(1-\upmu)$
-\citep{Russell1912a,Russell1912b}.  In this section we set $I_0=1$ and $u_1=1$, so 
+\citep{Russell1912a,Russell1912b}.  In this section we set $I_0=1$ and $u_1=1$, so
 that $I(\upmu)=\upmu$;  the general case can be computed as a linear
 combination with the uniform case.
 Note that since $\upmu = \sqrt{1-x^2-y^2}$, this problem is equivalent to
@@ -929,7 +929,7 @@ within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
 Finally, in Figures~\ref{fig:s2_plot_MA2002} and \ref{fig:s2_plot} we plot
 the relative numerical error in the flux of a linearly limb-darkened source
 when using the equations in \citet{MandelAgol2002} and in this paper,
-respectively, over a portion of the $b-r$ plane. The former method 
+respectively, over a portion of the $b-r$ plane. The former method
 (Figure~\ref{fig:s2_plot_MA2002}) yields errors
 on the order of $10^{-7}$ over most of the domain, although the error approaches
 unity near the singular regions discussed above. In contrast, the method introduced
@@ -953,7 +953,7 @@ singular points.
     limb-darkened star ($u_1=1$) using the $\mathfrak{s}_1(r,b)$ formalism introduced in this
     paper. Compare to Figure~\ref{fig:s2_plot_MA2002}, noting the change in the color
     scale. The new method is eight orders of magnitude more precise on average,
-    approaching machine epsilon everywhere in the domain. 
+    approaching machine epsilon everywhere in the domain.
     \jlcodelink{s2_residuals}\label{fig:s2_plot}}
     \end{centering}
 \end{figure}
@@ -965,7 +965,7 @@ singular points.
 %\frac{F(u_1,r,b)}{F_0} &=& \frac{\pi(1-u_1)(1-\Lambda^e)+ u_1 \mathfrak{s}_1(r,b)}{\frac{2\pi}{3}u_1 + \pi(1-u_1)},\\
 %&=& 1-(1-u_1/3)^{-1}\left[(1-u_1)\Lambda^e(r,b) + u_1\left(\Lambda(r,b)+\tfrac{2}{3}\Theta(r-b)\right)\right],
 %\end{eqnarray}
-%where $F_0$ is the total unocculted flux.  
+%where $F_0$ is the total unocculted flux.
 % Note:  I'm not using this in
 % transit_poly since it is not as precise as the starry expressions.
 
@@ -981,7 +981,7 @@ The derivatives of $\Lambda$ with respect to $r$ and $b$ are:
     \label{eq:dbiglam_dr}
     \frac{\partial \Lambda}{\partial r} &=
     \begin{dcases}
-          0 
+          0
           \phantom{MMMMMMMMMMMMMMMMMMM} %viz hack
           & \qquad  r = 0\\
           0 & \qquad  \vert r- b\vert \ge 1\\
@@ -1058,7 +1058,7 @@ The next order of limb darkening has been widely studied due to its
 accurate description of stellar atmospheres \citep{Claret2000,MandelAgol2002,Pal2008}.
 We summarize here the formulae for quadratic limb darkening%
 %with $\mathfrak{g}_2 = 4\mu^2-2$
-, along with the derivatives, using the transformed 
+, along with the derivatives, using the transformed
 expressions described above. The general quadratic case may be computed as
 a linear combination with the foregoing uniform and linear cases.
 
@@ -1088,7 +1088,7 @@ uniform case, these quantities are reused in the quadratic computation.
 With this definition, the quadratic term, $\mathfrak{s}_2(r,b)$ is given simply by
 %\rodrigo{This definition doesn't agree with that given in the next section.
 %I'm thinking of changing this section to reflect the Green's basis defined in
-%the next section.}  It turns out this does agree with next section. I've changed the text in the intro to this section. -EA 
+%the next section.}  It turns out this does agree with next section. I've changed the text in the intro to this section. -EA
 %
 \begin{eqnarray}
     \label{eq:s2}
@@ -1098,7 +1098,7 @@ With this definition, the quadratic term, $\mathfrak{s}_2(r,b)$ is given simply 
 where $\mathfrak{s}_0$ is defined in Equation (\ref{eq:uniform}).
 
 %With the formulae for $\mathfrak{s}_0$, $\mathfrak{s}_1$, and $\mathfrak{s}_2$, the light curve and derivatives
-%of quadratic limb darkening may be computed with Equations (\ref{eq:occint_greens}) and 
+%of quadratic limb darkening may be computed with Equations (\ref{eq:occint_greens}) and
 %(\ref{eq:derivatives}) given below.
 
 \subsection{Derivatives}
@@ -1150,7 +1150,7 @@ In the following section we turn our attention to the general polynomial limb da
 $\upmu^n$ with $n > 2$.  As discussed in \citet{starry},
 these terms may be expressed exactly as the sum of
 spherical harmonics with $m=0$. However, it is possible to exploit
-the azimuthal symmetry of the limb darkening problem to 
+the azimuthal symmetry of the limb darkening problem to
 derive far more efficient and accurate formulae, which we describe in the following section.
 
 \section{Higher Order Limb Darkening}
@@ -1159,9 +1159,9 @@ derive far more efficient and accurate formulae, which we describe in the follow
 % ------------------------------------------------------------------------------
 % ==============================================================================
 
-%%%%%% REMOVED SECTION 5 INTRO 
+%%%%%% REMOVED SECTION 5 INTRO
 
-Having computed $\mathfrak{s}_0$, $\mathfrak{s}_1$, and $\mathfrak{s}_2$, 
+Having computed $\mathfrak{s}_0$, $\mathfrak{s}_1$, and $\mathfrak{s}_2$,
 we now seek a general expression for $\mathfrak{s}_n$ for any $n > 2$.
 Recalling our definition of $\mathfrak{s}$ as the surface integral of
 the terms in the Green's basis,
@@ -1173,7 +1173,7 @@ the terms in the Green's basis,
 in this section we will use Green's theorem to re-express this two-dimensional
 integral as a one-dimensional line integral over the boundary of the visible
 portion of the occulted body's disk. This is the same procedure adopted by
-\citet{starry}, albeit with different basis functions. 
+\citet{starry}, albeit with different basis functions.
 Given $\bvec{r} = x \xhat + y \yhat$, we may write
 %
 %
@@ -1183,9 +1183,9 @@ Given $\bvec{r} = x \xhat + y \yhat$, we may write
     \oint \bvec{G} (z) \cdot \dd \bvec{r}
     \quad,
 \end{align}
-%  
+%
 where $\bvec{G}$ is a matrix whose $n^{\mathrm{th}}$ row is the
-vector 
+vector
 %
 \begin{align}
     \label{eq:greens_n}
@@ -1201,7 +1201,7 @@ The components $G_{n,x}$ and $G_{n,y}$ are chosen such that
                                &= \gbasisn(z) \quad.
 \end{align}
 %
-As in \citet{Pal2012} and \citet{starry}, the operation 
+As in \citet{Pal2012} and \citet{starry}, the operation
 $\bvec{D} \wedge \bvec{G}_n$ denotes the
 \emph{exterior derivative} of $\bvec{G}_n$.
 %
@@ -1209,10 +1209,10 @@ $\bvec{D} \wedge \bvec{G}_n$ denotes the
 %Since the polynomial expansion only depends on $\upmu = z =\sqrt{1-x^2-y^2}$,
 %where $(x,y,z)$ are the coordinates of the unit sphere, we only require
 %Green's functions whose curl has dependence on $z$ for axially-symmetric
-%limb darkening.  
+%limb darkening.
 %
 Following \citet{starry},
-if we choose the following form for 
+if we choose the following form for
 Equation~(\ref{eq:greens_n}),
 %
 \begin{equation}
@@ -1229,7 +1229,7 @@ for the components of the Green's basis:
               &= (n+2)z^n-n z^{n-2}
 \end{align}
 %
-for $2 \le n \le N$. 
+for $2 \le n \le N$.
 %
 Note that we already introduced the first three terms, $\tilde{\mathfrak{g}}_0 = 1$
 (uniform limb darkening), $\tilde{\mathfrak{g}}_1 = z$ (linear limb darkening),
@@ -1242,7 +1242,7 @@ we treat them separately from the higher order terms.
 
 Returning to \eq{greens}, we note that the line integral consists of two arcs:
 an arc $\mathcal{P}$ along the boundary of the occulting body and an arc $\mathcal{Q}$ along the
-boundary of the occulted body. We may therefore write the $n^\mathrm{th}$ component of 
+boundary of the occulted body. We may therefore write the $n^\mathrm{th}$ component of
 the solution vector as
 %
 \begin{align}
@@ -1291,15 +1291,15 @@ and we used the fact that along the arc of a circle,
     \quad.
 \end{align}
 %
-The angles $\phi$ and $\lambda$ are the same as those used in 
+The angles $\phi$ and $\lambda$ are the same as those used in
 \citet{starry} (see their Figure~2) and are given by
 %
 $\phi = \kappa_0-\pi/2$ and
-$\lambda = \pi/2 - \kappa_1$ (c.f. Equation~\ref{eq:area_of_overlap} and 
+$\lambda = \pi/2 - \kappa_1$ (c.f. Equation~\ref{eq:area_of_overlap} and
 Figure~\ref{fig:circle_overlap}).
 
 
-Inserting our expression for $\mathbf{G}_n$ into Equations~(\ref{eq:primitivePdef}) 
+Inserting our expression for $\mathbf{G}_n$ into Equations~(\ref{eq:primitivePdef})
 and (\ref{eq:primitiveQdef}), we arrive at a fairly simple form for the primitive
 integrals:
 %
@@ -1316,7 +1316,7 @@ integrals:
 \end{align}
 
 Conveniently, the primitive integral $\mathcal{Q}(\bvec{G}_n) = 0$ for
-all $n > 0$, since $z=0$ at the boundary of the star. 
+all $n > 0$, since $z=0$ at the boundary of the star.
 Since we need not compute the integral for $n=0$, as we already
 found a solution for uniform limb darkening in \S\ref{sec:uniform},
 our final task is to find the solution to Equation~(\ref{eq:primitiveP}).
@@ -1362,14 +1362,14 @@ in terms of which the primitive integral takes the particulary simple form
 The integrals $\mathcal{M}_n$ obey straightforward recursion relations
 \begin{proof}{Mn_recursion}\label{eq:Mn_recursion}
 %\begin{eqnarray}
-\mathcal{M}_n &= \frac{1}{n} \left[ 2(n-1) (1-r^2-b^2) \mathcal{M}_{n-2} \right.\nonumber\\ 
+\mathcal{M}_n &= \frac{1}{n} \left[ 2(n-1) (1-r^2-b^2) \mathcal{M}_{n-2} \right.\nonumber\\
   &+ \left. (n-2) (1-(b-r)^2)((b+r)^2-1) M_{n-4}\right],\\[1em]
 \mathcal{M}_n &= \frac{(n+4)\mathcal{M}_{m+4} - 2(n+3)(1-r^2-b^2)\mathcal{M}_{n+2}}{(n+2)(1-(b-r)^2)((b+r)^2-1)},
 %\end{eqnarray}
 \end{proof}
-where the first relation may be used for upwards recursion in $n$ for $k^2 > \frac{1}{2}$, 
+where the first relation may be used for upwards recursion in $n$ for $k^2 > \frac{1}{2}$,
 and the second for downward recursion in $n$ otherwise.
-In practice we replace $\mathcal{M}_{n+2}$ in Equation~(\ref{eq:primitive}) with 
+In practice we replace $\mathcal{M}_{n+2}$ in Equation~(\ref{eq:primitive}) with
 the recursion relation to obtain a more stable expression for $\mathcal{P}(\bvec{G}_n)$:
 \begin{proof}{pofgn_v02}\label{eq:PofGn_v02}
 \mathcal{P}(\bvec{G}_n) = 2r^2 \mathcal{M}_n - \frac{n}{n+2}\left((1-r^2-b^2)\mathcal{M}_n+(1-(b-r)^2)((b+r)^2-1)\mathcal{M}_{n-2}\right).
@@ -1415,7 +1415,7 @@ Hypergeometric functions and infinite series,
 \alpha_0 &= \sqrt{\pi} \frac{\Gamma(1+\tfrac{n}{2})}{\Gamma(\tfrac{3}{2}+\tfrac{n}{2})},\nonumber\\
 \alpha_j &= \alpha_{j-1} \frac{(2j-1)^2}{2j(1+n+2j)}.
 \end{proof}
-Although $j_{max} = \infty$, in practice we set $j_{max} = 100$, and the series is 
+Although $j_{max} = \infty$, in practice we set $j_{max} = 100$, and the series is
 truncated when a term goes below a tolerance specified by the numerical precision.
 
 We find that upward recursion in $n$ is more stable for $k^2 > \tfrac{1}{2} $,
@@ -1520,7 +1520,7 @@ Equation~(\ref{eq:normalization}) in the following section to obtain
 The derivatives of the coefficients, $\frac{\partial \mathfrak{g}_j}{\partial u_i}$, are
 computed by differentiating each term in Equation~(\ref{eq:an_of_un}) to obtain
 $\frac{\partial \mathfrak{p}_n}{\partial u_i}$, and differentiating each term in Equation~(\ref{eq:dn_of_an})
- to obtain $\frac{\partial \mathfrak{g}_j}{\partial \mathfrak{p}_n}$, and propagating 
+ to obtain $\frac{\partial \mathfrak{g}_j}{\partial \mathfrak{p}_n}$, and propagating
 the derivatives via the chain rule.  Then, the light curve derivatives are given by
 \begin{eqnarray}\label{eq:dFdu}
 \frac{\partial F}{\partial u_i} =  \sum_{j} \frac{\partial \mathfrak{g}_j}{\partial u_i}\frac{\partial F}{\partial \mathfrak{g}_j}.
@@ -1531,7 +1531,7 @@ the derivatives via the chain rule.  Then, the light curve derivatives are given
 \label{sec:normalization}
 %
 We now know how to compute the flux and all its derivatives during an occultation,
-but only up to an unknown normalization constant $I_0$. It is convenient to 
+but only up to an unknown normalization constant $I_0$. It is convenient to
 choose a normalization such that the total unocculted flux is unity, regardless
 of the value of the limb darkening coefficients. We therefore require that
 %
@@ -1550,10 +1550,10 @@ when the integral is taken over the entire disk of the body. We must thus have
         &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathfrak{g}} \quad,
 \end{align}
 %
-where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no 
+where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no
 occultor (i.e., $r = 0$). We could compute $I_0$ using
 the formalism from the previous section, but it is easier to evaluate the integral
-directly. When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$ 
+directly. When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$
 corresponds to the double integral in polar coordinates
 %
 \begin{align}
@@ -1573,8 +1573,8 @@ From Equation~(\ref{eq:greensbasis}), we may write
         \\
         \int_0^1 z \, r \, \dd r & \qquad n = 1
         \\
-        (n+2) \int_0^1 z^n \, r \, \dd r 
-        - n \int_0^1 z^{n-2} \, r \, \dd r 
+        (n+2) \int_0^1 z^n \, r \, \dd r
+        - n \int_0^1 z^{n-2} \, r \, \dd r
         & \qquad n \ge 2 \quad.
     \end{dcases}
 \end{align}
@@ -1651,18 +1651,18 @@ the integration of the light curve over a finite time step.
 \section{Time integration} \label{sec:time}
 
 Given that most observations are made over a finite exposure time,
-the integration of the light curve over time is necessary to capture the 
+the integration of the light curve over time is necessary to capture the
 change in brightness over the timestep
 with high fidelity \citep[e.g.,][]{Kipping2010}. When constructing
-a light curve, usually one divides the time integral of the flux (the \emph{fluence}) 
+a light curve, usually one divides the time integral of the flux (the \emph{fluence})
 by the integration time
-to obtain the time-averaged flux. For optimizing and inferring the 
+to obtain the time-averaged flux. For optimizing and inferring the
 posterior of model parameters, we would like to compute the derivatives
 of the time-averaged flux with respect to the model parameters.
 
-The instantaneous flux is a function of $3+N$ parameters in the Green's basis, 
+The instantaneous flux is a function of $3+N$ parameters in the Green's basis,
 $\{r,b,\mathfrak{g}_n\}$, or $2+N$ parameters in the polynomial in basis, and of
-these, only one varies with time, $b(t)$.  Thus, we can compute the 
+these, only one varies with time, $b(t)$.  Thus, we can compute the
 time-dependent flux with a model for $b(t)=b(\bvec{x},t)$, where
 $b(\bvec{x},t)$ is a model for the impact parameter as a function of time
 and model parameters $\bvec{x}$.  The set of model parameters need to be specified
@@ -1671,7 +1671,7 @@ with respect to one another, or a full dynamical model of an $N$-body system.
 To compute the derivatives of the light curve with respect to $\bvec{x}$, the
 derivatives of the dynamical model must be computed as well.
 
-The time-averaged flux, $\overline{F}$, and its derivatives, are given by 
+The time-averaged flux, $\overline{F}$, and its derivatives, are given by
 \begin{eqnarray}\label{eq:avg_flux}
 \overline{F} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} F(t^\prime) dt^\prime,\\
 \frac{\partial \overline{F}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial r} dt^\prime,\\
@@ -1685,21 +1685,21 @@ $\Delta t$ is the exposure time.
 
 As an example, we choose the approximate transit model $b(t) = (b_0^2 + v^2(t-t_0)^2)^{1/2}$,
 which ignores acceleration and curvature during a transit, and thus is valid in the
-limit of large orbital separation.  We compute the time-averaged flux and derivatives 
+limit of large orbital separation.  We compute the time-averaged flux and derivatives
 with respect to $\bvec{x} = \{t_0,v,b_0\}$ for a length of integration time $\Delta t$.
 %The integration is carried out with an adaptive refinement of the exposure time interval by
 %factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
 %of the mean of the start and end with a maximum
-%number of refinement depths of 32.  
-The integration is carried out with an adaptive Simpson quadrature routine 
+%number of refinement depths of 32.
+The integration is carried out with an adaptive Simpson quadrature routine
 \citep{Kuncir1962}.  Since at each point we compute the flux along with
 its derivatives, we have developed a vectorized version of this routine
 which keeps track of the quadrature separately for each component of the
 flux and its partial derivatives.  The convergence check for the adaptive
 Simpson rule is applied to each component, and when all satisfy the
-convergence criterion, the adaptive refinement is terminated.  
+convergence criterion, the adaptive refinement is terminated.
 In practice this algorithm requires specifying a convergence tolerance,
-$\epsilon_{tol}$, as well as a maximum number of depths, $D_{max}$, to 
+$\epsilon_{tol}$, as well as a maximum number of depths, $D_{max}$, to
 allocate memory to store the intermediate results.
 Figure \ref{fig:integrated_derivs} shows a
 comparison of the derivatives of the time-integrated light curve for this
@@ -1709,7 +1709,7 @@ The time-integration smooths both the features of
 the light curve, as well as the features of the derivative curves.  The similarity of
 the shape of the derivative with respect to $v$ and $b_0$ makes it apparent
 that there may be partial degeneracies between the impact parameter and duration
-of a transit, which can make the impact parameter more difficult to measure, especially 
+of a transit, which can make the impact parameter more difficult to measure, especially
 when the exposure time is longer than the time of ingress/egress.  Likewise, the
 derivatives with respect to the two limb darkening parameters have a similar shape,
 which explains why in some cases it can be difficult to constrain both parameters.
@@ -1738,31 +1738,31 @@ section.
 
 When a light curve is computed, there are some computations which only
 need to be carried out once, and then can be reused at each time step in the
-light curve computation.  
+light curve computation.
 We define a structure to hold these variables
-which are reused throughout the light curve.  In addition, due to the greater 
-computational expense of square-roots and divisions, where possible we try 
+which are reused throughout the light curve.  In addition, due to the greater
+computational expense of square-roots and divisions, where possible we try
 to only compute a square root or division once, storing these in a variable
-within the structure, and then reuse these with cheaper multiplication 
-throughout the computation when needed.  For instance, for many formulae we 
-require the inverse of an integer, so an array of integer inverses is computed 
+within the structure, and then reuse these with cheaper multiplication
+throughout the computation when needed.  For instance, for many formulae we
+require the inverse of an integer, so an array of integer inverses is computed
 once and stored, and then accessed as required rather than recomputed.
 
 Once the number of limb darkening
 terms, $N$, is specified, then the series coefficients for $\mathcal{M}_n$
-and $\mathcal{N}_n$, $\alpha_j$ and $\gamma_j$, are a simple function of $j$ 
-and $n$, and so we compute these coefficients once, and store them in a vector 
-for $k^2 \le 1$, separately for $N-3$ to $N$ for $\mathcal{M}_n$, and for 
+and $\mathcal{N}_n$, $\alpha_j$ and $\gamma_j$, are a simple function of $j$
+and $n$, and so we compute these coefficients once, and store them in a vector
+for $k^2 \le 1$, separately for $N-3$ to $N$ for $\mathcal{M}_n$, and for
 $N-1$ and $N$ for $\mathcal{N}_n$.
 
 In addition, once $N$ is specified, then the transformation matrix for
-the Jacobian from $\mathfrak{g}_i$ to $u_j$, $\frac{\partial \mathfrak{g}_i}{\partial u_j}=\mathcal{A}$,  
-remains the same throughout the light curve 
+the Jacobian from $\mathfrak{g}_i$ to $u_j$, $\frac{\partial \mathfrak{g}_i}{\partial u_j}=\mathcal{A}$,
+remains the same throughout the light curve
 computation, so we compute this matrix only once, and then compute the
 flux derivative (Equation \ref{eq:dFdu}) with matrix multiplication.
 In fact, since the Jacobian matrix for transforming the derivatives from $\mathfrak{g}_i$
-to $u_j$ can be expensive to apply, we can carry out the gradient of the 
-likelihood function with respect to $\mathfrak{g}_i$, and then apply the Jacobian 
+to $u_j$ can be expensive to apply, we can carry out the gradient of the
+likelihood function with respect to $\mathfrak{g}_i$, and then apply the Jacobian
 transformation from $\mathfrak{g}_i$ to $u_j$ only once to obtain the gradient
 of the likelihood with respect to the limb darkening parameterization.
 In practice, we are usually only concerned with optimizing a likelihood
@@ -1772,12 +1772,12 @@ light curve with respect to $u_i$ aren't needed.  This results in a
 significant computational savings, especially for large $N$.
 Transformation to other parameterizations, such as $q_1$ and $q_2$
 defined by \citet{Kipping2013} for quadratic limb-darkening, may also be accomplished after the
-fact by applying the Jacobian to compute the gradient of the likelihood 
+fact by applying the Jacobian to compute the gradient of the likelihood
 in terms of these transformed parameters.
 
 In computing the elliptic integrals, cel, we found that several terms
-which appear in the Bartky formalism are repeated amongst all three elliptic 
-integrals which appear in the expressions for $\mathfrak{s}_1$.  Consequently, we carry 
+which appear in the Bartky formalism are repeated amongst all three elliptic
+integrals which appear in the expressions for $\mathfrak{s}_1$.  Consequently, we carry
 out a parallel computation of these elliptic integrals such that these
 repeated terms are only computed once;  this improves the efficiency of
 the elliptic integral computations.  Once these elliptic integrals
@@ -1790,8 +1790,8 @@ We find that the precision of the computation begins to degrade for
 $N \approx 25-30$.  For large values of $N$, the computing time for
 propagating the derivatives from $\mathfrak{g}_i$ to $u_i$ scales as $N^2$, and
 thus can dominate the computation time.  We utilize the BLAS linear
-algebra library (specifically, the routine \texttt{gemv}) for efficient 
-multiplication of this matrix times the derivative of the light curve with 
+algebra library (specifically, the routine \texttt{gemv}) for efficient
+multiplication of this matrix times the derivative of the light curve with
 respect to $\mathfrak{g}_i$ in order to obtain the derivatives with respect to $u_i$.
 However, as we note above, an even more efficient approach is to
 simply apply this transformation once to the gradient of the likelihood.
@@ -1852,7 +1852,7 @@ about the same with different numbers of points in the light curve.
 benchmarking and comparison to other codes. Perhaps it should go right
 after the time integration section, before implementation details? Or
 perhaps in the application section, followed by a blurb on how we plan
-to derive a better, more flexible analytic limb-darkening model in 
+to derive a better, more flexible analytic limb-darkening model in
 upcoming work? -RL}
 
 \citet{Claret2000} introduced a ``non-linear'' limb darkening model which
@@ -1870,9 +1870,9 @@ We have computed an example non-linear light curve with $r=0.1$ and
 $c_1=c_2=c_3=c_4=0.2$, and then fit it with successive orders of the
 polynomial approximation.  The non-linear light curve model
 we computed numerically as the analytic expressions in \citet{MandelAgol2002}
-are in terms of hypergeometric functions which are expensive to evaluate.  
-We compute the light curve with a ``layer-cake'' model in which sums of 
-layers of surface brightness with a grid of increasing radii are added together 
+are in terms of hypergeometric functions which are expensive to evaluate.
+We compute the light curve with a ``layer-cake'' model in which sums of
+layers of surface brightness with a grid of increasing radii are added together
 to approximate the lightcurve;  this
 is the approach taken in the numerical model used to compute the
 non-linear limb darkening light curves in the code of \citet{MandelAgol2002},
@@ -1888,7 +1888,7 @@ relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
     \begin{centering}
     \includegraphics[width=0.8\linewidth]{figures/julia/occult_nonlinear_poly.pdf}
     \caption{Comparison of the non-linear limb darkening with polynomial
-    fits of various orders. 
+    fits of various orders.
     \jlcodelink{occult_nonlinear}
     \label{fig:nonlinear}}
     \end{centering}
@@ -1944,8 +1944,8 @@ For uniform, linear or quadratic limb darkening, the widely used computation
 by \citet{MandelAgol2002} has been improved in speed by utilizing the
 \citet{Bulirsch1965a,Bulirsch1965b} expressions for the complete elliptic
 integral of the third kind which is needed for the linear case, as implemented
-in the \texttt{EXOFAST} routines \citep{Eastman2013}.  It also uses a series 
-approximation for the complete elliptic integrals of the first and second 
+in the \texttt{EXOFAST} routines \citep{Eastman2013}.  It also uses a series
+approximation for the complete elliptic integrals of the first and second
 kind \citep{Hastings1955}. These three elliptic integrals, especially the third
 kind, are the bottleneck in the computation, and the Bulirsch version is faster
 than widely used Carlson implementation of elliptic integrals \citep{Carlson1979}.
@@ -1972,7 +1972,7 @@ A speed comparison for a transit computed with $10^7$ data points shows that
 the \texttt{Julia} implementation of these routines takes about 55\% of the CPU
 time as the IDL EXOFAST implementation without derivatives, and about 65\%
 of the computation time when including the derivatives.  Consequently, we
-conclude that our new implementation is both faster (by 35-45\%) and more 
+conclude that our new implementation is both faster (by 35-45\%) and more
 accurate than the Mandel \& Agol IDL implementation.  We note that EXOFAST
 v2.0 now utilizes the numerically-stable quadratic limb darkening expressions
 presented above, albeit without the computed derivatives (Eastman et al.,
@@ -2014,14 +2014,14 @@ giving our \texttt{Julia} code a 70\% speed advantage over the Fortran code.
 \begin{figure}[p!]
     \begin{centering}
     \includegraphics[width=0.95\linewidth]{figures/python/compare_to_batman.pdf}
-    \caption{Comparison of \citet{Kreidberg2015} (orange) with \thiswork 
+    \caption{Comparison of \citet{Kreidberg2015} (orange) with \thiswork
              (\texttt{Julia} implementation in blue and \starry implementation
              in green) for a transit across a quadratically limb-darkened star.
              Also shown are points corresponding to the computation using
              \texttt{PyTransit} \citep{Parviainen2015b}. Dashed lines indicate
              computations including the gradients of the flux with respect to
              the radius, impact parameter, and all limb darkening coefficients.
-             The $y$-axis corresponds to the evaluation time of the model in 
+             The $y$-axis corresponds to the evaluation time of the model in
              seconds and the size of the points is proportional to the log of
              the error in the computation relative to a calculation performed
              at 128-bit precision.
@@ -2069,7 +2069,7 @@ non-linear limb darkening profile with $c_1=c_2=c_3=c_4=0.2$ with a
 polynomial limb darkening model with $N=15$.  We then ran a timing
 comparison between the \texttt{batman} model and the polynomial
 model, and we find that the polynomial model is about 7 times
-more accurate and 25 times faster (\texttt{Julia}) 
+more accurate and 25 times faster (\texttt{Julia})
 and 20 times faster (\starry) to evaluate compared with \texttt{batman}.
 
 \subsection{Comparison to \texttt{PyTransit}}
@@ -2079,7 +2079,7 @@ and 20 times faster (\starry) to evaluate compared with \texttt{batman}.
     \includegraphics[width=\linewidth]{figures/python/compare_to_gimenez.pdf}
     \caption{Comparison of the algorithm presented in this work (blue and
              green points) to that of
-             \citet{Gimenez2006} for the computation of a transit across a 
+             \citet{Gimenez2006} for the computation of a transit across a
              star with polynomial limb darkening, as implemented in the
              \texttt{PyTransit} package \citep{Parviainen2015b}
              (purple points), as a function
@@ -2108,9 +2108,9 @@ more precise. When computing derivatives, our codes are still faster by about
 an order of magnitude. For reference, in Figure~\ref{fig:gimenez_comparison},
 we also plot the evaluation time when computing the light curve using the
 spherical harmonic formalism of \cite{starry}. Because the algorithm presented
-in that paper computes surface integrals via recursions in both the 
-spherical harmonic degree $l$ and the order $m$ (as it was designed to 
-solve the occultation problem for arbitrary surface features), 
+in that paper computes surface integrals via recursions in both the
+spherical harmonic degree $l$ and the order $m$ (as it was designed to
+solve the occultation problem for arbitrary surface features),
 it scales super-quadratically with the degree of limb darkening. That
 algorithm is therefore orders of magnitude slower
 to evaluate in the case of pure limb darkening ($m=0$ modes only). We have
@@ -2124,25 +2124,25 @@ limb-darkened body with a limb darkening profile which is given by a polynomial
 in $\upmu$.  These formulae have multiple assumptions built in:  both bodies
 are treated as spherical \citep[but see][]{Seager2002,Hui2002}, so that their projected
 sufaces are assumed to be circular \citep[but see][]{Barnes2003,Barnes2004,Barnes2009b,
-DobbsDixon2012};  limb darkening is treated as azimuthally-symmetric \citep[but see][]{Barnes2009a}; 
-refraction and any relativistic effects are ignored \citep[but see][]{Sidis2010}; 
+DobbsDixon2012};  limb darkening is treated as azimuthally-symmetric \citep[but see][]{Barnes2009a};
+refraction and any relativistic effects are ignored \citep[but see][]{Sidis2010};
 and the edges of both bodies are assumed to have a sharp boundary.
 All of these assumptions are violated in every transit event to some extent,
-but in the majority of cases these assumptions can yield a sufficiently precise model for 
+but in the majority of cases these assumptions can yield a sufficiently precise model for
 a given signal-to-noise ratio.
 
 Given these assumptions, generally one next assumes a particular functional
-form for the limb darkening law \citep{Csizmadia2018}.  The parameterization of 
+form for the limb darkening law \citep{Csizmadia2018}.  The parameterization of
 the limb darkening model can impact the precision of the computation
 of transit light curves.  A common approach is to derive limb darkening
-coefficients for a particular limb darkening model from stellar atmosphere models, 
-and to either fix these at the tabulated values given an observing band and an 
-estimate of stellar parameters \citep{Claret2011,Howarth2011}, or at least to place 
+coefficients for a particular limb darkening model from stellar atmosphere models,
+and to either fix these at the tabulated values given an observing band and an
+estimate of stellar parameters \citep{Claret2011,Howarth2011}, or at least to place
 a prior that the limb darkening parameters should nearly match these values.
 This approach can have several pitfalls:  the limb darkening model may not be
 sufficiently precise,  the stellar atmosphere model may not be accurate, and
 the stellar parameters may not be precise.
-In computing limb darkening from stellar atmosphere models, 
+In computing limb darkening from stellar atmosphere models,
 the spherical nature of limb darkening can affect the transit light curve
 \citep{Neilson2013,Neilson2017}, and thus the limb darkening coefficients must be fit
 with care \citep{Claret2018}.  Even more importantly, full three dimensional
@@ -2153,12 +2153,12 @@ physical model for a stellar atmosphere has limitations in the fidelity at
 which it can model actual stellar atmospheres,
 and any modeler can only explore a finite set of parameters (effective temperature,
 metallicity, surface gravity, and magnetic field strength).
-In practice, then, it may be most robust simply to let the limb darkening parameters 
-be free parameters, to let the limb darkening model be as flexible as possible, 
+In practice, then, it may be most robust simply to let the limb darkening parameters
+be free parameters, to let the limb darkening model be as flexible as possible,
 and to let the limb darkening model be fit along with the radius ratio and
 orbital parameters \citep{Csizmadia2012,Espinoza2015}.
 
-Even so, this approach still assumes azimuthal symmetry for the star, while 
+Even so, this approach still assumes azimuthal symmetry for the star, while
 any model for the surface brightness of a star can only be approximate:
 to some extent most stars are convective, rotationally-oblate, spotted, oscillating, flaring,
 etc.  The model we have presented, then, will only resemble any given star to
@@ -2166,8 +2166,8 @@ a precision which is limited by the lack of uniformity of the actual stellar
 surface.  This begs the question of why a numerically precise model is required
 for modelling transit light curves.  The answer is computational accuracy
 and stability: this more accurate model can be used over all of parameter space,
-without returning spurious results, and the high precision enables computation 
-of derivatives which are beneficial when optimizing model parameters, computing 
+without returning spurious results, and the high precision enables computation
+of derivatives which are beneficial when optimizing model parameters, computing
 the Fisher information matrix, or deriving parameter posteriors with MCMC.
 
 Since we are limited in the knowledge of the properties of any given star,
@@ -2213,7 +2213,7 @@ with a high-order polynomial for a given set.  Then, only the non-linear
 parameters need to be varied, while the polynomial coefficients will
 be a simple function of these non-linear parameters.  In this approach
 it should be straightforward to linearize the polynomial limb darkening
-model fitting, which ought to yield good computational efficiency.  
+model fitting, which ought to yield good computational efficiency.
 A limitation of our computational approach is that the precision
 begins to degrade for $N \approx 25-30$; however, we anticipate that such
 a high order will rarely be required.
@@ -2229,8 +2229,8 @@ a high order will rarely be required.
 \section{Applications}
 
 We envision that this code will be used for fits to higher precision
-transit data, such as gathered by the James Webb Space Telescope (JWST), 
-which require an improved model of stellar limb darkening.  Here we discuss 
+transit data, such as gathered by the James Webb Space Telescope (JWST),
+which require an improved model of stellar limb darkening.  Here we discuss
 some potential avenues for application of this model.
 
 The derivatives of the time-integrated light curves may be used to revisit the
@@ -2238,9 +2238,9 @@ Fisher information analysis as carried out by \citet{Price2014}, as originally
 investigated without time-integration by \citet{Carter2008}.  Accounting
 for correlated noise in this analysis will give more plausible estimates
 for the impact of stellar variability on the determination of transit
-transmission spectroscopy and transit-timing variations \citep{ForemanMackey2017}.  
-This limit will be encountered as more precise measurements are made by gathering 
-more photons during a transit.  For example, for some targets, one can expect to 
+transmission spectroscopy and transit-timing variations \citep{ForemanMackey2017}.
+This limit will be encountered as more precise measurements are made by gathering
+more photons during a transit.  For example, for some targets, one can expect to
 obtain $\sim 10^2$ times as many photons with JWST as collected with Kepler.
 With such higher precision, as well as the wavelength-dependence afforded
 by several JWST observing modes, one can expect that high fidelity transit
@@ -2277,16 +2277,16 @@ to \citet{Pal2008}, 5-30 faster than that of Gimenez, a factor of 2-25 faster th
 We expect that this code may be used both as a workhorse model for
 general fitting of transit models, as well as a tool for more
 specialized applications, such as photodynamical modeling of
-interacting planets \citep{Carter2012}, triple stars \citep{Carter2011}, and 
+interacting planets \citep{Carter2012}, triple stars \citep{Carter2011}, and
 transiting circumbinary planets \citep{Doyle2011}.
 
 During the preparation of this paper, a related paper appeared on
 the mutual eclipse of multiple bodies \citep{Short2018}.  Their
 approach is complementary to ours in that they utilize Green's theorem to
 carry out a numerical quadrature for mulitiple limb darkening models.
-Their approach does not yet include the computation of derivatives, but 
+Their approach does not yet include the computation of derivatives, but
 it allows for a wider range of limb darkening models than polynomial, it
-allows for computation of the Rossiter-McLaughlin effect, and it 
+allows for computation of the Rossiter-McLaughlin effect, and it
 carries out the computation for multiple overlapping bodies.
 
 The code is open source, and has two versions:  one of which is a part
@@ -2346,7 +2346,7 @@ the input parameters.
 
 %\begin{eqnarray}
 %\frac{\partial {\rm cel}()}{\partial k_c} &=& \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial k_c} = \frac{-k_c}{p-k_c^2}\left[\mathrm{cel}(k_c,k_c^2,a,b)-\mathrm{cel}(k_c,p,a,b)\right],\\
-%\frac{\partial {\rm cel}()}{\partial p} &=& \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial p} &= \frac{\mathrm{cel}(k_c,p,0,\lambda) +(b-ap)\mathrm{cel}(k_c,1,1-p,k_c^2-p)}{2p(1-p)(p-k_c^2)},\\ 
+%\frac{\partial {\rm cel}()}{\partial p} &=& \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial p} &= \frac{\mathrm{cel}(k_c,p,0,\lambda) +(b-ap)\mathrm{cel}(k_c,1,1-p,k_c^2-p)}{2p(1-p)(p-k_c^2)},\\
 %\lambda & =& k_c^2(b+ap-2bp)+p(3bp-ap^2-2b),\\
 %\frac{\partial {\rm cel}()}{\partial a } &=& {\rm cel}(k_c,p,1,0),\\
 %\frac{\partial {\rm cel}()}{\partial b} &=&{\rm cel}(k_c,p,0,1).
@@ -2355,7 +2355,7 @@ the input parameters.
 %\begin{eqnarray}
 \begin{proof}{cel_derivative}
 \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial k_c} &=& \frac{-k_c}{p-k_c^2}\left[\mathrm{cel}(k_c,k_c^2,a,b)-\mathrm{cel}(k_c,p,a,b)\right],\\
-\frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial p} &=& \frac{\mathrm{cel}(k_c,p,0,\lambda) +(b-ap)\mathrm{cel}(k_c,1,1-p,k_c^2-p)}{2p(1-p)(p-k_c^2)},\\ 
+\frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial p} &=& \frac{\mathrm{cel}(k_c,p,0,\lambda) +(b-ap)\mathrm{cel}(k_c,1,1-p,k_c^2-p)}{2p(1-p)(p-k_c^2)},\\
 \lambda &=& k_c^2(b+ap-2bp)+p(3bp-ap^2-2b),\\
 \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial a } &=& \mathrm{cel}(k_c,p,1,0),\\
 \frac{\partial \mathrm{cel}(k_c,p,a,b)}{\partial b} &=& \mathrm{cel}(k_c,p,0,1).
@@ -2405,25 +2405,25 @@ $\bvec{A}_1$    & Change of basis matrix:
                  polynomials                            & \eq{A1} \\
 $\bvec{A}_2$    & Change of basis matrix:
                 polynonials to Green's polynomials      & \eq{gbasis} \\
-$A_{lens}$      & Lens-shaped area of overlap of 
+$A_{lens}$      & Lens-shaped area of overlap of
                   two circles                           & \eq{MAuniform}\\
-$A_{kite}$      & Kite-shaped area b/w center 
+$A_{kite}$      & Kite-shaped area b/w center
                   of circles and points of contact		& \eq{Kite_area}\\
 $b$             & Impact parameter in units of occulted
                  body's radius                          &  \\
 $b_c$           & Cutoff for using alternative
                   expression for $d\mathcal{P}/db$      & \S\ref{sec:analytic_derivatives}\\
-$c_1-c_4$       & Non-linear limb darkening 
+$c_1-c_4$       & Non-linear limb darkening
                   coefficients                          &  \S\ref{sec:nonlinear}\\
 $\bvec{D}\,\wedge$
                 & Exterior derivative                   & \eq{DGg} \\
-$\mathrm{cel}(k_c,p,a,b)$ 
+$\mathrm{cel}(k_c,p,a,b)$
                 & General complete elliptic
                  integral \citep{Bulirsch1969}          & \eq{cel}\\
 $E(\bigdot)$    & Complete elliptic integral of the
                  second kind                            & \eq{elliptic} \\
-$F$             & Normalized flux seen by observer      & \eq{occint} \\ 
-$\overline{F}$  & Time-averaged normalized flux         & \eq{avg_flux} \\ 
+$F$             & Normalized flux seen by observer      & \eq{occint} \\
+$\overline{F}$  & Time-averaged normalized flux         & \eq{avg_flux} \\
 $_2F_1$         & Generalized Hypergeometric function   & \eq{Mn_series} \\
 $\gbasis$       & Green's basis                         & \eq{greensbasis} \\
 $\mathfrak{g}$  & Vector in the basis $\gbasis$         & \\
@@ -2441,10 +2441,10 @@ $K(\bigdot)$    & Complete Elliptic integral of the
                   first kind                            & \eq{elliptic} \\
 $m_k$           & Elliptic integral parameter           & \S\ref{sec:reparam}\\
 $n$             & Order of limb darkening/Green's basis	& \\
-$\mathcal{M}_n(r,b)$ 
+$\mathcal{M}_n(r,b)$
                 & Integral computed recursively         & \eq{M_of_n}\\
 $N$             & Highest order of limb darkening polynomial & \\
-$\mathcal{N}_n(r,b)$ 
+$\mathcal{N}_n(r,b)$
                 & Integral computed recursively         & \eq{N_of_n}\\
 $p$             & Cofficient of $cel$			        & \eq{cel}\\
 $\pbasis$       & Polynomial basis                      & \eq{polybasis} \\
@@ -2456,7 +2456,7 @@ $\mathcal{Q}$   & Primitive integral along perimiter
                  of occulted body                       & \eq{primitiveQ} \\
 $r$             & Occultor radius in units of occulted
                  body's radius                          & \S\ref{sec:intro} \\
-$\bvec{r}$      & Vector for integration over 
+$\bvec{r}$      & Vector for integration over
                  boundary of visible disk               & \eq{greens} \\
 $\mathfrak{s}$  & Occultation light curve solution
                  vector                                 & \eq{greens} \\
@@ -2473,21 +2473,21 @@ $\y$            & Cartesian coordinate                  & \eq{xyz} \\
 $\z$            & Cartesian coordinate,
                  $z = \sqrt{1 - \x^2 - \y^2}$           & \eq{xyz} \\
 %
-$\alpha_j$      & Coefficient in series for 
+$\alpha_j$      & Coefficient in series for
                   $\mathcal{M}_n$                       & \eq{Mn_series} \\
-$\gamma_j$      & Coefficient in series for 
+$\gamma_j$      & Coefficient in series for
                   $\mathcal{N}_n$                       & \eq{Nn_series} \\
 $\Gamma$        & Gamma function                        & \\
-$\eta$          & Parameter in quadratic limb 
+$\eta$          & Parameter in quadratic limb
                   darkening term                        & \eq{eta}\\
-$\theta$        & Polar angle on star with 
+$\theta$        & Polar angle on star with
                   respect to observer                   & \\
 $\Theta$        & Heaviside step function               & \eq{biglam} \\
-$\kappa_0$      & Angular position of occultor/occulted 
+$\kappa_0$      & Angular position of occultor/occulted
                   intersection point                    & \eq{cosine_formulation} \\
-$\kappa_1$      & Angular position of occultor/occulted 
+$\kappa_1$      & Angular position of occultor/occulted
                   intersection point                    & \eq{cosine_formulation} \\
-$\lambda$       & Angular position of occultor/occulted 
+$\lambda$       & Angular position of occultor/occulted
                   intersection point                    & \eq{primitiveQdef} \\
                 & Term in cel identities                & \eq{cel_identities} \\
 $\Lambda$       & \citet{MandelAgol2002} function       & \eq{biglam} \\
@@ -2496,7 +2496,7 @@ $\upmu$         & Cosine of polar angle on star,
 $\Pi(\bigdot,\bigdot)$
                 & Complete elliptic integral of the
                  third kind                             & \eq{elliptic} \\
-$\phi$          & Angular position of occultor/occulted 
+$\phi$          & Angular position of occultor/occulted
                   intersection point                    & \eq{primitivePdef} \\
 $\varphi$      & Dummy integration variable             & \\
 $\xi$          & Transformed integration variable       & \eq{greens_transformed}\\
