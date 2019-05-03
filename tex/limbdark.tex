@@ -238,7 +238,19 @@ we introduce the general form for polynomial limb darkening
 and define the notation used throughout the paper. In \S\ref{sec:uniform}--\ref{sec:quadratic}
 we derive updated equations for the well-known cases of uniform, linear, and
 quadratic limb darkening, and in \S\ref{sec:higher_order} we generalize the
-expressions to limb darkening of arbitrary order. \todo{Describe paper layout.}
+expressions to limb darkening of arbitrary order.
+\todo{Paper layout}
+
+    % \S\ref{sec:time}
+    % \S\ref{sec:???} implementation
+    % \S\ref{sec:???} benchmarking
+    % \S\ref{sec:nonlinear}
+    % \S\ref{sec:comparison}
+
+    % \S\ref{sec:discussion} ??
+    % \S\ref{sec:applications} ??
+    % \S\ref{sec:conclusions} ??
+    % Appendix: errata, derivs of cel and a table
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -640,8 +652,9 @@ Finally, we compute the corresponding element of the solution vector $\mathfrak{
 as
 %
 \begin{eqnarray} \label{eq:uniform}
-\mathfrak{s}_0(r,b) &=& \pi-A_{lens}\nonumber\\
-&=&\pi -\kappa_1 - r^2\kappa_0 + A_{kite},
+    \label{eq:s0}
+    \mathfrak{s}_0(r,b) &=& \pi-A_{lens}\nonumber\\
+                        &=&\pi -\kappa_1 - r^2\kappa_0 + A_{kite},
 \end{eqnarray}
 %
 We note that instead of computing $\kappa_1$,
@@ -687,7 +700,7 @@ flux visible during the occultation of a body whose surface map is given by
 $I(x, y) = \sqrt{1 - \x^2 -\y^2}$ may be computed as
 %
 \begin{align}
-    \label{eq:s2}
+    \label{eq:s1}
     \mathfrak{s}_1 = \frac{2\pi}{3} \left(1 - \frac{3\Lambda(r,b)}{2} - \Theta(r - b) \right)
 \end{align}
 %
@@ -1078,7 +1091,8 @@ With this definition, the quadratic term, $\mathfrak{s}_2(r,b)$ is given simply 
 %the next section.}  It turns out this does agree with next section. I've changed the text in the intro to this section. -EA 
 %
 \begin{eqnarray}
-\mathfrak{s}_2 &=& 2 \mathfrak{s}_0 + 4\pi \eta - 2\pi,\\
+    \label{eq:s2}
+    \mathfrak{s}_2 &=& 2 \mathfrak{s}_0 + 4\pi \eta - 2\pi \quad,
 \end{eqnarray}
 %
 where $\mathfrak{s}_0$ is defined in Equation (\ref{eq:uniform}).
@@ -1602,7 +1616,7 @@ $n \ge 2$ is exactly zero. We may finally evaluate our normalization constant:
 
 \subsection{Summary}
 \label{sec:summary}
-In this section, we showed that if we express the specific intensity distribution
+In the last several sections, we showed that if we express the specific intensity distribution
 on the surface of a spherical body as the series
 %
 \begin{align}
@@ -1619,45 +1633,41 @@ expression
 \end{align}
 %
 where $I_0$ is a normalizing constant (Equation~\ref{eq:normalization}),
-$\mathfrak{s}$ is the solution vector (Equation~\ref{eq:sn}), 
+$\mathfrak{s}^\top$ is the solution vector (Equation~\ref{eq:sn}, with special
+cases given by Equations~\ref{eq:s0}, \ref{eq:s1}, and \ref{eq:s2}, and
+the general case given by Equation~\ref{eq:sn}),
 a function of only the impact parameter
 $b$ and radius $r$ of the occultor, $\mathcal{A}$ is a change of basis
 matrix (Equation~\ref{eq:A}), and $\mathbf{u}$ is the vector of limb
 darkening coefficients $(u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$.
-Note that in general $\mathfrak{s}^T$ is time-dependent, as it depends
+Note that in general $\mathfrak{s}^\top$ is time-dependent, as it depends
 upon the relative positions of the bodies as a function of time, while
 $\mathcal{A}\mathbf{u}$ is time-independent, and thus the matrix
 multiplication only needs to be computed once per light curve.
 
-%
-\rodrigo{Write a slightly more detailed summary. Emphasize how the uniform and linear
-terms are computed separately.}
-%
-
 With the description of the light curve computation complete, we next discuss
 the integration of the light curve over a finite time step.
-
-
 
 \section{Time integration} \label{sec:time}
 
 Given that most observations are made over a finite exposure time,
-the integration of the light curve over time is necessary for representing
-a transit light curve to capture the change in brightness over the timestep
-with high fidelity \citep{Kipping2010}.  For constructing
-a light curve, usually one divides the fluence by the integration time
-to obtain the time-averaged flux.  For optimizing and inferring the 
+the integration of the light curve over time is necessary to capture the 
+change in brightness over the timestep
+with high fidelity \citep[e.g.,][]{Kipping2010}. When constructing
+a light curve, usually one divides the time integral of the flux (the \emph{fluence}) 
+by the integration time
+to obtain the time-averaged flux. For optimizing and inferring the 
 posterior of model parameters, we would like to compute the derivatives
 of the time-averaged flux with respect to the model parameters.
 
 The instantaneous flux is a function of $3+N$ parameters in the Green's basis, 
-$\{r,b,\mathfrak{g}_n\}$, or $2+N$ parameters in the polynomial in $1-\upmu$ basis, and of
+$\{r,b,\mathfrak{g}_n\}$, or $2+N$ parameters in the polynomial in basis, and of
 these, only one varies with time, $b(t)$.  Thus, we can compute the 
 time-dependent flux with a model for $b(t)=b(\bvec{x},t)$, where
-where $b(\bvec{x},t)$ is a model for the impact parameter as a function of time
+$b(\bvec{x},t)$ is a model for the impact parameter as a function of time
 and model parameters $\bvec{x}$.  The set of model parameters need to be specified
 by a function, which, for example, might be a Keplerian orbit of the two bodies
-with respect to one another, or a full dynamical model of an n-body system.
+with respect to one another, or a full dynamical model of an $N$-body system.
 To compute the derivatives of the light curve with respect to $\bvec{x}$, the
 derivatives of the dynamical model must be computed as well.
 

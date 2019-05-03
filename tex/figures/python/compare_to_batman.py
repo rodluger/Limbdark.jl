@@ -142,8 +142,8 @@ ax.set_xscale('log')
 ax.set_yscale('log')
 
 # Legend
-axleg1.plot([0, 1], [0, 1], color='C0', label='This work', lw=1.5)
-axleg1.plot([0, 1], [0, 1], '--', color='C0', label='This work\n(+ gradients)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], color='C0', label='ALFM (2019)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], '--', color='C0', label='ALFM (2019)\n(+ gradients)', lw=1.5)
 axleg1.plot([0, 1], [0, 1], color='C2', label='starry', lw=1.5)
 axleg1.plot([0, 1], [0, 1], '--', color='C2', label='starry\n(+ gradients)', lw=1.5)
 axleg1.plot([0, 1], [0, 1], color='C1', label='batman', lw=1.5)
