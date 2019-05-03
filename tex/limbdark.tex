@@ -473,12 +473,17 @@ where
     \mathfrak{s} \equiv \oiint \gbasis (z) \, \dd S
 \end{align}
 %
-is the \emph{solution vector} first introduced in \S \ref{sec:uniform}.
+is the \emph{solution vector}.
 If we can find the general solution to the integral in Equation (\ref{eq:solution_vector}),
 we can compute the occultation flux for arbitrary order limb darkening.
-
-
-
+The solutions for the case of uniform ($\mathfrak{s}_0$), linear ($\mathfrak{s}_1$),
+and quadratic ($\mathfrak{s}_2$) limb darkening have been studied in 
+the past, so we dedicate the next three sections
+(\S\ref{sec:uniform}--\ref{sec:quadratic})
+to revisiting existing
+formulae and algorithms for computing them, with both speed and numerical accuracy
+in mind. The following section (\S\ref{sec:higher_order}) tackles the case of higher order
+limb darkening.
 
 \section{Uniform brightness}
 
@@ -583,7 +588,7 @@ A_{lens} &= \kappa_1 + r^2\kappa_0 - A_{kite},\nonumber\\
 \kappa_0 &= \mathrm{atan2}(2A_{kite},(r-1)(r+1)+b^2),\nonumber\\
 \kappa_1 &= \mathrm{atan2}(2A_{kite},(1-r)(1+r)+b^2),
 \end{proof}
-with $A_{kite}$ given in equation \ref{eq:Kite_area}.
+with $A_{kite}$ given in Equation~(\ref{eq:Kite_area}).
 
 \begin{figure}[p!]
     \begin{centering}
@@ -631,15 +636,17 @@ At the beginning of ingress/end of egress when $b \approx 1+r$,
 even higher precision is achieved since the area of overlap approaches
 zero, as shown in the right hand panels of Figure \ref{fig:overlap_precision}.
 
-The final modification we make when computing the uniform light
-curve is that our computations make use of the visible area of the disk, $\mathfrak{s}_0$, defined as
+Finally, we compute the corresponding element of the solution vector $\mathfrak{s}_0$
+as
+%
 \begin{eqnarray} \label{eq:uniform}
 \mathfrak{s}_0(r,b) &=& \pi-A_{lens}\nonumber\\
 &=&\pi -\kappa_1 - r^2\kappa_0 + A_{kite},
 \end{eqnarray}
-rather than the obscured area, $A_{lens}$.  So, instead of computing $\kappa_1$,
-we compute $\pi-\kappa_1 = -\mathrm{atan2}(\sin{\kappa_1},\cos{\kappa_1})$.
-We find that this leads to machine-precision as well.  Note that $\mathfrak{s}_0$ is
+%
+We note that instead of computing $\kappa_1$,
+we compute $\pi-\kappa_1 = -\mathrm{atan2}(\sin{\kappa_1},\cos{\kappa_1})$,
+which leads to machine precision as well. Note also that $\mathfrak{s}_0$ is
 identical to the first basis function ($s_0$) in the \starry implementation 
 from \citet{starry}.
 
@@ -668,8 +675,8 @@ for linear limb darkening.
 % ------------------------------------------------------------------------------
 % ==============================================================================
 
-We now turn to the case of linear limb darkening, $I(\upmu)/I(1) = 1-u_1(1-\upmu)$
-\citep{Russell1912a,Russell1912b}.  In this section we set $I(1)=1$ and $u_1=1$, so 
+We now turn to the case of linear limb darkening, $I(\upmu)/I_0 = 1-u_1(1-\upmu)$
+\citep{Russell1912a,Russell1912b}.  In this section we set $I_0=1$ and $u_1=1$, so 
 that $I(\upmu)=\upmu$;  the general case can be computed as a linear
 combination with the uniform case.
 Note that since $\upmu = \sqrt{1-x^2-y^2}$, this problem is equivalent to
@@ -1036,12 +1043,13 @@ We next increase the power of limb darkening by one, $\upmu^2$.
 
 The next order of limb darkening has been widely studied due to its
 accurate description of stellar atmospheres \citep{Claret2000,MandelAgol2002,Pal2008}.
-We summarize here the formulae for quadratic limb darkening with 
-$\mathfrak{s}_2 = 4\mu^2-2$, along with the derivatives, using the transformed 
-expressions described above.  The general quadratic case may be computed as
+We summarize here the formulae for quadratic limb darkening%
+%with $\mathfrak{g}_2 = 4\mu^2-2$
+, along with the derivatives, using the transformed 
+expressions described above. The general quadratic case may be computed as
 a linear combination with the foregoing uniform and linear cases.
 
-We first give the formula for the function $\eta(r,b)$, which is the term which appears 
+We first give the formula for the function $\eta(r,b)$, which is the term appearing
 in the quadratic limb darkening model only when $u_2 \ne 0$
 \citep{MandelAgol2002}. In terms of quantities we have defined above for the uniform case:
 \begin{proof}{Eta}
@@ -1139,9 +1147,20 @@ derive far more efficient and accurate formulae, which we describe in the follow
 
 %%%%%% REMOVED SECTION 5 INTRO 
 
-As in \citet{starry}, we use Green's theorem to re-express the surface
-integral as a line integral over the boundary of the visible portion of
-the occulted body's disk, $\bvec{r} = x \xhat + y \yhat$:
+Having computed $\mathfrak{s}_0$, $\mathfrak{s}_1$, and $\mathfrak{s}_2$, 
+we now seek a general expression for $\mathfrak{s}_n$ for any $n > 2$.
+Recalling our definition of $\mathfrak{s}$ as the surface integral of
+the terms in the Green's basis,
+%
+\begin{align}
+    \mathfrak{s} \equiv \oiint \gbasis (z) \, \dd S \quad,
+\end{align}
+%
+in this section we will use Green's theorem to re-express this two-dimensional
+integral as a one-dimensional line integral over the boundary of the visible
+portion of the occulted body's disk. This is the same procedure adopted by
+\citet{starry}, albeit with different basis functions. 
+Given $\bvec{r} = x \xhat + y \yhat$, we may write
 %
 %
 \begin{align}
@@ -1156,7 +1175,7 @@ vector
 %
 \begin{align}
     \label{eq:greens_n}
-    \bvec{G}_n (z) = G_{n,x} (z) \, \xhat + G_{n,y} (z) \, \yhat \quad.
+    \bvec{G}_n (z) = G_{n,x} (z) \, \xhat + G_{n,y} (z) \, \yhat \quad .
 \end{align}
 %
 The components $G_{n,x}$ and $G_{n,y}$ are chosen such that
@@ -1198,9 +1217,10 @@ for the components of the Green's basis:
 %
 for $2 \le n \le N$. 
 %
-Note that we already introduced the first two terms, $\tilde{\mathfrak{g}}_0 = 1$
-(uniform limb darkening) and $\tilde{\mathfrak{g}}_1 = z$ (linear limb darkening).
-Since we already know how to integrate them (\S\ref{sec:uniform} and \S\ref{sec:reparam}),
+Note that we already introduced the first three terms, $\tilde{\mathfrak{g}}_0 = 1$
+(uniform limb darkening), $\tilde{\mathfrak{g}}_1 = z$ (linear limb darkening),
+and $\tilde{\mathfrak{g}}_2 = 4z^2 - 2$ (quadratic limb darkening).
+Since we already know how to integrate them (\S\ref{sec:uniform}--\ref{sec:quadratic}),
 we treat them separately from the higher order terms.
 
 % MENTION THIS LATER: Note that the total flux of each term in this basis set, $\tilde{\mathfrak{g}}_n$, integrates
