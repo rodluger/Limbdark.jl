@@ -164,7 +164,7 @@ by \citet{Gimenez2006}, who derived transit light curves for a limb darkening
 function
 %
 \begin{equation} \label{eq:gimenez}
-    \frac{I(\upmu)}{I_0} = \left[1-\sum_{n=1}^N a_n (1-\upmu^n) \right],
+    \frac{I(\upmu)}{I_0} = 1-\sum_{n=1}^N a_n (1-\upmu^n) \quad,
 \end{equation}
 %
 where $a_n$ is a limb darkening coefficient.  \cite{Gimenez2006}
@@ -239,7 +239,7 @@ and define the notation used throughout the paper. In \S\ref{sec:uniform}--\ref{
 we derive updated equations for the well-known cases of uniform, linear, and
 quadratic limb darkening, and in \S\ref{sec:higher_order} we generalize the
 expressions to limb darkening of arbitrary order.
-\todo{Paper layout}
+\todo{Finish explaining the paper layout.}
 
     % \S\ref{sec:time}
     % \S\ref{sec:???} implementation
@@ -1798,6 +1798,26 @@ simply apply this transformation once to the gradient of the likelihood.
 
 \section{Benchmarking}\label{sec:benchmark}
 
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=0.7\linewidth]{figures/julia/benchmark_transit_poly.pdf}
+    \caption{Scaling of the computation time in seconds with the number of
+    data points in the light curve for $r=0.1$ with $b$ ranging from $0$ to $1.2$,
+    and with the number of limb darkening coefficients, $N$. \jlcodelink{benchmark_transit_poly}
+    \label{fig:ncoeff}}
+    \end{centering}
+\end{figure}
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=0.7\linewidth]{figures/julia/benchmark_limbdark_timing.pdf}
+    \caption{Scaling of the computation time with the number of
+    limb darkening coeffients, $N$.  The $y$-axis scales the timing with respect
+    to the timing for a single limb darkening coefficient. \jlcodelink{benchmark_transit_poly}
+    \label{fig:nlimb}}
+    \end{centering}
+\end{figure}
+
 We have measured the performance of the limb-darkened light curves
 with derivatives as a function of the number of computed data points
 and as a function of the number of limb darkening coefficients.  We
@@ -1807,9 +1827,12 @@ coefficients ranging from $1$ to $144$.  For each set of timing benchmark
 parameters, we carried out nine measurements  of the timing, and
 we use the median of these for plotting purposes.  The benchmarking
 for the \texttt{Julia} code was carried out with \texttt{v0.7} of
-Julia on a MacBook Pro with 2.8 GHz Intel Core i7.
-No time-integration/sub-sampling was carried out in this computation. \rodrigo{Update this
-sentence with the Travis CPU specs.}
+Julia on the \texttt{trusty} Ubuntu environment of Travis-CI%
+\footnote{\url{https://travis-ci.org}}
+on a 2.3 GHz
+% SEE https://travis-ci.org/rodluger/limbdark/jobs/527913189#L545
+2-core machine with 7.5 GB of RAM.
+No time-integration/sub-sampling was carried out in this computation.
 
 Figure \ref{fig:ncoeff} shows that the time dependence is linear with the
 number of $b$ values (which is equivalent to the number of data points
@@ -1823,33 +1846,20 @@ scaled the timing to the single-coefficient case, and took a second
 median over the number of light curve points as the cube-root scaling scales
 about the same with different numbers of points in the light curve.
 
-\begin{figure}
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/julia/benchmark_transit_poly.pdf}
-    \caption{Scaling of the computation time in seconds with the number of
-    data points in the light curve for $r=0.1$ with $b$ ranging from $0$ to $1.2$,
-    and with the number of limb darkening coefficients, $N$. \jlcodelink{benchmark_transit_poly}
-    \label{fig:ncoeff}}
-    \end{centering}
-\end{figure}
-
-\begin{figure}
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/julia/benchmark_limbdark_timing.pdf}
-    \caption{Scaling of the computation time with the number of
-    limb darkening coeffients, $N$.  The $y$-axis scales the timing with respect
-    to the timing for a single limb darkening coefficient. \jlcodelink{benchmark_transit_poly}
-    \label{fig:nlimb}}
-    \end{centering}
-\end{figure}
-
 \section{Non-linear limb darkening}\label{sec:nonlinear}
+
+\todo{Eric: This section seems a bit out of place, sandwiched in between
+benchmarking and comparison to other codes. Perhaps it should go right
+after the time integration section, before implementation details? Or
+perhaps in the application section, followed by a blurb on how we plan
+to derive a better, more flexible analytic limb-darkening model in 
+upcoming work? -RL}
 
 \citet{Claret2000} introduced a ``non-linear'' limb darkening model which
 was found to be an effective model for describing the limb darkening functions
 which are produced by models of stellar atmospheres.
-Although we can only model limb darkening which is integer powers of $\upmu$,
-we can use the polynomial model as an alternative limb darkening model.
+Although we can only model limb darkening in integer powers of $\upmu$,
+we can use a high order polynomial model as an alternative limb darkening model.
 
 %\begin{itemize}
 %\item Compare polynomial models to non-linear light curves. [x]
@@ -1858,7 +1868,7 @@ we can use the polynomial model as an alternative limb darkening model.
 
 We have computed an example non-linear light curve with $r=0.1$ and
 $c_1=c_2=c_3=c_4=0.2$, and then fit it with successive orders of the
-polynomial approximation.  The non-linear light curve model model
+polynomial approximation.  The non-linear light curve model
 we computed numerically as the analytic expressions in \citet{MandelAgol2002}
 are in terms of hypergeometric functions which are expensive to evaluate.  
 We compute the light curve with a ``layer-cake'' model in which sums of 
@@ -1876,7 +1886,7 @@ relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
 
 \begin{figure}
     \begin{centering}
-    \includegraphics[width=\linewidth]{figures/julia/occult_nonlinear_poly.pdf}
+    \includegraphics[width=0.8\linewidth]{figures/julia/occult_nonlinear_poly.pdf}
     \caption{Comparison of the non-linear limb darkening with polynomial
     fits of various orders. 
     \jlcodelink{occult_nonlinear}
@@ -1911,9 +1921,24 @@ relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
 \section{Comparison with prior work} \label{sec:comparison}
 
 In this section we compare our computations with existing code in terms
-of accuracy and speed.
+of accuracy and speed. We compare both the \texttt{Julia} version
+of our code and an implementation of our algorithms
+in the \texttt{starry} package, with and without the computation
+of gradients. To ensure a fair comparison between the codes, we
+perform all calculations on a single core without multi-threading
+or interpolation over a pre-computed grid, which is an option
+in some codes.
 
 \subsection{Comparison with Mandel \& Agol}
+
+\begin{figure}[t!]
+    \begin{centering}
+    \includegraphics[width=0.9\linewidth]{figures/julia/compare_MA2002.pdf}
+    \caption{Comparison of Mandel \& Agol (2002) with \thiswork.
+    \jlcodelink{compare_MA2002}
+    \label{fig:compareMA}}
+    \end{centering}
+\end{figure}
 
 For uniform, linear or quadratic limb darkening, the widely used computation
 by \citet{MandelAgol2002} has been improved in speed by utilizing the
@@ -1924,6 +1949,10 @@ approximation for the complete elliptic integrals of the first and second
 kind \citep{Hastings1955}. These three elliptic integrals, especially the third
 kind, are the bottleneck in the computation, and the Bulirsch version is faster
 than widely used Carlson implementation of elliptic integrals \citep{Carlson1979}.
+\todo{Eric: I'm confused by the sentences above. It's partly the passive tense
+in the first sentence that's throwing me off: you are referring to our current
+paper, correct? But in the second sentence, you say ``it also uses a series
+approximation...'' but I think you are now referring to Exofast? -RL}
 
 We have carried out a numerical comparison of the \citet{MandelAgol2002}
 for the linear case ($u_1=1$), and find that the most severe errors
@@ -1939,17 +1968,8 @@ to grow as $b$ gets closer to $r$.  No such instability occurs for
 our new expressions, demonstrating their utility in all regions of
 parameter space.
 
-\begin{figure}
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/julia/compare_MA2002.pdf}
-    \caption{Comparison of Mandel \& Agol (2002) with \thiswork.
-    \jlcodelink{compare_MA2002}
-    \label{fig:compareMA}}
-    \end{centering}
-\end{figure}
-
 A speed comparison for a transit computed with $10^7$ data points shows that
-the Julia implementation of these routines takes about 55\% of the CPU
+the \texttt{Julia} implementation of these routines takes about 55\% of the CPU
 time as the IDL EXOFAST implementation without derivatives, and about 65\%
 of the computation time when including the derivatives.  Consequently, we
 conclude that our new implementation is both faster (by 35-45\%) and more 
@@ -1973,14 +1993,14 @@ which in practice we find can be both less precise and slower to
 evaluate than the \citet{Bulirsch1965a} code for computing elliptic
 integrals.
 
-We have also compared the evaluation speed of our code with P\'al's as well.
+We have also compared the evaluation speed of our code with P\'al's.
 We compiled P\'al's code using \texttt{gfortran -O3}, and found that
 the computation of quadratic limb-darkened light curves and
 derivatives takes an average of 0.52 seconds to compute $10^6$ models,
 while the \texttt{transit\_poly\_struct.jl} takes an average of 0.16 seconds,
-giving our Julia code a 70\% speed advantage over the Fortran code.
+giving our \texttt{Julia} code a 70\% speed advantage over the Fortran code.
 
-\begin{figure}
+\begin{figure}[p!]
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_pal.pdf}
     \caption{Comparison of \citet{Pal2008} with \thiswork.  The
@@ -1990,6 +2010,35 @@ giving our Julia code a 70\% speed advantage over the Fortran code.
 \end{figure}
 
 \subsection{Comparison to \texttt{batman}}
+
+\begin{figure}[p!]
+    \begin{centering}
+    \includegraphics[width=0.95\linewidth]{figures/python/compare_to_batman.pdf}
+    \caption{Comparison of \citet{Kreidberg2015} (orange) with \thiswork 
+             (\texttt{Julia} implementation in blue and \starry implementation
+             in green) for a transit across a quadratically limb-darkened star.
+             Also shown are points corresponding to the computation using
+             \texttt{PyTransit} \citep{Parviainen2015b}. Dashed lines indicate
+             computations including the gradients of the flux with respect to
+             the radius, impact parameter, and all limb darkening coefficients.
+             The $y$-axis corresponds to the evaluation time of the model in 
+             seconds and the size of the points is proportional to the log of
+             the error in the computation relative to a calculation performed
+             at 128-bit precision.
+             \pycodelink{compare_to_batman}
+    \label{fig:batman_comparison}}
+    \end{centering}
+\end{figure}
+
+\begin{figure}[p!]
+    \begin{centering}
+    \includegraphics[width=0.95\linewidth]{figures/python/compare_to_batman_nonlinear.pdf}
+    \caption{Similar to Figure~\ref{fig:batman_comparison}, but this time comparing
+             the computation of a transit across a nonlinearly limb-darkened star.
+             \pycodelink{compare_to_batman_nonlinear}
+    \label{fig:batman_nonlinear_comparison}}
+    \end{centering}
+\end{figure}
 
 A Python implementation of transit light curves which has been widely applied
 is the \texttt{batman} package by \citet{Kreidberg2015}.  This package
@@ -2001,8 +2050,14 @@ of \citet{MandelAgol2002}, and uses the same approach for computing
 the complete elliptic integrals as EXOFAST.  We have made a comparison
 of our implementation of quadratic limb darkening with \texttt{batman},
 which is shown in Figure \ref{fig:batman_comparison}.  Without computing
-derivatives, our approach take about 60\% of the time of \texttt{batman};
-with derivatives, the two are comparable in speed.
+derivatives, our approach (as implemented in \texttt{Julia}; blue)
+takes about 60\% of the time of \texttt{batman} (orange);
+with derivatives, the two are comparable in speed. The implementation
+of our algorithm in \starry (green) is similar in speed to \texttt{batman}
+without derivatives, and about a factor of 2 slower than \texttt{batman}
+when derivatives are computed. Both the \texttt{Julia} and \starry
+implementations have errors close to machine precision and are therefore
+many orders of magnitude more precise than \batman.
 
 Next, we ran a comparison with the non-linear limb darkening model which
 proves to be a better fit than the quadratic model to both simulated
@@ -2014,39 +2069,53 @@ non-linear limb darkening profile with $c_1=c_2=c_3=c_4=0.2$ with a
 polynomial limb darkening model with $N=15$.  We then ran a timing
 comparison between the \texttt{batman} model and the polynomial
 model, and we find that the polynomial model is about 7 times
-as accurate and 25 times faster to evaluate compared with \texttt{batman}.
+more accurate and 25 times faster (\texttt{Julia}) 
+and 20 times faster (\starry) to evaluate compared with \texttt{batman}.
 
-\begin{figure}
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/python/compare_to_batman.pdf}
-    \caption{Comparison of \citet{Kreidberg2015} with \thiswork for
-             a transit across a quadratically limb-darkened star.
-             \pycodelink{compare_to_batman}
-    \label{fig:batman_comparison}}
-    \end{centering}
-\end{figure}
+\subsection{Comparison to \texttt{PyTransit}}
 
-\begin{figure}
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/python/compare_to_batman_nonlinear.pdf}
-    \caption{Comparison of \citet{Kreidberg2015} with \thiswork for
-             a transit across a nonlinearly limb-darkened star.
-             \pycodelink{compare_to_batman_nonlinear}
-    \label{fig:batman_nonlinear_comparison}}
-    \end{centering}
-\end{figure}
-
-\begin{figure}
+\begin{figure}[t!]
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/python/compare_to_gimenez.pdf}
-    \caption{Comparison of \citet{Gimenez2006} with \thiswork.
+    \caption{Comparison of the algorithm presented in this work (blue and
+             green points) to that of
+             \citet{Gimenez2006} for the computation of a transit across a 
+             star with polynomial limb darkening, as implemented in the
+             \texttt{PyTransit} package \citep{Parviainen2015b}
+             (purple points), as a function
+             of the order of the polynomial. As before, the $y$-axis
+             corresponds to the evaluation time and the size of the points
+             to the log of the error in the computation. For reference, the
+             red points correspond to the evaluation using a naive implementation
+             of the full spherical harmonic formalism of \citet{starry}, which
+             this paper has improved upon.
              \pycodelink{compare_to_gimenez}
     \label{fig:gimenez_comparison}}
     \end{centering}
 \end{figure}
 
-\subsection{Comparison to \texttt{PyTransit}}
-\rodrigo{Describe comparison with the Gimenez computation.}
+Another popular implementation of transit light curve computation is the
+\texttt{PyTransit} code \citep{Parviainen2015b}. We included points corresponding
+to this code in Figures~\ref{fig:batman_comparison} and \ref{fig:batman_nonlinear_comparison},
+and in general find that it is comparable to \batman in both evaluation time
+and accuracy. However, unlike \batman, \texttt{PyTransit} implements the
+algorithm of \citet{Gimenez2006} for polynomial limb darkening (Equation~\ref{eq:gimenez}).
+In Figure~\ref{fig:gimenez_comparison} we therefore compare our implementation
+to that in \texttt{PyTransit} as a function of the degree of limb darkening.
+We find our algorithm to be approximately between 5 (for low-order limb darkening)
+and 30 (for high-order limb darkening) times faster, and many orders of magnitude
+more precise. When computing derivatives, our codes are still faster by about
+an order of magnitude. For reference, in Figure~\ref{fig:gimenez_comparison},
+we also plot the evaluation time when computing the light curve using the
+spherical harmonic formalism of \cite{starry}. Because the algorithm presented
+in that paper computes surface integrals via recursions in both the 
+spherical harmonic degree $l$ and the order $m$ (as it was designed to 
+solve the occultation problem for arbitrary surface features), 
+it scales super-quadratically with the degree of limb darkening. That
+algorithm is therefore orders of magnitude slower
+to evaluate in the case of pure limb darkening ($m=0$ modes only). We have
+therefore modified the \starry package to compute light curves
+using the formalism in this paper in the case of pure limb darkening.
 
 \section{Discussion}
 
@@ -2201,8 +2270,8 @@ cosine of the angle from the sub-stellar point, $\upmu$).  The model is more pre
 and accurate than prior models that we have compared to, especially near
 special limits such as the points of contact and the coincidence of the edge
 of the occultor with the center of the source.  The model also compares favorably in
-speed of evaluation, about a factor of three faster than the code due
-to \citet{Pal2008}, XXX faster than Gimenez, a factor of 2-25 faster than \texttt{batman}
+speed of evaluation, about a factor of three faster than the code of
+to \citet{Pal2008}, 5-30 faster than that of Gimenez, a factor of 2-25 faster than \texttt{batman}
 (depending on the order of the limb darkening), and 35-45\% faster than EXOFAST.
 
 We expect that this code may be used both as a workhorse model for

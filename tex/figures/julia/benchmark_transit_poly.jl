@@ -68,9 +68,9 @@ for iu = 1:nnu
   loglog(nb,timing,color=cmap(float(iu)/(1.25 * nnu)))
   loglog(nb,timing,"o",color=cmap(float(iu)/(1.25 * nnu)),label=string("N: ",nu[iu]))
 end
-xlabel("Number of points")
-ylabel("Timing [sec]")
-legend(loc="upper left",fontsize=8,ncol=3)
+xlabel("Number of points", fontsize=16)
+ylabel("Timing [sec]", fontsize=16)
+legend(loc="upper left",fontsize=9,ncol=3)
 timing_ratio[:,1].=1.0
 savefig("benchmark_transit_poly.pdf", bbox_inches="tight")
 
@@ -82,9 +82,9 @@ alp = log(tmed[nnu])/log(nu[nnu])
 plot(nu,nu.^0.2,linestyle="--",label=L"$N^{0.2}$",color="C1")
 #plot(nu,tmed[nnu]*(nu/nu[nnu]).^2,linestyle="-.",label=L"$N^2$",color="C1")
 plot(nu,tmed[nnu]*(nu/nu[nnu]).^1,linestyle="-.",label=L"$N^1$",color="C1")
-xlabel("Number of limb-darkening coefficients")
-ylabel("Relative timing")
-legend(loc="upper left")
+xlabel("Number of limb-darkening coefficients", fontsize=16)
+ylabel("Relative timing", fontsize=16)
+legend(loc="upper left", fontsize=12)
 axis([1,144,0.8,10.])
 savefig("benchmark_limbdark_timing.pdf", bbox_inches="tight")
 
