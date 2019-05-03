@@ -299,7 +299,7 @@ dot product
     \frac{I(z)}{I_0} &= \ubasis^\mathsf{T} \bvec{u} \quad .
 \end{align}
 
-Our task now is to compute the flux, $F$, observed during a transit or occultation by
+In this paper, our task is to compute the flux, $F$, observed during a transit or occultation by
 integrating this function over the visible area of the disk:
 %
 \begin{align}
@@ -430,10 +430,26 @@ As before, the specific intensity at a point may be written
 where we define the complete change of basis matrix from limb darkening
 coefficients to Green's coefficients
 %
-\begin{align}
+\begin{proof}{A}
     \label{eq:A}
     \mathcal{A} \equiv \mathcal{A}_2 \mathcal{A}_1 \quad.
-\end{align}
+\end{proof}
+%
+%
+As an example, the full change of basis matrix for $N = 5$ is
+%
+\begin{proof}{A}
+    \mathcal{A} = \left(\begin{matrix}-1 & -1 & - \frac{3}{2} & - \frac{5}{2} & - \frac{13}{3} & - \frac{23}{3}\\0 & 1 & 2 & \frac{18}{5} & \frac{32}{5} & \frac{80}{7}\\0 & 0 & - \frac{1}{4} & - \frac{3}{4} & - \frac{5}{3} & - \frac{10}{3}\\0 & 0 & 0 & \frac{1}{5} & \frac{4}{5} & \frac{15}{7}\\0 & 0 & 0 & 0 & - \frac{1}{6} & - \frac{5}{6}\\0 & 0 & 0 & 0 & 0 & \frac{1}{7}\end{matrix}\right)
+\end{proof}
+%
+And for reference, for the common case of quadratic limb darkening, the
+Green's vector is given by the dot product of $\mathcal{A}$ and the
+vector of limb darkening coefficients and is equal to
+%
+\begin{proof}{A}
+    \mathfrak{g} &= \mathcal{A} \bvec{u} \nonumber \\
+                 &= \left(1-u_1-\tfrac{3}{2}u_2 \,\,\,\,\,\,\,\,\, u_1+2u_2 \,\,\,\,\,\,\,\,\, -\tfrac{1}{4}u_2\right)^\top \quad.
+\end{proof}
 %
 
 \subsection{Computing the surface integral}
