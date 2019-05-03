@@ -146,10 +146,14 @@ as $I(\upmu)\propto \upmu^2$; these are the three most commonly used  terms
 that can be integrated analytically, which we describe in detail below 
 in sections \ref{sec:uniform}, \ref{sec:reparam}, and \ref{sec:quadratic}.
 These are typically combined to yield the quadratic limb darkening law,
+%
 \begin{equation} \label{eq:quadraticld}
-I(\upmu) = I(1) [1-u_1 (1-\upmu) - u_2 (1-\upmu)^2],
+    \frac{I(\upmu)}{I_0} = 1-u_1 (1-\upmu) - u_2 (1-\upmu)^2,
 \end{equation}
-where $u_1$ and $u_2$ are the limb darkening parameters.
+%
+where $u_1$ and $u_2$ are the limb darkening parameters, and
+$I_0 \equiv I(1)$ is a normalization constant, equal to the 
+intensity at the center of the stellar disk.
 In this paper, we will show that higher order powers of $\upmu^n$ with integer
 $n$ can be integrated analytically for $n > 2$ when expressed as recursion relations.
 Linear combinations of these laws can be constructed,
@@ -158,9 +162,11 @@ with various parameterizations, to describe stellar limb darkening more precisel
 The first goal of modelling higher-order limb darkening was accomplished
 by \citet{Gimenez2006}, who derived transit light curves for a limb darkening
 function
+%
 \begin{equation} \label{eq:gimenez}
-I(\upmu) = I(1) \left[1-\sum_{n=1}^N a_n (1-\upmu^n) \right],
+    \frac{I(\upmu)}{I_0} = \left[1-\sum_{n=1}^N a_n (1-\upmu^n) \right],
 \end{equation}
+%
 where $a_n$ is a limb darkening coefficient.  \cite{Gimenez2006}
 found an infinite series expansion for computing the limb-darkened light curve
 for each $a_n$ term.  Here we instead present closed-form expressions for these terms
@@ -195,41 +201,268 @@ limb darkening law despite only using two parameters \citep{Morello2017,Maxted20
 We were unable to find an analytic solution for these limb darkening
 laws, but we will compare with these models below in \S \ref{sec:comparison}.
 
-Before we proceed we need to introduce some additional notation.  We express the
-flux of the star, $F$, as a linear combination of basis functions, $\mathfrak{s}_i(r,b)$, 
-where $0 \le i \le N$, where $N$ is the order of the limb darkening.  Specifically,
-the flux during a transit or occultation
-is given by the inner product of $\mathfrak{s}(r,b)$ with a vector of coefficients
-$\mathfrak{g}$ that depend only on the limb darkening coefficients:
-%
-\begin{eqnarray}
-F = I(1) \mathfrak{s}^\top \mathfrak{g},
-\end{eqnarray}
-%
-where, as before, $I(1)$ is the normalization constant, equal to the 
-intensity at the center of the stellar disk.
-%
-As an example, in the quadratic limb darkening case, the flux is defined as
-%
-$\mathfrak{s} = \left(\mathfrak{s}_0(r,b) \,\,\,\,\,\, \mathfrak{s}_1(r,b) \,\,\,\,\,\, \mathfrak{s}_2(r,b)\right)^\top$ 
-%
-is a vector in which each element depends solely on $b$ and $r$, while 
-%
-$\mathfrak{g} = \left(1-u_1-\tfrac{3}{2}u_2 \,\,\,\,\,\, u_1+2u_2 \,\,\,\,\,\, -\tfrac{1}{4}u_2\right)^\top$
-%
-is a vector that depends only on the limb darkening coefficients. As we will see
-later, reparameterizing the limb darkening coefficients in terms of the
-$\mathfrak{g}$ functions greatly simplifies the surface integrals. This is
-analogous to the reparameterization in \cite{starry} in terms of the ``Green's basis''.
+%%%%%% REDUNDANT WITH THE NEXT SECTION
+% Before we proceed we need to introduce some additional notation.  We express the
+% flux of the star, $F$, as a linear combination of basis functions, $\mathfrak{s}_i(r,b)$, 
+% where $0 \le i \le N$, where $N$ is the order of the limb darkening.  Specifically,
+% the flux during a transit or occultation
+% is given by the inner product of $\mathfrak{s}(r,b)$ with a vector of coefficients
+% $\mathfrak{g}$ that depend only on the limb darkening coefficients:
+% %
+% \begin{eqnarray}
+% F = I(1) \mathfrak{s}^\top \mathfrak{g},
+% \end{eqnarray}
+% %
+% where, as before, $I(1)$ is the normalization constant, equal to the 
+% intensity at the center of the stellar disk.
+% %
+% As an example, in the quadratic limb darkening case, the flux is defined as
+% %
+% $\mathfrak{s} = \left(\mathfrak{s}_0(r,b) \,\,\,\,\,\, \mathfrak{s}_1(r,b) \,\,\,\,\,\, \mathfrak{s}_2(r,b)\right)^\top$ 
+% %
+% is a vector in which each element depends solely on $b$ and $r$, while 
+% %
+% $\mathfrak{g} = \left(1-u_1-\tfrac{3}{2}u_2 \,\,\,\,\,\, u_1+2u_2 \,\,\,\,\,\, -\tfrac{1}{4}u_2\right)^\top$
+% %
+% is a vector that depends only on the limb darkening coefficients. As we will see
+% later, reparameterizing the limb darkening coefficients in terms of the
+% $\mathfrak{g}$ functions greatly simplifies the surface integrals. This is
+% analogous to the reparameterization in \cite{starry} in terms of the ``Green's basis''.
 
-We turn now towards presenting formulae for more accurate limb darkening transit,
-occultation, and eclipse models, starting with the simplest case:  a source
-of uniform surface brightness.
+% We turn now towards presenting formulae for more accurate limb darkening transit,
+% occultation, and eclipse models, starting with the simplest case:  a source
+% of uniform surface brightness.
+
+This paper is organized as follows. In \S\ref{sec:poly_limbdark}
+we introduce the general form for polynomial limb darkening 
+and define the notation used throughout the paper. In \S\ref{sec:uniform}--\ref{sec:quadratic}
+we derive updated equations for the well-known cases of uniform, linear, and
+quadratic limb darkening, and in \S\ref{sec:higher_order} we generalize the
+expressions to limb darkening of arbitrary order. \todo{Describe paper layout.}
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
 % ------------------------------------------------------------------------------
 %
+
+\section{Polynomial Limb Darkening}
+\label{sec:poly_limbdark}
+
+In analogy with the quadratic
+limb darkening law (Equation~\ref{eq:quadraticld}), let us define the 
+generalized polynomial limb darkening law of order $N$ as
+%
+%
+\begin{align}
+    \label{eq:polynomialld}
+    \frac{I(\upmu)}{I_0} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - 
+                                ... - u_{N}(1 - \upmu)^{N} \nonumber \\
+                          &= -\sum_{i=0}^N u_i (1 - \upmu)^i
+\end{align}
+%
+%\rodrigo{I think $u_0=1$, not $-1$, right?}
+%\eric{There was a minus sign missing in front of the second line of the equation.}
+where we define $u_0 \equiv -1$. In a right-handed Cartesian coordinate system centered 
+on the body, with the $z$-axis pointing to the observer, 
+\begin{equation}\label{eq:xyz}
+\upmu(x, y) = z(x, y) = \sqrt{1 - x^2 - y^2}.
+\end{equation}
+%
+%Although the foregoing analysis takes advantage of the existing formalism
+%in \starry developed for occultation of spheres with arbitrary spherical harmonic
+%brightness, the problem can be simplified significantly for the limb darkening
+%case due to the azimuthal symmetry assumed for a star.  This simplification
+%leads to analytic expressions for the derivatives, which we find can be
+%evaluated with greater speed and accuracy compared with automatic differentiation.
+%
+If we let $\bvec{u}$ be the column vector of limb darkening coefficients
+$\bvec{u} \equiv (u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$ 
+and $\ubasis$ be the \emph{limb darkening basis}
+%
+\begin{align}
+    \label{eq:ldbasis}
+    \ubasis = -\begin{pmatrix}
+        1 & &
+        (1 - z) & &
+        (1 - z)^2 & &
+        ... & &
+        (1 - z)^N
+    \end{pmatrix}^\mathsf{T} \quad,
+\end{align}
+%
+we may 
+express Equation~(\ref{eq:polynomialld}) more compactly as the
+dot product
+%
+\begin{align}
+    \label{eq:polynomialld_vec}
+    \frac{I(z)}{I_0} &= \ubasis^\mathsf{T} \bvec{u} \quad .
+\end{align}
+
+Our task now is to compute the flux, $F$, observed during a transit or occultation by
+integrating this function over the visible area of the disk:
+%
+\begin{align}
+    \label{eq:occint}
+    F &=
+    \oiint I(z) \, \dd S \quad .
+\end{align}
+%
+In general, the surface integral in Equation~(\ref{eq:occint}) is difficult---if not
+impossible---to solve directly with $I(z)$ given by Equation~(\ref{eq:polynomialld_vec}). 
+However, as in \citet{starry}, we note that the problem
+is made significantly more tractable if we first perform a couple change of basis
+operations.
+
+\subsection{Change of basis}
+\label{sec:higher_order}
+We wish to find a basis in which to express the limb darkening profile that
+makes evaluating Equation~(\ref{eq:occint}) easy. This section follows
+closely the discussion in \citet{starry}, in which the authors first transform
+to a \emph{polynomial basis}, whose terms are simple powers of the coordinates,
+and then to a \emph{Green's basis}, whose terms make application of Green's
+theorem convenient in reducing the surface integral to a one-dimensional line
+integral.
+
+Let us define the transformation to the polynomial basis by the linear equation
+%
+\begin{align}
+    \label{eq:pbasis}
+    \mathfrak{p} = \mathcal{A}_1 \bvec{u}
+\end{align}
+%
+where $\mathfrak{p}$ is the vector of limb darkening coefficients in the
+polynomial basis $\pbasis$ and $\mathcal{A}_1$ is a change of basis matrix.
+We define the polynomial basis to be the power series in $z$,
+%
+\begin{align}
+    \label{eq:polybasis}
+    \pbasis = \begin{pmatrix}
+        1 & z & z^2 & z^3 & ... & z^N
+    \end{pmatrix}^\mathsf{T} \quad.
+\end{align}
+%
+
+%Note that $\mathfrak{p}_0 \equiv 1-\sum_{n=1}^N \mathfrak{p}_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
+
+The transformation between vectors in $\ubasis$ and vectors in
+$\pbasis$ is straightforward. By the binomial theorem, we may write
+the $i^\mathrm{th}$ coefficient of $\mathfrak{p}$ as
+%
+\begin{equation}
+    \label{eq:an_of_un}
+    \mathfrak{p}_i = (-1)^{i+1}\sum_{j=0}^N \binom{j}{i} u_j.
+\end{equation}
+%
+The elements of the matrix $\mathcal{A}_1$ are thus given by
+%
+\begin{align}
+    \label{eq:A1}
+    \mathcal{A}_{1_{i, j}} = (-1)^{i+1}\binom{j}{i} \quad .
+\end{align}
+%
+Note that, as with the limb darkening basis, 
+the specific intensity at a point may be written
+%
+\begin{align}
+    \label{eq:pbasis_intensity}
+    \frac{I(z)}{I_0} &= \pbasis^\mathsf{T} \mathfrak{p} \nonumber \\
+                     &= \pbasis^\mathsf{T} \mathcal{A}_1 \mathbf{u}  \quad .
+\end{align}
+%
+Next, we transform to the Green's basis via the equation
+%
+\begin{align}
+    \label{eq:gbasis}
+    \mathfrak{g} = \mathcal{A}_2 \mathfrak{p}
+\end{align}
+%
+where $\mathfrak{g}$ is the vector of limb darkening coefficients in the
+Green's basis $\gbasis$ and $\mathcal{A}_2$ is another change of basis matrix.
+For reasons that will become clear later in this paper,
+we define the Green's basis to be
+%
+\begin{align}
+    \gbasis_n &=
+    \begin{dcases}
+        1 & \qquad n = 0
+        \\
+        z & \qquad n = 1
+        \\
+        (n+2)z^n-n z^{n-2} & \qquad n \ge 2
+    \end{dcases}
+    \nonumber\\[0.5em]
+    \gbasis &=
+    \begin{pmatrix}
+        1 & &
+        z & &
+        4z^2 - 2 &&
+        5z^3 - 3z &&
+        ...
+    \end{pmatrix}^\mathsf{T}
+    \quad,
+    \label{eq:greensbasis}
+\end{align}
+%
+Given this definition, the columns of the change of basis matrix
+$\mathcal{A}_2$ are the Green's basis vectors corresponding to each
+of the polynomial terms in Equation~(\ref{eq:polybasis}). Note that 
+in practice, it is more efficient to transform vectors in the $\pbasis$ 
+basis to vectors in the $\gbasis$ basis via the
+downward recursion relation
+%
+\begin{equation} 
+    \label{eq:dn_of_an}
+    \mathfrak{g}_n = \frac{\mathfrak{p}_n}{n+2} + \mathfrak{g}_{n+2},
+\end{equation}
+%
+starting with $n=N$ and $\mathfrak{g}_{N+1}=\mathfrak{g}_{N+2}=0$.
+
+As before, the specific intensity at a point may be written
+%
+\begin{align}
+    \label{eq:pbasis_intensity}
+    \frac{I(z)}{I_0} &= \gbasis^\mathsf{T} \mathfrak{g} \nonumber \\[0.5em]
+                     &= \gbasis^\mathsf{T} \mathcal{A}_2 \mathfrak{p} \nonumber \\[0.5em]
+                     &= \gbasis^\mathsf{T} \mathcal{A} \ \mathbf{u} \quad ,
+\end{align}
+%
+where we define the complete change of basis matrix from limb darkening
+coefficients to Green's coefficients
+%
+\begin{align}
+    \label{eq:A}
+    \mathcal{A} \equiv \mathcal{A}_2 \mathcal{A}_1 \quad.
+\end{align}
+%
+
+\subsection{Computing the surface integral}
+\label{sec:theintegral}
+
+Given our reparametrization in terms of Green's polynomials, we may
+re-write Equation~(\ref{eq:occint}) as
+%
+\begin{align}
+    \label{eq:occint_greens}
+    F &= \oiint I(z) \, \dd S \nonumber \\[0.5em]
+      &= I_0 \oiint \gbasis^\mathsf{T} \mathcal{A} \ \bvec{u} \, \dd S \,  \nonumber \\[0.5em]
+      &= I_0 \left( \oiint \gbasis (z) \, \dd S \right)^\mathsf{T} \mathcal{A} \ \bvec{u} \nonumber \\[0.5em]
+      &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \bvec{u} \quad ,
+\end{align}
+%
+where 
+%
+\begin{align}
+    \label{eq:solution_vector}
+    \mathfrak{s} \equiv \oiint \gbasis (z) \, \dd S
+\end{align}
+%
+is the \emph{solution vector} first introduced in \S \ref{sec:uniform}.
+If we can find the general solution to the integral in Equation (\ref{eq:solution_vector}),
+we can compute the occultation flux for arbitrary order limb darkening.
+
+
+
 
 \section{Uniform brightness}
 
@@ -888,220 +1121,7 @@ derive far more efficient and accurate formulae, which we describe in the follow
 % ------------------------------------------------------------------------------
 % ==============================================================================
 
-In analogy with the linear and quadratic
-limb darkening laws, let us define the polynomial limb darkening law of
-order $N$ as
-%
-%
-\begin{align}
-    \label{eq:polynomialld}
-    \frac{I(\upmu)}{I_0} &= 1 - u_1 (1 - \upmu) - u_2 (1 - \upmu)^2 - 
-                                ... - u_{N}(1 - \upmu)^{N} \nonumber \\
-                          &= -\sum_{i=0}^N u_i (1 - \upmu)^i
-\end{align}
-%
-%\rodrigo{I think $u_0=1$, not $-1$, right?}
-%\eric{There was a minus sign missing in front of the second line of the equation.}
-where $I_0 \equiv I(1)$, $u_0 \equiv -1$, and $\upmu$
-is the cosine of the angle between the line of sight and the vector normal to 
-the body's surface. In a right-handed Cartesian coordinate system centered 
-on the body, with the $z$-axis pointing to the observer, 
-\begin{equation}\label{eq:xyz}
-\upmu(x, y) = z(x, y) = \sqrt{1 - x^2 - y^2}.
-\end{equation}
-%
-%Although the foregoing analysis takes advantage of the existing formalism
-%in \starry developed for occultation of spheres with arbitrary spherical harmonic
-%brightness, the problem can be simplified significantly for the limb darkening
-%case due to the azimuthal symmetry assumed for a star.  This simplification
-%leads to analytic expressions for the derivatives, which we find can be
-%evaluated with greater speed and accuracy compared with automatic differentiation.
-%
-If we let $\bvec{u}$ be the column vector of limb darkening coefficients
-$\bvec{u} \equiv (u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$ 
-and $\ubasis$ be the \emph{limb darkening basis}
-%
-\begin{align}
-    \label{eq:ldbasis}
-    \ubasis = -\begin{pmatrix}
-        1 & &
-        (1 - z) & &
-        (1 - z)^2 & &
-        ... & &
-        (1 - z)^N
-    \end{pmatrix}^\mathsf{T} \quad,
-\end{align}
-%
-we may 
-express Equation~(\ref{eq:polynomialld}) more compactly as the
-dot product
-%
-\begin{align}
-    \label{eq:polynomialld_vec}
-    \frac{I(z)}{I_0} &= \ubasis^\mathsf{T} \bvec{u} \quad .
-\end{align}
-
-Our task now is to compute the flux, $F$, observed during an occultation by
-integrating this function over the visible area of the disk:
-%
-\begin{align}
-    \label{eq:occint}
-    F &=
-    \oiint I(z) \, \dd S \quad .
-\end{align}
-%
-In general, the surface integral in Equation~(\ref{eq:occint}) is difficult---if not
-impossible---to solve directly with $I(z)$ given by Equation~(\ref{eq:polynomialld_vec}). 
-However, as in \citet{starry}, we note that the problem
-is made significantly more tractable if we first perform a couple change of basis
-operations.
-
-\subsection{Change of basis}
-\label{sec:higher_order}
-We wish to find a basis in which to express the limb darkening profile that
-makes evaluating Equation~(\ref{eq:occint}) easy. This section follows
-closely the discussion in \citet{starry}, in which the authors first transform
-to a \emph{polynomial basis}, whose terms are simple powers of the coordinates,
-and then to a \emph{Green's basis}, whose terms make application of Green's
-theorem convenient in reducing the surface integral to a one-dimensional line
-integral.
-
-Let us define the transformation to the polynomial basis by the linear equation
-%
-\begin{align}
-    \label{eq:pbasis}
-    \mathfrak{p} = \mathcal{A}_1 \bvec{u}
-\end{align}
-%
-where $\mathfrak{p}$ is the vector of limb darkening coefficients in the
-polynomial basis $\pbasis$ and $\mathcal{A}_1$ is a change of basis matrix.
-We define the polynomial basis to be the power series in $z$,
-%
-\begin{align}
-    \label{eq:polybasis}
-    \pbasis = \begin{pmatrix}
-        1 & z & z^2 & z^3 & ... & z^N
-    \end{pmatrix}^\mathsf{T} \quad.
-\end{align}
-%
-
-%Note that $\mathfrak{p}_0 \equiv 1-\sum_{n=1}^N \mathfrak{p}_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
-
-The transformation between vectors in $\ubasis$ and vectors in
-$\pbasis$ is straightforward. By the binomial theorem, we may write
-the $i^\mathrm{th}$ coefficient of $\mathfrak{p}$ as
-%
-\begin{equation}
-    \label{eq:an_of_un}
-    \mathfrak{p}_i = (-1)^{i+1}\sum_{j=0}^N \binom{j}{i} u_j.
-\end{equation}
-%
-The elements of the matrix $\bvec{A}_1$ are thus given by
-%
-\begin{align}
-    \label{eq:A1}
-    \mathcal{A}_{1_{i, j}} = (-1)^{i+1}\binom{j}{i} \quad .
-\end{align}
-%
-Note that, as with the limb darkening basis, 
-the specific intensity at a point may be written
-%
-\begin{align}
-    \label{eq:pbasis_intensity}
-    \frac{I(z)}{I_0} &= \pbasis^\mathsf{T} \mathfrak{p} \nonumber \\
-                     &= \pbasis^\mathsf{T} \mathcal{A}_1 \mathbf{u}  \quad .
-\end{align}
-%
-Next, we transform to the Green's basis via the equation
-%
-\begin{align}
-    \label{eq:gbasis}
-    \mathfrak{g} = \mathcal{A}_2 \mathfrak{p}
-\end{align}
-%
-where $\mathfrak{g}$ is the vector of limb darkening coefficients in the
-Green's basis $\gbasis$ and $\mathcal{A}_2$ is another change of basis matrix.
-For reasons that will become clear in the following section,
-we define the Green's basis to be
-%
-\begin{align}
-    \gbasis_n &=
-    \begin{dcases}
-        1 & \qquad n = 0
-        \\
-        z & \qquad n = 1
-        \\
-        (n+2)z^n-n z^{n-2} & \qquad n \ge 2
-    \end{dcases}
-    \nonumber\\[0.5em]
-    \gbasis &=
-    \begin{pmatrix}
-        1 & &
-        z & &
-        4z^2 - 2 &&
-        5z^3 - 3z &&
-        ...
-    \end{pmatrix}^\mathsf{T}
-    \quad,
-    \label{eq:greensbasis}
-\end{align}
-%
-Given this definition, the columns of the change of basis matrix
-$\mathcal{A}_2$ are the Green's basis vectors corresponding to each
-of the polynomial terms in Equation~(\ref{eq:polybasis}). Note that 
-in practice, it is more efficient to transform vectors in the $\pbasis$ 
-basis to vectors in the $\gbasis$ basis via the
-downward recursion relation
-%
-\begin{equation} 
-    \label{eq:dn_of_an}
-    \mathfrak{g}_n = \frac{\mathfrak{p}_n}{n+2} + \mathfrak{g}_{n+2},
-\end{equation}
-%
-starting with $n=N$ and $\mathfrak{g}_{N+1}=\mathfrak{g}_{N+2}=0$.
-
-As before, the specific intensity at a point may be written
-%
-\begin{align}
-    \label{eq:pbasis_intensity}
-    \frac{I(z)}{I_0} &= \gbasis^\mathsf{T} \mathfrak{g} \nonumber \\[0.5em]
-                     &= \gbasis^\mathsf{T} \mathcal{A}_2 \mathfrak{p} \nonumber \\[0.5em]
-                     &= \gbasis^\mathsf{T} \mathcal{A} \ \mathbf{u} \quad ,
-\end{align}
-%
-where we define the complete change of basis matrix from limb darkening
-coefficients to Green's coefficients
-%
-\begin{align}
-    \label{eq:A}
-    \mathcal{A} \equiv \mathcal{A}_2 \mathcal{A}_1 \quad.
-\end{align}
-%
-
-\subsection{Computing the surface integral}
-\label{sec:theintegral}
-
-Given our reparametrization in terms of Green's polynomials, we may
-re-write Equation~(\ref{eq:occint}) as
-%
-\begin{align}
-    \label{eq:occint_greens}
-    F &= \oiint I(z) \, \dd S \nonumber \\[0.5em]
-      &= I_0 \oiint \gbasis^\mathsf{T} \mathcal{A} \ \bvec{u} \, \dd S \,  \nonumber \\[0.5em]
-      &= I_0 \left( \oiint \gbasis (z) \, \dd S \right)^\mathsf{T} \mathcal{A} \ \bvec{u} \nonumber \\[0.5em]
-      &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \bvec{u} \quad ,
-\end{align}
-%
-where 
-%
-\begin{align}
-    \label{eq:solution_vector}
-    \mathfrak{s} \equiv \oiint \gbasis (z) \, \dd S
-\end{align}
-%
-is the \emph{solution vector} first introduced in \S \ref{sec:uniform}.
-If we can find the general solution to the integral in Equation (\ref{eq:solution_vector}),
-we can compute the occultation flux for arbitrary order limb darkening.
+%%%%%% REMOVED SECTION 5 INTRO 
 
 As in \citet{starry}, we use Green's theorem to re-express the surface
 integral as a line integral over the boundary of the visible portion of
