@@ -494,7 +494,7 @@ the past, so we dedicate the next three sections
 (\S\ref{sec:uniform}--\ref{sec:quadratic})
 to revisiting existing
 formulae and algorithms for computing them, with both speed and numerical accuracy
-in mind. The following section (\S\ref{sec:higher_order}) tackles the case of higher order
+in mind. The subsequent section (\S\ref{sec:higher_order}) tackles the case of higher order
 limb darkening.
 
 \section{Uniform brightness}
@@ -1434,12 +1434,14 @@ of $\mathcal{M}_n$:
 \frac{\partial \mathcal{P}}{\partial r} &=& 2r \left[(n+2)\mathcal{M}_n - n \mathcal{M}_{n-2}\right],\\
 \frac{\partial \mathcal{P}}{\partial b} &=& \frac{n}{b} \left[(r^2+b^2)(\mathcal{M}_n - \mathcal{M}_{n-2})+(r^2-b^2)^2\mathcal{M}_{n-2}\right].
 \end{eqnarray}
+Since the $\mathcal{M}_n$ integrals are computed for the total flux case,
+there is little overhead for computing the derivatives.
 
-We find that the derivative with respect to impact parameter becomes numerically
-unstable for small values of $b$ due to cancellation between the two
+For small values of $b$ we find that the derivative with respect to impact parameter 
+becomes numerically unstable due to the cancellation between the two
 terms, followed by division by $b$.  To avoid this problem
-for small $b$, we have derived an alternative expression which we utilize when
-$b < b_c$, where $b_c$ is a (small) cutoff value, which avoids division by $b$:
+for small $b$, we have derived an alternative expression which avoids division by $b$
+which we utilize when $b < b_c$, where $b_c$ is a (small) cutoff value:
 \begin{eqnarray}
 \frac{\partial \mathcal{P}}{\partial b} = n \left[b\mathcal{M}_n +(2r^3+b^3-3r^2b-b-3) \mathcal{M}_{n-2}-4r^3\mathcal{N}_{n-2}\right],
 \end{eqnarray}
@@ -1644,6 +1646,13 @@ Note that in general $\mathfrak{s}^\top$ is time-dependent, as it depends
 upon the relative positions of the bodies as a function of time, while
 $\mathcal{A}\mathbf{u}$ is time-independent, and thus the matrix
 multiplication only needs to be computed once per light curve.
+
+Usually when fitting a light curve the unocculted flux is not equal
+to unity, but is some unknown value.  So, the correct procedure is to 
+multiply $F(t)$ by a constant which represents the unocculted flux.  
+In this case the derivative with respect to the flux constant is trivially 
+equal to $F(t)$, and the derivatives with respect to the other parameters 
+must be multiplied by the same constant.
 
 With the description of the light curve computation complete, we next discuss
 the integration of the light curve over a finite time step.
