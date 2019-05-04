@@ -283,8 +283,8 @@ println("sextic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
 #fmod = optimize_fit!(r,b,flux,fmod,u_n)
 #plot(b,flux-fmod,linestyle="--",label="nonic")
 #println("nonic: ",maximum(abs,flux-fmod)," sig: ",std(flux-fmod))
-ax[:legend](loc = "upper left",fontsize=8)
-ax[:set_ylabel]("Deviation of fit [ppm]")
+ax[:legend](loc = "upper left",fontsize=10)
+ax[:set_ylabel]("Deviation of fit [ppm]", fontsize=16)
 ax[:set_xlabel](L"$b$", fontsize=18)
 ax[:axis]([0,1.2,-10,10])
 ax = axes[1]
@@ -292,9 +292,9 @@ ax = axes[1]
 ax[:plot](b,flux,linewidth=2,label="non-linear")
 ax[:plot](b,fmod,linestyle="--",label="sextic",linewidth=2)
 ax[:set_title](L"$c_1 = c_2=c_3=c_4=0.2$")
-ax[:legend](loc="upper left", fontsize=8)
+ax[:legend](loc="upper left", fontsize=10)
 ax[:axis]([0,1.2,0.984,1.001])
-ax[:set_ylabel]("Relative flux")
+ax[:set_ylabel]("Relative flux", fontsize=16)
 
 show()
 

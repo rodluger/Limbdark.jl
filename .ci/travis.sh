@@ -1,6 +1,10 @@
 # Make errors fatal
 set -e
 
+# Get Travis CPU speed
+echo "Travis CPU clock speed:"
+lscpu | grep "MHz"
+
 # Miniconda
 export PATH="$HOME/miniconda-cache/bin:$PATH"
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;

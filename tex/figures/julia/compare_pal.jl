@@ -34,14 +34,14 @@ end
 fig,axes = subplots(3,1, figsize=(8,12))
 
 ax = axes[1]
-ax[:plot](b,flux,label="This work",linestyle="-",lw=2,color="C0")
+ax[:plot](b,flux,label="ALFM (2019)",linestyle="-",lw=2,color="C0")
 ax[:plot](b,1 .- data_pal[:,1],label="Pal (2008)",linestyle="--",lw=1,color="C1")
 ax[:set_ylabel]("Flux", fontsize=14)
 ax[:legend](loc="upper left", fontsize=8)
 ax[:set_title](L"$r = 0.1$", fontsize=14)
 
 ax = axes[2]
-ax[:plot](b,flux_grad[:,1],linestyle="-",lw=2,label="This work", color="C0")
+ax[:plot](b,flux_grad[:,1],linestyle="-",lw=2,label="ALFM (2019)", color="C0")
 ax[:plot](b,flux_grad[:,2],linestyle="-",lw=2, color="C0")
 ax[:plot](b,50.0*flux_grad[:,3],linestyle="-",lw=2, color="C0")
 ax[:plot](b,50.0*flux_grad[:,4],linestyle="-",lw=2, color="C0")
