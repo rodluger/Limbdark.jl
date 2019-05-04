@@ -1949,24 +1949,20 @@ in some codes.
     \end{centering}
 \end{figure}
 
-For uniform, linear or quadratic limb darkening, the widely used computation
-by \citet{MandelAgol2002} has been improved in speed by utilizing the
-\citet{Bulirsch1965a,Bulirsch1965b} expressions for the complete elliptic
-integral of the third kind which is needed for the linear case, as implemented
-in the \texttt{EXOFAST} routines \citep{Eastman2013}.  It also uses a series
+For uniform, linear or quadratic limb darkening, the IDL package EXOFAST 
+improved upon the speed of the widely used computation by \citet{MandelAgol2002} 
+by utilizing the \citet{Bulirsch1965a,Bulirsch1965b} expressions for the complete 
+elliptic integral of the third kind which is needed for the linear case
+\citep{Eastman2013}.  EXOFAST also uses a series
 approximation for the complete elliptic integrals of the first and second
 kind \citep{Hastings1955}. These three elliptic integrals, especially the third
 kind, are the bottleneck in the computation, and the Bulirsch version is faster
 than widely used Carlson implementation of elliptic integrals \citep{Carlson1979}.
-\todo{Eric: I'm confused by the sentences above. It's partly the passive tense
-in the first sentence that's throwing me off: you are referring to our current
-paper, correct? But in the second sentence, you say ``it also uses a series
-approximation...'' but I think you are now referring to Exofast? -RL}
 
-We have carried out a numerical comparison of the \citet{MandelAgol2002}
-for the linear case ($u_1=1$), and find that the most severe errors
-occur for $b = r \pm \epsilon$.  Figure \ref{fig:compareMA} shows
-the computed models and the errors as a function of $r$ for $b=1-r-\epsilon$
+We have carried out a numerical comparison of the EXOFAST implementation
+of the \citet{MandelAgol2002} formulae for the linear case ($u_1=1$), and find 
+that the most severe errors occur for $b = r \pm \epsilon$.  Figure \ref{fig:compareMA} 
+shows the computed models and the errors as a function of $r$ for $b=1-r-\epsilon$
 and $b=r-\epsilon$, with $\epsilon = 10^{-12}$ (the results look very
 similar with $+\epsilon$, so we have only plotted one case for clarity).
 In the $b\approx 1-r$ case (near second and third contacts), the errors
@@ -1982,10 +1978,11 @@ the \texttt{Julia} implementation of these routines takes about 55\% of the CPU
 time as the IDL EXOFAST implementation without derivatives, and about 65\%
 of the computation time when including the derivatives.  Consequently, we
 conclude that our new implementation is both faster (by 35-45\%) and more
-accurate than the Mandel \& Agol IDL implementation.  We note that EXOFAST
-v2.0 now utilizes the numerically-stable quadratic limb darkening expressions
-presented above, albeit without the computed derivatives (Eastman et al.,
-in preparation).
+accurate than the Mandel \& Agol IDL implementation.  
+
+We note that EXOFAST v2.0 has now been updated to utilize the numerically-stable 
+quadratic limb darkening expressions given above, albeit without the computed 
+derivatives (Eastman et al., in preparation).
 
 \subsection{Derivative comparison with P\'al}
 
