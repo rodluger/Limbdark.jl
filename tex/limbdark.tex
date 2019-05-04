@@ -2066,9 +2066,9 @@ a numerical integration over the surface brightness as a function of
 radius over the stellar disk, which requires additional computational
 time and limits the precision.  We have carried out a fit to the
 non-linear limb darkening profile with $c_1=c_2=c_3=c_4=0.2$ with a
-polynomial limb darkening model with $N=15$.  We then ran a timing
-comparison between the \texttt{batman} model and the polynomial
-model, and we find that the polynomial model is about 7 times
+polynomial limb darkening model with $N=15$ (\S \ref{sec:nonlinear}).  
+We then ran a timing comparison between the \texttt{batman} model and the 
+polynomial model, and we find that the polynomial model is about 7 times
 more accurate and 25 times faster (\texttt{Julia})
 and 20 times faster (\starry) to evaluate compared with \texttt{batman}.
 
@@ -2229,7 +2229,7 @@ a high order will rarely be required.
 \section{Applications}
 
 We envision that this code will be used for fits to higher precision
-transit data, such as gathered by the James Webb Space Telescope (JWST),
+transit data, such as gathered by the James Webb Space Telescope \citep[JWST][]{Beichman2014},
 which require an improved model of stellar limb darkening.  Here we discuss
 some potential avenues for application of this model.
 
