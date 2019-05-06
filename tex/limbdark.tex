@@ -40,7 +40,8 @@ Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomia
  derivatives of exposure-time averaged transit light curves with respect to all
  model parameters.  An additional application is modeling eclipsing binary or
  eclipsing multiple star systems in cases where the stars may be treated as spherically
- symmetric.  We provide code which implements these formulae in C++, Python, IDL, and Julia,
+ symmetric.  We provide code which implements these formulae in \texttt{C++}, 
+ \texttt{Python}, \texttt{IDL}, and \texttt{Julia},
  with tests and examples of usage.
  \href{https://github.com/rodluger/limbdark}{\color{linkcolor}\faGithub}
 \end{abstract}
@@ -248,7 +249,10 @@ of the algorithm in \S\ref{sec:implementation}. In \S\ref{sec:benchmark} and
 \S\ref{sec:comparison} we discuss timing benchmarks and comparisons to
 existing codes. Finally, in \S\ref{sec:discussion}--\S\ref{sec:conclusions}
 we discuss our assumptions, caveats of our modeling, applications of our
-algorithm, and a summary of our results.
+algorithm, and a summary of our results. Appendices A--C contain a list
+of errata for \citet{MandelAgol2002}, derivatives of the general
+complete elliptic integral, and a comprehensive list of symbols used in
+the paper.
 
 Finally, as in \cite{starry} and \cite{AprilFools}, we embed links
 to \Python code (\,\codeicon\,) to reproduce all of the
@@ -1923,7 +1927,7 @@ coefficients ranging from $1$ to $144$.  For each set of timing benchmark
 parameters, we carried out nine measurements  of the timing, and
 we use the median of these for plotting purposes.  The benchmarking
 for the \texttt{Julia} code was carried out with \texttt{v0.7} of
-Julia on the \texttt{trusty} Ubuntu environment of Travis-CI%
+\texttt{Julia} on the \texttt{trusty} Ubuntu environment of Travis-CI%
 \footnote{\url{https://travis-ci.org}}
 on a 2.3 GHz
 % SEE https://travis-ci.org/rodluger/limbdark/jobs/527913189#L545
@@ -1965,17 +1969,17 @@ in some codes.
     \end{centering}
 \end{figure}
 
-For uniform, linear or quadratic limb darkening, the IDL package EXOFAST 
+For uniform, linear or quadratic limb darkening, the \texttt{IDL} package \texttt{EXOFAST} 
 improved upon the speed of the widely used computation by \citet{MandelAgol2002} 
 by utilizing the \citet{Bulirsch1965a,Bulirsch1965b} expressions for the complete 
 elliptic integral of the third kind which is needed for the linear case
-\citep{Eastman2013}.  EXOFAST also uses a series
+\citep{Eastman2013}.  \texttt{EXOFAST} also uses a series
 approximation for the complete elliptic integrals of the first and second
 kind \citep{Hastings1955}. These three elliptic integrals, especially the third
 kind, are the bottleneck in the computation, and the Bulirsch version is faster
 than widely used Carlson implementation of elliptic integrals \citep{Carlson1979}.
 
-We have carried out a numerical comparison of the EXOFAST implementation
+We have carried out a numerical comparison of the \texttt{EXOFAST} implementation
 of the \citet{MandelAgol2002} formulae for the linear case ($u_1=1$), and find 
 that the most severe errors occur for $b = r \pm \epsilon$.  Figure \ref{fig:compareMA} 
 shows the computed models and the errors as a function of $r$ for $b=1-r-\epsilon$
@@ -1991,12 +1995,12 @@ parameter space.
 
 A speed comparison for a transit computed with $10^7$ data points shows that
 the \texttt{Julia} implementation of these routines takes about 55\% of the CPU
-time as the IDL EXOFAST implementation without derivatives, and about 65\%
+time as the \texttt{IDL} \texttt{EXOFAST} implementation without derivatives, and about 65\%
 of the computation time when including the derivatives.  Consequently, we
 conclude that our new implementation is both faster (by 35-45\%) and more
-accurate than the \cite{MandelAgol2002} IDL implementation.  
+accurate than the \cite{MandelAgol2002} \texttt{IDL} implementation.  
 
-We note that EXOFAST v2.0 has now been updated to utilize the numerically-stable 
+We note that \texttt{EXOFAST} v2.0 has now been updated to utilize the numerically-stable 
 quadratic limb darkening expressions given above, albeit without the computed 
 derivatives (Eastman et al., in preparation).
 
@@ -2069,7 +2073,7 @@ ease of use.
 
 The \texttt{batman} package computes the quadratic limb darkening model
 of \citet{MandelAgol2002}, and uses the same approach for computing
-the complete elliptic integrals as EXOFAST.  We have made a comparison
+the complete elliptic integrals as \texttt{EXOFAST}.  We have made a comparison
 of our implementation of quadratic limb darkening with \texttt{batman},
 which is shown in Figure \ref{fig:batman_comparison}.  Without computing
 derivatives, our approach (as implemented in \texttt{Julia}; blue)
@@ -2297,7 +2301,7 @@ special limits such as the points of contact and the coincidence of the edge
 of the occultor with the center of the source.  The model also compares favorably in
 speed of evaluation, about a factor of three faster than the code of
 to \citet{Pal2008}, 5-30 faster than that of Gimenez, a factor of 2-25 faster than \texttt{batman}
-(depending on the order of the limb darkening), and 35-45\% faster than EXOFAST.
+(depending on the order of the limb darkening), and 35-45\% faster than \texttt{EXOFAST}.
 
 We expect that this code may be used both as a workhorse model for
 general fitting of transit models, as well as a tool for more
@@ -2319,7 +2323,7 @@ of the \starry package, \texttt{http://github.com/rodluger/starry/}, written
 in a combination of C++ and Python, and a new code written in \texttt{Julia},
 \texttt{http://github.com/rodluger/limbdark/}, as
 part of the development of the equations in this paper.  We have also implemented
-the flux model in IDL, without derivatives; this is also available within
+the flux model in \texttt{IDL}, without derivatives; this is also available within
 the GitHub repository. We welcome usage of these
 codes, and contributions to further develop and enhance their capabilities.
 
