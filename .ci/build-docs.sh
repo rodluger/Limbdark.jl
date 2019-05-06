@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+#set -e
 
 # Only make the docs with current Julia version
 if [ $TRAVIS_JULIA_VERSION != "0.7.0" ]
@@ -18,11 +18,6 @@ then
 
     # Go to the html build
     cd $TRAVIS_BUILD_DIR/docs/build/
-
-    # Clone the `gh-pages` branch
-    mkdir gh-pages
-    cd gh-pages
-    git clone -b gh-pages --single-branch https://github.com/rodluger/Limbdark.jl.git .
 
     # Commit & force push back
     git init
