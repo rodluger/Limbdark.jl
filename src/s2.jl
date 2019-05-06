@@ -20,9 +20,9 @@ end
 """
     s2_ell(r,b)
  
-Compute the integral of the linear limb-darkening case, s_2 from
-starry (which is S_1 in Agol & Luger) and also return two elliptic 
-integrals, E(k) and (E(m)-(1-m)K(m))/m, where m = k^2.
+Compute the integral of the linear limb-darkening case, `s_2` from
+starry (which is `S_1` in Agol & Luger) and also return two elliptic 
+integrals, `E(k)` and `(E(m)-(1-m)K(m))/m`, where `m = k^2`.
 
 # Examples
 ```julia-repl
@@ -109,9 +109,9 @@ end
     s2!(r,b,s2_grad)
  
 Computes the linear limb-darkening case, as well as the gradient,
-s2_grad=[ds_2/dr,ds_2/db] is a pre-allocated two-element array.
-Returns s2 and complete elliptic integrals, E(k) and 
-(E(m)-(1-m)K(m))/m, where m = k^2.
+`s2_grad=[ds_2/dr,ds_2/db]` is a pre-allocated two-element array.
+Returns `s2` and complete elliptic integrals, `E(k)` and 
+`(E(m)-(1-m)K(m))/m`, where `m = k^2`.
 
 # Example
 ```julia-repl
