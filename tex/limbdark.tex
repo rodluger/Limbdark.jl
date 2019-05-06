@@ -239,18 +239,15 @@ and define the notation used throughout the paper. In \S\ref{sec:uniform}--\ref{
 we derive updated equations for the well-known cases of uniform, linear, and
 quadratic limb darkening, and in \S\ref{sec:higher_order} we generalize the
 expressions to limb darkening of arbitrary order.
-\todo{Finish explaining the paper layout.}
 
-    % \S\ref{sec:time}
-    % \S\ref{sec:???} implementation
-    % \S\ref{sec:???} benchmarking
-    % \S\ref{sec:nonlinear}
-    % \S\ref{sec:comparison}
-
-    % \S\ref{sec:discussion} ??
-    % \S\ref{sec:applications} ??
-    % \S\ref{sec:conclusions} ??
-    % Appendix: errata, derivs of cel and a table
+We discuss time integration of the equations (for finite exposure time)
+in \S\ref{sec:time}, an application to modeling non-linear limb
+darkening in \S\ref{sec:nonlinear}, and details on the implementation
+of the algorithm in \S\ref{sec:implementation}. In \S\ref{sec:benchmark} and
+\S\ref{sec:comparison} we discuss timing benchmarks and comparisons to
+existing codes. Finally, in \S\ref{sec:discussion}--\S\ref{sec:conclusions}
+we discuss our assumptions, caveats of our modeling, applications of our
+algorithm, and a summary of our results.
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -451,10 +448,18 @@ coefficients to Green's coefficients
 As an example, the full change of basis matrix for $N = 5$ is
 %
 \begin{proof}{A}
-    \mathcal{A} = \left(\begin{matrix}-1 & -1 & - \frac{3}{2} & - \frac{5}{2} & - \frac{13}{3} & - \frac{23}{3}\\0 & 1 & 2 & \frac{18}{5} & \frac{32}{5} & \frac{80}{7}\\0 & 0 & - \frac{1}{4} & - \frac{3}{4} & - \frac{5}{3} & - \frac{10}{3}\\0 & 0 & 0 & \frac{1}{5} & \frac{4}{5} & \frac{15}{7}\\0 & 0 & 0 & 0 & - \frac{1}{6} & - \frac{5}{6}\\0 & 0 & 0 & 0 & 0 & \frac{1}{7}\end{matrix}\right)
+    \label{eq:Aexample}
+    \mathcal{A} = \left(\begin{matrix}-1 & -1 & - \frac{3}{2} & - \frac{5}{2} 
+    & - \frac{13}{3} & - \frac{23}{3}\\0 & 1 & 2 & \frac{18}{5} & \frac{32}{5} 
+& \frac{80}{7}\\0 & 0 & - \frac{1}{4} & - \frac{3}{4} & - \frac{5}{3} 
+& - \frac{10}{3}\\0 & 0 & 0 & \frac{1}{5} & \frac{4}{5} & \frac{15}{7}\\0 & 0 & 0 & 0 
+& - \frac{1}{6} & - \frac{5}{6}\\0 & 0 & 0 & 0 & 0 & \frac{1}{7}\end{matrix}\right) \quad.
 \end{proof}
 %
-And for reference, for the common case of quadratic limb darkening, the
+The link next to Equation~(\ref{eq:Aexample}) provides code
+to compute $\mathcal{A}$ for any value of $N$.
+%
+Finally, for future reference, for the common case of quadratic limb darkening, the
 Green's vector is given by the dot product of $\mathcal{A}$ and the
 vector of limb darkening coefficients and is equal to
 %
@@ -490,12 +495,98 @@ If we can find the general solution to the integral in Equation (\ref{eq:solutio
 we can compute the occultation flux for arbitrary order limb darkening.
 The solutions for the case of uniform ($\mathfrak{s}_0$), linear ($\mathfrak{s}_1$),
 and quadratic ($\mathfrak{s}_2$) limb darkening have been studied in
-the past, so we dedicate the next three sections
-(\S\ref{sec:uniform}--\ref{sec:quadratic})
-to revisiting existing
-formulae and algorithms for computing them, with both speed and numerical accuracy
+the past, so we dedicate sections \S\ref{sec:uniform}--\ref{sec:quadratic}
+to revisiting existing formulae and algorithms for computing them, with both speed and numerical accuracy
 in mind. The subsequent section (\S\ref{sec:higher_order}) tackles the case of higher order
 limb darkening.
+
+
+\subsection{Normalization}
+\label{sec:normalization}
+%
+Before we discuss how to compute $\mathfrak{s}$, we turn our attention to
+the normalization constant $I_0$. It is convenient to
+choose a normalization such that the total unocculted flux is unity (for some choice of units), 
+regardless of the value of the limb darkening coefficients. We therefore require that
+%
+\begin{align}
+    \label{eq:normalization1}
+    F &= \oiint I(z) \, \dd S \nonumber \\
+      &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \mathbf{u} \nonumber \\
+      &= 1
+\end{align}
+%
+when the integral is taken over the entire disk of the body. We must thus have
+%
+\begin{align}
+    \label{eq:normalization2}
+    I_0 &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathcal{A} \mathbf{u}} \nonumber \\[0.5em]
+        &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathfrak{g}} \quad,
+\end{align}
+%
+where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no
+occultor (i.e., $r = 0$). When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$
+corresponds to the double integral in polar coordinates
+%
+\begin{align}
+    \label{eq:normalization3}
+    \mathfrak{s}_n (r=0) &= \int_0^{2\pi}\int_0^1 \gbasisn(z) \, r \, \dd r \, \dd\theta \nonumber \\[0.5em]
+                         &= 2\pi \int_0^1 \gbasisn(z) \, r \, \dd r \quad,
+\end{align}
+%
+From Equation~(\ref{eq:greensbasis}), we may write
+%
+\begin{align}
+    \label{eq:normalization4}
+    \mathfrak{s}_n (r=0) &=
+    2\pi
+    \begin{dcases}
+        \int_0^1 r \, \dd r & \qquad n = 0
+        \\
+        \int_0^1 z \, r \, \dd r & \qquad n = 1
+        \\
+        (n+2) \int_0^1 z^n \, r \, \dd r
+        - n \int_0^1 z^{n-2} \, r \, \dd r
+        & \qquad n \ge 2 \quad.
+    \end{dcases}
+\end{align}
+%
+The first case is trivial and integrates to $\mathfrak{s}_0(r = 0) = \pi$.
+The remaining cases involve integrands of the form $z^n r$,
+where $z = \sqrt{1 - r^2}$. We may evaluate
+these integrals by substituting $u = z^2 = 1 - r^2$ and $\dd u = -2r \, \dd r$:
+%
+\begin{align}
+    \label{eq:normalization5}
+    \int_0^1 z^n \, r \, \dd r &= \frac{1}{2} \int_0^1 u^\frac{n}{2} \, \dd u \nonumber \\[0.5em]
+                               &= \frac{1}{2 + n} \quad.
+\end{align}
+%
+The solution vector then simplifies to
+%
+\begin{align}
+    \label{eq:normalization6}
+    \mathfrak{s}_n (r=0) &=
+    \begin{dcases}
+        \pi & \qquad n = 0
+        \\
+        \frac{2\pi}{3} & \qquad n = 1
+        \\
+        0 & \qquad n \ge 2 \quad.
+    \end{dcases}
+\end{align}
+%
+Interestingly, the net flux contribution for all terms in the Green's basis with
+$n \ge 2$ is exactly zero. We may finally evaluate our normalization constant:
+%
+\begin{eqnarray}
+    \label{eq:normalization}
+    I_0 &=& \frac{1}{\pi(\mathfrak{g}_0+ \tfrac{2}{3} \mathfrak{g}_1)}.
+\end{eqnarray}
+%
+
+
+
 
 \section{Uniform brightness}
 
@@ -1503,8 +1594,8 @@ are then computed as
 \frac{\partial F}{\partial b} &=& I_0 \sum_{n=0}^N \mathfrak{g}_n \frac{\partial \mathfrak{s}_n}{\partial b} \quad.
 \end{eqnarray}
 %
-We will see in the following section that the normalization constant, $I_0$,
-is independent of $\mathfrak{g}$ for $n \ge 2$, so the derivative of $F$
+Since the normalization constant, $I_0$,
+is independent of $\mathfrak{g}$ for $n \ge 2$ (Equation~\ref{eq:normalization}), the derivative of $F$
 with respect to $\mathfrak{g}$ is trivial:
 %
 \begin{eqnarray}
@@ -1512,7 +1603,7 @@ with respect to $\mathfrak{g}$ is trivial:
 \end{eqnarray}
 %
 for $n \ge 2$. For the first two terms, we differentiate
-Equation~(\ref{eq:normalization}) in the following section to obtain
+Equation~(\ref{eq:normalization}) to obtain
 %
 \begin{eqnarray}
 \frac{\partial F}{\partial \mathfrak{g}_0} &=&  I_0 \mathfrak{s}_0 - \pi I_0 F,\\[0.5em]
@@ -1528,93 +1619,7 @@ the derivatives via the chain rule.  Then, the light curve derivatives are given
 \frac{\partial F}{\partial u_i} =  \sum_{j} \frac{\partial \mathfrak{g}_j}{\partial u_i}\frac{\partial F}{\partial \mathfrak{g}_j}.
 \end{eqnarray}
 
-
-\subsection{Normalization}
-\label{sec:normalization}
 %
-We now know how to compute the flux and all its derivatives during an occultation,
-but only up to an unknown normalization constant $I_0$. It is convenient to
-choose a normalization such that the total unocculted flux is unity, regardless
-of the value of the limb darkening coefficients. We therefore require that
-%
-\begin{align}
-    \label{eq:normalization1}
-    F &= \oiint I(z) \, \dd S \nonumber \\
-      &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \mathbf{u} \nonumber \\
-      &= 1
-\end{align}
-%
-when the integral is taken over the entire disk of the body. We must thus have
-%
-\begin{align}
-    \label{eq:normalization2}
-    I_0 &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathcal{A} \mathbf{u}} \nonumber \\[0.5em]
-        &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathfrak{g}} \quad,
-\end{align}
-%
-where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no
-occultor (i.e., $r = 0$). We could compute $I_0$ using
-the formalism from the previous section, but it is easier to evaluate the integral
-directly. When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$
-corresponds to the double integral in polar coordinates
-%
-\begin{align}
-    \label{eq:normalization3}
-    \mathfrak{s}_n (r=0) &= \int_0^{2\pi}\int_0^1 \gbasisn(z) \, r \, \dd r \, \dd\theta \nonumber \\[0.5em]
-                         &= 2\pi \int_0^1 \gbasisn(z) \, r \, \dd r \quad,
-\end{align}
-%
-From Equation~(\ref{eq:greensbasis}), we may write
-%
-\begin{align}
-    \label{eq:normalization4}
-    \mathfrak{s}_n (r=0) &=
-    2\pi
-    \begin{dcases}
-        \int_0^1 r \, \dd r & \qquad n = 0
-        \\
-        \int_0^1 z \, r \, \dd r & \qquad n = 1
-        \\
-        (n+2) \int_0^1 z^n \, r \, \dd r
-        - n \int_0^1 z^{n-2} \, r \, \dd r
-        & \qquad n \ge 2 \quad.
-    \end{dcases}
-\end{align}
-%
-The first case is trivial and integrates to $\mathfrak{s}_0(r = 0) = \pi$.
-The remaining cases involve integrands of the form $z^n r$,
-where $z = \sqrt{1 - r^2}$. We may evaluate
-these integrals by substituting $u = z^2 = 1 - r^2$ and $\dd u = -2r \, \dd r$:
-%
-\begin{align}
-    \label{eq:normalization5}
-    \int_0^1 z^n \, r \, \dd r &= \frac{1}{2} \int_0^1 u^\frac{n}{2} \, \dd u \nonumber \\[0.5em]
-                               &= \frac{1}{2 + n} \quad.
-\end{align}
-%
-The solution vector then simplifies to
-%
-\begin{align}
-    \label{eq:normalization6}
-    \mathfrak{s}_n (r=0) &=
-    \begin{dcases}
-        \pi & \qquad n = 0
-        \\
-        \frac{2\pi}{3} & \qquad n = 1
-        \\
-        0 & \qquad n \ge 2 \quad.
-    \end{dcases}
-\end{align}
-%
-Interestingly, the net flux contribution for all terms in the Green's basis with
-$n \ge 2$ is exactly zero. We may finally evaluate our normalization constant:
-%
-\begin{eqnarray}
-    \label{eq:normalization}
-    I_0 &=& \frac{1}{\pi(\mathfrak{g}_0+ \tfrac{2}{3} \mathfrak{g}_1)}.
-\end{eqnarray}
-%
-
 
 \subsection{Summary}
 \label{sec:summary}
@@ -1636,8 +1641,7 @@ expression
 %
 where $I_0$ is a normalizing constant (Equation~\ref{eq:normalization}),
 $\mathfrak{s}^\top$ is the solution vector (Equation~\ref{eq:sn}, with special
-cases given by Equations~\ref{eq:s0}, \ref{eq:s1}, and \ref{eq:s2}, and
-the general case given by Equation~\ref{eq:sn}),
+cases given by Equations~\ref{eq:s0}, \ref{eq:s1}, and \ref{eq:s2}),
 a function of only the impact parameter
 $b$ and radius $r$ of the occultor, $\mathcal{A}$ is a change of basis
 matrix (Equation~\ref{eq:A}), and $\mathbf{u}$ is the vector of limb
@@ -1805,6 +1809,7 @@ with its derivatives.  We now turn to discussing the implementation of
 the computation, followed by comparison with existing codes.
 
 \section{Implementation details}
+\label{sec:implementation}
 
 There are several details in our implementation of the foregoing equations
 which give further speedup of the computation, which we describe in this
@@ -1870,7 +1875,8 @@ respect to $\mathfrak{g}_i$ in order to obtain the derivatives with respect to $
 However, as we note above, an even more efficient approach is to
 simply apply this transformation once to the gradient of the likelihood.
 
-\section{Benchmarking}\label{sec:benchmark}
+\section{Benchmarking}
+\label{sec:benchmark}
 
 \begin{figure}
     \begin{centering}
@@ -2118,6 +2124,7 @@ therefore modified the \starry package to compute light curves
 using the formalism in this paper in the case of pure limb darkening.
 
 \section{Discussion}
+\label{sec:discussion}
 
 We have presented formulae for the transit (or occultation/eclipse) of a
 limb-darkened body with a limb darkening profile which is given by a polynomial
@@ -2227,6 +2234,7 @@ a high order will rarely be required.
 %\end{enumerate}
 
 \section{Applications}
+\label{sec:applications}
 
 We envision that this code will be used for fits to higher precision
 transit data, such as gathered by the James Webb Space Telescope \citep[JWST][]{Beichman2014},
@@ -2262,6 +2270,7 @@ variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
 model over a narrow range of parameter space.
 
 \section{Conclusions}
+\label{sec:conclusions}
 
 We have presented an analytic model for the transits, occultations, and
 eclipses of limb-darkened bodies with a polynomial dependence of the limb darkening
