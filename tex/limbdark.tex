@@ -606,7 +606,8 @@ $n \ge 2$ is exactly zero. We may finally evaluate our normalization constant:
 
 \label{sec:uniform}
 
-Evaluation of the transit light curve of a uniformly bright star amounts to computing the
+Evaluation of the transit light curve of a uniformly bright star, $I(\upmu)=1$, 
+amounts to computing the
 area of overlap of two disks \citep{MandelAgol2002}.  This has a well-known
 analytic solution \citep[e.g.][]{Weisstein2018};  however, we find that the
 standard formula leads to round-off error that is larger than necessary
@@ -919,7 +920,7 @@ To transform the elliptic integrals in Equation~(\ref{eq:biglam}) to $\mathrm{ce
 we used the following relations from \citet{Bulirsch1969}:
 \begin{eqnarray} \label{eq:cel_identities}
 \lambda K(m_k) + q E(m_k) &=& {\rm cel}(k_c,1,\lambda+q,\lambda+q k_c^2)\\
-\lambda K(m_k) + q \Pi(n,m_k) &=& {\rm cel}(k_c,1-n,\lambda+q,\lambda+q k_c^2)\\
+\lambda K(m_k) + q \Pi(n,m_k) &=& {\rm cel}(k_c,1-n,\lambda+q,\lambda (1-n) + q)\\
 E(m_k) &=& {\rm cel}(k_c,1,1,1-m_k)\\
 E(m_k)-(1-m_k)K(m_k) &=& m_k \, {\rm cel}(k_c,1,1,0)\\
 \Pi(n,m_k)-K(m_k)  &=& n \, {\rm cel}(k_c,1-n,0,1),
