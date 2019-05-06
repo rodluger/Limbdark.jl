@@ -6,6 +6,7 @@
 *.pdf
 *.png
 tex/gitlinks.tex
+docs/build
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

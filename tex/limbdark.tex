@@ -40,8 +40,10 @@ Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomia
  derivatives of exposure-time averaged transit light curves with respect to all
  model parameters.  An additional application is modeling eclipsing binary or
  eclipsing multiple star systems in cases where the stars may be treated as spherically
- symmetric.  We provide code which implements these formulae in C++, Python, IDL, and Julia,
+ symmetric.  We provide code which implements these formulae in \texttt{C++}, 
+ \texttt{Python}, \texttt{IDL}, and \texttt{Julia},
  with tests and examples of usage.
+ \href{https://github.com/rodluger/limbdark}{\color{linkcolor}\faGithub}
 \end{abstract}
 
 % ------------------------------------------------------------------------------
@@ -239,18 +241,27 @@ and define the notation used throughout the paper. In \S\ref{sec:uniform}--\ref{
 we derive updated equations for the well-known cases of uniform, linear, and
 quadratic limb darkening, and in \S\ref{sec:higher_order} we generalize the
 expressions to limb darkening of arbitrary order.
-\todo{Finish explaining the paper layout.}
+%
+We discuss time integration of the equations (for finite exposure time)
+in \S\ref{sec:time}, an application to modeling non-linear limb
+darkening in \S\ref{sec:nonlinear}, and details on the implementation
+of the algorithm in \S\ref{sec:implementation}. In \S\ref{sec:benchmark} and
+\S\ref{sec:comparison} we discuss timing benchmarks and comparisons to
+existing codes. Finally, in \S\ref{sec:discussion}--\S\ref{sec:conclusions}
+we discuss our assumptions, caveats of our modeling, applications of our
+algorithm, and a summary of our results. Appendices A--C contain a list
+of errata for \citet{MandelAgol2002}, derivatives of the general
+complete elliptic integral, and a comprehensive list of symbols used in
+the paper.
 
-    % \S\ref{sec:time}
-    % \S\ref{sec:???} implementation
-    % \S\ref{sec:???} benchmarking
-    % \S\ref{sec:nonlinear}
-    % \S\ref{sec:comparison}
+Finally, as in \cite{starry} and \cite{AprilFools}, we embed links
+to \Python code (\,\codeicon\,) to reproduce all of the
+figures, as well as links to \texttt{Jupyter} notebooks
+(\,\prooficon\,) containing proofs and derivations
+of the principal equations. We urge members of the community to do the same
+to improve the accessibility, transparency, and reproducibility of
+research in astronomy.
 
-    % \S\ref{sec:discussion} ??
-    % \S\ref{sec:applications} ??
-    % \S\ref{sec:conclusions} ??
-    % Appendix: errata, derivs of cel and a table
 
 % ==============================================================================
 % ------------------------------------------------------------------------------
@@ -451,10 +462,18 @@ coefficients to Green's coefficients
 As an example, the full change of basis matrix for $N = 5$ is
 %
 \begin{proof}{A}
-    \mathcal{A} = \left(\begin{matrix}-1 & -1 & - \frac{3}{2} & - \frac{5}{2} & - \frac{13}{3} & - \frac{23}{3}\\0 & 1 & 2 & \frac{18}{5} & \frac{32}{5} & \frac{80}{7}\\0 & 0 & - \frac{1}{4} & - \frac{3}{4} & - \frac{5}{3} & - \frac{10}{3}\\0 & 0 & 0 & \frac{1}{5} & \frac{4}{5} & \frac{15}{7}\\0 & 0 & 0 & 0 & - \frac{1}{6} & - \frac{5}{6}\\0 & 0 & 0 & 0 & 0 & \frac{1}{7}\end{matrix}\right)
+    \label{eq:Aexample}
+    \mathcal{A} = \left(\begin{matrix}-1 & -1 & - \frac{3}{2} & - \frac{5}{2} 
+    & - \frac{13}{3} & - \frac{23}{3}\\0 & 1 & 2 & \frac{18}{5} & \frac{32}{5} 
+& \frac{80}{7}\\0 & 0 & - \frac{1}{4} & - \frac{3}{4} & - \frac{5}{3} 
+& - \frac{10}{3}\\0 & 0 & 0 & \frac{1}{5} & \frac{4}{5} & \frac{15}{7}\\0 & 0 & 0 & 0 
+& - \frac{1}{6} & - \frac{5}{6}\\0 & 0 & 0 & 0 & 0 & \frac{1}{7}\end{matrix}\right) \quad.
 \end{proof}
 %
-And for reference, for the common case of quadratic limb darkening, the
+The link next to Equation~(\ref{eq:Aexample}) provides code
+to compute $\mathcal{A}$ for any value of $N$.
+%
+Finally, for future reference, for the common case of quadratic limb darkening, the
 Green's vector is given by the dot product of $\mathcal{A}$ and the
 vector of limb darkening coefficients and is equal to
 %
@@ -490,12 +509,98 @@ If we can find the general solution to the integral in Equation (\ref{eq:solutio
 we can compute the occultation flux for arbitrary order limb darkening.
 The solutions for the case of uniform ($\mathfrak{s}_0$), linear ($\mathfrak{s}_1$),
 and quadratic ($\mathfrak{s}_2$) limb darkening have been studied in
-the past, so we dedicate the next three sections
-(\S\ref{sec:uniform}--\ref{sec:quadratic})
-to revisiting existing
-formulae and algorithms for computing them, with both speed and numerical accuracy
+the past, so we dedicate sections \S\ref{sec:uniform}--\ref{sec:quadratic}
+to revisiting existing formulae and algorithms for computing them, with both speed and numerical accuracy
 in mind. The subsequent section (\S\ref{sec:higher_order}) tackles the case of higher order
 limb darkening.
+
+
+\subsection{Normalization}
+\label{sec:normalization}
+%
+Before we discuss how to compute $\mathfrak{s}$, we turn our attention to
+the normalization constant $I_0$. It is convenient to
+choose a normalization such that the total unocculted flux is unity (for some choice of units), 
+regardless of the value of the limb darkening coefficients. We therefore require that
+%
+\begin{align}
+    \label{eq:normalization1}
+    F &= \oiint I(z) \, \dd S \nonumber \\
+      &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \mathbf{u} \nonumber \\
+      &= 1
+\end{align}
+%
+when the integral is taken over the entire disk of the body. We must thus have
+%
+\begin{align}
+    \label{eq:normalization2}
+    I_0 &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathcal{A} \mathbf{u}} \nonumber \\[0.5em]
+        &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathfrak{g}} \quad,
+\end{align}
+%
+where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no
+occultor (i.e., $r = 0$). When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$
+corresponds to the double integral in polar coordinates
+%
+\begin{align}
+    \label{eq:normalization3}
+    \mathfrak{s}_n (r=0) &= \int_0^{2\pi}\int_0^1 \gbasisn(z) \, r \, \dd r \, \dd\theta \nonumber \\[0.5em]
+                         &= 2\pi \int_0^1 \gbasisn(z) \, r \, \dd r \quad,
+\end{align}
+%
+From Equation~(\ref{eq:greensbasis}), we may write
+%
+\begin{align}
+    \label{eq:normalization4}
+    \mathfrak{s}_n (r=0) &=
+    2\pi
+    \begin{dcases}
+        \int_0^1 r \, \dd r & \qquad n = 0
+        \\
+        \int_0^1 z \, r \, \dd r & \qquad n = 1
+        \\
+        (n+2) \int_0^1 z^n \, r \, \dd r
+        - n \int_0^1 z^{n-2} \, r \, \dd r
+        & \qquad n \ge 2 \quad.
+    \end{dcases}
+\end{align}
+%
+The first case is trivial and integrates to $\mathfrak{s}_0(r = 0) = \pi$.
+The remaining cases involve integrands of the form $z^n r$,
+where $z = \sqrt{1 - r^2}$. We may evaluate
+these integrals by substituting $u = z^2 = 1 - r^2$ and $\dd u = -2r \, \dd r$:
+%
+\begin{align}
+    \label{eq:normalization5}
+    \int_0^1 z^n \, r \, \dd r &= \frac{1}{2} \int_0^1 u^\frac{n}{2} \, \dd u \nonumber \\[0.5em]
+                               &= \frac{1}{2 + n} \quad.
+\end{align}
+%
+The solution vector then simplifies to
+%
+\begin{align}
+    \label{eq:normalization6}
+    \mathfrak{s}_n (r=0) &=
+    \begin{dcases}
+        \pi & \qquad n = 0
+        \\
+        \frac{2\pi}{3} & \qquad n = 1
+        \\
+        0 & \qquad n \ge 2 \quad.
+    \end{dcases}
+\end{align}
+%
+Interestingly, the net flux contribution for all terms in the Green's basis with
+$n \ge 2$ is exactly zero. We may finally evaluate our normalization constant:
+%
+\begin{eqnarray}
+    \label{eq:normalization}
+    I_0 &=& \frac{1}{\pi(\mathfrak{g}_0+ \tfrac{2}{3} \mathfrak{g}_1)}.
+\end{eqnarray}
+%
+
+
+
 
 \section{Uniform brightness}
 
@@ -602,7 +707,7 @@ A_{lens} &= \kappa_1 + r^2\kappa_0 - A_{kite},\nonumber\\
 \end{proof}
 with $A_{kite}$ given in Equation~(\ref{eq:Kite_area}).
 
-\begin{figure}[p!]
+\begin{figure}[t!]
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/area_of_overlap_r01.pdf}
     \caption{Precision of formulae for the area of overlap of two circles with
@@ -1101,6 +1206,8 @@ where $\mathfrak{s}_0$ is defined in Equation (\ref{eq:uniform}).
 %of quadratic limb darkening may be computed with Equations (\ref{eq:occint_greens}) and
 %(\ref{eq:derivatives}) given below.
 
+\pagebreak % DEBUG
+
 \subsection{Derivatives}
 %
 The derivatives of $\eta$ are given by:
@@ -1321,6 +1428,8 @@ Since we need not compute the integral for $n=0$, as we already
 found a solution for uniform limb darkening in \S\ref{sec:uniform},
 our final task is to find the solution to Equation~(\ref{eq:primitiveP}).
 
+\pagebreak % DEBUG
+
 \subsection{Solving the $\mathcal{P}$ integral}
 \label{sec:Pintegral}
 
@@ -1503,8 +1612,8 @@ are then computed as
 \frac{\partial F}{\partial b} &=& I_0 \sum_{n=0}^N \mathfrak{g}_n \frac{\partial \mathfrak{s}_n}{\partial b} \quad.
 \end{eqnarray}
 %
-We will see in the following section that the normalization constant, $I_0$,
-is independent of $\mathfrak{g}$ for $n \ge 2$, so the derivative of $F$
+Since the normalization constant, $I_0$,
+is independent of $\mathfrak{g}$ for $n \ge 2$ (Equation~\ref{eq:normalization}), the derivative of $F$
 with respect to $\mathfrak{g}$ is trivial:
 %
 \begin{eqnarray}
@@ -1512,7 +1621,7 @@ with respect to $\mathfrak{g}$ is trivial:
 \end{eqnarray}
 %
 for $n \ge 2$. For the first two terms, we differentiate
-Equation~(\ref{eq:normalization}) in the following section to obtain
+Equation~(\ref{eq:normalization}) to obtain
 %
 \begin{eqnarray}
 \frac{\partial F}{\partial \mathfrak{g}_0} &=&  I_0 \mathfrak{s}_0 - \pi I_0 F,\\[0.5em]
@@ -1528,93 +1637,7 @@ the derivatives via the chain rule.  Then, the light curve derivatives are given
 \frac{\partial F}{\partial u_i} =  \sum_{j} \frac{\partial \mathfrak{g}_j}{\partial u_i}\frac{\partial F}{\partial \mathfrak{g}_j}.
 \end{eqnarray}
 
-
-\subsection{Normalization}
-\label{sec:normalization}
 %
-We now know how to compute the flux and all its derivatives during an occultation,
-but only up to an unknown normalization constant $I_0$. It is convenient to
-choose a normalization such that the total unocculted flux is unity, regardless
-of the value of the limb darkening coefficients. We therefore require that
-%
-\begin{align}
-    \label{eq:normalization1}
-    F &= \oiint I(z) \, \dd S \nonumber \\
-      &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \mathbf{u} \nonumber \\
-      &= 1
-\end{align}
-%
-when the integral is taken over the entire disk of the body. We must thus have
-%
-\begin{align}
-    \label{eq:normalization2}
-    I_0 &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathcal{A} \mathbf{u}} \nonumber \\[0.5em]
-        &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathfrak{g}} \quad,
-\end{align}
-%
-where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no
-occultor (i.e., $r = 0$). We could compute $I_0$ using
-the formalism from the previous section, but it is easier to evaluate the integral
-directly. When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$
-corresponds to the double integral in polar coordinates
-%
-\begin{align}
-    \label{eq:normalization3}
-    \mathfrak{s}_n (r=0) &= \int_0^{2\pi}\int_0^1 \gbasisn(z) \, r \, \dd r \, \dd\theta \nonumber \\[0.5em]
-                         &= 2\pi \int_0^1 \gbasisn(z) \, r \, \dd r \quad,
-\end{align}
-%
-From Equation~(\ref{eq:greensbasis}), we may write
-%
-\begin{align}
-    \label{eq:normalization4}
-    \mathfrak{s}_n (r=0) &=
-    2\pi
-    \begin{dcases}
-        \int_0^1 r \, \dd r & \qquad n = 0
-        \\
-        \int_0^1 z \, r \, \dd r & \qquad n = 1
-        \\
-        (n+2) \int_0^1 z^n \, r \, \dd r
-        - n \int_0^1 z^{n-2} \, r \, \dd r
-        & \qquad n \ge 2 \quad.
-    \end{dcases}
-\end{align}
-%
-The first case is trivial and integrates to $\mathfrak{s}_0(r = 0) = \pi$.
-The remaining cases involve integrands of the form $z^n r$,
-where $z = \sqrt{1 - r^2}$. We may evaluate
-these integrals by substituting $u = z^2 = 1 - r^2$ and $\dd u = -2r \, \dd r$:
-%
-\begin{align}
-    \label{eq:normalization5}
-    \int_0^1 z^n \, r \, \dd r &= \frac{1}{2} \int_0^1 u^\frac{n}{2} \, \dd u \nonumber \\[0.5em]
-                               &= \frac{1}{2 + n} \quad.
-\end{align}
-%
-The solution vector then simplifies to
-%
-\begin{align}
-    \label{eq:normalization6}
-    \mathfrak{s}_n (r=0) &=
-    \begin{dcases}
-        \pi & \qquad n = 0
-        \\
-        \frac{2\pi}{3} & \qquad n = 1
-        \\
-        0 & \qquad n \ge 2 \quad.
-    \end{dcases}
-\end{align}
-%
-Interestingly, the net flux contribution for all terms in the Green's basis with
-$n \ge 2$ is exactly zero. We may finally evaluate our normalization constant:
-%
-\begin{eqnarray}
-    \label{eq:normalization}
-    I_0 &=& \frac{1}{\pi(\mathfrak{g}_0+ \tfrac{2}{3} \mathfrak{g}_1)}.
-\end{eqnarray}
-%
-
 
 \subsection{Summary}
 \label{sec:summary}
@@ -1636,8 +1659,7 @@ expression
 %
 where $I_0$ is a normalizing constant (Equation~\ref{eq:normalization}),
 $\mathfrak{s}^\top$ is the solution vector (Equation~\ref{eq:sn}, with special
-cases given by Equations~\ref{eq:s0}, \ref{eq:s1}, and \ref{eq:s2}, and
-the general case given by Equation~\ref{eq:sn}),
+cases given by Equations~\ref{eq:s0}, \ref{eq:s1}, and \ref{eq:s2}),
 a function of only the impact parameter
 $b$ and radius $r$ of the occultor, $\mathcal{A}$ is a change of basis
 matrix (Equation~\ref{eq:A}), and $\mathbf{u}$ is the vector of limb
@@ -1735,6 +1757,8 @@ which explains why in some cases it can be difficult to constrain both parameter
     \end{centering}
 \end{figure}
 
+\pagebreak % DEBUG
+
 \section{Non-linear limb darkening}\label{sec:nonlinear}
 
 \citet{Claret2000} introduced a ``non-linear'' limb darkening model which
@@ -1805,6 +1829,7 @@ with its derivatives.  We now turn to discussing the implementation of
 the computation, followed by comparison with existing codes.
 
 \section{Implementation details}
+\label{sec:implementation}
 
 There are several details in our implementation of the foregoing equations
 which give further speedup of the computation, which we describe in this
@@ -1870,7 +1895,8 @@ respect to $\mathfrak{g}_i$ in order to obtain the derivatives with respect to $
 However, as we note above, an even more efficient approach is to
 simply apply this transformation once to the gradient of the likelihood.
 
-\section{Benchmarking}\label{sec:benchmark}
+\section{Benchmarking}
+\label{sec:benchmark}
 
 \begin{figure}
     \begin{centering}
@@ -1901,7 +1927,7 @@ coefficients ranging from $1$ to $144$.  For each set of timing benchmark
 parameters, we carried out nine measurements  of the timing, and
 we use the median of these for plotting purposes.  The benchmarking
 for the \texttt{Julia} code was carried out with \texttt{v0.7} of
-Julia on the \texttt{trusty} Ubuntu environment of Travis-CI%
+\texttt{Julia} on the \texttt{trusty} Ubuntu environment of Travis-CI%
 \footnote{\url{https://travis-ci.org}}
 on a 2.3 GHz
 % SEE https://travis-ci.org/rodluger/limbdark/jobs/527913189#L545
@@ -1932,7 +1958,7 @@ perform all calculations on a single core without multi-threading
 or interpolation over a pre-computed grid, which is an option
 in some codes.
 
-\subsection{Comparison with Mandel \& Agol}
+\subsection{Comparison with Mandel \& Agol (2002)}
 
 \begin{figure}[t!]
     \begin{centering}
@@ -1943,17 +1969,17 @@ in some codes.
     \end{centering}
 \end{figure}
 
-For uniform, linear or quadratic limb darkening, the IDL package EXOFAST 
+For uniform, linear or quadratic limb darkening, the \texttt{IDL} package \texttt{EXOFAST} 
 improved upon the speed of the widely used computation by \citet{MandelAgol2002} 
 by utilizing the \citet{Bulirsch1965a,Bulirsch1965b} expressions for the complete 
 elliptic integral of the third kind which is needed for the linear case
-\citep{Eastman2013}.  EXOFAST also uses a series
+\citep{Eastman2013}.  \texttt{EXOFAST} also uses a series
 approximation for the complete elliptic integrals of the first and second
 kind \citep{Hastings1955}. These three elliptic integrals, especially the third
 kind, are the bottleneck in the computation, and the Bulirsch version is faster
 than widely used Carlson implementation of elliptic integrals \citep{Carlson1979}.
 
-We have carried out a numerical comparison of the EXOFAST implementation
+We have carried out a numerical comparison of the \texttt{EXOFAST} implementation
 of the \citet{MandelAgol2002} formulae for the linear case ($u_1=1$), and find 
 that the most severe errors occur for $b = r \pm \epsilon$.  Figure \ref{fig:compareMA} 
 shows the computed models and the errors as a function of $r$ for $b=1-r-\epsilon$
@@ -1969,12 +1995,12 @@ parameter space.
 
 A speed comparison for a transit computed with $10^7$ data points shows that
 the \texttt{Julia} implementation of these routines takes about 55\% of the CPU
-time as the IDL EXOFAST implementation without derivatives, and about 65\%
+time as the \texttt{IDL} \texttt{EXOFAST} implementation without derivatives, and about 65\%
 of the computation time when including the derivatives.  Consequently, we
 conclude that our new implementation is both faster (by 35-45\%) and more
-accurate than the Mandel \& Agol IDL implementation.  
+accurate than the \cite{MandelAgol2002} \texttt{IDL} implementation.  
 
-We note that EXOFAST v2.0 has now been updated to utilize the numerically-stable 
+We note that \texttt{EXOFAST} v2.0 has now been updated to utilize the numerically-stable 
 quadratic limb darkening expressions given above, albeit without the computed 
 derivatives (Eastman et al., in preparation).
 
@@ -2041,13 +2067,13 @@ giving our \texttt{Julia} code a 70\% speed advantage over the Fortran code.
 \end{figure}
 
 A Python implementation of transit light curves which has been widely applied
-is the \texttt{batman} package by \citet{Kreidberg2015}.  This package
-implements a fast C++ version of the computation, called by Python for
+is the \texttt{batman} package \citep{Kreidberg2015}.  This package
+implements a fast C version of the computation, called by Python for
 ease of use.
 
 The \texttt{batman} package computes the quadratic limb darkening model
 of \citet{MandelAgol2002}, and uses the same approach for computing
-the complete elliptic integrals as EXOFAST.  We have made a comparison
+the complete elliptic integrals as \texttt{EXOFAST}.  We have made a comparison
 of our implementation of quadratic limb darkening with \texttt{batman},
 which is shown in Figure \ref{fig:batman_comparison}.  Without computing
 derivatives, our approach (as implemented in \texttt{Julia}; blue)
@@ -2114,10 +2140,11 @@ solve the occultation problem for arbitrary surface features),
 it scales super-quadratically with the degree of limb darkening. That
 algorithm is therefore orders of magnitude slower
 to evaluate in the case of pure limb darkening ($m=0$ modes only). We have
-therefore modified the \starry package to compute light curves
+modified the \starry package to compute light curves
 using the formalism in this paper in the case of pure limb darkening.
 
 \section{Discussion}
+\label{sec:discussion}
 
 We have presented formulae for the transit (or occultation/eclipse) of a
 limb-darkened body with a limb darkening profile which is given by a polynomial
@@ -2227,9 +2254,10 @@ a high order will rarely be required.
 %\end{enumerate}
 
 \section{Applications}
+\label{sec:applications}
 
 We envision that this code will be used for fits to higher precision
-transit data, such as gathered by the James Webb Space Telescope \citep[JWST][]{Beichman2014},
+transit data, such as gathered by the James Webb Space Telescope \citep[JWST;][]{Beichman2014},
 which require an improved model of stellar limb darkening.  Here we discuss
 some potential avenues for application of this model.
 
@@ -2262,6 +2290,7 @@ variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
 model over a narrow range of parameter space.
 
 \section{Conclusions}
+\label{sec:conclusions}
 
 We have presented an analytic model for the transits, occultations, and
 eclipses of limb-darkened bodies with a polynomial dependence of the limb darkening
@@ -2272,7 +2301,7 @@ special limits such as the points of contact and the coincidence of the edge
 of the occultor with the center of the source.  The model also compares favorably in
 speed of evaluation, about a factor of three faster than the code of
 to \citet{Pal2008}, 5-30 faster than that of Gimenez, a factor of 2-25 faster than \texttt{batman}
-(depending on the order of the limb darkening), and 35-45\% faster than EXOFAST.
+(depending on the order of the limb darkening), and 35-45\% faster than \texttt{EXOFAST}.
 
 We expect that this code may be used both as a workhorse model for
 general fitting of transit models, as well as a tool for more
@@ -2289,25 +2318,37 @@ it allows for a wider range of limb darkening models than polynomial, it
 allows for computation of the Rossiter-McLaughlin effect, and it
 carries out the computation for multiple overlapping bodies.
 
-The code is open source, and has two versions:  one of which is a part
+The code presented in this paper is open source and has two versions: one of which is a part
 of the \starry package, \texttt{http://github.com/rodluger/starry/}, written
-in a combination of C++ and Python, and a new code written in Julia as
-part of the development of the equations in this paper,
-\texttt{http://github.com/rodluger/limbdark/}.  We have also implemented
-the flux model in IDL, without derivatives. We welcome usage of these
+in a combination of C++ and Python, and a new code written in \texttt{Julia},
+\texttt{http://github.com/rodluger/limbdark/}, as
+part of the development of the equations in this paper.  We have also implemented
+the flux model in \texttt{IDL}, without derivatives; this is also available within
+the GitHub repository. We welcome usage of these
 codes, and contributions to further develop and enhance their capabilities.
+
+All figures in this paper were autogenerated on Travis-CI from the latest
+version of our repository. Clickable icons (\,\codeicon\,) next to each figure link
+to the source code used to produce them, and icons (\,\prooficon\,) next to the main 
+equations link to derivations or numerical proofs. We encourage the community
+to adopt similar practices to bolster the accessibility, transparency, and
+reproducibility of research in the field.
+
 
 \acknowledgements
 
 We thank Andr\'as P\'al for sharing his Fortran code, \texttt{ntiq-fortran.f}.
 We thank Andr\'as P\'al, Kevin Stevenson, Kai Ueltzh\"offer, Mario Damasso,
 Matthew Heising, Robert Morehead, and Laura Kreidberg for pointing out
-errors or inaccuracies in the Mandel \& Agol paper and code, which we have
+errors or inaccuracies in the \cite{MandelAgol2002} paper and code, which we have
 hopefully rectified in this paper.
 EA acknowledges NSF grant AST-1615315, NASA grant NNX13AF62G, and from
 the NASA Astrobiology Institute's Virtual Planetary Laboratory Lead Team,
 funded through the NASA Astrobiology Institute under solicitation NNH12ZDA002C
-and Cooperative Agreement Number NNA13AA93A.  This research was partially conducted during the Exostar19 program at the Kavli Institute for Theoretical Physics at UC Santa Barbara, which was supported in part by the National Science Foundation under Grant No.\ NSF PHY-1748958.
+and Cooperative Agreement Number NNA13AA93A.  This research was partially 
+conducted during the Exostar19 program at the Kavli Institute for Theoretical 
+Physics at UC Santa Barbara, which was supported in part by the National 
+Science Foundation under Grant No.\ NSF PHY-1748958.
 
 \bibliography{limbdark}
 
