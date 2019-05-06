@@ -1,4 +1,6 @@
+authors = ["Rodrigo Luger <rodluger@gmail.com>"]
 name = "Limbdark"
-uuid = "a8ea2468-7020-11e9-21b8-e18c1ea05de2"
-authors = ["Eric Agol <agol@uw.edu>", "Rodrigo Luger <rodluger@gmail.com>", "Daniel Foreman-Mackey <foreman.mackey@gmail.com>"]
+uuid = "01eff828-7024-11e9-3df0-8b77921d67e3"
 version = "0.1.0"
+
+[deps]
