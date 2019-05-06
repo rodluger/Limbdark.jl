@@ -1,4 +1,4 @@
 push!(LOAD_PATH, "../src/")
-using Documenter, limbdark
+using Documenter, Limbdark
 
-makedocs(sitename="limbdark")
+makedocs(sitename="Limbdark")
