@@ -9,7 +9,7 @@ function profile_transit_poly!(trans,flux,b)
     for k=1:10
         for i=1:length(b)
           trans.b = b[i]
-          flux[i] = transit_poly_d(trans)
+          flux[i] = transit_poly_g(trans)
         end
     end
     elapsed = 1e-10 * (time_ns() - t1)
@@ -32,6 +32,6 @@ trans_big = transit_init(big(0.1), big(0.0), big.(u_n), false)
 flux_big = zeros(BigFloat, length(b))
 for i=1:length(b)
   trans_big.b = big(b[i])
-  flux_big[i] = transit_poly_d(trans_big)
+  flux_big[i] = transit_poly_g(trans_big)
 end
 writedlm("flux_multi.txt", flux_big)

@@ -56,7 +56,7 @@ for iu = 1:nnu
   u_n = ones(nu[iu])/float(nu[iu])
   trans = transit_init(r,b[1],u_n,true)
 #  trans = transit_init(r,b[1],u_n,false)
-# Transform from u_n to d_n coefficients:
+# Transform from u_n to g_n coefficients:
   timing = zeros(nnb)
 # Call the function:
   @time timing =profile_transit_poly(trans,nb)
