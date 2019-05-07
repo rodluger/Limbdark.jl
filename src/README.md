@@ -16,3 +16,21 @@ julia> f = transit_poly(0.1,0.5,[0.1,0.2,0.3])
 ```
 Although this is the quickest entry into the code, it is
 *not* the fastest when computing an entire light curve.
+
+To compute a light curve with derivatives, initialize the transit structure:
+
+```
+
+julia> trans = transit_init(0.1,0.5,[0.1,0.2,0.3],true)
+julia> npts = 100000
+julia> b = range(-1.5,stop=1.5,length=npts)
+julia> f = zeros(npts,7)
+julia> for i=1:npts
+         trans.b = abs(b[i])
+         f[i,1] = Limbdark.transit_poly_g!(trans)
+         f[i,2:3] = trans.dfdrb
+         f[i,4:7] = trans.dfdg
+       end
+julia> using PyPlot
+julia> plot(b,f[:,1])
+```
