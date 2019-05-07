@@ -70,7 +70,7 @@ fint  = zeros(T,6+trans.n)
       end
     end
     push!(tlim,t2)
-    # ftmp is an array which contains the derivatives with respect to d_n:
+    # ftmp is an array which contains the derivatives with respect to g_n:
     ftmp=zeros(T,6+trans.n)
     # Carry out the integration between the start & end time of the exposure,
     # as well as up to each contact point:
@@ -90,7 +90,7 @@ fint  = zeros(T,6+trans.n)
   # Pass the flux and derivatives with respect to the lightcurve variables to
   # the average flux vector:
   favg1[1:5,i]=ftmp[1:5]
-  # Convert from d_n to u_n derivatives for the remaining parts of the vector:
+  # Convert from g_n to u_n derivatives for the remaining parts of the vector:
   favg1[6:5+trans.n,i]=BLAS.gemv('T',1.0,trans.dddu,ftmp[6:6+trans.n])
 #  println("i: ",i," t: ",t[i]," result: ",ftmp)
 end

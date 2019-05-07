@@ -36,7 +36,7 @@ for j=1:length(nb)
       b[i] = sqrt(((i-float(nb0)/2)*2/float(nb0)*(1.0+2.0*trans.r))^2)
       trans.b = b[i]
 #      flux[i] = transit_poly!(trans)
-      flux[i] = transit_poly_d!(trans)
+      flux[i] = transit_poly_g!(trans)
     end
     tmean[k] = (time_ns()-elapsed)*1e-9
 

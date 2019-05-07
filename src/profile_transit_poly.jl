@@ -1,3 +1,4 @@
+
 include("transit_poly_struct.jl")
 #trans = transit_init(0.1,0.5,[0.5,0.5],true)
 #u_n = [0.5,0.25,0.125,0.0625,0.03125]
@@ -14,13 +15,13 @@ function transit_b!(trans::Transit_Struct{T},b::Array{T,1},flux::Array{T,1}) whe
 #  gradient = zeros(length(b),2+trans.n)
   for i=1:length(b)
     trans.b = b[i]
-#    flux[i]=transit_poly_d!(trans)
+#    flux[i]=transit_poly_g!(trans)
 #    gradient[i,1:2]=trans.dfdrb
 #    gradient[i,3:2+trans.n]=trans.dfdu
     if trans.grad
-      flux[i]=transit_poly_d!(trans)
+      flux[i]=transit_poly_g!(trans)
     else
-      flux[i]=transit_poly_d(trans)
+      flux[i]=transit_poly_g(trans)
     end
   end
 #  return flux,gradient

@@ -1,3 +1,4 @@
+
 """
     Transit_Struct
 
@@ -9,7 +10,7 @@ Structure to hold arrays and other quantities for computing transit.
 - `u_n::Array{T,1}`: limb-darkening coefficients
 - `n::Int64`: number of limb-darkening coefficients
 - `n_max::Int64`: maximum number of terms in M_n
-- `d_n::Array{T,1}`: Green's basis coefficients
+- `g_n::Array{T,1}`: Green's basis coefficients
 - `sn::Array{T,1}`: Green's basis terms
 - `Mn::Array{T,1}`: integral over ``(k^2-\\sin^2(\\phi))^{m/2}``
 - `Nn::Array{T,1}`: integral over ``(k^2-\\sin^2(\\phi))^{m/2}\\sin^2(\\phi)``
@@ -17,9 +18,9 @@ Structure to hold arrays and other quantities for computing transit.
 - `s2_grad::Array{T,1}`: gradient of ``s2`` with respect to ``(r,b)`` - this is ``S_1 = s_2`` from starry
 - `dsndr::Array{T,1}`: derivatives of Green's basis with respect to ``r``
 - `dsndb::Array{T,1}`: derivatives of Green's basis with respect to ``b``
-- `dddu::Array{T,2}`: derivatives ``d_n`` with respect to ``u_n``
+- `dddu::Array{T,2}`: derivatives ``g_n`` with respect to ``u_n``
 - `dfdrb::Array{T,1}`: derivative of flux with respect to `r,b`
-- `dfdd::Array{T,1}`: derivative of flux with respect to ``d_n``
+- `dfdd::Array{T,1}`: derivative of flux with respect to ``g_n``
 - `dfdu::Array{T,1}`: derivative of flux with respect to `u_n`
 - `jmax::Int64`: maximum number of terms in series expansions of ``I_v`` and ``J_v``
 - `Mn_coeff::Array{T,3}`: coefficients for series expansion of ``M_n``
@@ -47,7 +48,7 @@ Structure to hold arrays and other quantities for computing transit.
 - `k2inv::T`: ``1/k^2``
 - `kc2::T`: ``1-k^2`` (or ``1-1/k^2`` if ``k > 1``)
 - `sqrt1mr2:: T`: ``\\sqrt{1-r^2}``
-- `den::T`: ``1/(d_1 + 2/3 d_2)``
+- `den::T`: ``1/(g_1 + 2/3 g_2)``
 - `third::T`: ``1/3``
 - `twothird:: T`: ``2/3``
 - `sqr1mr::T`: ``\\sqrt{r(1-r)}`` if ``r < 1``
@@ -59,7 +60,7 @@ mutable struct Transit_Struct{T}
   u_n    ::Array{T,1}  # limb-darkening coefficients
   n      ::Int64       # number of limb-darkening coefficients
   n_max  ::Int64       # maximum number of terms in M_n
-  d_n    ::Array{T,1}  # Green's basis coefficients
+  g_n    ::Array{T,1}  # Green's basis coefficients
   sn     ::Array{T,1}  # Green's basis terms
   Mn     :: Array{T,1} # integral over (k^2-sin^2(phi))^(m/2)
   Nn     :: Array{T,1} # integral over (k^2-sin^2(phi))^(m/2)*sin^2(phi)
@@ -67,9 +68,9 @@ mutable struct Transit_Struct{T}
   s2_grad::Array{T,1}  # gradient of s2 with respect to (r,b) - this is S_1 = s_2 from starry
   dsndr  :: Array{T,1} # derivatives of Green's basis with respect to r
   dsndb  :: Array{T,1} # derivatives of Green's basis with respect to b
-  dddu   ::Array{T,2}  # derivatives d_n with respect to u_n
+  dddu   ::Array{T,2}  # derivatives g_n with respect to u_n
   dfdrb  ::Array{T,1}  # derivative of flux with respect to r,b
-  dfdd   ::Array{T,1}  # derivative of flux with respect to d_n
+  dfdd   ::Array{T,1}  # derivative of flux with respect to g_n
   dfdu   ::Array{T,1}  # derivative of flux with respect to u_n
   jmax   ::Int64       # maximum number of terms in series expansions of I_v and J_v
   Mn_coeff::Array{T,3} # coefficients for series expansion of M_n
@@ -97,14 +98,14 @@ mutable struct Transit_Struct{T}
   k2inv  ::T           # 1/k^2
   kc2    ::T           # 1-k^2 (or 1-1/k^2 if k > 1)
   sqrt1mr2:: T           # sqrt(1-r^2)
-  den    ::T           # 1/(d_1 + d_2*2/3)
+  den    ::T           # 1/(g_1 + g_2*2/3)
   third  ::T           # 1/3
   twothird:: T           # 2/3
   sqr1mr ::T           # sqrt(r*(1-r)) if r < 1
 end
 
 using SpecialFunctions
-include("compute_d_n_struct.jl")
+include("compute_g_n_struct.jl")
 include("Mn_coeff.jl")
 include("Nn_coeff.jl")
 
@@ -130,7 +131,7 @@ function transit_init(r::T,b::T,u_n::Array{T,1},grad::Bool) where {T <: Real}
   n_max = n
   jmax = 100
   trans = Transit_Struct{T}(r,b,u_n,n,n_max,
-    zeros(T,n+1),    # d_n
+    zeros(T,n+1),    # g_n
     zeros(T,n+1),    # sn
     zeros(T,n_max+1),# M_n from m= 0 to n_max
     zeros(T,n_max+1),# N_n from m= 0 to n_max
@@ -181,10 +182,10 @@ function transit_init(r::T,b::T,u_n::Array{T,1},grad::Bool) where {T <: Real}
     trans.ninv[n] = inv(n)
   end
   if grad
-    compute_d_n_grad!(trans)
+    compute_g_n_grad!(trans)
   else
-    compute_d_n!(trans)
+    compute_g_n!(trans)
   end
-  trans.den = inv(pi*(trans.d_n[1]+trans.twothird*trans.d_n[2]))  # for d_2 and above, the flux is zero.
+  trans.den = inv(pi*(trans.g_n[1]+trans.twothird*trans.g_n[2]))  # for g_2 and above, the flux is zero.
   return trans
 end

@@ -67,7 +67,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   # Add the impact parameter to the transit structure:
   trans.b = solver(tmid)
   # Carry out the transit computation:
-  fmid0 = transit_poly_d!(trans); neval += 1
+  fmid0 = transit_poly_g!(trans); neval += 1
   # Then, fillin the flux and derivatives in the fmid vector:
   fill_flux!(tmid,fmid0,trans,fmid)  # So is this line
 #  println("tfd, r: ",trans.r," b: ",trans.b," f/df: ",fmid)
@@ -77,7 +77,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   # Function to define the vector integration in cubature:
   function transit_flux_derivative!(tmid::T,fmid::Array{T,1}) where {T <: Real}
   trans.b = solver(tmid)
-  fmid0 = transit_poly_d!(trans); neval += 1
+  fmid0 = transit_poly_g!(trans); neval += 1
 #  fmid .= fill_flux!(tmid,fmid0,trans)
   fill_flux!(tmid,fmid0,trans,fmid)
 #  println("b: ",trans.b," f/df: ",fmid)
