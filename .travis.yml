@@ -21,6 +21,11 @@ install:
     - source .ci/travis.sh
     - julia .ci/install.jl
 
+before_script: 
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+  - sleep 3 
+
 script:
     - julia test/runtests.jl
     - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then source .ci/build-docs.sh; fi
