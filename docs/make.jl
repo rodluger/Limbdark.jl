@@ -6,6 +6,7 @@ makedocs(
     sitename="Limbdark",
     pages = [
         "Home" => "index.md",
+        "Installation" => "install.md",
         "API" => "api.md"
     ],
     format = Documenter.HTML(prettyurls = false)
