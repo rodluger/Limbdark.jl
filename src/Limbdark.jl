@@ -9,7 +9,8 @@ module Limbdark
 
 include("transit_structure.jl")
 include("transit_poly_struct.jl")
+include("integrate_lightcurve.jl")
 
-export transit_init, transit_poly
+export transit_init, transit_poly, integrate_lightcurve
 
 end
