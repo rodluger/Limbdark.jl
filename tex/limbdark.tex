@@ -1162,7 +1162,7 @@ We next increase the power of limb darkening by one, $\upmu^2$.
 
 The next order of limb darkening has been widely studied due to its
 accurate description of stellar atmospheres \citep{Claret2000,MandelAgol2002,Pal2008}.
-We summarize here the formulae for quadratic limb darkening%
+We summarize here the formulae for quadratic limb darkening for $I(\upmu)=4\upmu^2-2$%
 %with $\mathfrak{g}_2 = 4\mu^2-2$
 , along with the derivatives, using the transformed
 expressions described above. The general quadratic case may be computed as
@@ -1629,11 +1629,9 @@ Equation~(\ref{eq:normalization}) to obtain
 \frac{\partial F}{\partial \mathfrak{g}_1} &=&  I_0 \mathfrak{s}_1 - \frac{2\pi}{3} I_0 F\quad.
 \end{eqnarray}
 
-The derivatives of the coefficients, $\frac{\partial \mathfrak{g}_j}{\partial u_i}$, are
-computed by differentiating each term in Equation~(\ref{eq:an_of_un}) to obtain
-$\frac{\partial \mathfrak{p}_n}{\partial u_i}$, and differentiating each term in Equation~(\ref{eq:dn_of_an})
- to obtain $\frac{\partial \mathfrak{g}_j}{\partial \mathfrak{p}_n}$, and propagating
-the derivatives via the chain rule.  Then, the light curve derivatives are given by
+The derivatives of the light curve with respect to $\mathbf{u}$ are computed by applying
+the chain rule to the derivatives of the coefficients, 
+$\frac{\partial \mathfrak{g}_j}{\partial u_i} = \mathcal{A}_{ji}$,
 \begin{eqnarray}\label{eq:dFdu}
 \frac{\partial F}{\partial u_i} =  \sum_{j} \frac{\partial \mathfrak{g}_j}{\partial u_i}\frac{\partial F}{\partial \mathfrak{g}_j}.
 \end{eqnarray}
@@ -1671,11 +1669,12 @@ $\mathcal{A}\mathbf{u}$ is time-independent, and thus the matrix
 multiplication only needs to be computed once per light curve.
 
 Usually when fitting a light curve the unocculted flux is not equal
-to unity, but is some unknown value.  So, the correct procedure is to 
-multiply $F(t)$ by a constant which represents the unocculted flux.  
+to unity, but is some unknown value which needs to be fit for.  
+So, the correct procedure is to multiply $F(t)$ by a parameter which 
+represents the unocculted flux.
 In this case the derivative with respect to the flux constant is trivially 
 equal to $F(t)$, and the derivatives with respect to the other parameters 
-must be multiplied by the same constant.
+must be multiplied by the same parameter.
 
 With the description of the light curve computation complete, we next discuss
 the integration of the light curve over a finite time step.
@@ -1750,10 +1749,10 @@ which explains why in some cases it can be difficult to constrain both parameter
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/integrate_transit_gradient.pdf}
     \caption{Comparison of the normalized flux and its derivatives with (solid) and
-    without (dashed) time-integration.  The integration time is indicated in the
+    without (dashed) time-integration.  The integration time, $\Delta t = 0.3$, is indicated in the
     upper left panel with a horizontal blue line. The derivatives are computed with
     respect to $\{r,t_0,v,b_0,u_1,u_2\}$.  The parameters are given by $r=0.1$,
-    $t_0 = 0$, $b_0=0.5$, $u_1=u_2=0.3$. \jlcodelink{integrate_transit_gradient}
+    $t_0 = 0$, $b_0=0.5$, and $u_1=u_2=0.3$. \jlcodelink{integrate_transit_gradient}
     \label{fig:integrated_derivs}}
     \end{centering}
 \end{figure}
