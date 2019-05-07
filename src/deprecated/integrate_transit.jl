@@ -107,7 +107,7 @@ function integrate_timestep_gradient(param::Array{T,1},trans::Transit_Struct{T},
   fmid0 = transit_poly_d!(trans)
   # Compute: flux, df/dr, df/dt0, df/dv, df/db0, df/d d_n:
   fmid = [fmid0;trans.dfdrb[1];trans.dfdrb[2]/trans.b*param[2]*(param[1]-tmid);
-     trans.dfdrb[2]*param[2]/trans.b*(tmid-param[1])^2;trans.dfdrb[2]*param[3]/trans.b;trans.dfdd]
+     trans.dfdrb[2]*param[2]/trans.b*(tmid-param[1])^2;trans.dfdrb[2]*param[3]/trans.b;trans.dfdg]
   # Extrapolate the flux at the boundaries to the midpoint:
   fapprox = 0.5*(f1+f2)
   # Tolerance is set by the flux term only:
@@ -124,15 +124,15 @@ function integrate_timestep_gradient(param::Array{T,1},trans::Transit_Struct{T},
   b1 = solver(param,t1)
   trans.b = b1
   f10 = transit_poly_d!(trans)
-  f1 = [f10;trans.dfdrb;trans.dfdd]
+  f1 = [f10;trans.dfdrb;trans.dfdg]
   f1 = [f10;trans.dfdrb[1];trans.dfdrb[2]/trans.b*param[2]*(param[1]-t1);
-     trans.dfdrb[2]*param[2]/trans.b*(t1-param[1])^2;trans.dfdrb[2]*param[3]/trans.b;trans.dfdd]
+     trans.dfdrb[2]*param[2]/trans.b*(t1-param[1])^2;trans.dfdrb[2]*param[3]/trans.b;trans.dfdg]
   t2 = time + 0.5*dt
   b2 = solver(param,t2)
   trans.b = b2
   f20 = transit_poly_d!(trans)
   f2 = [f20;trans.dfdrb[1];trans.dfdrb[2]/trans.b*param[2]^2*(param[1]-t2);
-     trans.dfdrb[2]*param[2]/trans.b*(t2-param[1])^2;trans.dfdrb[2]*param[3]/trans.b;trans.dfdd]
+     trans.dfdrb[2]*param[2]/trans.b*(t2-param[1])^2;trans.dfdrb[2]*param[3]/trans.b;trans.dfdg]
   fint = integrate(param,f1,f2,t1,t2,0)
 return fint
 end

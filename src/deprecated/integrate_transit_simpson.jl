@@ -23,7 +23,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   fmid[4] = trans_mid.dfdrb[2]*param[2]*binv*(tmid-param[1])^2  # v derivative
   fmid[5] = trans_mid.dfdrb[2]*param[3]*binv  # b0 derivative
   @inbounds for i=1:trans_mid.n+1
-    fmid[5+i] = trans_mid.dfdd[i]  # d_i derivatives
+    fmid[5+i] = trans_mid.dfdg[i]  # d_i derivatives
   end
   return fmid
   end

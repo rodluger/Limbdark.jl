@@ -18,9 +18,9 @@ Structure to hold arrays and other quantities for computing transit.
 - `s2_grad::Array{T,1}`: gradient of ``s2`` with respect to ``(r,b)`` - this is ``S_1 = s_2`` from starry
 - `dsndr::Array{T,1}`: derivatives of Green's basis with respect to ``r``
 - `dsndb::Array{T,1}`: derivatives of Green's basis with respect to ``b``
-- `dddu::Array{T,2}`: derivatives ``g_n`` with respect to ``u_n``
+- `dgdu::Array{T,2}`: derivatives ``g_n`` with respect to ``u_n``
 - `dfdrb::Array{T,1}`: derivative of flux with respect to `r,b`
-- `dfdd::Array{T,1}`: derivative of flux with respect to ``g_n``
+- `dfdg::Array{T,1}`: derivative of flux with respect to ``g_n``
 - `dfdu::Array{T,1}`: derivative of flux with respect to `u_n`
 - `jmax::Int64`: maximum number of terms in series expansions of ``I_v`` and ``J_v``
 - `Mn_coeff::Array{T,3}`: coefficients for series expansion of ``M_n``
@@ -68,9 +68,9 @@ mutable struct Transit_Struct{T}
   s2_grad::Array{T,1}  # gradient of s2 with respect to (r,b) - this is S_1 = s_2 from starry
   dsndr  :: Array{T,1} # derivatives of Green's basis with respect to r
   dsndb  :: Array{T,1} # derivatives of Green's basis with respect to b
-  dddu   ::Array{T,2}  # derivatives g_n with respect to u_n
+  dgdu   ::Array{T,2}  # derivatives g_n with respect to u_n
   dfdrb  ::Array{T,1}  # derivative of flux with respect to r,b
-  dfdd   ::Array{T,1}  # derivative of flux with respect to g_n
+  dfdg   ::Array{T,1}  # derivative of flux with respect to g_n
   dfdu   ::Array{T,1}  # derivative of flux with respect to u_n
   jmax   ::Int64       # maximum number of terms in series expansions of I_v and J_v
   Mn_coeff::Array{T,3} # coefficients for series expansion of M_n
@@ -139,9 +139,9 @@ function transit_init(r::T,b::T,u_n::Array{T,1},grad::Bool) where {T <: Real}
     zeros(T,2),      # s2_grad
     zeros(T,n+1),    # dsndr
     zeros(T,n+1),    # dsndb
-    zeros(T,n+1,n),  # dddu
+    zeros(T,n+1,n),  # dgdu
     zeros(T,2),      # dfdrb
-    zeros(T,n+1),    # dfdd
+    zeros(T,n+1),    # dfdg
     zeros(T,n),      # dfdu
     jmax,		   # jmax
     zeros(T,2,4,jmax),   # Mn_coeff for k^2 < 1 & k^2 > 1; n_max-3 to n_max; series coefficients

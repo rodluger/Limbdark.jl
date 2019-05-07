@@ -16,7 +16,7 @@ include("Nn_compute.jl")
 """
     compute_uniform(t)
 
-Computes the coefficient for the uniform disk case, `S_0`, given
+Computes the coefficient for the uniform disk case, `s_0`, given
 a `TransitStruct` instance `t`.
 """
 function compute_uniform!(t::Transit_Struct{T}) where {T <: Real}
@@ -227,11 +227,13 @@ end
 
 
 """
-    transit_poly!(t)
+    transit_poly!(r,b,u_n,dfdrbu)
 
-Given a `TransitStruct` instance `t`,
-computes a limb-darkened transit light curve and optionally
-its gradient.
+Given a radius-ratio, impact parameter, vector of limb-darkening coefficients
+of size N, and pre-allocated vector for derivatives of size N+2, returns
+the flux (normalized to one for unocculted star)
+for a limb-darkened transit light curve and its gradient with respect to
+the input parameters is returned.
 
 !!! warning
 
@@ -240,20 +242,21 @@ its gradient.
 # Arguments
 - `r::Real`: The radius of the occultor in units of the radius of the occulted body.
 - `b::Real`: The (initial) impact parameter of the occultation.
-- `u_n::Array{Real,1}`: The array of limb darkening coefficients.
-- `dfdrbu::Array{Real,1}`: Gradient of the flux with respect to all input parameters.
+- `u_n::Array{Real,1}`: The array of limb darkening coefficients.  Size N.
+- `dfdrbu::Array{Real,1}`: Gradient of the flux with respect to all input parameters. Size is N+2
 """
 function transit_poly!(r::T,b::T,u_n::Array{T,1},dfdrbu::Array{T,1}) where {T <: Real}
+  # Initialize `TransitStruct`:
   t = transit_init(r,b,u_n,true)
   # Pass g_n (without last two dummy values):
   flux = transit_poly_g!(t)
-  # Now, transform derivaties from c to u:
+  # Now, transform derivaties from g to u:
   fill!(dfdrbu,zero(T))
   # u_n derivatives:
   dfdrbu[1] = t.dfdrb[1]
   dfdrbu[2] = t.dfdrb[2]
   @inbounds for i=1:t.n, j=0:t.n
-    dfdrbu[i+2] += t.dfdd[j+1]*t.dddu[j+1,i]
+    dfdrbu[i+2] += t.dfdg[j+1]*t.dgdu[j+1,i]
   end
   return flux
 end
@@ -287,11 +290,11 @@ function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
     flux = transit_poly_g!(t)
     # Now, transform derivaties from c to u:
     fill!(t.dfdu,zero(T))
-  #  t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dddu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
-    BLAS.gemv!('T',1.0,t.dddu,t.dfdd,0.0,t.dfdu)
-  #  t.dfdrbu[3:t.n+2]=BLAS.gemv('T',1.0,t.dddu,t.dfdrbc[3:t.n+3])
+  #  t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dgdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
+    BLAS.gemv!('T',1.0,t.dgdu,t.dfdg,0.0,t.dfdu)
+  #  t.dfdrbu[3:t.n+2]=BLAS.gemv('T',1.0,t.dgdu,t.dfdrbc[3:t.n+3])
   #  @inbounds for i=1:t.n, j=0:t.n
-  #    t.dfdu[i] += t.dfdd[j+1]*t.dddu[j+1,i]
+  #    t.dfdu[i] += t.dfdg[j+1]*t.dgdu[j+1,i]
   #  end
     return flux
   else
@@ -309,7 +312,7 @@ end
 """
 function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
   r = t.r; b=t.b; n = t.n; r2 =r*r; b2=b*b; bcut = 1e-3
-  @assert((length(t.g_n)) == length(t.dfdd))
+  @assert((length(t.g_n)) == length(t.dfdg))
   @assert(r > 0)
   # Number of limb-darkening components to include (beyond 0 and 1):
   # We are parameterizing these with the function:
@@ -326,19 +329,19 @@ function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
   if b >= 1+r || r ==  0.0
     # unobscured - return one, and zero derivatives:
     fill!(t.dfdrb,zero(T))
-    fill!(t.dfdd,zero(T))
+    fill!(t.dfdg,zero(T))
     return one(T)
   end
   if r >= 1+b
     # full obscuration - return zero, and zero derivatives:
     fill!(t.dfdrb,zero(T))
-    fill!(t.dfdd,zero(T))
+    fill!(t.dfdg,zero(T))
     return zero(T)
   end
   if b == 0.0
     # Annular eclipse - integrate around the full boundary of both bodies:
     flux = zero(T); onemr2 = 1-r2; t.sqrt1mr2 = sqrt(onemr2)
-    fill!(t.dfdd,zero(T))
+    fill!(t.dfdg,zero(T))
     flux = (t.g_n[1]*onemr2+t.twothird*t.g_n[2]*t.sqrt1mr2^3)*pi*t.den
     fac  = 2r2*onemr2*pi*t.den
     facd = -2r*pi*t.den
@@ -346,13 +349,13 @@ function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
     @inbounds for i=2:t.n
       flux -= t.g_n[i+1]*fac
       t.dfdrb[1] += t.g_n[i+1]*facd*(2*onemr2-i*r2)
-      t.dfdd[i+1] -= fac
+      t.dfdg[i+1] -= fac
       fac *= t.sqrt1mr2
       facd *= t.sqrt1mr2
     end
     #  dfdrb[2]=0 since the derivative with respect to b is zero.
-    t.dfdd[1] = (onemr2-flux)*pi*t.den
-    t.dfdd[2] = t.twothird*(t.sqrt1mr2^3-flux)*pi*t.den
+    t.dfdg[1] = (onemr2-flux)*pi*t.den
+    t.dfdg[2] = t.twothird*(t.sqrt1mr2^3-flux)*pi*t.den
     return flux
   else
   # Next, compute k^2 = m:
@@ -485,15 +488,15 @@ function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
   t.dfdrb[2]=zero(T)  # Derivative with respect to b
   @inbounds for i=0:t.n
     # derivatives with respect to the coefficients:
-    t.dfdd[i+1]= t.sn[i+1]*t.den
+    t.dfdg[i+1]= t.sn[i+1]*t.den
     # total flux:
-    flux += t.g_n[i+1]*t.dfdd[i+1]
+    flux += t.g_n[i+1]*t.dfdg[i+1]
     # derivatives with respect to r and b:
     t.dfdrb[1] += t.g_n[i+1]*t.dsndr[i+1]*t.den
     t.dfdrb[2] += t.g_n[i+1]*t.dsndb[i+1]*t.den
   end
   # Include derivatives with respect to first two g_n parameters:
-  t.dfdd[1] -= flux*t.den*pi
-  t.dfdd[2] -= flux*t.den*pi*t.twothird
+  t.dfdg[1] -= flux*t.den*pi
+  t.dfdg[2] -= flux*t.den*pi*t.twothird
   return flux
 end

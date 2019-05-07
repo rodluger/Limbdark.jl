@@ -91,7 +91,7 @@ fint  = zeros(T,6+trans.n)
   # the average flux vector:
   favg1[1:5,i]=ftmp[1:5]
   # Convert from g_n to u_n derivatives for the remaining parts of the vector:
-  favg1[6:5+trans.n,i]=BLAS.gemv('T',1.0,trans.dddu,ftmp[6:6+trans.n])
+  favg1[6:5+trans.n,i]=BLAS.gemv('T',1.0,trans.dgdu,ftmp[6:6+trans.n])
 #  println("i: ",i," t: ",t[i]," result: ",ftmp)
 end
 return

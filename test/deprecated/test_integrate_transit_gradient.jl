@@ -1,4 +1,4 @@
-# This is test of the code for computing a transit model integrated over a time step.
+ # This is test of the code for computing a transit model integrated over a time step2
 # Computes derivatives over the timestep.
 using PyPlot
 
@@ -89,7 +89,7 @@ fint  = zeros(T,6+trans.n)
   end
   favg1[i,1:5]=ftmp[1:5]
   # Convert from d_n to u_n derivatives:
-  favg1[i,6:5+trans.n]=BLAS.gemv('T',1.0,trans.dddu,ftmp[6:6+trans.n])
+  favg1[i,6:5+trans.n]=BLAS.gemv('T',1.0,trans.dgdu,ftmp[6:6+trans.n])
 #  println("i: ",i," t: ",t[i]," result: ",ftmp)
 end
 return
@@ -104,7 +104,7 @@ integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,3,neval1)
 #        ftmp = integrate_timestep_gradient(param,trans,t[i],dt,1e-6*r^2,32)*dtinv
 #        favg1[i,1:5]=ftmp[1:5]
 #        # Convert from d_n to u_n derivatives:
-#        favg1[i,6:5+nu]=BLAS.gemv('T',1.0,trans.dddu,ftmp[6:6+nu])
+#        favg1[i,6:5+nu]=BLAS.gemv('T',1.0,trans.dgdu,ftmp[6:6+nu])
 #      end
 
 # Now plot the results:

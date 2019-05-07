@@ -1,3 +1,4 @@
+# Timing tests of transit_poly_g!:
 
 include("transit_poly_struct.jl")
 #trans = transit_init(0.1,0.5,[0.5,0.5],true)

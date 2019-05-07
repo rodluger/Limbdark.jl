@@ -56,7 +56,7 @@ integrate_lightcurve!(trans,param,t,dt,favg1,nt,1e-4,3,neval1,depthmax1)
 #        ftmp = integrate_timestep_gradient(param,trans,t[i],dt,1e-6*r^2,32)*dtinv
 #        favg1[i,1:5]=ftmp[1:5]
 #        # Convert from g_n to u_n derivatives:
-#        favg1[i,6:5+nu]=BLAS.gemv('T',1.0,trans.dddu,ftmp[6:6+nu])
+#        favg1[i,6:5+nu]=BLAS.gemv('T',1.0,trans.dgdu,ftmp[6:6+nu])
 #      end
 
 # Now plot the results:
