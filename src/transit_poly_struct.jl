@@ -1,6 +1,3 @@
-g to u:
-    fill!(t.dfdu,zero(T))
-  #  t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dgdu,t.dfdr2
 include("define_constants.jl")
 # Include linear algebara:
 if VERSION >= v"0.7"

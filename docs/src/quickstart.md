@@ -5,6 +5,7 @@
 ```@example 1
 using Plots # hide
 using Plots.PlotMeasures # hide
+push!(LOAD_PATH, "../../src/") # hide
 import Limbdark
 
 # Array of impact parameters
@@ -32,8 +33,10 @@ for i = 1:npts
 end
 
 # Plot it
-plot(b, flux, linewidth=2, xlabel="Impact parameter", 
-     ylabel="Flux", left_margin=30mm);
+plot(b, flux, linewidth=2, 
+     xlabel="Impact parameter", 
+     ylabel="Flux",
+     label="light curve");
 savefig("example1.svg"); nothing # hide
 ```
 
