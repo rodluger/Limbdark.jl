@@ -20,7 +20,7 @@ Although this is the quickest entry into the code, it is
 To compute a light curve with derivatives, initialize the transit structure:
 
 ```
-
+julia> import Limbdark
 julia> trans = transit_init(0.1,0.5,[0.1,0.2,0.3],true)
 julia> npts = 100000
 julia> b = range(-1.5,stop=1.5,length=npts)
