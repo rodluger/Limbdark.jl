@@ -1,4 +1,4 @@
-
+constan2
 \documentclass[modern]{aastex61}
 
 \input{stylez}
@@ -1773,19 +1773,20 @@ we can use a high order polynomial model as an alternative limb darkening model.
 %\end{itemize}
 
 We have computed an example non-linear light curve with $r=0.1$ and
-$c_1=c_2=c_3=c_4=0.2$, and then fit it with successive orders of the
-polynomial approximation.  The non-linear light curve model
+$c_1=c_2=c_3=c_4=0.2$, and then fit it with the polynomial limb-darkening
+model with increasing orders of the polynomial approximation.  The non-linear light curve model
 we computed numerically as the analytic expressions in \citet{MandelAgol2002}
 are in terms of hypergeometric functions which are expensive to evaluate.
-We compute the light curve with a ``layer-cake'' model in which sums of
+We numerically compute the non-linear light curve with a ``layer-cake'' model in which sums of
 layers of surface brightness with a grid of increasing radii are added together
 to approximate the lightcurve;  this
 is the approach taken in the numerical model used to compute the
 non-linear limb darkening light curves in the code of \citet{MandelAgol2002},
-and it is analagous to the approach taken by \citet{Kreidberg2015} for
+and it is analogous to the approach taken by \citet{Kreidberg2015} for
 computing models with arbitrary limb darkening profiles.
 
-We find that the fit improves steadily up until $N=6$ (a sextic
+When fitting the non-linear lightcurve with the polynomial model,
+we find that the fit improves steadily up until $N=6$ (a sextic
 polynomial), while beyond sextic, the RMS improves imperceptibly.
 The RMS of the sextic fit for this example is $<5 \times 10^{-7}$
 relative to a depth of transit of about 1.4\% (Figure \ref{fig:nonlinear}).
