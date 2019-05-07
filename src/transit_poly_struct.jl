@@ -1,4 +1,6 @@
-# Define constants for speed:
+g to u:
+    fill!(t.dfdu,zero(T))
+  #  t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dgdu,t.dfdr2
 include("define_constants.jl")
 # Include linear algebara:
 if VERSION >= v"0.7"
@@ -77,9 +79,10 @@ end
 """
     transit_poly_g(t)
 
-Given a `TransitStruct` instance `t`,
-computes a limb-darkened transit light curve and optionally
-its gradient.
+Given a `TransitStruct` instance `t`, computes a limb-darkened transit light 
+curve without gradient.
+
+
 """
 function transit_poly_g(t::Transit_Struct{T}) where {T <: Real}
   # Number of limb-darkening components to include (beyond 0 and 1):
@@ -231,13 +234,8 @@ end
 
 Given a radius-ratio, impact parameter, vector of limb-darkening coefficients
 of size N, and pre-allocated vector for derivatives of size N+2, returns
-the flux (normalized to one for unocculted star)
-for a limb-darkened transit light curve and its gradient with respect to
-the input parameters is returned.
-
-!!! warning
-
-    Write docstring for this function.
+the flux (normalized to one for unocculted star) for a limb-darkened transit 
+light curve and its gradient with respect to the input parameters is returned.
 
 # Arguments
 - `r::Real`: The radius of the occultor in units of the radius of the occulted body.
@@ -262,11 +260,16 @@ function transit_poly!(r::T,b::T,u_n::Array{T,1},dfdrbu::Array{T,1}) where {T <:
 end
 
 """
-    transit_poly(t)
+    transit_poly(r,b,u_n)
 
-!!! warning
+Given a radius-ratio, impact parameter, vector of limb-darkening coefficients
+of size N, returns the flux (normalized to one for unocculted star) for a 
+limb-darkened transit.
 
-    Write docstring for this function.
+# Arguments
+- `r::Real`: The radius of the occultor in units of the radius of the occulted body.
+- `b::Real`: The (initial) impact parameter of the occultation.
+- `u_n::Array{Real,1}`: The array of limb darkening coefficients.  Size N.
 """
 function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
   t = transit_init(r,b,u_n,false)
@@ -275,11 +278,12 @@ function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
 end
 
 """
-    transit_poly_g(t)
+    transit_poly!(t)
 
-!!! warning
+Given a `TransitStruct` instance `t`, with Green's coefficients already initialized,
+computes a limb-darkened transit light curve with optional gradient with
+respect to r, b and u coefficients.
 
-    Write docstring for this function.
 """
 function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
   # This function assumes that g_n has already been computed from u_n
@@ -288,11 +292,9 @@ function transit_poly!(t::Transit_Struct{T}) where {T <: Real}
   # Pass transit structure, and compute flux:
   if t.grad
     flux = transit_poly_g!(t)
-    # Now, transform derivaties from c to u:
+    # Now, transform derivaties from g to u:
     fill!(t.dfdu,zero(T))
-  #  t.dfdrbu[3:t.n+2]=BLAS.gemv!('T',1.0,t.dgdu,t.dfdrbc[3:t.n+3],0.0,t.dfdrbu[3:t.n+2])
     BLAS.gemv!('T',1.0,t.dgdu,t.dfdg,0.0,t.dfdu)
-  #  t.dfdrbu[3:t.n+2]=BLAS.gemv('T',1.0,t.dgdu,t.dfdrbc[3:t.n+3])
   #  @inbounds for i=1:t.n, j=0:t.n
   #    t.dfdu[i] += t.dfdg[j+1]*t.dgdu[j+1,i]
   #  end
@@ -306,9 +308,10 @@ end
 """
     transit_poly_g!(t)
 
-!!! warning
+Given a `TransitStruct` instance `t`, with Green's coefficients already initialized,
+computes a limb-darkened transit light curve including gradient with
+respect to r, b and g coefficients.
 
-    Write docstring for this function.
 """
 function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
   r = t.r; b=t.b; n = t.n; r2 =r*r; b2=b*b; bcut = 1e-3
