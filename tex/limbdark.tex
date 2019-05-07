@@ -1840,7 +1840,9 @@ When a light curve is computed, there are some computations which only
 need to be carried out once, and then can be reused at each time step in the
 light curve computation.
 We define a structure to hold these variables
-which are reused throughout the light curve.  In addition, due to the greater
+which are reused throughout the light curve; we also pre-allocate variables which
+are used throughout the computation to avoid the overhead of memory allocation
+and garbage collection.  In addition, due to the greater
 computational expense of square-roots and divisions, where possible we try
 to only compute a square root or division once, storing these in a variable
 within the structure, and then reuse these with cheaper multiplication
