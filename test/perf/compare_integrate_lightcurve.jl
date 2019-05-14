@@ -67,5 +67,5 @@ include("../loglinspace.jl")
     run_timing_test()
   end
 
-  @test timeTaken < 2.0 # TEMP
+  println("Time taken: $timeTaken")
 end
