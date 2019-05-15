@@ -15,7 +15,7 @@ println("\nRunning comparison...\n")
 
 # TODO read in data from starry or exoplanet for comparison
 
-function run_timing_test(r::Ty, b0::Ty, aonr::Ty, period::Ty, u_1::Ty, u_2::Ty, trials::Int64) where {Ty <: Real}
+function run_ALFM_test(r::Ty, b0::Ty, aonr::Ty, period::Ty, u_1::Ty, u_2::Ty, trials::Int64) where {Ty <: Real}
 
   # TODO probably want to continue moving these out for sharing when running other code
 
@@ -27,10 +27,11 @@ function run_timing_test(r::Ty, b0::Ty, aonr::Ty, period::Ty, u_1::Ty, u_2::Ty, 
   nobs = convert(Int64,round(tobs * 30))  # Number of data points
   time = linearspace(-1.5*trans_dur ,1.5*trans_dur, nobs)  # Time array in units of hours
 
+
   expression, timeTaken, bytes, gctime, memallocs = @timed for k=1:trials
 
     # Setup all the parameters
-    trans = transit_init(r, b0, u_n, false)  # Initialize transit structure
+    trans = transit_init(r, b0, [u_1, u_2], false)  # Initialize transit structure
     param = [0.0, v/24, b0]   # parameters of the transit: [t_0,v,b_0]
     t = Array{Float64,1}(undef,nobs)
     t .= time
@@ -69,8 +70,8 @@ runs = length(period_vals) * length(b_vals) # number of parameter configurations
 trialsPerConfig = 10 # number of trials to run for a given parameter configuration
 
 # Structures for holding results
-limbdark_time = zeros(runs)
 num_datapoints = zeros(runs)
+limbdark_time = zeros(runs)
 #results_aveflux = zeros(runs)
 
 # Run the timing test
@@ -80,30 +81,48 @@ for i = 1:runs
 
   # the number of data points is computed based on the parameters provided
   # this is the most interesting thing to graph
-  num_datapoints[i], limbdark_time[i] = run_timing_test(r, b, aonr,  period, trialsPerConfig)
+  num_datapoints[i], limbdark_time[i] = run_ALFM_test(r, b, aonr, period, u_1, u_2, trialsPerConfig)
+  # TODO run starry/exoplanet here
 end
-
-
 
 # Plot Results
 fig, axes = subplots(3,1, figsize=(8,12))
 
 ax = axes[1]
 ax.plot(num_datapoints, limbdark_time, label = "ALFM (2019)", linestyle = "-", lw=2, color="C0")
-
 ax.set_title("r=0.1; b=0.3")
 ax.set_xlabel("Data Points")
-ax.set_xlabel("Data Points")
-
+ax.set_ylabel("Time [s]")
 #ax.set_xscale(:log) # scales lineary to number of data points
 ax.legend(loc="upper left",fontsize=10)
 
-#=
+
+################
+# SECOND TEST - VARY B
+################
+
+# TODO not that interesting as is since it affects the number of data points
+# which we already did above... this is less obvious
+
+b_vals = collect(linearspace(0.0, 1.1, 50))
+runs = length(b_vals)
+junk = zeros(runs)
+limbdark_b_time = zeros(runs)
+trialsPerConfig = 30
+
+# Run the timing test
+for i = 1:runs
+  b = b_vals[i]
+  period = 50.0
+
+  junk[i], limbdark_b_time[i] = run_ALFM_test(r, b, aonr, period, u_1, u_2, trialsPerConfig)
+  # TODO run starry/exoplanet here
+end
+
+
 ax = axes[2]
-ax.plot(period_vals, limbdark_time, label = "ALFM (2019)", linestyle = "-", lw=2, color="C0")
-
-ax.set_xlabel("Data Points")
-ax.legend(loc="upper right",fontsize=10)
-=#
-
-# TODO plot other's data for comparison
+ax.plot(b_vals, limbdark_b_time, label = "ALFM (2019)", linestyle = "-", lw=2, color="C0")
+ax.set_title("r=0.1; period=50d")
+ax.set_xlabel("Impact Parameter")
+ax.set_ylabel("Time [s]")
+ax.legend(loc="upper left",fontsize=10)
