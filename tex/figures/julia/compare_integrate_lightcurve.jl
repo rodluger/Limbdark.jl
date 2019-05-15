@@ -11,72 +11,99 @@ end
 include("../../../src/integrate_lightcurve.jl")
 include("../../../test/loglinspace.jl")
 
+println("\nRunning comparison...\n")
+
 # TODO read in data from starry or exoplanet for comparison
 
-function run_timing_test(r::Ty, b0::Ty,) where {Ty <: Real}
+function run_timing_test(r::Ty, b0::Ty, aonr::Ty, period::Ty, u_1::Ty, u_2::Ty, trials::Int64) where {Ty <: Real}
 
-  # Specify parameters appropriate for KOI-984.01.
-  # Plucking these from NexSci Kepler candidate archive.
+  # TODO probably want to continue moving these out for sharing when running other code
 
-  # Radius ratio:
-  #r = 0.025717
-  # Ratio of semi-major axis to stellar radius:
-  aonr = 19.94
-  # Orbital period [d]:
-  period = 4.28746668
-  # Impact parameter:
-  #b0 = 0.374
-  # Transit duration [hr] (this is time between first and fourth contact):
-  #T0 = 1.5693 (this is value from catalog)
+  v = 2*pi*aonr/period # velocity
+  trans_dur = 2*sqrt((1+r)^2-b0^2)/v*24 # approx transit duration in hours
 
-  # Check that these agree.  Compute velocity:
-  v = 2*pi*aonr/period
-  # Compute transit duration [convert to hr], approximate:
-  T = 2*sqrt((1+r)^2-b0^2)/v*24
-  #@test T ≈ T0 atol=0.001
-
-  # Okay, now to simulate transit.  Assume a 2-minute cadence:
-  tobs = 3*T  # Observation duration in hours
+  # Simulate transit data with a 2-minute cadence:
+  tobs = 3*trans_dur  # Observation duration in hours
   nobs = convert(Int64,round(tobs * 30))  # Number of data points
-  time = linearspace(-1.5*T ,1.5*T, nobs)  # Time array in units of hours
+  time = linearspace(-1.5*trans_dur ,1.5*trans_dur, nobs)  # Time array in units of hours
 
-  u_n = [0.1914,0.5167]  # Quadratic limb-darkening parameters
+  expression, timeTaken, bytes, gctime, memallocs = @timed for k=1:trials
 
-  # Setup all the parameters
-  trans = transit_init(r, b0, u_n, false)  # Initialize transit structure
-  param = [0.0, v/24, b0]   # parameters of the transit: [t_0,v,b_0]
-  t = Array{Float64,1}(undef,nobs)
-  t .= time
-  dt = 2/60  # Transit exposure time is 2 minutes, convert to hours.
-  favg1 = Array{Float64,2}(undef, 7, nobs)
-  nt = nobs
-  tol = 1e-6
-  maxdepth = 6
-  neval_t = Array{Int64,1}(undef, nobs)
-  depthmax = Array{Int64,1}(undef, nobs)
+    # Setup all the parameters
+    trans = transit_init(r, b0, u_n, false)  # Initialize transit structure
+    param = [0.0, v/24, b0]   # parameters of the transit: [t_0,v,b_0]
+    t = Array{Float64,1}(undef,nobs)
+    t .= time
+    dt = 2/60  # Transit exposure time is 2 minutes, convert to hours.
+    favg1 = Array{Float64,2}(undef, 7, nobs)
+    nt = nobs
+    tol = 1e-6
+    maxdepth = 6
+    neval_t = Array{Int64,1}(undef, nobs)
+    depthmax = Array{Int64,1}(undef, nobs)
 
-  integrate_lightcurve!(trans, param, t, dt, favg1, nt, tol, maxdepth, neval_t, depthmax)
+    integrate_lightcurve!(trans, param, t, dt, favg1, nt, tol, maxdepth, neval_t, depthmax)
+  end
 
-  #println("Depthmax: $depthmax")
-  #println("neval_t: $neval_t")
-  #println("Depthmax: $depthmax")
-
+  return nobs, timeTaken/trials
 end
 
 
-r = 0.025717 # radius ratio
+# Transit parameters. Some vary, some are fixed
 
-runs = 1001 # number of runs
-b = zeros(runs) # impact parameter
+# Ratio of semi-major axis to stellar radius:
+aonr = 30.0
+# Orbital period [d]:
+period_vals = collect(linearspace(1, 1000.0, 20)) # = 4.28746668
+#r = 0.025717 # radius ratio
+r = 0.1
+b_vals = [0.3]
+#b_vals = collect(linearspace(0.1, 0.4, 4)) # impact parameter
+#b[i+1] = sqrt(((i-500.0)/500.0*(1.0+2.0*r))^2) # use i-1
+# Quadratic limb darkening parameters
+u_1 = 0.2
+u_2 = 0.2
 
-# Run the timing test many times and benchmark the total amount of time
-expression, timeTaken, bytes, gctime, memallocs = @timed for i = 0:(runs - 1)
+# Comparison configuration
+runs = length(period_vals) * length(b_vals) # number of parameter configurations we're trying
+trialsPerConfig = 10 # number of trials to run for a given parameter configuration
 
-  # vary the impact parameter
-  #b[i+1] = sqrt(((i-500.0)/500.0*(1.0+2.0*r))^2)
-  b[i+1] = 0.374
+# Structures for holding results
+limbdark_time = zeros(runs)
+num_datapoints = zeros(runs)
+#results_aveflux = zeros(runs)
 
-  run_timing_test(r, b[i+1])
+# Run the timing test
+for i = 1:runs
+  b = b_vals[mod(i-1, length(b_vals)) + 1]
+  period = period_vals[mod(i-1, length(period_vals)) + 1]
+
+  # the number of data points is computed based on the parameters provided
+  # this is the most interesting thing to graph
+  num_datapoints[i], limbdark_time[i] = run_timing_test(r, b, aonr,  period, trialsPerConfig)
 end
 
-println("Elapsed time: $timeTaken")
+
+
+# Plot Results
+fig, axes = subplots(3,1, figsize=(8,12))
+
+ax = axes[1]
+ax.plot(num_datapoints, limbdark_time, label = "ALFM (2019)", linestyle = "-", lw=2, color="C0")
+
+ax.set_title("r=0.1; b=0.3")
+ax.set_xlabel("Data Points")
+ax.set_xlabel("Data Points")
+
+#ax.set_xscale(:log) # scales lineary to number of data points
+ax.legend(loc="upper left",fontsize=10)
+
+#=
+ax = axes[2]
+ax.plot(period_vals, limbdark_time, label = "ALFM (2019)", linestyle = "-", lw=2, color="C0")
+
+ax.set_xlabel("Data Points")
+ax.legend(loc="upper right",fontsize=10)
+=#
+
+# TODO plot other's data for comparison
