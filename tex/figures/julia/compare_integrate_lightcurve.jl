@@ -22,45 +22,54 @@ perfplot = axes[3]
 
 # Duration is observed duration in hours
 # Returns a time array in units of hours
-function get_time_points(duration::Real)
-  # Simulate transit data with a 2-minute cadence:
-  tobs = 3 * duration  # Observation duration in hours
-  nobs = convert(Int64,round(tobs * 30))  # Number of data points
-  return linearspace(-1.5*duration, 1.5*duration, nobs)  # Time array in units of hours
-end
+# function get_time_points(duration::Real)
+#   # Simulate transit data with a 2-minute cadence:
+#   tobs = 3 * duration  # Observation duration in hours
+#   nobs = convert(Int64,round(tobs * 30))  # Number of data points
+#   return linearspace(-1.5*duration, 1.5*duration, nobs)  # Time array in units of hours
+# end
 
 function get_time_array(dataPoints::Real)
   #trans_dur = 2*sqrt((1+r)^2-b0^2)/v*24 # approx transit duration in hours
-  return linearspace(-2.0, 2.0, dataPoints)
+  return linearspace(0.0 - 0.5*get_duration_days(), 0.5*get_duration_days(), dataPoints)
 end
 
+function get_duration_days()
+  return 3.0 # TODO hardcoded. Should vary with the orbital paramters. Fine for this one-off test.
+end
 
-function run_ALFM_test(r::Float64, b0::Float64, aonr::Float64, period::Float64, u_1::Float64, u_2::Float64, dataPoints::Int64, trials::Int64, plot_curve::Bool)
+function get_exposure_hours(dataPoints::Real)
+  return 2/60 # TODO is it OK if this doesn't exactly cover the space of time of the duration? Overlap ok? Gaps ok?
+  #return get_duration_days() * 24 / dataPoints # this would make it gapless without overlap always
+end
 
-  v = 2*pi*aonr/period # velocity
-  println("ALFM velocity estimate: $v")
+function run_ALFM_test(r::Float64, b0::Float64, s::Float64, period::Float64, u_1::Float64, u_2::Float64, dataPoints::Int64, trials::Int64, plot_curve::Bool)
+
+  #aonr = a / r # change units of semi-major axis from solar radii to planet radii
+  #v = 2*pi*aonr/period # velocity estimate
+  speed = s / 24 # change units of speed to be in terms of planet radii instead of solar radii, and hours instead of days
+  #speed = speed * 2 # TODO bug?
 
   time = get_time_array(dataPoints)
-  nobs = length(time)
 
   expression, timeTaken, bytes, gctime, memallocs = @timed for k=1:trials
 
     # Setup all the parameters
     trans = transit_init(r, b0, [u_1, u_2], false)  # Initialize transit structure
-    param = [0.0, v/24, b0]   # parameters of the transit: [t_0,v,b_0]  # TODO fixed speed is different than exoplanet
-    t = Array{Float64,1}(undef,nobs)
+    param = [0.0, speed, b0]   # parameters of the transit: [t_0,v,b_0]  # TODO fixed speed is different than exoplanet
+    t = Array{Float64,1}(undef,dataPoints)
     t .= time
-    dt = 2/60  # Transit exposure time is 2 minutes, convert to hours.
-    favg1 = Array{Float64,2}(undef, 7, nobs)
+    dt = get_exposure_hours(dataPoints)  #2/60  # Transit exposure time is 2 minutes, convert to hours.
+    favg1 = Array{Float64,2}(undef, 7, dataPoints)
     tol = 1e-6
     maxdepth = 6
-    neval_t = Array{Int64,1}(undef, nobs)
-    depthmax = Array{Int64,1}(undef, nobs)
+    neval_t = Array{Int64,1}(undef, dataPoints)
+    depthmax = Array{Int64,1}(undef, dataPoints)
 
-    integrate_lightcurve!(trans, param, t, dt, favg1, nobs, tol, maxdepth, neval_t, depthmax)
+    integrate_lightcurve!(trans, param, t, dt, favg1, dataPoints, tol, maxdepth, neval_t, depthmax)
 
     if (plot_curve && k==1)
-      topplot.plot(t, favg1[1,:], label="ALFM (n=$nobs)", linestyle = "-", lw=1)
+      topplot.plot(t, favg1[1,:], label="ALFM (n=$dataPoints)", linestyle = "-", lw=2)
     end
   end
 
@@ -70,15 +79,15 @@ end
 function run_exoplanet_test(orbit::PyObject, r::Ty, u_1::Ty, u_2::Ty, dataPoints::Int64, trials::Int64, plot_curve::Bool) where {Ty <: Real}
 
   t = get_time_array(dataPoints)
-  nobs = length(t)
+  texp = get_exposure_hours(dataPoints)
 
   expression, timeTaken, bytes, gctime, memallocs = @timed for k=1:trials
 
-    lc = exo.StarryLightCurve([u_1, u_2]).get_light_curve(orbit=orbit, r=r, t=t, texp=2.0/60.0).eval()
+    lc = exo.StarryLightCurve([u_1, u_2]).get_light_curve(orbit=orbit, r=r, t=t, texp=texp, order=2).eval()
 
     if (plot_curve && k==1)
       lc = lc.+1.0 # move relative flux to be on same scale as ALFM
-      topplot.plot(t, lc, label="exoplanet (n=$nobs)", linestyle = "-", lw=1)
+      topplot.plot(t, lc, label="exoplanet (n=$dataPoints)", linestyle = "-", lw=2)
     end
   end
 
@@ -87,11 +96,11 @@ end
 
 # Transit parameters. Some vary, some are fixed
 
-datapoints_vals = collect(logarithmspace(1.0, 4.5, 15)) # orbital period (~2.5 to 10000 days)
+datapoints_vals = collect(logarithmspace(1.0, 5.0, 10)) # TODO more values and higher values
 #period_vals = collect(logarithmspace(0.4, 3.0, 25)) # orbital period (~2.5 to 10000 days)
-period = 1000.0 # days
+period = 4000.0 # days
 r = 0.1 # radius of planet in units of stellar radius
-b = 0.3 # impact parameter
+b = 0.2 # impact parameter
 
 # Quadratic limb darkening parameters
 u_1 = 0.2; u_2 = 0.2
@@ -105,46 +114,42 @@ num_datapoints = zeros(runs)
 limbdark_time = zeros(runs)
 exoplanet_time = zeros(runs)
 
+# with these parameters, it will assume solar mass and solar radius
+orbit = exo.orbits.KeplerianOrbit(period=period, b=b, ecc=0.0, omega=0.0)
+
+#a = orbit.a.eval()[1] # in units of R_sun
+
+# speed differences around this time are trivial (such as at 1.0)
+v0 = orbit.get_planet_velocity(0.0)
+s0 = sqrt((v0[1].eval()[1]^2.0) + (v0[2].eval()[1]^2.0) + (v0[3].eval()[1]^2.0))
+println("  Speed: $s0 solar_radii / day")
+
 # Run the timing test
 for i = 1:runs
   #period = period_vals[mod(i-1, length(period_vals)) + 1]
   dataPoints = convert(Int64, round(datapoints_vals[i]))
 
-  # with these parameters, it will assume solar mass and solar radius
-  # TODO that probably isn't consistent with what we did above
-  orbit = exo.orbits.KeplerianOrbit(period=period, b=b, ecc=0.0, omega=0.0)
-
-  # TODO calculate velocity at t=0 and compare to the ALFM calculation. should be very close.
-  a = orbit.a.eval()
-  aonr = a / r
-
-  v0 = orbit.get_planet_velocity(0.0)
-  s0 = sqrt((v0[1].eval()[1]^2.0) + (v0[2].eval()[1]^2.0) + (v0[3].eval()[1]^2.0))
-  println("velocity from exoplanet: $s0")
-  # TODO make sure units are the same. Is there a discrepancy?
-
-
-  plot_it = 3 <= i <= 3
+  plot_it = 6 <= i <= 6
 
   num_datapoints[i] = dataPoints
-  limbdark_time[i] = run_ALFM_test(r, b, aonr, period, u_1, u_2, dataPoints, trialsPerConfig, plot_it)
+  limbdark_time[i] = run_ALFM_test(r, b, s0, period, u_1, u_2, dataPoints, trialsPerConfig, plot_it)
   exoplanet_time[i] = run_exoplanet_test(orbit, r, u_1, u_2, dataPoints, trialsPerConfig, plot_it)
 
 end
 
-topplot.set_xlabel("Time")
+topplot.set_xlabel("Time [days]")
 topplot.set_ylabel("Relative Flux")
 topplot.legend(loc="upper left",fontsize=10)
 
-middleplot.set_xlabel("Time")
-middleplot.set_ylabel("Relative Flux")
-middleplot.legend(loc="upper left",fontsize=10)
+#middleplot.set_xlabel("Time [days]")
+#middleplot.set_ylabel("Relative Flux")
+#middleplot.legend(loc="upper left",fontsize=10)
 
 # Prepare plot for comparing performance
 perfplot.plot(num_datapoints, limbdark_time, label = "ALFM (2019)", linestyle = "-", lw=2, color="C0")
 perfplot.plot(num_datapoints, exoplanet_time, label = "exoplanet", linestyle = "-", lw=2, color=:red)
 
-perfplot.set_title("Time Integration Comparison (r=0.1; b=0.3)")
+perfplot.set_title("Time Integration Comparison (r=$r; b=$b)")
 perfplot.set_xlabel("Data Points")
 perfplot.set_ylabel("Time [s]")
 perfplot.set_xscale(:log)
