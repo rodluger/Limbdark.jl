@@ -15,6 +15,7 @@ include("../../../test/loglinspace.jl")
 println("Running comparison...")
 
 fig, axes = subplots(3,1, figsize=(8,12))
+fig.subplots_adjust(hspace=.4)
 
 topplot = axes[1]
 middleplot = axes[2]
@@ -43,12 +44,11 @@ function get_exposure_hours(dataPoints::Real)
   #return get_duration_days() * 24 / dataPoints # this would make it gapless without overlap always
 end
 
-function run_ALFM_test(r::Float64, b0::Float64, s::Float64, period::Float64, u_1::Float64, u_2::Float64, dataPoints::Int64, trials::Int64, plot_curve::Bool)
+function run_ALFM_test(r::Float64, b0::Float64, s::Float64, period::Float64, u_1::Float64, u_2::Float64, dataPoints::Int64, trials::Int64, graph::PyObject=nothing)
 
   #aonr = a / r # change units of semi-major axis from solar radii to planet radii
   #v = 2*pi*aonr/period # velocity estimate
-  speed = s / 24 # change units of speed to be in terms of planet radii instead of solar radii, and hours instead of days
-  #speed = speed * 2 # TODO bug?
+  speed = s / r / 24 # change units of speed to be in terms of planet radii instead of solar radii, and hours instead of days
 
   time = get_time_array(dataPoints)
 
@@ -56,7 +56,7 @@ function run_ALFM_test(r::Float64, b0::Float64, s::Float64, period::Float64, u_1
 
     # Setup all the parameters
     trans = transit_init(r, b0, [u_1, u_2], false)  # Initialize transit structure
-    param = [0.0, speed, b0]   # parameters of the transit: [t_0,v,b_0]  # TODO fixed speed is different than exoplanet
+    param = [0.0, speed, b0]   # parameters of the transit: [t_0,v,b_0]
     t = Array{Float64,1}(undef,dataPoints)
     t .= time
     dt = get_exposure_hours(dataPoints)  #2/60  # Transit exposure time is 2 minutes, convert to hours.
@@ -68,15 +68,15 @@ function run_ALFM_test(r::Float64, b0::Float64, s::Float64, period::Float64, u_1
 
     integrate_lightcurve!(trans, param, t, dt, favg1, dataPoints, tol, maxdepth, neval_t, depthmax)
 
-    if (plot_curve && k==1)
-      topplot.plot(t, favg1[1,:], label="ALFM (n=$dataPoints)", linestyle = "-", lw=2)
+    if (graph != nothing && k==1)
+      graph.plot(t, favg1[1,:], label="ALFM (n=$dataPoints)", linestyle = "-", lw=2)
     end
   end
 
   return timeTaken/trials
 end
 
-function run_exoplanet_test(orbit::PyObject, r::Ty, u_1::Ty, u_2::Ty, dataPoints::Int64, trials::Int64, plot_curve::Bool) where {Ty <: Real}
+function run_exoplanet_test(orbit::PyObject, r::Ty, u_1::Ty, u_2::Ty, dataPoints::Int64, trials::Int64, graph::PyObject=nothing) where {Ty <: Real}
 
   t = get_time_array(dataPoints)
   texp = get_exposure_hours(dataPoints)
@@ -85,9 +85,9 @@ function run_exoplanet_test(orbit::PyObject, r::Ty, u_1::Ty, u_2::Ty, dataPoints
 
     lc = exo.StarryLightCurve([u_1, u_2]).get_light_curve(orbit=orbit, r=r, t=t, texp=texp, order=2).eval()
 
-    if (plot_curve && k==1)
+    if (graph != nothing && k==1)
       lc = lc.+1.0 # move relative flux to be on same scale as ALFM
-      topplot.plot(t, lc, label="exoplanet (n=$dataPoints)", linestyle = "-", lw=2)
+      graph.plot(t, lc, label="exoplanet (n=$dataPoints)", linestyle = "-", lw=2)
     end
   end
 
@@ -96,10 +96,10 @@ end
 
 # Transit parameters. Some vary, some are fixed
 
-datapoints_vals = collect(logarithmspace(1.0, 5.0, 10)) # TODO more values and higher values
+datapoints_vals = collect(logarithmspace(1.0, 6.0, 15)) # TODO more values and higher values for final comparison
 #period_vals = collect(logarithmspace(0.4, 3.0, 25)) # orbital period (~2.5 to 10000 days)
 period = 4000.0 # days
-r = 0.1 # radius of planet in units of stellar radius
+r = 0.08 # radius of planet in units of stellar radius TODO varying this produces unexpected results from limbdark?
 b = 0.2 # impact parameter
 
 # Quadratic limb darkening parameters
@@ -107,7 +107,7 @@ u_1 = 0.2; u_2 = 0.2
 
 # Comparison configuration
 runs = length(datapoints_vals)
-trialsPerConfig = 3 # number of trials to run for a given parameter configuration
+trialsPerConfig = 10 # number of trials to run for a given parameter configuration
 
 # Structures for holding results
 num_datapoints = zeros(runs)
@@ -116,34 +116,43 @@ exoplanet_time = zeros(runs)
 
 # with these parameters, it will assume solar mass and solar radius
 orbit = exo.orbits.KeplerianOrbit(period=period, b=b, ecc=0.0, omega=0.0)
-
 #a = orbit.a.eval()[1] # in units of R_sun
 
 # speed differences around this time are trivial (such as at 1.0)
 v0 = orbit.get_planet_velocity(0.0)
 s0 = sqrt((v0[1].eval()[1]^2.0) + (v0[2].eval()[1]^2.0) + (v0[3].eval()[1]^2.0))
-println("  Speed: $s0 solar_radii / day")
+#println("  Speed: $s0 solar_radii / day")
 
 # Run the timing test
 for i = 1:runs
   #period = period_vals[mod(i-1, length(period_vals)) + 1]
   dataPoints = convert(Int64, round(datapoints_vals[i]))
 
-  plot_it = 6 <= i <= 6
+  graph_to_use::PyObject = nothing
+  if (6 <= i <= 6)
+    graph_to_use = topplot
+  end
 
   num_datapoints[i] = dataPoints
-  limbdark_time[i] = run_ALFM_test(r, b, s0, period, u_1, u_2, dataPoints, trialsPerConfig, plot_it)
-  exoplanet_time[i] = run_exoplanet_test(orbit, r, u_1, u_2, dataPoints, trialsPerConfig, plot_it)
-
+  limbdark_time[i] = run_ALFM_test(r, b, s0, period, u_1, u_2, dataPoints, trialsPerConfig, graph_to_use)
+  exoplanet_time[i] = run_exoplanet_test(orbit, r, u_1, u_2, dataPoints, trialsPerConfig, graph_to_use)
 end
 
+# extra test for different period, for debugging
+r2 = 0.02
+dataPoints = convert(Int64, round(datapoints_vals[6]))
+run_ALFM_test(r2, b, s0, period, u_1, u_2, dataPoints, trialsPerConfig, middleplot)
+run_exoplanet_test(orbit, r2, u_1, u_2, dataPoints, trialsPerConfig, middleplot)
+
+topplot.set_title("Light Curves (r=$r; b=$b; T=$period d)")
 topplot.set_xlabel("Time [days]")
 topplot.set_ylabel("Relative Flux")
-topplot.legend(loc="upper left",fontsize=10)
+topplot.legend(loc="lower right",fontsize=9)
 
-#middleplot.set_xlabel("Time [days]")
-#middleplot.set_ylabel("Relative Flux")
-#middleplot.legend(loc="upper left",fontsize=10)
+middleplot.set_title("Light Curves (r=$r2; b=$b; T=$period d)")
+middleplot.set_xlabel("Time [days]")
+middleplot.set_ylabel("Relative Flux")
+middleplot.legend(loc="lower right",fontsize=9)
 
 # Prepare plot for comparing performance
 perfplot.plot(num_datapoints, limbdark_time, label = "ALFM (2019)", linestyle = "-", lw=2, color="C0")
@@ -154,4 +163,4 @@ perfplot.set_xlabel("Data Points")
 perfplot.set_ylabel("Time [s]")
 perfplot.set_xscale(:log)
 perfplot.set_yscale(:log)
-perfplot.legend(loc="upper left",fontsize=10)
+perfplot.legend(loc="lower right",fontsize=9)
