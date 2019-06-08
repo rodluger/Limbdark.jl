@@ -82,7 +82,7 @@ function run_exoplanet_test(orbit::PyObject, r::Ty, u_1::Ty, u_2::Ty, dataPoints
 end
 
 # Transit parameters
-datapoints_vals = collect(logarithmspace(1.0, 7.0, 15))
+datapoints_vals = collect(logarithmspace(1.0, 6.0, 15))
 period = 1000.0 # days
 r = 0.1 # radius of planet in units of stellar radius TODO varying this produces unexpected results from limbdark?
 b = 0.2 # impact parameter
@@ -92,7 +92,7 @@ u_1 = 0.2; u_2 = 0.2
 
 # Comparison configuration
 runs = length(datapoints_vals)
-trialsPerConfig = 5 # number of trials to run for a given parameter configuration
+trialsPerConfig = 10 # number of trials to run for a given parameter configuration
 
 # Structures for holding results
 num_datapoints = zeros(runs)
