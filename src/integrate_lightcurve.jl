@@ -4,7 +4,7 @@
 include("integrate_transit_simpson_vec.jl")
 
 function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64,tol::T,maxdepth::Int64,neval_t::Array{Int64,1},depthmax::Array{Int64,1}) where {T <: Real}
-# This routine integrates a lightcurve with a constant velocity, v,
+# This routine integrates a lightcurve with a constant velocity, v,  
 # and impact parameter, b0, which are specified in the "param" vector.
 # The trans structure needs to be initialized before calling this routine,
 # which will contain workspace for the transit computation, the radius ratio,
