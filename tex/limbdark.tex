@@ -1,5 +1,5 @@
 
-\documentclass[modern]{aastex61}
+\documentclass[modern,trackchanges]{aastex63}
 
 \input{stylez}
 \usepackage{graphicx}
@@ -23,7 +23,7 @@ Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomia
 \author[0000-0002-9328-5652]{Daniel Foreman-Mackey}
 \affil{Center~for~Computational~Astrophysics, Flatiron~Institute, New~York, NY}
 
-\keywords{methods: analytic --- techniques: photometric}
+\keywords{methods: analytic --- techniques: photometric --- planets and satellites: detection}
 
 \begin{abstract}
  We derive analytic, closed-form solutions for the light curve of a planet
@@ -171,10 +171,17 @@ function
 %
 where $a_n$ is a limb darkening coefficient.  \cite{Gimenez2006}
 found an infinite series expansion for computing the limb-darkened light curve
-for each $a_n$ term.  Here we instead present closed-form expressions for these terms
+for each $a_n$ term.  {\bf This algorithm is remarkable in that it allows
+for computation of limb-darkening to arbitrary polynomial order, and gives
+excellent single-precision accuracy and better speed than numerical integration
+approaches.}  Here we {\bf improve upon the pioneering work of \citet{Gimenez2006}
+by presneting} closed-form expressions for these terms
 which can be easily computed with recursion relations, although for purposes
 of numerical stability we need to revert to series solutions in some limits
-which we find to be rapid to evaluate.
+which we find to be rapid to evaluate.  {\bf In addition to being faster
+to evaluate and more accurate for low-order limb-darkening 
+(\S \ref{sec:comparison_pytransit}), these new expressions
+also include derivaties with respect to the model parameters.}
 
 The second goal, of computing dervatives of the light curve with respect to
 the model parameters, was accomplished by \cite{Pal2008} for the quadratic
@@ -192,7 +199,7 @@ slower, they have precisions which may depend upon the tolerance of the computat
 which is specified, and, in addition, they do not yield derivatives of the light curves.
 The expressions presented in this work were derived with numerical stability in
 mind, and we show that for low order limb darkening our expressions are accurate
-to machine precision in nearly all cases.
+to {\bf double} precision in nearly all cases.
 
 A disadvantage of our approach is that it requires integer powers of the limb darkening
 expansion.  \citet{Claret2000} has shown that a non-linear limb darkening law,
@@ -534,25 +541,25 @@ when the integral is taken over the entire disk of the body. We must thus have
 %
 \begin{align}
     \label{eq:normalization2}
-    I_0 &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathcal{A} \mathbf{u}} \nonumber \\[0.5em]
-        &= \frac{1}{\mathfrak{s}^\mathsf{T}(r=0) \mathfrak{g}} \quad,
+    I_0 &= \frac{1}{\mathfrak{s}^\mathsf{T}_{r=0} \mathcal{A} \mathbf{u}} \nonumber \\[0.5em]
+        &= \frac{1}{\mathfrak{s}^\mathsf{T}_{r=0} \mathfrak{g}} \quad,
 \end{align}
 %
-where $\mathfrak{s}^\mathsf{T}(r=0)$ is the solution vector when there is no
+where $\mathfrak{s}^\mathsf{T}_{r=0}$ is the solution vector when there is no
 occultor (i.e., $r = 0$). When there is no occultor, the $n^\mathrm{th}$ term of $\mathfrak{s}$
 corresponds to the double integral in polar coordinates
 %
 \begin{align}
     \label{eq:normalization3}
-    \mathfrak{s}_n (r=0) &= \int_0^{2\pi}\int_0^1 \gbasisn(z) \, r \, \dd r \, \dd\theta \nonumber \\[0.5em]
-                         &= 2\pi \int_0^1 \gbasisn(z) \, r \, \dd r \quad,
+    \mathfrak{s}_{n,r=0} &= \int_0^{2\pi}\int_0^1 \gbasisn(z) \, r^\prime \, \dd r^\prime \, \dd\theta \nonumber \\[0.5em]
+                         &= 2\pi \int_0^1 \gbasisn(z) \, r^\prime \, \dd r^\prime \quad,
 \end{align}
 %
 From Equation~(\ref{eq:greensbasis}), we may write
 %
 \begin{align}
     \label{eq:normalization4}
-    \mathfrak{s}_n (r=0) &=
+    \mathfrak{s}_{n,r=0} &=
     2\pi
     \begin{dcases}
         \int_0^1 r \, \dd r & \qquad n = 0
@@ -565,7 +572,7 @@ From Equation~(\ref{eq:greensbasis}), we may write
     \end{dcases}
 \end{align}
 %
-The first case is trivial and integrates to $\mathfrak{s}_0(r = 0) = \pi$.
+The first case is trivial and integrates to $\mathfrak{s}_{0,r = 0} = \pi$.
 The remaining cases involve integrands of the form $z^n r$,
 where $z = \sqrt{1 - r^2}$. We may evaluate
 these integrals by substituting $u = z^2 = 1 - r^2$ and $\dd u = -2r \, \dd r$:
@@ -580,7 +587,7 @@ The solution vector then simplifies to
 %
 \begin{align}
     \label{eq:normalization6}
-    \mathfrak{s}_n (r=0) &=
+    \mathfrak{s}_{n,r=0} &=
     \begin{dcases}
         \pi & \qquad n = 0
         \\
@@ -612,7 +619,7 @@ area of overlap of two disks \citep{MandelAgol2002}.  This has a well-known
 analytic solution \citep[e.g.][]{Weisstein2018};  however, we find that the
 standard formula leads to round-off error that is larger than necessary
 or desirable.  In this section we present a new formula which we demonstrate
-yields machine precision for the area of overlap, along with its derivatives.
+yields {\bf double} precision for the area of overlap, along with its derivatives.
 
 Figure \ref{fig:circle_overlap} shows how the area of overlap can be computed
 for two circles.  The sums of the areas of the sectors of each circle which span
@@ -663,7 +670,8 @@ in length to the spine of the kite.  The square root term in this formula (Equat
 \ref{eq:MAuniform}) computes the area of the kite-shaped region, which in this
 form causes round-off error when the kite is flattened.  The same issue occurs when
 computing the area of a triangle in which two of the sides are of similar length;
-the kite has an area that is twice the area of the triangle connecting the centers
+the kite has an area that is twice the area of the {\bf two mirror-image triangles}
+connecting the centers
 of both circles and one of the intersection points.  \cite{Goldberg1991} gives a
 formula for precisely computing the area of a triangle, based on a method developed
 by William Kahan \citep[later described in][]{Kahan2000}, which we use to compute
@@ -675,7 +683,10 @@ for $A \ge B \ge C$, where the tuple $\{A,B,C\}$ equals $\{1,r,b\}$
 sorted from from greatest to least.  Note that the order of operations
 needs to be carried out as specified by the series of parentheses in
 the entry to the square root;  this sequence of operations preserves
-numerical precision.
+numerical precision. {\bf This formula is a novel implementation of Heron's
+formula for a triangle for which loss of precision occurs due to subtracting 
+quantities with similar numerical values which differ at high significant digits,
+and thus are more subject to round-off errors.}
 
 Next, the inverse cosine formulae are also imprecise when $\cos{\kappa_0} = x_0 \approx
 1$ or $\cos{\kappa_1} = x_1 \approx 1$.  The approximate solutions in this limit
@@ -765,7 +776,7 @@ as
 %
 We note that instead of computing $\kappa_1$,
 we compute $\pi-\kappa_1 = -\mathrm{atan2}(\sin{\kappa_1},\cos{\kappa_1})$,
-which leads to machine precision as well. Note also that $\mathfrak{s}_0$ is
+which leads to {\bf double} precision as well. Note also that $\mathfrak{s}_0$ is
 identical to the first basis function ($s_0$) in the \starry implementation
 from \citet{starry}.
 
@@ -1028,7 +1039,7 @@ arithmetic, which is much less subject to round-off error, and
 hence gives more precise expressions than double precision.  We implemented the
 pseudocode from \citet{Bulirsch1969} to compute ${\rm cel}(k_c,p,a,b)$,
 which has a termination test that scales as the square root of
-the machine precision.  We find that the transformed expressions
+the {\bf double} precision.  We find that the transformed expressions
 are accurate to $\la \times 10^{-14}$ when computed in double precision
 within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
 
@@ -1040,7 +1051,7 @@ respectively, over a portion of the $b-r$ plane. The former method
 on the order of $10^{-7}$ over most of the domain, although the error approaches
 unity near the singular regions discussed above. In contrast, the method introduced
 in this paper (Figure~\ref{fig:s2_plot}; note the change in the color scale)
-yields errors close to machine precision everywhere, including the vicinity of the
+yields errors close to {\bf double} precision everywhere, including the vicinity of the
 singular points.
 
 \begin{figure}[p!]
@@ -1153,7 +1164,7 @@ From these expressions, the derivatives of $\mathfrak{s}_1$ are given by
 
 We have tested these formulae with finite-difference derivatives evaluated at
 256-bit precision, and, as with the total flux term, we find that these are accurate
-to $\la 2 \times 10^{-15}$, close to machine precision.
+to $\la 2 \times 10^{-15}$, close to {\bf double} precision.
 
 We next increase the power of limb darkening by one, $\upmu^2$.
 
@@ -1474,7 +1485,7 @@ The integrals $\mathcal{M}_n$ obey straightforward recursion relations
 %\begin{eqnarray}
 \mathcal{M}_n &= \frac{1}{n} \left[ 2(n-1) (1-r^2-b^2) \mathcal{M}_{n-2} \right.\nonumber\\
   &+ \left. (n-2) (1-(b-r)^2)((b+r)^2-1) M_{n-4}\right],\\[1em]
-\mathcal{M}_n &= \frac{(n+4)\mathcal{M}_{m+4} - 2(n+3)(1-r^2-b^2)\mathcal{M}_{n+2}}{(n+2)(1-(b-r)^2)((b+r)^2-1)},
+\mathcal{M}_n &= \frac{(n+4)\mathcal{M}_{n+4} - 2(n+3)(1-r^2-b^2)\mathcal{M}_{n+2}}{(n+2)(1-(b-r)^2)((b+r)^2-1)},
 %\end{eqnarray}
 \end{proof}
 where the first relation may be used for upwards recursion in $n$ for $k^2 > \frac{1}{2}$,
@@ -1749,11 +1760,12 @@ which explains why in some cases it can be difficult to constrain both parameter
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/integrate_transit_gradient.pdf}
-    \caption{Comparison of the normalized flux and its derivatives with (solid) and
-    without (dashed) time-integration.  The integration time, $\Delta t = 0.3$, is indicated in the
+    \caption{Comparison of the normalized flux and its derivatives with {\bf and
+    without time-integration (see solid and dashed lines, respectively)}.  
+    The integration time, $\Delta t = 0.3$, is indicated in the
     upper left panel with a horizontal blue line. The derivatives are computed with
     respect to $\{r,t_0,v,b_0,u_1,u_2\}$.  The parameters are given by $r=0.1$,
-    $t_0 = 0$, $b_0=0.5$, and $u_1=u_2=0.3$. \jlcodelink{integrate_transit_gradient}
+    $t_0 = 0$, {\bf $v=1$}, $b_0=0.5$, and $u_1=u_2=0.3$. \jlcodelink{integrate_transit_gradient}
     \label{fig:integrated_derivs}}
     \end{centering}
 \end{figure}
@@ -2020,11 +2032,12 @@ The light curve models agree quite well, as do the derivatives, which is
 a good check on both codes.  However, we find that the P\'al model only
 achieves single precision for the computation, with errors reaching as
 much as a few $\times 10^{-8}$ for the flux and the derivatives with
-respect to the limb darkening parameters.  \citet{Pal2008} uses the
+respect to the limb darkening parameters.  {\bf One possible origin
+for this difference is that} \citet{Pal2008} uses the
 Carlson implementation of elliptic integrals \citep{Carlson1979},
-which in practice we find can be both less precise and slower to
-evaluate than the \citet{Bulirsch1965a} code for computing elliptic
-integrals.
+which {\bf in this implementation may be} be both less precise and slower to
+evaluate than {\bf our new implementation of the}  \citet{Bulirsch1965a} code 
+for computing elliptic integrals.
 
 We have also compared the evaluation speed of our code with P\'al's.
 We compiled P\'al's code using \texttt{gfortran -O3}, and found that
@@ -2089,7 +2102,7 @@ with derivatives, the two are comparable in speed. The implementation
 of our algorithm in \starry (green) is similar in speed to \texttt{batman}
 without derivatives, and about a factor of 2 slower than \texttt{batman}
 when derivatives are computed. Both the \texttt{Julia} and \starry
-implementations have errors close to machine precision and are therefore
+implementations have errors close to {\bf double} precision and are therefore
 many orders of magnitude more precise than \batman.
 
 Next, we ran a comparison with the non-linear limb darkening model which
@@ -2105,7 +2118,7 @@ polynomial model, and we find that the polynomial model is about 7 times
 more accurate and 25 times faster (\texttt{Julia})
 and 20 times faster (\starry) to evaluate compared with \texttt{batman}.
 
-\subsection{Comparison to \texttt{PyTransit}}
+\subsection{Comparison to \texttt{PyTransit}} \label{sec:comparison_pytransit}
 
 \begin{figure}[t!]
     \begin{centering}
@@ -2128,17 +2141,25 @@ and 20 times faster (\starry) to evaluate compared with \texttt{batman}.
 \end{figure}
 
 Another popular implementation of transit light curve computation is the
-\texttt{PyTransit} code \citep{Parviainen2015b}. We included points corresponding
+\texttt{PyTransit} code \citep{Parviainen2015b}. We {\bf have} included points corresponding
 to this code in Figures~\ref{fig:batman_comparison} and \ref{fig:batman_nonlinear_comparison},
 and in general find that it is comparable to \batman in both evaluation time
 and accuracy. However, unlike \batman, \texttt{PyTransit} implements the
 algorithm of \citet{Gimenez2006} for polynomial limb darkening (Equation~\ref{eq:gimenez}).
+
 In Figure~\ref{fig:gimenez_comparison} we therefore compare our implementation
-to that in \texttt{PyTransit} as a function of the degree of limb darkening.
+to {\bf the Gim\'enez algorithm implementation} in \texttt{PyTransit} as a function 
+of the degree of limb darkening.
 We find our algorithm to be approximately between 5 (for low-order limb darkening)
 and 30 (for high-order limb darkening) times faster, and many orders of magnitude
-more precise. When computing derivatives, our codes are still faster by about
-an order of magnitude. For reference, in Figure~\ref{fig:gimenez_comparison},
+more precise {\bf for low order limb-darkening, while gradually degrading in precision
+to higher order limb-darkening to become comparable at very high orders ($N=50$)}. 
+{\bf Even when computing derivatives, our \texttt{Julia} code is still faster by
+a about a factor of 2.5 for low-order limb-darkening, $N=0$, increasing in
+speed relative to the Gim\'enez algorithm by about an order of magnitude at high-orders,
+$N=50$}.
+
+For reference, in Figure~\ref{fig:gimenez_comparison},
 we also plot the evaluation time when computing the light curve using the
 spherical harmonic formalism of \cite{starry}. Because the algorithm presented
 in that paper computes surface integrals via recursions in both the
@@ -2415,6 +2436,10 @@ the input parameters.
 Table \ref{tab:symbols} gives a list of the notation used throughout
 the main paper.
 
+{\bf Table \ref{tab:precision} lists the IEEE 754 interchange formats
+utilized in three versions of this code (\texttt{Limbdark.jl} and \texttt{starry})
+written in \texttt{Julia}, \texttt{Python}, and \texttt{C++}.}
+
 \clearpage
 
 \begin{center}
@@ -2554,4 +2579,10 @@ $\xi$          & Transformed integration variable       & \eq{greens_transformed
 \end{longtable}
 \end{center}
 
+{\bf 
+\begin{tabular}{lll}
+Language & Variable type & IEEE 754 interchange format & precision for 1.0\\
+Julia & Float64 & binary64 & $2.0^{-52} = 2.22e-16$\\
+Julia & BigFloat & binary256 & $2.0^{-255} = 1.73e-77 \\
+\end{tabular}}
 \end{document}

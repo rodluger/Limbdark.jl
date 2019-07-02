@@ -1,0 +1,142 @@
+Dear Steven,
+
+We thank the referee for the helpful comments on the submitted
+manuscript, which we address in turn below.
+
+- Although this paper presents results related to computations up to arbitrary 
+number of limb darkening, it just extremely briefly mentions the Gimenez (2006)
+paper - only in the context of evaluation speed comparisons - while that work is 
+one of the prominent earlier works providing formulae up to arbitrary order. 
+Please provide a bit more detailed comparison and specify some more quantitative 
+aspects between this new and the algorithm(s) presented there. 
+
+This is an excellent point which we were remiss to not address in the first 
+version.  We have added additional discussion of the Gimenez (2006) paper in the 
+introduction, and we since we have already carried out extensive comparisons 
+with this code in Figure 15, we describe these results in more detail in section 
+11.4.
+
+(Should we add further comparison? TBD Rodrigo).
+
+- While the paper refers to many types of floating representations for a few 
+languages, it is not straightforward to compare these at the first glance. 
+Please give all of the presented floating representations in the context of the 
+technical standard of IEEE 754 (for instance, in a form of a separate table 
+where rows correspond to the various technical standards and columns are for the 
+discussed programming languages and the table cells show the corresponding 
+variable type). In addition, please always refer to some of these standards 
+while saying "machine precision" throughout the paper.
+
+Thanks very much for this comment.  We have now included a table
+in the appendix which lists the variable types used in the
+code which we have implemented.  Throughout the paper we
+have replaced "machine precision" with "double precision"
+as most CPU cores operate with double-precision arithmetic,
+and hence the binary64 interchange format gives the relevant
+precision. 
+Add Python/C++ to table.  TBD Rodrigo
+(Refer to this in the main text: TBD Eric).
+
+- In the very early parts of this paper (see e.g. page 3 in the uploaded draft), 
+\mu and z are used for the same quantity while later on, these are used in a 
+seemingly interchangeable manner (see e.g. equations 3 and 5). Please clarify 
+this issue. Is there any reason for using both \mu and z?
+
+TBD Rodrigo
+The reason for using \mu is mostly historical:  \mu is the standard
+quantity used for specifying limb-darkening equations.  The reason
+for using z is that it is more physically intuitive:  it is the
+elevation on the surface of the star (as viewed by the observer)
+in units in which the radius of the star is unity.
+
+- The usage of \oiint and \oint are a bit confusing. Use only \o(i)int for 
+denoting integration over the closed perimeter of a 2D-set (\oint) or a closed 
+surface of a 3D subset of the R^3 space (\oiint). While integrating on an 
+arbitrary subset of R^2, use \iint. See e.g. Equations 58 (where use \iint) vs. 
+59 (where \oint is fine). Since here there are no closed boundaries of R^3 
+volumes, please avoid the usage of \oiint.
+
+TBD Rodrigo
+
+- Please use a subscript in equations like 23 while referring to r=0: S^T_{r=0}.
+
+Done.
+
+- Please fix Equation 24 where the variable $r$ presented on the LHS while also 
+used as a parametric value for the integration on the RHS.
+
+Thanks, this is now fixed.
+
+- Equation 31 is known as Heron's formula, known since the ancient times. Please 
+avoid such references from 1991 or 2000 so. 
+
+In fact, equation (31) is a new implementation of Heron's formula developed by 
+Kahan in which the order of operations specified by the parentheses _must_ be 
+obeyed to retain the precision of the computation for triangles of arbitrary 
+shape for the triangle sides ordered from least (A) to greatest (C).  We have 
+added a note to this effect as the whole point of using this formula is that it 
+gives higher precision than the standard Heron's formula.
+
+- In addition, there isn't any need to refer this formula as something related 
+to a kite since these are more closely related to triangles instead of 
+quadrilaterals.  A kite, by definition, can always be cut into two halves, two 
+identical (except for the chirality) triangles.
+
+We prefer to retain the kite terminology as this makes it clear which area
+is being computed. We have now stated in the text that the kite is twice the
+area of the two mirror image triangles.
+
+- Fig 3: please fix the Z (color) scale, it should go in the interval [0,1] 
+instead of [0:2].
+
+Actually the color scale is correct in this figure:  the scale is [0,2\pi/3].
+Note that this basis function, s_1, has a maximum value of 2\pi/3 (equation 27),
+and that when computing the intensity, this needs to be normalized as given
+in equation 28.
+
+- Equation 75: please check the index for M_{m+4}. It should be M_{n+4} at the 
+first glance.
+
+Thanks for catching this;  we have fixed this typo.
+
+- page 29: instead of saying "in the k^2<1/2 limit", please use the proper 
+notation for the (supposedly) one-sided limits.
+
+Actually this is correct as it stands.
+
+- Fig 7: what is the value of $v$, for which the plots are computed? It is 
+essential to know that in this context, otherwise \Delta t is meaningless. 
+
+Thanks for catching this oversight;  v=1, which we have added to the caption.
+
+- Please also reword a bit the first sentence of the caption: ``flux and its 
+derivatives with and without time integration (see solid and dashed lines, 
+respectively).'
+
+Thanks, changed.
+
+- Regarding to Sec 7: while the formulae shown in this draft are for a certain 
+time instance, in real observations, the measurements are always needed to be 
+considered in a time integration manner - as the authors stated correctly.
+Therefore, the question is simple: how the attained per-point nearly machine 
+precision is lost while performing some (more-or-less simple) numerical 
+integration? A series of plots similar to Fig 7 would indeed be nice where for a 
+certain v/Delta t value, the various curves show the difference between the 
+truly exact time-integrated flux and/or parametric derivatives as the function 
+of the integration stepsize and/or the number of individual evaluation function 
+calls within one step (where 1 would be equivalent to the ``without time-
+integration' case). Or anything equivalent. How fast will it converge to the 
+machine precision and at which level?
+
+TBD Eric
+
+- While the authors say that the employment of Carlson symmetric forms are not 
+the most effective way of implementing a certain E, K or \Pi function, the 
+statement in the paper is not necessary true since in the final merged formulae 
+which contain more than one of the E, K or \Pi terms can significantly be 
+simplified via the Carlson functions (in a somehow equivalent manner where the 
+cel(.) function is introduced in page 16). Therefore, I recommend to leave the 
+statement on the top of page 39 a bit more open for now.
+
+This is an excellent point:  the Carlson elliptic integrals could be combined
+more efficiently.  We have rewritten this to be more open.
