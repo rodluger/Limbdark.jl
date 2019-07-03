@@ -31,7 +31,8 @@ if b0 > (1.0+r)
   println("b0: ",b0," r: ",r)
   println("No transit")
   # No transit occurs, so returns ones for lightcurves, and zeros for derivatives:
-  favg1[1,:] = one(T)
+#  favg1[1,:] = one(T)
+  favg1[1,:] = zero(T)
   favg1[2:5+trans.n,:] = zero(T)
   return
 # If a grazing transit, then there are only two points of contact:
@@ -60,7 +61,8 @@ fint  = zeros(T,6+trans.n)
   if t2 < tc[1] || t1 > tc[nc]
     # No points lie within the transit:
     ftmp=zeros(T,6+trans.n)
-    ftmp[1]=one(T)
+#    ftmp[1]=one(T)
+    ftmp[1]=zero(T)
   else
     # Loop over points of contact:
     tlim = [t1]

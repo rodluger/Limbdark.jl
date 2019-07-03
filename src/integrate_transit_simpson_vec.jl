@@ -69,7 +69,8 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   # Carry out the transit computation:
   fmid0 = transit_poly_g!(trans); neval += 1
   # Then, fillin the flux and derivatives in the fmid vector:
-  fill_flux!(tmid,fmid0,trans,fmid)  # So is this line
+#  fill_flux!(tmid,fmid0,trans,fmid)  # So is this line
+  fill_flux!(tmid,fmid0-1,trans,fmid)  # So is this line
 #  println("tfd, r: ",trans.r," b: ",trans.b," f/df: ",fmid)
   return
   end
@@ -79,7 +80,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   trans.b = solver(tmid)
   fmid0 = transit_poly_g!(trans); neval += 1
 #  fmid .= fill_flux!(tmid,fmid0,trans)
-  fill_flux!(tmid,fmid0,trans,fmid)
+  fill_flux!(tmid,fmid0-1,trans,fmid)
 #  println("b: ",trans.b," f/df: ",fmid)
   return
   end
