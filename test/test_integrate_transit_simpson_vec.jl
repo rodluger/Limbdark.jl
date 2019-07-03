@@ -59,7 +59,7 @@ end
 compute_lightcurve!(trans,param,t,favg0,nt,neval0)
 @time compute_lightcurve!(trans,param,t,favg0,nt,neval0)
 # Subtract 1 from the flux:
-favg0[1,:] -= 1
+favg0[1,:] .-= 1
 
 # Now, integrate this lightcurve by simply averaging over this grid using trapezoidal rule:
 fsmooth = copy(favg0)
