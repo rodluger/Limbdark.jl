@@ -1,4 +1,4 @@
-2
+
 # This is test of the code for computing a transit model integrated over a time step.
 # Computes derivatives over the timestep.
 using PyPlot
