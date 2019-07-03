@@ -128,7 +128,15 @@ calls within one step (where 1 would be equivalent to the ``without time-
 integration' case). Or anything equivalent. How fast will it converge to the 
 machine precision and at which level?
 
-TBD Eric
+Thanks for this comment.  We have now included a figure and two paragraphs
+describing the precision of the time-integrated lightcurves, as well as
+the relative evalution time.  For the adaptive-Simpson routine, we find that
+the specified precision, \epsilon_{tol}, needs to be about a factor of 10 
+smaller than the desired precision for all of the fluxes and the derivatives.
+The timing per exposure is larger than average number of model evaluations
+per exposure;  this may be due to overheads in the adaptive-Simpson routine,
+or due to the adaptive algorithm causing extra refinement at model parameters
+which are more expensive to evaluate, or a combination of both factors.
 
 - While the authors say that the employment of Carlson symmetric forms are not 
 the most effective way of implementing a certain E, K or \Pi function, the 
