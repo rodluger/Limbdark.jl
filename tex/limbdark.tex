@@ -1730,12 +1730,21 @@ As an example, we choose the approximate transit model $b(t) = (b_0^2 + v^2(t-t_
 which ignores acceleration and curvature during a transit, and thus is valid in the
 limit of large orbital separation.  We compute the time-averaged flux and derivatives
 with respect to $\bvec{x} = \{t_0,v,b_0\}$ for a length of integration time $\Delta t$.
+{\bf For exposures which contain a contact point, we break these up into sub-exposures
+between the start, end, and contact points within the exposure, and then separately
+carry out the integration over each sub-exposure.  This is required due to the fact
+that the flux and derivatives are discontinuous at each of the contact points, and
+so the time-integration is most efficient when integrating up to, but not over,
+a contact point.  For our simplified transit trajectory, $b(t)$, these contact points
+can be computed analytically;  for an eccentric orbit, the contact points may require
+numerical methods to identify before the sub-exposures can be identified.}
+
 %The integration is carried out with an adaptive refinement of the exposure time interval by
 %factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
 %of the mean of the start and end with a maximum
 %number of refinement depths of 32.
-The integration is carried out with an adaptive Simpson quadrature routine
-\citep{Kuncir1962}.  Since at each point we compute the flux along with
+The integration {\bf of each (sub-)exposure} is carried out with an adaptive Simpson 
+quadrature routine \citep{Kuncir1962}.  Since at each point we compute the flux along with
 its derivatives, we have developed a vectorized version of this routine
 which keeps track of the quadrature separately for each component of the
 flux and its partial derivatives.  The convergence check for the adaptive
@@ -1769,6 +1778,55 @@ which explains why in some cases it can be difficult to constrain both parameter
     \label{fig:integrated_derivs}}
     \end{centering}
 \end{figure}
+
+{\bf In practice the $\epsilon_{tol}$ parameter controls the average number of evaluations
+per exposure time, while the tolerance achieved is typically $<10 \epsilon_{tol}$.
+Figure \ref{fig:integration_precision} shows the maximum numerical error achieved
+for computations with $\epsilon_{tol} = (10^{-4},10^{-6},10^{-8},10^{-10},10^{-12},10^{-14})$
+relative to a precision of $\epsilon_{tol} = 10^{-16}$.    The
+computed model has $10^4$ exposures for quadratic limb-darkening with the same parameters 
+as in Figure \ref{fig:integrated_derivs}
+(note that these exposures overlap in time;  in practice many fewer exposures would
+be required to compute this light curve).  In computing the time-integrated light
+curves, we integrate over the difference of the flux minus one, so that shallow
+transit depths will not lose precision.  In Figure \ref{fig:integration_precision},
+the achieved precision is plotted versus the average number of evaluations per exposure
+for the flux-1 and for each of the derivatives.  In all cases but the highest precision,
+the flux and all derivatives achieve a precision which is better than $10 \epsilon_{tol}$.
+For the highest tolerance case, $\epsilon_{tol} = 10^{-14}$, we find that the
+precision exceeds this value slightly;  this is likely due to the model reaching
+the limit of double-precision.
+
+Also plotted in Figure \ref{fig:integration_precision} is ten times the
+tolerance versus the evaluation time
+per exposure relative to the time for a single evaluation per exposure
+(dashed line).  This
+curve falls to the right of the number ratio line (dotted line) by about 
+a factor of $\approx 2$
+for high tolerance ($\epsilon_{tol} = 10^{-4}$), to about a factor of $1.3$
+for low tolerance ($\epsilon_{tol} = 10^{-14}$).  Thus, the time per
+evaluation for the adaptive time-integrated flux and derivatives exceeds the 
+expectation given a single evaluation per exposure.  This is likely due to 
+the fact that the model computation takes longer for some parameter values 
+than others, while the adaptive integration tends to concentrate the 
+evaluations at the parameters which are more expensive to evaluate.  In 
+addition there may be computation overhead from the adaptive simpson integration 
+function.
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/compare_precision.pdf}
+    \caption{Precision achieved for the time time-integrated flux (minus one)
+    versus the average number of evaluations per exposure.  The colored lines
+    show the precision achieved for the flux-1 and for each of the derivatives.
+    For comparison, the dotted line shows 10 times the tolerance, $\epsilon_{tol}$.
+    The dashed line uses as the abscissa the ratio of the total light curve evaluation 
+    time per exposure relative to a single evaluation per exposure.
+    \label{fig:integration_precision}}
+    \end{centering}
+\end{figure}
+
+} 
 
 \pagebreak % DEBUG
 
