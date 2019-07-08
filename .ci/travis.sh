@@ -13,7 +13,7 @@ export PATH="$HOME/miniconda-cache/bin:$PATH"
 if ! command -v conda > /dev/null; then
 
     # Conda
-    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     bash miniconda.sh -b -p $HOME/miniconda-cache -u;
     conda config --add channels conda-forge;
     conda config --set always_yes yes;
