@@ -18,7 +18,8 @@ addons:
             - gfortran
 
 install:
-    - travis_wait 45 source .ci/travis.sh
+    # - travis_wait 45 source .ci/travis.sh
+    - source .ci/travis.sh
     - julia .ci/install.jl
 
 before_script: 
