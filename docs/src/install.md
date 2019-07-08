@@ -7,5 +7,5 @@ from within `julia`:
 
 ```julia
 import Pkg
-Pkg.clone("git@github.com:rodluger/Limbdark.jl.git")
+Pkg.clone("https://github.com/rodluger/Limbdark.jl.git")
 ```
