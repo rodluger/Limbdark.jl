@@ -18,7 +18,7 @@ addons:
             - gfortran
 
 install:
-    - source .ci/travis.sh
+    - travis_wait 45 source .ci/travis.sh
     - julia .ci/install.jl
 
 before_script: 
@@ -34,6 +34,9 @@ script:
 cache:
     directories:
         - $HOME/.cache/Tectonic
+        - $HOME/miniconda
+        - /tmp/texlive
+        - $HOME/.texlive
 
 after_failure:
     - sleep 3
