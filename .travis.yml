@@ -20,12 +20,13 @@ addons:
 install:
     # - travis_wait 45 source .ci/travis.sh
     - source .ci/travis.sh
+    - travis_wait 45 source .ci/install-texlive.sh
     - julia .ci/install.jl
 
-before_script: 
+before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - sleep 3 
+  - sleep 3
 
 script:
     - julia test/runtests.jl
