@@ -20,7 +20,8 @@ addons:
 install:
     # - travis_wait 45 source .ci/travis.sh
     - source .ci/travis.sh
-    - source .ci/install-texlive.sh
+    #- source .ci/install-texlive.sh
+    - sudo apt-get install texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended 
     - julia .ci/install.jl
 
 before_script:
