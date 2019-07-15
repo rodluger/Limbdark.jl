@@ -3,17 +3,17 @@ pro cel_bulirsch_vec,k2,kc,p,a1,a2,a3,b1,b2,b3,f1,f2,f3
 ; This assumes first value of a and b uses p, the rest have p=1.
 ca = sqrt(k2*2.2d-16)
 ; Avoid undefined k2=1 case:
-indx = where((k2 eq 1.0) or (kc eq 0.0))
+indx = where((k2 eq 1d0) or (kc eq 0d0))
 if indx[0] ne -1 then kc[indx] = 2.22d-16
 ; Initialize values:
-ee = kc & m=0.0*kc+1.0
-pos = where(p ge 0.0,complement=neg)
-pinv = 0.0*k2
+ee = kc & m=0d0*kc+1d0
+pos = where(p ge 0d0,complement=neg)
+pinv = 0d0*k2
 if pos[0] ne -1 then begin & $
   p[pos] = sqrt(p[pos]) & pinv[pos] = 1d0/p[pos] & b1[pos] *= pinv[pos] &$
 endif 
 if neg[0] ne -1 then begin &$
-  q=k2[neg] & g=1.0-p[neg] & f = g-k2[neg] &$
+  q=k2[neg] & g=1d0-p[neg] & f = g-k2[neg] &$
   q *= (b1[neg]-a1[neg]*p[neg]) & ginv = 1d0/g   &$
   p[neg]=sqrt(f*ginv) & a1[neg]=(a1[neg]-b1[neg])*ginv & pinv[neg] = 1d0/p[neg] &$
   b1[neg] = -q*ginv^2*pinv[neg]+a1[neg]*p[neg] &$
@@ -55,8 +55,8 @@ while max(abs(g-kc) gt g*ca) and (iter lt itmax) do begin
   m += kc
   iter +=1
 endwhile
-f1 = 0.5*!dpi*(a1*m+b1)/(m*(m+p))
-f2 = 0.5*!dpi*(a2*m+b2)/(m*(m+p1))
-f3 = 0.5*!dpi*(a3*m+b3)/(m*(m+p1))
+f1 = 0.5d0*!dpi*(a1*m+b1)/(m*(m+p))
+f2 = 0.5d0*!dpi*(a2*m+b2)/(m*(m+p1))
+f3 = 0.5d0*!dpi*(a3*m+b3)/(m*(m+p1))
 return
 end

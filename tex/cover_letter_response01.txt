@@ -12,7 +12,7 @@ aspects between this new and the algorithm(s) presented there.
 
 This is an excellent point which we were remiss to not address in the first 
 version.  We have added additional discussion of the Gimenez (2006) paper in the 
-introduction, and we since we have already carried out extensive comparisons 
+introduction, and since we have already carried out extensive comparisons 
 with this code in Figure 15, we describe these results in more detail in section 
 11.4.
 
