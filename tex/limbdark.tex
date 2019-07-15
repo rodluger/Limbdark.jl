@@ -10,7 +10,7 @@
 \setlength{\belowdisplayskip}{1.5em}
 
 \title{%
-Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomial limb darkening
+Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomial Limb Darkening
 }
 
 
@@ -26,23 +26,23 @@ Analytic Planetary Transit Light Curves and Derivatives for Stars with Polynomia
 \keywords{methods: analytic --- techniques: photometric --- planets and satellites: detection}
 
 \begin{abstract}
- We derive analytic, closed-form solutions for the light curve of a planet
- transiting a star with a limb darkening profile which is a polynomial function
- of the stellar elevation, up to arbitrary integer order.
- We provide improved analytic expressions for the uniform, linear, and quadratic
- limb-darkened cases, as well as novel expressions for higher order integer powers
- of limb darkening.  The formulae are crafted to be numerically stable over the
- expected range of usage.  We additionally present analytic formulae for
- the partial derivatives of instantaneous flux with respect to the radius ratio,
- impact parameter, and limb darkening coefficients.  These expressions are rapid to
- evaluate, and compare quite favorably in speed and accuracy to existing transit light
- curve codes. We also use these expressions to numerically compute the first partial
- derivatives of exposure-time averaged transit light curves with respect to all
- model parameters.  An additional application is modeling eclipsing binary or
- eclipsing multiple star systems in cases where the stars may be treated as spherically
- symmetric.  We provide code which implements these formulae in \texttt{C++}, 
- \texttt{Python}, \texttt{IDL}, and \texttt{Julia},
- with tests and examples of usage.
+We derive analytic, closed-form solutions for the light curve of a planet
+transiting a star with a limb darkening profile which is a polynomial function
+of the stellar elevation, up to arbitrary integer order.
+We provide improved analytic expressions for the uniform, linear, and quadratic
+limb-darkened cases, as well as novel expressions for higher order integer powers
+of limb darkening.  The formulae are crafted to be numerically stable over the
+expected range of usage.  We additionally present analytic formulae for
+the partial derivatives of instantaneous flux with respect to the radius ratio,
+impact parameter, and limb darkening coefficients.  These expressions are rapid to
+evaluate, and compare quite favorably in speed and accuracy to existing transit light
+curve codes. We also use these expressions to numerically compute the first partial
+derivatives of exposure-time averaged transit light curves with respect to all
+model parameters.  An additional application is modeling eclipsing binary or
+eclipsing multiple star systems in cases where the stars may be treated as spherically
+symmetric.  We provide code which implements these formulae in \texttt{C++}, 
+\texttt{Python}, \texttt{IDL}, and \texttt{Julia},
+with tests and examples of usage.
  \href{https://github.com/rodluger/Limbdark.jl}{\color{linkcolor}\faGithub}
 \end{abstract}
 
@@ -2144,9 +2144,9 @@ giving our \texttt{Julia} code a 70\% speed advantage over the Fortran code.
     \end{centering}
 \end{figure}
 
-A Python implementation of transit light curves which has been widely applied
+A \Python implementation of transit light curves which has been widely applied
 is the \texttt{batman} package \citep{Kreidberg2015}.  This package
-implements a fast C version of the computation, called by Python for
+implements a fast C version of the computation, called by \Python for
 ease of use.
 
 The \texttt{batman} package computes the quadratic limb darkening model
@@ -2406,7 +2406,7 @@ carries out the computation for multiple overlapping bodies.
 
 The code presented in this paper is open source and has two versions: one of which is a part
 of the \starry package, \texttt{http://github.com/rodluger/starry/}, written
-in a combination of C++ and Python, and a new code written in \texttt{Julia},
+in a combination of \texttt{C++} and \Python, and a new code written in \texttt{Julia},
 \texttt{http://github.com/rodluger/Limbdark.jl/}, as
 part of the development of the equations in this paper.  We have also implemented
 the flux model in \texttt{IDL}, without derivatives; this is also available within

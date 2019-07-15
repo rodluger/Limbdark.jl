@@ -19,12 +19,13 @@ addons:
 
 install:
     - source .ci/travis.sh
+    - if [ "$TRAVIS_JULIA_VERSION" = "0.7.0" ]; then sudo apt-get install texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended; fi
     - julia .ci/install.jl
 
-before_script: 
+before_script:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
-  - sleep 3 
+  - sleep 3
 
 script:
     - julia test/runtests.jl
@@ -34,6 +35,9 @@ script:
 cache:
     directories:
         - $HOME/.cache/Tectonic
+        - $HOME/miniconda
+        - /tmp/texlive
+        - $HOME/.texlive
 
 after_failure:
     - sleep 3
