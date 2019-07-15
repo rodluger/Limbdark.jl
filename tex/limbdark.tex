@@ -2489,14 +2489,14 @@ the input parameters.
 %\end{eqnarray}
 \end{proof}
 
-\section{Listing of symbols used in the paper}
+\section{Listing of symbols and floating point precisions used in the paper and codebase}
 
 Table \ref{tab:symbols} gives a list of the notation used throughout
 the main paper.
 
 {\bf Table \ref{tab:precision} lists the IEEE 754 interchange formats
-utilized in three versions of this code (\texttt{Limbdark.jl} and \texttt{starry})
-written in \texttt{Julia}, \texttt{Python}, and \texttt{C++}.}
+utilized in four versions of this code (\texttt{Limbdark.jl} and \texttt{starry})
+written in \texttt{Julia}, \texttt{IDL}, \texttt{Python} and \texttt{C++}.}
 
 \clearpage
 
@@ -2637,11 +2637,17 @@ $\xi$          & Transformed integration variable       & \eq{greens_transformed
 \end{longtable}
 \end{center}
 
+\begin{table}
 {\bf 
 \begin{tabular}{llll}
+\tableline
 Language & Variable type & IEEE 754 interchange format & precision for 1.0\\
-Julia & Float64 & binary64 & $2.0^{-52} = 2.22e-16$\\
-Julia & BigFloat & binary256 & $2.0^{-255} = 1.73e-77$ \\
-IDL & double & binary64 & $2.0^{-52} = 2.22e-16$\\
+\tableline
+Julia & Float64 & binary64 & $2^{-52} = 2.22\times 10^{-16}$\\
+Julia & BigFloat & binary256 & $2^{-255} = 1.73\times 10^{-77}$ \\
+IDL & double & binary64 & $2^{-52} = 2.22 \times 10^{-16}$\\
+\tableline
 \end{tabular}}
+\caption{Floating point standards used in implementations of code. \label{tab:precision}}
+\end{table}
 \end{document}
