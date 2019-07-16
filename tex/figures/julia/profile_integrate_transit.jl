@@ -110,17 +110,24 @@ end
 tol = [1e-4,1e-6,1e-8,1e-10,1e-12,1e-14]
 
 clf()
-labels = ["flux-1","r","t0","v","b0","u1","u2"]
+labels = [L"$F-1$",L"$r$",L"$t_0$",L"$v$",L"$b_0$",L"$u_1$",L"$u_2$"]
 for j=1:7
 #  loglog(tol,absolute_precision[j,:],label=labels[j])
-  loglog(neval/nt,absolute_precision[j,:],label=labels[j])
-  loglog(neval/nt,absolute_precision[j,:],"o",color="k")
+  loglog(neval/nt,absolute_precision[j,:],"o-",label=labels[j])
+  #loglog(neval/nt,absolute_precision[j,:],"o",color="k")
 #  loglog(tol,fractional_precision[j,:],label=labels[j],linestyle=":")
 end
 #plot(tol,tol,label="tolerance",linestyle=":")
-plot(neval/nt,10*tol,label="10 * tolerance",linestyle=":")
-plot(timing[2:7]/timing[1],10*tol,label="10 * tol vs. time",linestyle=:dashed)
-xlabel("Average number of evaluations per exposure / time ratio per exposure")
+plot(neval/nt,10*tol,label=L"$10\epsilon_{tol}$",linestyle=":")
+legend(loc="lower left")
+xlabel("Average number of evaluations per exposure")
 ylabel("Absolute precision")
-legend()
+xlim(5, 1200)
+
+twiny()
+loglog(timing[2:7]/timing[1],10*tol,label=L"$10\epsilon_{tol}$",linestyle=:dashed)
+legend(loc="upper right")
+xlim(5, 1200)
+xlabel("Time ratio per exposure")
+
 savefig("compare_precision.pdf", bbox_inches="tight")
