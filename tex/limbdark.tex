@@ -175,13 +175,13 @@ for each $a_n$ term.  {\bf This algorithm is remarkable in that it allows
 for computation of limb-darkening to arbitrary polynomial order, and gives
 excellent single-precision accuracy and better speed than numerical integration
 approaches.}  Here we {\bf improve upon the pioneering work of \citet{Gimenez2006}
-by presneting} closed-form expressions for these terms
+by presenting} closed-form expressions for these terms
 which can be easily computed with recursion relations, although for purposes
 of numerical stability we need to revert to series solutions in some limits
 which we find to be rapid to evaluate.  {\bf In addition to being faster
 to evaluate and more accurate for low-order limb-darkening 
 (\S \ref{sec:comparison_pytransit}), these new expressions
-also include derivaties with respect to the model parameters.}
+also include derivatives with respect to the model parameters.}
 
 The second goal, of computing dervatives of the light curve with respect to
 the model parameters, was accomplished by \cite{Pal2008} for the quadratic
@@ -335,7 +335,7 @@ integrating this function over the visible area of the disk:
 \begin{align}
     \label{eq:occint}
     F &=
-    \oiint I(z) \, \dd S \quad .
+    \iint I(z) \, \dd S \quad .
 \end{align}
 %
 In general, the surface integral in Equation~(\ref{eq:occint}) is difficult---if not
@@ -498,9 +498,9 @@ re-write Equation~(\ref{eq:occint}) as
 %
 \begin{align}
     \label{eq:occint_greens}
-    F &= \oiint I(z) \, \dd S \nonumber \\[0.5em]
-      &= I_0 \oiint \gbasis^\mathsf{T} \mathcal{A} \ \bvec{u} \, \dd S \,  \nonumber \\[0.5em]
-      &= I_0 \left( \oiint \gbasis (z) \, \dd S \right)^\mathsf{T} \mathcal{A} \ \bvec{u} \nonumber \\[0.5em]
+    F &= \iint I(z) \, \dd S \nonumber \\[0.5em]
+      &= I_0 \iint \gbasis^\mathsf{T} \mathcal{A} \ \bvec{u} \, \dd S \,  \nonumber \\[0.5em]
+      &= I_0 \left( \iint \gbasis (z) \, \dd S \right)^\mathsf{T} \mathcal{A} \ \bvec{u} \nonumber \\[0.5em]
       &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \bvec{u} \quad ,
 \end{align}
 %
@@ -508,7 +508,7 @@ where
 %
 \begin{align}
     \label{eq:solution_vector}
-    \mathfrak{s} \equiv \oiint \gbasis (z) \, \dd S
+    \mathfrak{s} \equiv \iint \gbasis (z) \, \dd S
 \end{align}
 %
 is the \emph{solution vector}.
@@ -532,7 +532,7 @@ regardless of the value of the limb darkening coefficients. We therefore require
 %
 \begin{align}
     \label{eq:normalization1}
-    F &= \oiint I(z) \, \dd S \nonumber \\
+    F &= \iint I(z) \, \dd S \nonumber \\
       &= I_0 \, \mathfrak{s}^\mathsf{T} \mathcal{A} \mathbf{u} \nonumber \\
       &= 1
 \end{align}
@@ -1040,7 +1040,7 @@ hence gives more precise expressions than double precision.  We implemented the
 pseudocode from \citet{Bulirsch1969} to compute ${\rm cel}(k_c,p,a,b)$,
 which has a termination test that scales as the square root of
 the {\bf double} precision.  We find that the transformed expressions
-are accurate to $\la \times 10^{-14}$ when computed in double precision
+are accurate to $\sim 10^{-14}$ when computed in double precision
 within $\epsilon = 10^{-8}$ of the vicinity of $b=r$ and $b=1-r$.
 
 Finally, in Figures~\ref{fig:s2_plot_MA2002} and \ref{fig:s2_plot} we plot
@@ -1286,7 +1286,7 @@ Recalling our definition of $\mathfrak{s}$ as the surface integral of
 the terms in the Green's basis,
 %
 \begin{align}
-    \mathfrak{s} \equiv \oiint \gbasis (z) \, \dd S \quad,
+    \mathfrak{s} \equiv \iint \gbasis (z) \, \dd S \quad,
 \end{align}
 %
 in this section we will use Green's theorem to re-express this two-dimensional
@@ -1802,7 +1802,7 @@ tolerance versus the evaluation time
 per exposure relative to the time for a single evaluation per exposure
 (dashed line).  This
 curve falls to the right of the number ratio line (dotted line) by about 
-a factor of $\approx 2$
+a factor of $\sim 2$
 for high tolerance ($\epsilon_{tol} = 10^{-4}$), to about a factor of $1.3$
 for low tolerance ($\epsilon_{tol} = 10^{-14}$).  Thus, the time per
 evaluation for the adaptive time-integrated flux and derivatives exceeds the 
@@ -1810,13 +1810,13 @@ expectation given a single evaluation per exposure.  This is likely due to
 the fact that the model computation takes longer for some parameter values 
 than others, while the adaptive integration tends to concentrate the 
 evaluations at the parameters which are more expensive to evaluate.  In 
-addition there may be computation overhead from the adaptive simpson integration 
+addition there may be computation overhead from the adaptive Simpson integration 
 function.
 
 \begin{figure}
     \begin{centering}
     \includegraphics[width=\linewidth]{figures/julia/compare_precision.pdf}
-    \caption{Precision achieved for the time time-integrated flux (minus one)
+    \caption{Precision achieved for the time-integrated flux (minus one)
     versus the average number of evaluations per exposure.  The colored lines
     show the precision achieved for the flux-1 and for each of the derivatives.
     For comparison, the dotted line shows 10 times the tolerance, $\epsilon_{tol}$.

@@ -7,6 +7,11 @@
 if [ $TRAVIS_JULIA_VERSION == "0.7.0" ]
 then
 
+    # Display some info
+    which latex
+    which pdftex
+    which tlmgr
+    
     # Generate the Julia figures
     # https://github.com/JuliaPy/PyPlot.jl/issues/317#issuecomment-337348563
     echo "Generating julia figures..."
