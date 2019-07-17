@@ -16,8 +16,6 @@ introduction, and since we have already carried out extensive comparisons
 with this code in Figure 15, we describe these results in more detail in section 
 11.4.
 
-(Should we add further comparison? TBD Rodrigo).
-
 - While the paper refers to many types of floating representations for a few 
 languages, it is not straightforward to compare these at the first glance. 
 Please give all of the presented floating representations in the context of the 
@@ -34,7 +32,6 @@ have replaced "machine precision" with "double precision"
 as most CPU cores operate with double-precision arithmetic,
 and hence the binary64 interchange format gives the relevant
 precision. 
-Add Python/C++ to table.  TBD Rodrigo
 (Refer to this in the main text: TBD Eric).
 
 - In the very early parts of this paper (see e.g. page 3 in the uploaded draft), 
@@ -60,7 +57,7 @@ arbitrary subset of R^2, use \iint. See e.g. Equations 58 (where use \iint) vs.
 59 (where \oint is fine). Since here there are no closed boundaries of R^3 
 volumes, please avoid the usage of \oiint.
 
-TBD Rodrigo
+We have modified the integral notation as requested.
 
 - Please use a subscript in equations like 23 while referring to r=0: S^T_{r=0}.
 
