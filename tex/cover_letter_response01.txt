@@ -42,12 +42,16 @@ Add Python/C++ to table.  TBD Rodrigo
 seemingly interchangeable manner (see e.g. equations 3 and 5). Please clarify 
 this issue. Is there any reason for using both \mu and z?
 
-TBD Rodrigo
 The reason for using \mu is mostly historical:  \mu is the standard
 quantity used for specifying limb-darkening equations.  The reason
 for using z is that it is more physically intuitive:  it is the
 elevation on the surface of the star (as viewed by the observer)
-in units in which the radius of the star is unity.
+in units in which the radius of the star is unity, and when integrating
+over the surface brightness of the star in the sky plane, z = \sqrt{1-x^2+y^2},
+where the radius of the star is taken to be unity.  So the reason
+for using both \mu and z, even though they are identical, is that we use \mu 
+when discussing the limb-darkening law, and z when deriving the equations from 
+Green's integrals.
 
 - The usage of \oiint and \oint are a bit confusing. Use only \o(i)int for 
 denoting integration over the closed perimeter of a 2D-set (\oint) or a closed 

@@ -183,7 +183,7 @@ to evaluate and more accurate for low-order limb-darkening
 (\S \ref{sec:comparison_pytransit}), these new expressions
 also include derivatives with respect to the model parameters.}
 
-The second goal, of computing dervatives of the light curve with respect to
+The second goal, of computing derivatives of the light curve with respect to
 the model parameters, was accomplished by \cite{Pal2008} for the quadratic
 limb darkening case.  P\'al derived the partial derivatives of the quadratic
 limb darkening model with respect to $b$, $r$, and the two quadratic
@@ -2404,11 +2404,13 @@ it allows for a wider range of limb darkening models than polynomial, it
 allows for computation of the Rossiter-McLaughlin effect, and it
 carries out the computation for multiple overlapping bodies.
 
-The code presented in this paper is open source and has two versions: one of which is a part
+The code presented in this paper is open source and has \textbf{three} versions: one of which is a part
 of the \starry package, \texttt{http://github.com/rodluger/starry/}, written
-in a combination of \texttt{C++} and \Python, and a new code written in \texttt{Julia},
-\texttt{http://github.com/rodluger/Limbdark.jl/}, as
-part of the development of the equations in this paper.  We have also implemented
+in a combination of \texttt{C++} and \Python, 
+\textbf{another of which is implemented as the default transit model in the \exoplanet package
+\texttt{http://github.com/dfm/exoplanet/} (Foreman-Mackey et al., in preparation),}
+and a new code written in \texttt{Julia},
+\texttt{http://github.com/rodluger/Limbdark.jl/}.  We have also implemented
 the flux model in \texttt{IDL}, without derivatives; this is also available within
 the GitHub repository. We welcome usage of these
 codes, and contributions to further develop and enhance their capabilities.
@@ -2489,14 +2491,14 @@ the input parameters.
 %\end{eqnarray}
 \end{proof}
 
-\section{Listing of symbols used in the paper}
+\section{Listing of symbols and floating point precisions used in the paper and codebase}
 
 Table \ref{tab:symbols} gives a list of the notation used throughout
 the main paper.
 %
 {\bf Table \ref{tab:precision} lists the IEEE 754 interchange formats
-utilized in three versions of this code (\texttt{Limbdark.jl} and \texttt{starry})
-written in \texttt{Julia}, \texttt{Python}, and \texttt{C++}.}
+utilized in four versions of this code (\texttt{Limbdark.jl} and \texttt{starry})
+written in \texttt{Julia}, \texttt{IDL}, \texttt{Python} and \texttt{C++}.}
 
 \clearpage
 
@@ -2639,11 +2641,19 @@ $\xi$          & Transformed integration variable       & \eq{greens_transformed
 
 \clearpage
 
+\begin{table}
+\caption{Floating point standards used in implementations of code. \label{tab:precision}}
 {\bf 
 \begin{tabular}{llll}
+\tableline
 Language & Variable type & IEEE 754 interchange format & precision for 1.0\\
-Julia & Float64 & binary64 & $2.0^{-52} = 2.22e-16$\\
-Julia & BigFloat & binary256 & $2.0^{-255} = 1.73e-77$ \\
-IDL & double & binary64 & $2.0^{-52} = 2.22e-16$\\
+\tableline
+Julia & Float64 & binary64 & $2^{-52} = 2.22\times 10^{-16}$\\
+Julia & BigFloat & binary256 & $2^{-255} = 1.73\times 10^{-77}$ \\
+IDL & double & binary64 & $2^{-52} = 2.22 \times 10^{-16}$\\
+Python & double & binary64 & $2^{-52} = 2.22 \times 10^{-16}$\\
+C++ & double & binary64 & $2^{-52} = 2.22 \times 10^{-16}$\\
+\tableline
 \end{tabular}}
+\end{table}
 \end{document}
