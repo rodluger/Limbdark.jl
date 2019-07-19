@@ -36,15 +36,28 @@ then
     python gitlinks.py
 	tectonic limbdark.tex
 
+    # Get the branch name
+    if [[ $TRAVIS_COMMIT_MESSAGE == *"--branch="* ]]; then
+        PDFBRANCH="$(echo $TRAVIS_COMMIT_MESSAGE | sed -e 's/.*--branch=\([[:alnum:]_-]*\).*/\1/')"
+    else
+        PDFBRANCH=$TRAVIS_BRANCH-pdf
+    fi
+
     # Force push the paper to GitHub
     cd $HOME
     mkdir tmp && cd tmp
     git init
-    git checkout --orphan $TRAVIS_BRANCH-pdf
+    git checkout --orphan $PDFBRANCH
     mkdir tex
     cp $TRAVIS_BUILD_DIR/tex/limbdark.pdf tex/
     git add -f tex/limbdark.pdf
+
+    # Include figures in the commit?
+    if [[ $TRAVIS_COMMIT_MESSAGE == *"--keep-figures"* ]]; then
+        git add -f tex/figures/*/*.pdf
+    fi
+
     git -c user.name='travis' -c user.email='travis' commit -m "building the paper"
-    git push -q -f https://$GITHUB_USER:$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG $TRAVIS_BRANCH-pdf >/dev/null 2>&1
+    git push -q -f https://$GITHUB_USER:$GITHUB_API_KEY@github.com/$TRAVIS_REPO_SLUG $PDFBRANCH >/dev/null 2>&1
 
 fi
