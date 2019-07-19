@@ -54,7 +54,13 @@ then
 
     # Include figures in the commit?
     if [[ $TRAVIS_COMMIT_MESSAGE == *"--keep-figures"* ]]; then
-        git add -f tex/figures/*/*.pdf
+        mkdir tex/figures
+        mkdir tex/figures/julia
+        cp $TRAVIS_BUILD_DIR/tex/figures/julia/*.pdf tex/figures/julia/
+        git add -f tex/figures/julia/*.pdf
+        mkdir tex/figures/python
+        cp $TRAVIS_BUILD_DIR/tex/figures/python/*.pdf tex/figures/python/
+        git add -f tex/figures/python/*.pdf
     fi
 
     git -c user.name='travis' -c user.email='travis' commit -m "building the paper"
