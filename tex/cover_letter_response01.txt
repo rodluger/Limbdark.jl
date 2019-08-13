@@ -32,7 +32,6 @@ have replaced "machine precision" with "double precision"
 as most CPU cores operate with double-precision arithmetic,
 and hence the binary64 interchange format gives the relevant
 precision. 
-(Refer to this in the main text: TBD Eric).
 
 - In the very early parts of this paper (see e.g. page 3 in the uploaded draft), 
 \mu and z are used for the same quantity while later on, these are used in a 
