@@ -992,10 +992,11 @@ should be evaluated in the order they appear.
 \begin{figure}[p!]
     \begin{centering}
     \includegraphics[height=3in]{figures/julia/transit_linear.pdf}
-    \caption{The intensity of a linearly limb-darkened star ($u_1=1$) being
-    eclipsed, $\mathfrak{s}_1(r,b)$.
-    In the limit $b > r+1$, no eclipse occurs, so $\mathfrak{s}_1=1$.  For $b < r-1$, the star
-    is completely eclipsed and $\mathfrak{s}_1=0$.  In the limits $b=r$ and $b=1-r$, special
+    \caption{The flux of a linearly limb-darkened star being eclipsed, 
+    $F = \tfrac{3}{2\pi} \mathfrak{s}_1(r,b)$, with $u_1=1$ (all other $u_n$ zero), 
+    for which $I_0 = 3/(2\pi)$.
+    In the limit $b > r+1$, no eclipse occurs, so $F=1$.  For $b < r-1$, the star
+    is completely eclipsed and $F=0$.  In the limits $b=r$ and $b=1-r$, special
     expressions must be used.
     \jlcodelink{transit_linear}\label{transit_linear}}
     \end{centering}

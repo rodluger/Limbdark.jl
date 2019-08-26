@@ -1,4 +1,6 @@
 # Uses new formulation from limbdark paper.
+# Plot of the flux of a linearly limb-darkened star with u_1=1.
+# Normalized so that uneclipsed star has a flux of unity.
 
 include("../../../src/s2.jl")
 include("../../../src/define_constants.jl")
@@ -10,12 +12,14 @@ nb = 401; nr = 401
 b=linspace(0.0,2,nr)
 r=linspace(0.0,2,nr)
 fgrid = zeros(Float64,nr,nb)
+# Normalization constant (which is uneclipsed s_1):
+norm = 3/(2pi)
 for ib=1:nb
 #  if mod(ib,10) == 0
 #    println("Finished: ",ib/nr*100,"%")
 #  end
   for ir=1:nr
-    fgrid[ir,ib]=s2(r[ir],b[ib])
+    fgrid[ir,ib]=norm*s2(r[ir],b[ib])
   end
 end
 
