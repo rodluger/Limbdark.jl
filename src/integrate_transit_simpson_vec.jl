@@ -87,7 +87,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
 
 #  fint,ferr = hquadrature(trans.n+6,transit_flux_derivative,t1,t2,abstol=tol)
   # fint contains time-integrated flux (fluence) and derivatives:
-# simpson(a::T, b::T, f::Function, I_of_f::Array{T,1}, i::T, eps::T, N::Int64, nf::Int64) where {T <: Real}
+# simpson(a::T, b::T, f::Function, I_of_f::Array{T,1}, i::T, epsilon::T, N::Int64, nf::Int64) where {T <: Real}
   tend = zero(T)
   fint .= simpson_vec(t1,t2,transit_flux_derivative!,fint,tend,tol,maxdepth,trans.n+6)
 #  println("fint: ",fint)
