@@ -1,0 +1,17 @@
+There are just two small comments that can be addressed before the acceptance 
+and without any need of further reviewing:
+
+- First, please indicate in the caption of Fig. 3 that the z (color) scale is 
+running between 0 and 2\pi/3 and/or, alternatively, use a scale ticks in the 
+color bar which corresponds to fractions of pi (e.g. 0 - \pi/6 - \pi/3 - 
+\pi/2 - 2\pi/3). This is a bit confusing now that the caption says "intensity", 
+which implies a number between 0 and 1 and 2\pi/3 is pretty close to 2.
+
+Good suggestion.  For clarity we have now normalized this plot so that the
+uneclipsed flux is unity, and have edited the caption to reflect this.
+
+- Second, please use one of the notations found here: 
+https://en.wikipedia.org/wiki/One-sided_limit in order to note the one-sided 
+limit after Eq. 88 (middle of page 29).
+
+We were inaccurate in using the word "limit".  
