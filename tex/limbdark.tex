@@ -57,20 +57,22 @@ with tests and examples of usage.
 % ------------------------------------------------------------------------------
 
 The precise measurement of the transits of an exoplanet offers a host of information
-about the planet's properties.  To start with, the times of transit give
-the planet's orbital ephemeris.  The depth of transit, corrected for stellar
-limb darkening, gives the planet's radius relative to that of the star
+about the planet's properties \citep{Charbonneau2007,Winn2008,Winn2010,Haswell2010}.  To start with, 
+the times of transit give the planet's orbital ephemeris.  The depth of transit, corrected 
+for stellar limb darkening, gives the planet's radius relative to that of the star
 {\edited \citep{Heller2019}}.   The
 shape of the transit, especially the duration of ingress and egress relative to
-the full transit duration, yields the orbital impact parameter of the planet.
+the full transit duration, yields the orbital impact parameter of the planet, which
+constrains the inclination of the orbit relative to the observer \citep{Seager2003}.
 Beyond these basic properties, if the transit depth is seen to vary with wavelength,
 the presence of spectral features may be used to constrain the chemical composition
-of the planet's atmosphere.  If the transit times are seen to vary, a dynamical
-model can constrain the masses of the planet companions (and vice versa).  If
+of the planet's atmosphere \citep{Brown2001,Seager2010,Burrows2014,Crossfield2015,
+Madhusudhan2019}.  If the transit times are seen to vary, a dynamical
+model can constrain the masses of the planet companions, and vice versa \citep{Agol2005,Holman2005}.  If
 the planet is seen in eclipse, its temperature, emission spectrum, and atmospheric
-circulation pattern can be constrained.  When combined with radial velocity
+circulation pattern can be constrained \citep{Cowan2017,Alonso2018}.  When combined with radial velocity
 measurements, the bulk density of a planet can be inferred, yielding constraints
-on its bulk composition.
+on its bulk composition \citep{Udry2007}.
 
 And yet, all of these inferences are predicated on the precise computation of models
 of the planetary transit which may be used to infer the model parameters.  Stars
@@ -1547,7 +1549,7 @@ truncated when a term goes below a tolerance specified by the numerical precisio
 
 We find that upward recursion in $n$ is more stable for $k^2 > \tfrac{1}{2} $,
 while downward recursion is more stable for $k^2 < \tfrac{1}{2}$.  Note that
-this differs from \citet{starry}, for which downward recusion was also required for $k^2 > 2$.
+this differs from \citet{starry}, for which downward recursion was also required for $k^2 > 2$.
 
 %With the computation of the light curves for the basis functions, $\mathfrak{s}_n$, the final step is to
 %combine these to make the full light curve with limb darkening coefficients, which we describe
@@ -1565,7 +1567,7 @@ Since the $\mathcal{M}_n$ integrals are computed for the total flux case,
 there is little overhead for computing the derivatives.
 
 For small values of $b$ we find that the derivative with respect to impact parameter 
-becomes numerically unstable due to the cancellation between the two
+becomes numerically unstable due to the near cancellation between the two
 terms, followed by division by $b$.  To avoid this problem
 for small $b$, we have derived an alternative expression which avoids division by $b$
 which we utilize when $b < b_c$, where $b_c$ is a (small) cutoff value:
@@ -1655,6 +1657,65 @@ $\frac{\partial \mathfrak{g}_j}{\partial u_i} = \mathcal{A}_{ji}$,
 
 %
 \pagebreak % DEBUG
+
+{\edited
+\subsection{Limitation of precision with order of limb-darkening}
+
+When computing limb-darkened light curves for very high order limb-darkening,
+we have found that the precision can be limited by cancellations which occur
+between different orders of the limb darkening.  For standard polynomial
+limb-darkening, we find that the $\mathfrak{g}_n$ alternates between very large
+values which can end up cancelling to produce a smaller amplitude light curve.
+These cancellations can lead to round-off and truncation errors which limit
+the precision of the computation.
+
+Figure \ref{fig:g_n_vs_n} shows the values of the $\mathfrak{g}_n$ coefficients
+for $u_1 = u_2 = ... = u_{20} = 0.05$ with $N=20$.  Due to the alternating
+signs of coefficients in the binomial expansion, the $\mathfrak{g}_n$ values alternate
+between large negative and large positive values, in this case varying in amplitude
+by about seven orders of magnitude from the smallest coefficient to the largest.  
+Despite the large values of $\mathfrak{g}_n$, the light curve computed has a reasonable 
+value with a depth of $\approx 1$\% for a planet with a radius ratio of $r=0.1$
+due to a fine-tuned cancellation between these large coefficients.
+
+Figure \ref{fig:fractional_error_vs_order} shows the fractional error found
+by computing a light curve at double precision with a lightcurve computed
+at \texttt{BigFloat} versus the order of the limb darkening.  Ten trials
+were made in which each of the limb-darkening coefficients was randomly
+chosen between zero and one, and the sum of their values was normalized
+to unity.  In the figure the fractional error is computed relative to
+the transit depth for a planet-star radius ratio of $r=0.1$.  For polynomial
+limb-darkening order of $N=30$ the fractional error can approach $10^{-6}$.
+Consequently we urge caution when using this model with large values of
+the polynomial order $N$; the light curve should be checked against a higher 
+precision computation for some typical values of the parameters to gauge the 
+accuracy of the model.
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/g_n_vs_n.pdf}
+    \caption{Values of the $\mathfrak{g}_n$ vector versus $n$ for $N=20$
+    and for uniform values of $u_n = 1/20$.
+    \jlcodelink{plot_g_n}
+    \label{fig:g_n_vs_n}}
+    \end{centering}
+\end{figure}
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/fractional_error_vs_order.pdf}
+    \caption{The fractional error on a light curve computed as a function of
+    $N$, the order of the limb-darkening.  The dotted points show the results of
+    the maximum fractional error (relative to the depth of the transit) for ten
+    different random realizations of the $u_n$ limb-darkening coefficients.  The
+    thick solid curve shows the median of these ten realizations.
+    \jlcodelink{comp_order}
+    \label{fig:fractional_error_vs_order}}
+    \end{centering}
+\end{figure}
+
+
+}
 
 \subsection{Summary}
 \label{sec:summary}

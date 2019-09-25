@@ -7,11 +7,24 @@ color bar which corresponds to fractions of pi (e.g. 0 - \pi/6 - \pi/3 -
 \pi/2 - 2\pi/3). This is a bit confusing now that the caption says "intensity", 
 which implies a number between 0 and 1 and 2\pi/3 is pretty close to 2.
 
-Good suggestion.  For clarity we have now normalized this plot so that the
+Response: Good suggestion.  For clarity we have now normalized this plot so that the
 uneclipsed flux is unity, and have edited the caption to reflect this.
 
 - Second, please use one of the notations found here: 
 https://en.wikipedia.org/wiki/One-sided_limit in order to note the one-sided 
 limit after Eq. 88 (middle of page 29).
 
-We were inaccurate in using the word "limit".  
+Response:  We were inaccurate in using the word "limit".  What we meant
+is to describe the range of k^2 for which the formulae are valid.   We have
+corrected the wording.
+
+
+In addition to these changes, we have added additional references in the
+introduction for background reading on transiting exoplanets.  We have
+also added a new subsection, 6.3, with two new figures, 7 & 8, which
+discuss the limits of the precision of the code for high order limb-darkening.
+We hope the additions will be useful to the readers of the paper and
+users of the code.
+
+
+

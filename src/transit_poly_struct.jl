@@ -224,9 +224,6 @@ function transit_poly_g(t::Transit_Struct{T}) where {T <: Real}
       #flux += t.g_n[n+1]*t.sn[n+1]
       flux,ferror = comp_sum(flux,ferror,t.g_n[n+1]*t.sn[n+1])
   end
-  if rand() < 0.001
-    println("flux: ",flux," ferror: ",ferror)
-  end
   # That's it!
   # flux = sum(t.g_n.*t.sn)/(pi*(t.g_n[1]+t.twothird*t.g_n[2]))  # for g_2 and above, the flux is zero.
   # Divide by denominator:
