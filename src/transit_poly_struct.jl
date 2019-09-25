@@ -203,11 +203,7 @@ function transit_poly_g(t::Transit_Struct{T}) where {T <: Real}
   end
 
   # Add up first three terms in flux numerator:
-#  flux = t.g_n[1]*t.sn[1]+t.g_n[2]*t.sn[2]+t.g_n[3]*t.sn[3]
-  flux = t.g_n[1]*t.sn[1]
-  ferror = zero(T)
-  flux,ferror = comp_sum(flux,ferror,t.g_n[2]*t.sn[2])
-  flux,ferror = comp_sum(flux,ferror,t.g_n[3]*t.sn[3])
+  flux = t.g_n[1]*t.sn[1]+t.g_n[2]*t.sn[2]+t.g_n[3]*t.sn[3]
   # Next, loop over the Green's function components:
   @inbounds for n=3:t.n
   #  pofgn_M = (1+(r-b)*(r+b))*t.Mn[n+1]-t.Mn[n+3]
@@ -221,8 +217,7 @@ function transit_poly_g(t::Transit_Struct{T}) where {T <: Real}
   # boundary for n > 0.
   # Compute sn[n]:
     t.sn[n+1] = -pofgn_M
-      #flux += t.g_n[n+1]*t.sn[n+1]
-      flux,ferror = comp_sum(flux,ferror,t.g_n[n+1]*t.sn[n+1])
+      flux += t.g_n[n+1]*t.sn[n+1]
   end
   # That's it!
   # flux = sum(t.g_n.*t.sn)/(pi*(t.g_n[1]+t.twothird*t.g_n[2]))  # for g_2 and above, the flux is zero.
@@ -506,24 +501,3 @@ function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
   t.dfdg[2] -= flux*t.den*pi*t.twothird
   return flux
 end
-
-"""
-  comp_sum(sum_value,sum_error,addend)
-
-Uses Kahan (1965) algorithm to compute compensated summation
-iteratively in which sum_value and sum_error are returned after
-being updated with addend.
-
-"""
-function comp_sum(sum_value::T,sum_error::T,addend::T) where {T <: Real}
-#  Function for compensated summation using the Kahan (1965) algorithm.
-#  sum_value:  current value of the sum
-#  sum_error:  truncation/rounding error accumulated from prior steps in sum
-#  addend:     new value to be added to the sum
-sum_error += addend
-tmp = sum_value + sum_error
-sum_error = (sum_value - tmp) + sum_error
-sum_value = tmp
-return sum_value::T,sum_error::T
-end
-
