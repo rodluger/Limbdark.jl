@@ -96,7 +96,8 @@ optimization of the transit light curve parameters, which is critical for
 obtaining initial estimates for a Markov Chain Monte Carlo simulation
 \citep[MCMC; e.g.][]{Ford2005,Ford2006},
 for looking for multi-modal solutions, for initializing the multi-nest
-algorithm \citep{Feroz2008}, or for computing the Fisher information matrix.
+algorithm \citep{Feroz2008}, or for computing the Fisher information matrix 
+\citep{Vallisneri2008}.
 In some cases, MCMC can be slow to converge, and derivatives can accelerate
 convergence by adding an artificial momentum term to the log likelihood,
 and then allowing the sampler to follow contours of constant ``energy.''
@@ -104,7 +105,8 @@ This so-called ``hybrid'' or ``Hamiltonian'' MCMC approach holds great promise \
 but its application has been hampered by the lack of models with derivatives,
 as derivatives are in general more difficult to compute.
 
-Finally, the analytic computation of transit light curves with quadratic
+Finally, the analytic\footnote{By ``analytic" we mean closed-form, not
+infinitely differentiable.} computation of transit light curves with quadratic
 limb darkening has a precision which can be limited by numerical round-off
 error for parameters near some special cases.  In
 particular, when the radius equals the impact-parameter, which corresponds to
@@ -139,11 +141,11 @@ from the sub-stellar point, $\upmu = \cos{\theta}$, where $\theta$ is the
 polar angle on the photosphere, with $\theta=0$ at the center of the observed
 stellar disk, and $\theta=\pi/2$ at the limb.  In a coordinate system in which
 the projected disk of the star lies in the $x-y$ plane, and the $z$ coordinate
-points towards the observer, then $\upmu = z$, where $z$ is measured in units
-of the stellar radius.  The variable $\upmu=z$ is then the elevation on the
-surface of the star where the highest point is taken to be closest to the observer.
-In terms of $b$, the normalized separation projected onto
-the sky, this parameter is given by $\upmu = \cos{\theta} =\sqrt{1-b^2}$, where
+points towards the observer, then $\upmu = z$, where $x$, $y$, and $z$ are 
+measured in units of the stellar radius.  The variable $\upmu=z$ is then the 
+elevation on the surface of the star, where the highest point is taken to be 
+closest to the observer.  In terms of $b=\sqrt{x^2+y^2}$, the normalized separation projected onto
+the sky, this parameter is given by $\upmu =\sqrt{1-b^2}$, where
 $0\le b \le 1$ within the stellar disk.  We also introduce the radius ratio,
 $r$, which is the radius of the occultor divided by the radius of the source.
 In general, we will follow the notation
@@ -205,7 +207,7 @@ Although some numerical approaches are numerically stable, such as \cite{Gimenez
 slower, they have precisions which may depend upon the tolerance of the computation
 which is specified, and, in addition, they do not yield derivatives of the light curves.
 The expressions presented in this work were derived with numerical stability in
-mind, and we show that for low order limb darkening our expressions are accurate
+mind, and we show that for low-order limb darkening our expressions are accurate
 to {\edited double} precision in nearly all cases.
 
 A disadvantage of our approach is that it requires integer powers of the limb darkening
@@ -348,7 +350,7 @@ integrating this function over the visible area of the disk:
 In general, the surface integral in Equation~(\ref{eq:occint}) is difficult---if not
 impossible---to solve directly with $I(z)$ given by Equation~(\ref{eq:polynomialld_vec}).
 However, as in \citet{starry}, we note that the problem
-is made significantly more tractable if we first perform a couple change of basis
+is made significantly more tractable if we first perform two change of basis
 operations.
 
 \subsection{Change of basis}
@@ -376,9 +378,9 @@ We define the polynomial basis to be the power series in $z$,
     \label{eq:polybasis}
     \pbasis = \begin{pmatrix}
         1 & z & z^2 & z^3 & ... & z^N
-    \end{pmatrix}^\mathsf{T} \quad.
+    \end{pmatrix}^\mathsf{T} \quad,
 \end{align}
-%
+so that $\pbasis^T \cdot \mathfrak{p} = \ubasis^T \cdot \bvec{u}$.
 
 %Note that $\mathfrak{p}_0 \equiv 1-\sum_{n=1}^N \mathfrak{p}_n = 1 - \sum_{i=1}^N u_i$ in the formalism of \citet{Gimenez2006}.
 
@@ -450,7 +452,11 @@ downward recursion relation
 %
 \begin{equation}
     \label{eq:dn_of_an}
-    \mathfrak{g}_n = \frac{\mathfrak{p}_n}{n+2} + \mathfrak{g}_{n+2},
+    \mathfrak{g}_n = 
+\begin{dcases} 
+\frac{\mathfrak{p}_n}{n+2} + \mathfrak{g}_{n+2} & \qquad N \ge n \ge 2\\
+\mathfrak{p}_n + (n+2) \mathfrak{g}_{n+2} & \qquad n=1,0
+\end{dcases},
 \end{equation}
 %
 starting with $n=N$ and $\mathfrak{g}_{N+1}=\mathfrak{g}_{N+2}=0$.
@@ -652,7 +658,7 @@ the lens-shaped overlap area is given by
 A_{lens} = \pi \Lambda^e(r,b) &=
 \begin{dcases}
 0 & \qquad 1+r \le b,\\
-r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\vert < b \le 1+r,\\
+r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\vert < b < 1+r,\\
 \pi r^2 & \qquad b \le 1-r,\\
 \pi & \qquad b \le r-1,\\
 \end{dcases}
@@ -663,7 +669,7 @@ r^2 \kappa_0 + \kappa_1 -\sqrt{\frac{4b^2-(1+b^2-r^2)^2}{4}} & \qquad \vert 1-r\
 \cos{\kappa_1} &=& \left(\frac{(1-r)(1+r)+b^2}{2b}\right),
 \end{eqnarray}
 %
-where $\kappa_0$ and $\kappa_1$ are the angles defined in Figure \ref{fig:circle_overlap}.
+and $\kappa_0$ and $\kappa_1$ are the angles defined in Figure \ref{fig:circle_overlap}.
 The second term in Equation~(\ref{eq:MAuniform}) is the same as the standard formula for the area of overlap of two
 partially overlapping circles, with one of the circles scaled to a radius of unity
 \citep{Weisstein2018}.  This term corresponds to ingress (and egress), it is the most
@@ -778,7 +784,7 @@ as
 \begin{eqnarray} \label{eq:uniform}
     \label{eq:s0}
     \mathfrak{s}_0(r,b) &=& \pi-A_{lens}\nonumber\\
-                        &=&\pi -\kappa_1 - r^2\kappa_0 + A_{kite},
+                        &=&\pi -\kappa_1 - r^2\kappa_0 + A_{kite}.
 \end{eqnarray}
 %
 We note that instead of computing $\kappa_1$,
@@ -814,7 +820,8 @@ for linear limb darkening.
 
 We now turn to the case of linear limb darkening, $I(\upmu)/I_0 = 1-u_1(1-\upmu)$
 \citep{Russell1912a,Russell1912b}.  In this section we set $I_0=1$ and $u_1=1$, so
-that $I(\upmu)=\upmu$;  the general case can be computed as a linear
+that $I(\upmu)=\upmu$, which corresponds to the $n=1$ terms in both the polynomial
+and Green's bases;  the general linear limb-darkening case can be computed as a linear
 combination with the uniform case.
 Note that since $\upmu = \sqrt{1-x^2-y^2}$, this problem is equivalent to
 computing the volume of intersection between a sphere and a cylinder, which was
@@ -1040,7 +1047,7 @@ For $r < 1$, the second and third contacts occur when $r=1-b$.
 Near these boundaries, the standard \citet{MandelAgol2002} expressions
 can become singular, and so we paid particular care to the accuracy of these
 new expressions in these regions.  Figure \ref{s2_machine} shows
-that Equation~(\ref{eq:biglam_stable}) is accurate to machine
+that Equation~(\ref{eq:biglam_stable}) is accurate to double
 precision in all of these regimes.
 We tested the accuracy by computing the equations with 256 bit
 arithmetic, which is much less subject to round-off error, and
@@ -1078,7 +1085,7 @@ singular points.
     limb-darkened star ($u_1=1$) using the $\mathfrak{s}_1(r,b)$ formalism introduced in this
     paper. Compare to Figure~\ref{fig:s2_plot_MA2002}, noting the change in the color
     scale. The new method is eight orders of magnitude more precise on average,
-    approaching machine epsilon everywhere in the domain.
+    approaching double precision accuracy everywhere in the domain.
     \jlcodelink{s2_residuals}\label{fig:s2_plot}}
     \end{centering}
 \end{figure}
@@ -1633,8 +1640,8 @@ are then computed as
 \end{eqnarray}
 %
 Since the normalization constant, $I_0$,
-is independent of $\mathfrak{g}$ for $n \ge 2$ (Equation~\ref{eq:normalization}), the derivative of $F$
-with respect to $\mathfrak{g}$ is trivial:
+is independent of $\mathfrak{g}_n$ for $n \ge 2$ (Equation~\ref{eq:normalization}), the derivative of $F$
+with respect to $\mathfrak{g}_n$ is trivial:
 %
 \begin{eqnarray}
     \frac{\partial F}{\partial \mathfrak{g}_n} &=&  I_0 \mathfrak{s}_n
@@ -1657,65 +1664,6 @@ $\frac{\partial \mathfrak{g}_j}{\partial u_i} = \mathcal{A}_{ji}$,
 
 %
 \pagebreak % DEBUG
-
-{\edited
-\subsection{Limitation of precision with order of limb-darkening}
-
-When computing limb-darkened light curves for very high order limb-darkening,
-we have found that the precision can be limited by cancellations which occur
-between different orders of the limb darkening.  For standard polynomial
-limb-darkening, we find that the $\mathfrak{g}_n$ alternates between very large
-values which can end up cancelling to produce a smaller amplitude light curve.
-These cancellations can lead to round-off and truncation errors which limit
-the precision of the computation.
-
-Figure \ref{fig:g_n_vs_n} shows the values of the $\mathfrak{g}_n$ coefficients
-for $u_1 = u_2 = ... = u_{20} = 0.05$ with $N=20$.  Due to the alternating
-signs of coefficients in the binomial expansion, the $\mathfrak{g}_n$ values alternate
-between large negative and large positive values, in this case varying in amplitude
-by about seven orders of magnitude from the smallest coefficient to the largest.  
-Despite the large values of $\mathfrak{g}_n$, the light curve computed has a reasonable 
-value with a depth of $\approx 1$\% for a planet with a radius ratio of $r=0.1$
-due to a fine-tuned cancellation between these large coefficients.
-
-Figure \ref{fig:fractional_error_vs_order} shows the fractional error found
-by computing a light curve at double precision with a lightcurve computed
-at \texttt{BigFloat} versus the order of the limb darkening.  Ten trials
-were made in which each of the limb-darkening coefficients was randomly
-chosen between zero and one, and the sum of their values was normalized
-to unity.  In the figure the fractional error is computed relative to
-the transit depth for a planet-star radius ratio of $r=0.1$.  For polynomial
-limb-darkening order of $N=30$ the fractional error can approach $10^{-6}$.
-Consequently we urge caution when using this model with large values of
-the polynomial order $N$; the light curve should be checked against a higher 
-precision computation for some typical values of the parameters to gauge the 
-accuracy of the model.
-
-\begin{figure}
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/julia/g_n_vs_n.pdf}
-    \caption{Values of the $\mathfrak{g}_n$ vector versus $n$ for $N=20$
-    and for uniform values of $u_n = 1/20$.
-    \jlcodelink{plot_g_n}
-    \label{fig:g_n_vs_n}}
-    \end{centering}
-\end{figure}
-
-\begin{figure}
-    \begin{centering}
-    \includegraphics[width=\linewidth]{figures/julia/fractional_error_vs_order.pdf}
-    \caption{The fractional error on a light curve computed as a function of
-    $N$, the order of the limb-darkening.  The dotted points show the results of
-    the maximum fractional error (relative to the depth of the transit) for ten
-    different random realizations of the $u_n$ limb-darkening coefficients.  The
-    thick solid curve shows the median of these ten realizations.
-    \jlcodelink{comp_order}
-    \label{fig:fractional_error_vs_order}}
-    \end{centering}
-\end{figure}
-
-
-}
 
 \subsection{Summary}
 \label{sec:summary}
@@ -1743,9 +1691,14 @@ $b$ and radius $r$ of the occultor, $\mathcal{A}$ is a change of basis
 matrix (Equation~\ref{eq:A}), and $\mathbf{u}$ is the vector of limb
 darkening coefficients $(u_0 \ u_1 \ u_2 \ ... \ u_N)^\mathsf{T}$.
 Note that in general $\mathfrak{s}^\top$ is time-dependent, as it depends
-upon the relative positions of the bodies as a function of time, while
+upon the relative positions of the bodies as a function of time, $b(t)$, while
 $\mathcal{A}\mathbf{u}$ is time-independent, and thus the matrix
 multiplication only needs to be computed once per light curve.
+
+In addition to the flux, $F$, we give the partial derivatives of $F$ with respect
+to $r$, $b$, and $\{u_i\}$ (or alternatively $\{\mathfrak{g}_n\}$) in
+equations \ref{eq:derivatives}--\ref{eq:dFdu} which are efficient and
+accurate to evaluate.
 
 Usually when fitting a light curve the unocculted flux is not equal
 to unity, but is some unknown value which needs to be fit for.  
@@ -1753,7 +1706,7 @@ So, the correct procedure is to multiply $F(t)$ by a parameter which
 represents the unocculted flux.
 In this case the derivative with respect to the flux constant is trivially 
 equal to $F(t)$, and the derivatives with respect to the other parameters 
-must be multiplied by the same parameter.
+must be multiplied by the same factor.
 
 With the description of the light curve computation complete, we next discuss
 the integration of the light curve over a finite time step.
@@ -1779,14 +1732,14 @@ and model parameters $\bvec{x}$.  The set of model parameters need to be specifi
 by a function, which, for example, might be a Keplerian orbit of the two bodies
 with respect to one another, or a full dynamical model of an $N$-body system.
 To compute the derivatives of the light curve with respect to $\bvec{x}$, the
-derivatives of the dynamical model must be computed as well.
+derivatives of the dynamical model must be computed as well, $\partial{b}/\partial{\bvec{x}}$.
 
 The time-averaged flux, $\overline{F}$, and its derivatives, are given by
 \begin{eqnarray}\label{eq:avg_flux}
-\overline{F} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} F(t^\prime) dt^\prime,\\
-\frac{\partial \overline{F}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial r} dt^\prime,\\
-%\frac{\partial \overline{F}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial b} dt^\prime,\\
-\frac{\partial \overline{F}}{\partial \mathfrak{g}_i}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial \mathfrak{g}_i} dt^\prime,\\
+\overline{F} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} F(t^\prime) dt^\prime,\cr
+\frac{\partial \overline{F}}{\partial r} &=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial r} dt^\prime,\cr
+%\frac{\partial \overline{F}}{\partial b}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial b} dt^\prime,\cr
+\frac{\partial \overline{F}}{\partial \mathfrak{g}_i}&=& \frac{1}{\Delta t} \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F(t^\prime)}{\partial \mathfrak{g}_i} dt^\prime,\cr
 \frac{\partial \overline{F}}{\partial \bvec{x}} &=& \frac{1}{\Delta t}
 \int_{t-\tfrac{1}{2}\Delta t}^{t+\tfrac{1}{2}\Delta t} \frac{\partial F}{\partial b}\frac{\partial b(t^\prime)}{\partial \bvec{x}} dt^\prime,
 \end{eqnarray}
@@ -1804,7 +1757,7 @@ that the flux and derivatives are discontinuous at each of the contact points, a
 so the time-integration is most efficient when integrating up to, but not over,
 a contact point.  For our simplified transit trajectory, $b(t)$, these contact points
 can be computed analytically;  for an eccentric orbit, the contact points may require
-numerical methods to identify before the sub-exposures can be identified.}
+numerical methods to identify the times of contact before the sub-exposures can be specified.}
 
 %The integration is carried out with an adaptive refinement of the exposure time interval by
 %factors of two until the midpoint in each refined interval is within $10^{-6}r^2$
@@ -1814,7 +1767,7 @@ The integration {\edited of each (sub-)exposure} is carried out with an adaptive
 quadrature routine \citep{Kuncir1962}.  Since at each point we compute the flux along with
 its derivatives, we have developed a vectorized version of this routine
 which keeps track of the quadrature separately for each component of the
-flux and its partial derivatives.  The convergence check for the adaptive
+flux and its partial derivatives, Equations \ref{eq:avg_flux}.  The convergence check for the adaptive
 Simpson rule is applied to each component, and when all satisfy the
 convergence criterion, the adaptive refinement is terminated.
 In practice this algorithm requires specifying a convergence tolerance,
@@ -1858,7 +1811,7 @@ be required to compute this light curve).  In computing the time-integrated ligh
 curves, we integrate over the difference of the flux minus one, so that shallow
 transit depths will not lose precision.  In Figure \ref{fig:integration_precision},
 the achieved precision is plotted versus the average number of evaluations per exposure
-for the flux-1 and for each of the derivatives.  In all cases but the highest precision,
+for $\overline{F}(t)-1$ and for each of the derivatives.  In all cases but the highest precision,
 the flux and all derivatives achieve a precision which is better than $10 \epsilon_{tol}$.
 For the highest tolerance case, $\epsilon_{tol} = 10^{-14}$, we find that the
 precision exceeds this value slightly;  this is likely due to the model reaching
@@ -1885,7 +1838,7 @@ function.
     \includegraphics[width=\linewidth]{figures/julia/compare_precision.pdf}
     \caption{Precision achieved for the time-integrated flux (minus one)
     versus the average number of evaluations per exposure.  The colored lines
-    show the precision achieved for the flux-1 and for each of the derivatives.
+    show the precision achieved for $\overline{F}(t)-1$ and for each of the derivatives.
     For comparison, the dotted line shows 10 times the tolerance, $\epsilon_{tol}$.
     The dashed line uses as the abscissa the ratio of the total light curve evaluation 
     time per exposure relative to a single evaluation per exposure. \jlcodelink{profile_integrate_transit}
@@ -2026,15 +1979,14 @@ and $\mathrm{cel}(k_c,1,1,0)=(E(m_k)-(1-m_k)K(m_k))/m_k $ are
 stored in the structure and reused for computing $\mathcal{M}_n$
 and $\mathcal{N}_n$.
 
-We find that the precision of the computation begins to degrade for
-$N \approx 25-30$.  For large values of $N$, the computing time for
-propagating the derivatives from $\mathfrak{g}_i$ to $u_i$ scales as $N^2$, and
-thus can dominate the computation time.  We utilize the BLAS linear
-algebra library (specifically, the routine \texttt{gemv}) for efficient
-multiplication of this matrix times the derivative of the light curve with
-respect to $\mathfrak{g}_i$ in order to obtain the derivatives with respect to $u_i$.
-However, as we note above, an even more efficient approach is to
-simply apply this transformation once to the gradient of the likelihood.
+%For large values of $N$, the computing time for
+%propagating the derivatives from $\mathfrak{g}_i$ to $u_i$ scales as $N^2$, and
+%thus can dominate the computation time.  We utilize the BLAS linear
+%algebra library (specifically, the routine \texttt{gemv}) for efficient
+%multiplication of this matrix times the derivative of the light curve with
+%respect to $\mathfrak{g}_i$ in order to obtain the derivatives with respect to $u_i$.
+%However, as we note above, an even more efficient approach is to
+%simply apply this transformation once to the gradient of the likelihood.
 
 % DEBUG
 %\pagebreak
@@ -2087,9 +2039,68 @@ Figure \ref{fig:nlimb} shows that the time dependence scales approximately
 as $N^{0.2-1}$.  As with the number of light-curve points, we have taken
 the median over nine measurements for each set of parameters.  We then
 scaled the timing to the single-coefficient case, and took a second
-median over the number of light curve points as the cube-root scaling scales
-about the same with different numbers of points in the light curve.
+median over the number of light curve points.
 
+{\edited
+\subsection{Limitation of precision with order of limb-darkening}
+
+We find that the precision of the computation begins to degrade for $N \approx 25-30$.
+When computing limb-darkened light curves for very high order limb-darkening,
+we have found that the precision can be limited by cancellations which occur
+between different orders of the limb darkening.  For standard polynomial
+limb-darkening, we find that the $\mathfrak{g}_n$ alternates between very large
+positive and negative
+values which can end up cancelling to produce a smaller amplitude light curve.
+These cancellations can lead to round-off and truncation errors which limit
+the precision of the computation.
+
+Figure \ref{fig:g_n_vs_n} shows the values of the $\mathfrak{g}_n$ coefficients
+for $u_1 = u_2 = ... = u_{20} = 0.05$ with $N=20$.  Due to the alternating
+signs of coefficients in the binomial expansion, the $\mathfrak{g}_n$ values flip
+between large negative and large positive values, in this case varying in amplitude
+by about seven orders of magnitude from the smallest coefficient to the largest.  
+Despite the large values of $\mathfrak{g}_n$, the light curve computed has a reasonable 
+value with a depth of $\approx 1$\% for a planet with a radius ratio of $r=0.1$
+due to a fine-tuned cancellation between these large coefficients.
+
+Figure \ref{fig:fractional_error_vs_order} shows the fractional error found
+by computing a light curve at double precision with a lightcurve computed
+at \texttt{BigFloat} versus the order of the limb darkening.  Ten trials
+were made in which each of the limb-darkening coefficients was randomly
+chosen between zero and one, and the sum of their values was normalized
+to unity.  In the figure the fractional error is computed relative to
+the transit depth for a planet-star radius ratio of $r=0.1$.  For polynomial
+limb-darkening order of $N=30$ the fractional error can approach $10^{-6}$.
+Consequently we urge caution when using this model with large values of
+the polynomial order $N$; the light curve should be checked against a higher 
+precision computation for some typical values of the parameters to gauge the 
+accuracy of the model.
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/g_n_vs_n.pdf}
+    \caption{Values of the $\mathfrak{g}_n$ vector versus $n$ for $N=20$
+    and for uniform values of $u_n = 1/20$.
+    \jlcodelink{plot_g_n}
+    \label{fig:g_n_vs_n}}
+    \end{centering}
+\end{figure}
+
+\begin{figure}
+    \begin{centering}
+    \includegraphics[width=\linewidth]{figures/julia/fractional_error_vs_order.pdf}
+    \caption{The fractional error on a light curve computed as a function of
+    $N$, the order of the limb-darkening.  The dotted points show the results of
+    the maximum fractional error (relative to the depth of the transit) for ten
+    different random realizations of the $u_n$ limb-darkening coefficients.  The
+    thick solid curve shows the median of these ten realizations.
+    \jlcodelink{comp_order}
+    \label{fig:fractional_error_vs_order}}
+    \end{centering}
+\end{figure}
+
+
+}
 
 \section{Comparison with prior work} \label{sec:comparison}
 
@@ -2146,7 +2157,7 @@ accurate than the \cite{MandelAgol2002} \texttt{IDL} implementation.
 
 We note that \texttt{EXOFAST} v2.0 has now been updated to utilize the numerically-stable 
 quadratic limb darkening expressions given above, albeit without the computed 
-derivatives (Eastman et al., in preparation).
+derivatives (Eastman et al., submitted).
 
 \subsection{Derivative comparison with P\'al}
 
@@ -2241,7 +2252,8 @@ polynomial limb darkening model with $N=15$ (\S \ref{sec:nonlinear}).
 We then ran a timing comparison between the \texttt{batman} model and the 
 polynomial model, and we find that the polynomial model is about 7 times
 more accurate and 25 times faster (\texttt{Julia})
-and 20 times faster (\starry) to evaluate compared with \texttt{batman}.
+and 20 times faster (\starry) to evaluate compared with \texttt{batman} (Figure
+\ref{fig:batman_nonlinear_comparison}).
 
 \subsection{Comparison to \texttt{PyTransit}} \label{sec:comparison_pytransit}
 
@@ -2395,7 +2407,7 @@ be a simple function of these non-linear parameters.  In this approach
 it should be straightforward to linearize the polynomial limb darkening
 model fitting, which ought to yield good computational efficiency.
 A limitation of our computational approach is that the precision
-begins to degrade for $N \approx 25-30$; however, we anticipate that such
+begins to degrade significantly for $N \approx 25-30$; however, we anticipate that such
 a high order will rarely be required.
 
 %Example applications:
@@ -2436,7 +2448,7 @@ This approach requires derivatives of the light curve with respect to
 time, for which the \citet{MandelAgol2002} computation is too
 imprecise near the points of contact, $b \approx r$ and $b \approx 1-r$,
 within an impact parameter distance of $10^{-4}$, as shown by \citet{Ofir2018},
-who extrapolated over these regions with polynomials.
+who interpolated over these regions with polynomials.
 However, our new precise formulae, with derivatives, will be useful
 for the perturbative approach to the detection of transit timing
 variations, avoiding the numerical errors inherent in the \citet{MandelAgol2002}
@@ -2613,6 +2625,7 @@ $A_{kite}$      & Kite-shaped area b/w center
                   of circles and points of contact		& \eq{Kite_area}\\
 $b$             & Impact parameter in units of occulted
                  body's radius                          &  \\
+$b_0$             & Minimum impact parameter in time-integrated model & \S\ref{sec:time}\\
 $b_c$           & Cutoff for using alternative
                   expression for $d\mathcal{P}/db$      & \S\ref{sec:analytic_derivatives}\\
 $c_1-c_4$       & Non-linear limb darkening
@@ -2670,6 +2683,7 @@ $u_1, u_2$      & Quadratic limb darkening coefficients & \eq{quadraticld} \\
 $\ubasis$       & Limb darkening basis                  & \eq{ldbasis} \\
 $\bvec{u}$      & Vector of limb darkening coefficients
                  in the basis $\ubasis$                 & \S\ref{sec:poly_limbdark} \\
+$v$             & Velocity in time-integrated model & \S\ref{sec:time}\\
 $\bvec{x}$      & Parameters used in time integration   & \S\ref{sec:time}\\
 $\x$            & Cartesian coordinate                  & \eq{xyz} \\
 $\y$            & Cartesian coordinate                  & \eq{xyz} \\

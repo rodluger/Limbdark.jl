@@ -88,12 +88,13 @@ else
       mu = 3bmrdbpr*onembmr2inv
       p = bmrdbpr^2*onembpr2*onembmr2inv
       Piofk,Eofk,Em1mKdm = cel_bulirsch(k2inv,kc,p,1+mu,one(T),one(T),p+mu,kc2,zero(T))
-#      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)/3
-      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)*third
+      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)/3
+#      Lambda1 = 2*sqrt(onembmr2)*(onembpr2*Piofk -(4-7r^2-b^2)*Eofk)*third
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
 #      Lambda1 = 2*acos(1.0-2.0*r)-2pi*convert(T,r>.5) -(4/3*(3+2r-8r^2)+
       Lambda1 = 2*acos(1.0-2.0*r)-2pi*convert(T,r>.5) -(4*third*(3+2r-8r^2)+
+#      Lambda1 = 2*atan2(2sqrt(r*b),1-2*r)-2pi*convert(T,r>.5) -(4*third*(3+2r-8r^2)+
           8*(r+b-1)*r)*sqrt(r*(1-r)) # Adding in first derivatives
       Eofk = one(T)
       Em1mKdm = one(T)
@@ -204,7 +205,8 @@ else
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
 #      Lambda1 = 2*acos(1.0-2.0*r)-4/3*(3+2r-8r^2)*sqrt(r*(1-r))-2pi*convert(T,r>0.5) 
-      Lambda1 = 2*acos(1.0-2.0*r)-4*third*(3+2r-8r^2)*sqrt(r*(1-r))-2pi*convert(T,r>0.5) 
+      Lambda1 = 2*acos(1.0-2.0*r)-4*third*(3+2r-8r^2)*sqrt(r*(1-r))-2pi*convert(T,r>0.5)
+#      Lambda1 = 2*atan2(2sqrt(r*b),1-2*r)-4*third*(3+2r-8r^2)*sqrt(r*(1-r))-2pi*convert(T,r>0.5)
       s2_grad[1] = -8*r*sqrt(r*(1-r))
 #      s2_grad[2] = -s2_grad[1]/3
       s2_grad[2] = -s2_grad[1]*third
