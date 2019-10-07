@@ -21,10 +21,7 @@ corrected the wording.
 
 In addition to these changes, we have added additional references in the
 introduction for background reading on transiting exoplanets.  We have
-also added a new subsection, 6.3, with two new figures, 7 & 8, which
+also added a new subsection, 10.1, with two new figures, 12 & 13, which
 discuss the limits of the precision of the code for high order limb-darkening.
 We hope the additions will be useful to the readers of the paper and
 users of the code.
-
-
-
