@@ -55,7 +55,7 @@ end
 
 ax = axes[1]
 ax[:plot](db,abs.(pi*r^2 .- area),label=L"$r=0.1$, MA (2002)",lw=2)
-ax[:plot](db,abs.(pi*r^2 .- sn),label=L"$r=0.1$, ALFM (2019)",".")
+ax[:plot](db,abs.(pi*r^2 .- sn),label=L"$r=0.1$, ALFM (2020)",".")
 ax[:plot](db,abs.(convert(Array{Float64,1},pi*big(r)^2 .- sn_big)),label=L"$r=0.1$, BigFloat",linestyle="--",lw=2)
 ax[:set_ylabel](L"$\pi r^2 - A_\mathrm{overlap}$", fontsize=16)
 ax[:legend](loc="lower right",fontsize=11)
@@ -83,7 +83,7 @@ ax[:axis]("off")
 
 ax = axes[2]
 ax[:plot](db,abs.(area-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, MA (2002)",lw=2)
-ax[:plot](db,abs.(sn-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, ALFM (2019)",".")
+ax[:plot](db,abs.(sn-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, ALFM (2020)",".")
 ax[:set_xlabel](L"$b-(1-r)$", fontsize=14)
 ax[:set_ylabel]("error", fontsize=14)
 ax[:legend](loc="upper right",fontsize=11)
@@ -101,7 +101,7 @@ end
 ax = axes[3]
 mask = area .> 0.0
 ax[:plot](db[mask],area[mask],label=L"$r=0.1$, MA (2002)",lw=2)
-ax[:plot](db,sn,label=L"$r=0.1$, ALFM (2019)",".")
+ax[:plot](db,sn,label=L"$r=0.1$, ALFM (2020)",".")
 ax[:plot](db,convert(Array{Float64,1},sn_big),label=L"$r=0.1$, BigFloat",linestyle="--",lw=2)
 ax[:set_ylabel](L"$A_\mathrm{overlap}$", fontsize=16)
 ax[:legend](loc="lower right",fontsize=11)
@@ -111,7 +111,7 @@ ax[:axis]([1e-15,1e-2,1e-25,1e-2])
 
 ax = axes[4]
 ax[:plot](db,abs.(area-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, MA (2002)",lw=2)
-ax[:plot](db,abs.(sn-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, ALFM (2019)",".")
+ax[:plot](db,abs.(sn-convert(Array{Float64,1},sn_big)),label=L"$r=0.1$, ALFM (2020)",".")
 ax[:set_ylabel]("error", fontsize=14)
 ax[:set_xscale]("log")
 ax[:set_yscale]("log")

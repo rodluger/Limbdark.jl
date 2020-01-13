@@ -175,8 +175,8 @@ ax.set_yscale('log')
 #ax.set_ylim(5e-5, 1e-1)
 
 # Legend
-axleg1.plot([0, 1], [0, 1], color='C0', label='ALFM (2019)', lw=1.5)
-axleg1.plot([0, 1], [0, 1], '--', color='C0', label='ALFM (2019)\n(+ gradients)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], color='C0', label='ALFM (2020)', lw=1.5)
+axleg1.plot([0, 1], [0, 1], '--', color='C0', label='ALFM (2020)\n(+ gradients)', lw=1.5)
 axleg1.plot([0, 1], [0, 1], color='C2', label='starry', lw=1.5)
 axleg1.plot([0, 1], [0, 1], '--', color='C2', label='starry\n(+ gradients)', lw=1.5)
 axleg1.plot([0, 1], [0, 1], color='C3', label='starry\n(dense)', lw=1.5)

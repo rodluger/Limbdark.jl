@@ -48,7 +48,7 @@ using PyPlot
 fig,axes = subplots(2,1, figsize=(8,8))
 ax = axes[1]
 
-ax[:plot](r,f_AL,label="ALFM (2019)", color="C0", lw=2)
+ax[:plot](r,f_AL,label="ALFM (2020)", color="C0", lw=2)
 ax[:plot](r,f_MA,label="Mandel & Agol (2002)", color="C1", lw=1, ls="--")
 ax[:plot](r,f_AL2, color="C0", lw=2)
 ax[:plot](r,f_MA2, color="C1", lw=1, ls="--")
