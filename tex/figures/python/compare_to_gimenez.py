@@ -127,6 +127,8 @@ for i, N in enumerate(Narr):
     for k in range(10):
         starry_flux = map.flux(b=b, ro=0.1)
     starry_time[i] = (time.time() - tstart) / 10
+    # Run once before full timing:
+    map.flux(b=b, ro=0.1, bf=np.ones_like(b))
     tstart = time.time()
     for k in range(10):
         map.flux(b=b, ro=0.1, bf=np.ones_like(b))
