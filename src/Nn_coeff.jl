@@ -12,7 +12,7 @@ for j=1:2
   # m is n_max-1 to n_max (we need both since downward recursion requires two):
   m = t.n_max+j-2
   mhalf = 0.5*m
-  coeff = 0.5*sqrt(pi)*exp(lgamma(mhalf+1.0)-lgamma(mhalf+2.5))
+  coeff = 0.5*sqrt(pi)*exp(logabsgamma(mhalf+1.0)[1]-logabsgamma(mhalf+2.5)[1])
   # Add leading term to N_n:
   t.Nn_coeff[j,1] = coeff
   # Now, compute higher order terms until desired precision is reached:

@@ -15,7 +15,7 @@ for j=1:4
   m = t.n_max+j-4
   mhalf = 0.5*m
   if k2 < 1
-    coeff = sqrt(pi)*exp(lgamma(mhalf+1.0)-lgamma(mhalf+1.5))
+      coeff = sqrt(pi)*exp(logabsgamma(mhalf+1.0)[1]-logabsgamma(mhalf+1.5)[1])
     # Add leading term to M_n:
     t.Mn_coeff[1,j,1] = coeff
     # Now, compute higher order terms until desired precision is reached:
