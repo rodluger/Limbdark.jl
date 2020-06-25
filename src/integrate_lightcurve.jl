@@ -4,7 +4,7 @@
 include("integrate_transit_simpson_vec.jl")
 
 function integrate_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},dt::T,favg1::Array{T,2},nt::Int64,tol::T,maxdepth::Int64,neval_t::Array{Int64,1},depthmax::Array{Int64,1}) where {T <: Real}
-# This routine integrates a lightcurve with a constant velocity, v,  
+# This routine integrates a lightcurve with a constant velocity, v,
 # and impact parameter, b0, which are specified in the "param" vector.
 # The trans structure needs to be initialized before calling this routine,
 # which will contain workspace for the transit computation, the radius ratio,
@@ -32,8 +32,7 @@ if b0 > (1.0+r)
   println("No transit")
   # No transit occurs, so returns ones for lightcurves, and zeros for derivatives:
 #  favg1[1,:] = one(T)
-  favg1[1,:] = zero(T)
-  favg1[2:5+trans.n,:] = zero(T)
+  favg1[:] .= zero(T)
   return
 # If a grazing transit, then there are only two points of contact:
 elseif (b0+r) > 1.0
@@ -91,14 +90,14 @@ fint  = zeros(T,6+trans.n)
   end
   # Pass the flux and derivatives with respect to the lightcurve variables to
   # the average flux vector:
-  favg1[1:5,i]=ftmp[1:5]
+  favg1[i,1:5]=ftmp[1:5]
   # Convert from g_n to u_n derivatives for the remaining parts of the vector:
-  if typeof(trans.dgdu) != BigFloat
-    favg1[6:5+trans.n,i]=BLAS.gemv('T',1.0,trans.dgdu,ftmp[6:6+trans.n])
+  if T != BigFloat
+    favg1[i,6:5+trans.n]=BLAS.gemv('T',1.0,trans.dgdu,ftmp[6:6+trans.n])
   else
-    favg1[6:5+trans.n,i]=trans.dgdu'*ftmp[6:6+trans.n]
+    favg1[i,6:5+trans.n]=trans.dgdu'*ftmp[6:6+trans.n]
   end
-#  println("i: ",i," t: ",t[i]," result: ",ftmp)
+# println("i: ",i," t: ",t[i]," result: ",ftmp)
 end
 return
 end
