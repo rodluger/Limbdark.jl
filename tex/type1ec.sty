@@ -1,0 +1,49 @@
+% Copyright 2002 Vladimir Volovich
+%
+% Put \usepackage{type1ec} before \usepackage[...]{fontenc}
+% in order to use CM-Super EC/TC/LH fonts at arbitrary sizes.
+% To reduce the output PS or PDF file size, use \usepackage[10pt]{type1ec}
+% (that will use only 10 pt fonts scaled to any desired size).
+
+\ProvidesPackage{type1ec}[2002/09/07 v1.1 Type1 EC font definitions (for CM-Super fonts)]
+\DeclareOption{10pt}{%
+  \providecommand{\EC@family}[5]{\DeclareFontShape{#1}{#2}{#3}{#4}{<->#51000}{}}%
+  \providecommand{\EC@ttfamily}[5]{\DeclareFontShape{#1}{#2}{#3}{#4}{<->#51000}{}}%
+}
+\ProcessOptions
+\providecommand{\EC@family}[5]{%
+  \DeclareFontShape{#1}{#2}{#3}{#4}{%
+  <-6>#50500%
+  <6-7>#50600%
+  <7-8>#50700%
+  <8-9>#50800%
+  <9-10>#50900%
+  <10-10.95>#51000%
+  <10.95-12>#51095%
+  <12-14.4>#51200%
+  <14.4-17.28>#51440%
+  <17.28-20.74>#51728%
+  <20.74-24.88>#52074%
+  <24.88-29.86>#52488%
+  <29.86-35.83>#52986%
+  <35.83->#53583%
+}{}}
+\providecommand{\EC@ttfamily}[5]{%
+  \DeclareFontShape{#1}{#2}{#3}{#4}{%
+  <-9>#50800%
+  <9-10>#50900%
+  <10-10.95>#51000%
+  <10.95-12>#51095%
+  <12-14.4>#51200%
+  <14.4-17.28>#51440%
+  <17.28-20.74>#51728%
+  <20.74-24.88>#52074%
+  <24.88-29.86>#52488%
+  <29.86-35.83>#52986%
+  <35.83->#53583%
+}{}}
+\begingroup
+\nfss@catcodes
+\input{t1cmr.fd}
+\endgroup
+\endinput
