@@ -1,13 +1,13 @@
 2
 # Tests the code for computing the derivatives
 # of M_n with respect to k.
-include("../src/transit_poly_struct.jl")
-include("../src/Mn_compute.jl")
-include("../src/transit_structure.jl")
-include("../src/cel_bulirsch.jl")
+# include("../src/transit_poly_struct.jl")
+# include("../src/Mn_compute.jl")
+# include("../src/transit_structure.jl")
+# include("../src/cel_bulirsch.jl")
 # include("random.jl")
 
-using PyPlot
+# using PyPlot
 
 # Randomizer seed
 #using Random
@@ -42,7 +42,7 @@ prec_abs  = zeros(n_max+3)
 # Initialize the transit structure to pass to routines:
 t = transit_init(r,b,u,true)  # Float64
 t_big = transit_init(big(r),big(b),big.(u),false) # BigFloat
-# Call the transit routines, thereby computing Mn: 
+# Call the transit routines, thereby computing Mn:
 transit_poly!(t)
 transit_poly!(t_big)
 
@@ -76,7 +76,7 @@ for i=1:length(b0)
   if k2 >= 0
     prec_frac,prec_abs = test_Mn(r,b)
 #    semilogy(abs.(prec_frac))
-    semilogy(abs.(prec_abs),":")
+    #semilogy(abs.(prec_abs),":")
     println("r: ",r," b: ",b," k2: ",k2," max error frac: ",maximum(abs.(prec_frac))," max error abs: ",maximum(abs.(prec_abs)))
   end
 end
@@ -88,7 +88,7 @@ for i=1:length(b0)
   if k2 >= 0
     prec_frac,prec_abs= test_Mn(r,b)
 #    semilogy(abs.(prec_frac))
-    semilogy(abs.(prec_abs),":")
+    #semilogy(abs.(prec_abs),":")
     println("r: ",r," b: ",b," k2: ",k2," max error frac: ",maximum(abs.(prec_frac))," max error abs: ",maximum(abs.(prec_abs)))
   end
 end
@@ -102,8 +102,8 @@ for i=1:ntest
   k2 = (1-b+r)*(1+b-r)/(4*b*r)
   prec_frac,prec_abs = test_Mn(r,b)
 #  semilogy(abs.(prec_frac))
-  semilogy(abs.(prec_abs),":")
+  #semilogy(abs.(prec_abs),":")
   println("r: ",r," b: ",b," k2: ",k2," max error frac: ",maximum(abs.(prec_frac))," max error abs: ",maximum(abs.(prec_abs)))
 end
-axis([0,32,1e-17,1e-5])
+#axis([0,32,1e-17,1e-5])
 end

@@ -1,18 +1,9 @@
 
 # This is test of the code for computing a transit model integrated over a time step.
 # Computes derivatives over the timestep.
-using PyPlot
-
-if VERSION >= v"0.7"
-  using Statistics
-end
-
-#include("../src/integrate_transit_simpson_vec.jl")
-include("../src/integrate_lightcurve.jl")
-
 # Test it out:
 
-include("loglinspace.jl")
+import Limbdark: Transit_Struct
 
 #@testset "test_integrate" begin
 
@@ -70,7 +61,7 @@ nint = 500
 for i=1:nt
   fsum = zeros(5+nu)
   # Starting edge has weight of 1/2:
-  if i-nint < 1 
+  if i-nint < 1
 #    fsum[1] += 0.5
   else
     fsum += favg0[i-nint,:]*0.5

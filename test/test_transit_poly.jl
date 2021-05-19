@@ -1,12 +1,6 @@
-include("../src/transit_poly_struct.jl")
-if VERSION >= v"0.7"
-  using Test
-else
-  using Base.Test
-end
+import Limbdark: Mn_series_coeff!
 
 # Randomizer seed
-using Random
 Random.seed!(42)
 
 #@testset "transit_poly" begin

@@ -1,11 +1,13 @@
 # Tests the vectorized version of cel:
 #include("cel_bulirsch.jl")
-include("../src/cel_bulirsch.jl")
-if VERSION >= v"0.7"
-  using Test
-else
-  using Base.Test
-end
+# include("../src/cel_bulirsch.jl")
+#if VERSION >= v"0.7"
+#  using Test
+#else
+#  using Base.Test
+#end
+
+import Limbdark: cel_bulirsch
 
 # Randomizer seed
 using Random
