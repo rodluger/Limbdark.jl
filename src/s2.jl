@@ -1,5 +1,4 @@
 # Uses new formulation from limbdark paper.
-include("cel_bulirsch.jl")
 
 """
     s2(r,b)
@@ -19,9 +18,9 @@ end
 
 """
     s2_ell(r,b)
- 
+
 Compute the integral of the linear limb-darkening case, `s_2` from
-starry (which is `S_1` in Agol & Luger) and also return two elliptic 
+starry (which is `S_1` in Agol & Luger) and also return two elliptic
 integrals, `E(k)` and `(E(m)-(1-m)K(m))/m`, where `m = k^2`.
 
 # Examples
@@ -48,8 +47,8 @@ if b >= 1.0+r ||  r == 0.0
 elseif b <= r-1.0
   # Full occultation:
   Lambda1 = zero(T)  # Case 11
-else 
-  if b == 0 
+else
+  if b == 0
     Lambda1 = -2pi*sqrt(1.0-r^2)^3 # Case 10
     Eofk = .5*pi
     Em1mKdm = .25*pi
@@ -108,10 +107,10 @@ end
 
 """
     s2!(r,b,s2_grad)
- 
+
 Computes the linear limb-darkening case, as well as the gradient,
 `s2_grad=[ds_2/dr,ds_2/db]` is a pre-allocated two-element array.
-Returns `s2` and complete elliptic integrals, `E(k)` and 
+Returns `s2` and complete elliptic integrals, `E(k)` and
 `(E(m)-(1-m)K(m))/m`, where `m = k^2`.
 
 # Example
@@ -121,7 +120,7 @@ julia> s2!(0.1,0.5,s2_grad)
 (2.067294367278038, 1.4726447391114554, 0.8111640472029077)
 julia> s2_grad
 2-element Array{Float64,1}:
- -0.53988  
+ -0.53988
   0.0182916
 ```
 """
@@ -143,8 +142,8 @@ if b >= 1.0+r ||  r == 0.0
 elseif b <= r-1.0
   # Full occultation:
   Lambda1 = zero(T)  # Case 11
-else 
-  if b == 0 
+else
+  if b == 0
     sqrt1mr2 = sqrt(1.0-r^2)
     Lambda1 = -2pi*sqrt1mr2^3 # Case 10
     s2_grad[1] = -2pi*r*sqrt1mr2 # dLambda/dr (dLambda/db= 0)
@@ -191,7 +190,7 @@ else
       s2_grad[2] = 2r*onembmr2*(-Em1mKdm+2*Eofk)*sqbrinv*third
     elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
       onembmr2inv = inv(onembmr2); k2inv = inv(k2); kc2 =onembpr2*onembmr2inv; kc = sqrt(kc2)
-      bmrdbpr = (b-r)/(b+r); 
+      bmrdbpr = (b-r)/(b+r);
       mu = 3bmrdbpr*onembmr2inv
       p = bmrdbpr^2*onembpr2*onembmr2inv
 #      println("calling cel with: ",k2inv,kc,p,1+mu,one(T),one(T),p+mu,kc2,zero(T))
@@ -204,7 +203,7 @@ else
       s2_grad[2] = -4*r*third*sqonembmr2*(Eofk - 2*Em1mKdm)
     else
       # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
-#      Lambda1 = 2*acos(1.0-2.0*r)-4/3*(3+2r-8r^2)*sqrt(r*(1-r))-2pi*convert(T,r>0.5) 
+#      Lambda1 = 2*acos(1.0-2.0*r)-4/3*(3+2r-8r^2)*sqrt(r*(1-r))-2pi*convert(T,r>0.5)
       Lambda1 = 2*acos(1.0-2.0*r)-4*third*(3+2r-8r^2)*sqrt(r*(1-r))-2pi*convert(T,r>0.5)
 #      Lambda1 = 2*atan2(2sqrt(r*b),1-2*r)-4*third*(3+2r-8r^2)*sqrt(r*(1-r))-2pi*convert(T,r>0.5)
       s2_grad[1] = -8*r*sqrt(r*(1-r))
@@ -222,10 +221,10 @@ end
 
 #"""
 #    s2!(trans)
-# 
+#
 #Computes the linear limb-darkening case, as well as the gradient,
 #trans.s2_grad=[ds_2/dr,ds_2/db] is a pre-allocated two-element array.
-#Returns trans.s2, and computes the complete elliptic integrals, 
+#Returns trans.s2, and computes the complete elliptic integrals,
 #trans.Eofk, E(k), and trans.Em1mKdm, (E(m)-(1-m)K(m))/m, where m = k^2.
 #
 #NOTE:  This is only meant to be run in tandem with `transit_poly_struct.jl`,
@@ -238,7 +237,7 @@ end
 #julia> trans.sn[2]
 #julia> trans.s2_grad
 #2-element Array{Float64,1}:
-# -0.53988  
+# -0.53988
 #  0.0182916
 #```
 #"""
@@ -258,8 +257,8 @@ end
 #elseif b <= r-1.0
 #  # Full occultation:
 #  Lambda1 = zero(T)  # Case 11
-#else 
-#  if b == 0 
+#else
+#  if b == 0
 #    t.sqrt1mr2 = sqrt(1.0-r^2)
 #    Lambda1 = -2pi*t.sqrt1mr2^3 # Case 10
 #    if t.grad
@@ -308,7 +307,7 @@ end
 #      end
 #    elseif (b+r) < 1.0  # k^2 > 1, Case 3, Case 9
 ##      t.onembmr2inv=inv(t.onembmr2); t.k2inv = inv(t.k2); t.kc2 = t.onembpr2*t.onembmr2inv; t.kc = sqrt(t.kc2)
-#      bmrdbpr = (b-r)/(b+r); 
+#      bmrdbpr = (b-r)/(b+r);
 #      mu = 3bmrdbpr*t.onembmr2inv
 #      p = bmrdbpr^2*t.onembpr2*t.onembmr2inv
 #      t.k2inv = inv(t.k2)
@@ -323,7 +322,7 @@ end
 #    else
 #      # b+r = 1 or k^2=1, Case 4 (extending r up to 1)
 #      t.sqr1mr = sqrt(r*(1-r))
-#      Lambda1 = 2*acos(1.0-2.0*r)-4*t.third*(3+2r-8r^2)*t.sqr1mr-2pi*convert(T,r>0.5) 
+#      Lambda1 = 2*acos(1.0-2.0*r)-4*t.third*(3+2r-8r^2)*t.sqr1mr-2pi*convert(T,r>0.5)
 #      if t.grad
 #        t.s2_grad[1] = -8*r*t.sqr1mr
 #        t.s2_grad[2] = -t.s2_grad[1]*t.third

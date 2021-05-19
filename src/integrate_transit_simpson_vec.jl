@@ -1,10 +1,5 @@
-
 # This is code for computing a transit model and derivatives integrated over
 # a time step, giving the fluence in units of time (since flux is normalized to unity).
-
-#using Cubature
-include("transit_poly_struct.jl")
-include("simpson_vec.jl")
 
 # Now the version with derivatives:
 function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T},t1::T,t2::T,tol::T,maxdepth::Int64,fint::Array{T,1}) where {T <: Real}
@@ -14,7 +9,7 @@ function integrate_timestep_gradient!(param::Array{T,1},trans::Transit_Struct{T}
   third = inv(3)
   # Keep track of how many evaluations of the transit function are carried out:
   neval = 0
-  
+
   # When transit computation is carried out, we need to fill in the vector for the flux and derivatives
   # at the midpoint of the current refinement time range:
   function fill_flux!(tmid::T,fmid0::T,trans_mid::Transit_Struct{T},fmid::Array{T,1}) where {T <: Real}

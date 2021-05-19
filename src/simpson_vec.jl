@@ -2,25 +2,25 @@
 # Modified to work with a vector function.
 function simpson_vec(a::T, b::T, f::Function, I_of_f::Array{T,1}, i::T, epsilon::T, N::Int64, nf::Int64) where {T <: Real}
 
-# value a, b, epsilon, N; 
+# value a, b, epsilon, N;
 # integer N;
-# real a, b, I_of_f, i, epsilon; 
+# real a, b, I_of_f, i, epsilon;
 # real procedure f;
-# comment This procedure integrates the function f(x) using a modified 
-# Simpson's Rule quadrature formula. The quadrature is performed over j 
-# subintervals of [a,b] forming the total area I_of_f. Convergence in each 
-# subinterval of length (b-a)/2^n is indicated when the relative difference 
+# comment This procedure integrates the function f(x) using a modified
+# Simpson's Rule quadrature formula. The quadrature is performed over j
+# subintervals of [a,b] forming the total area I_of_f. Convergence in each
+# subinterval of length (b-a)/2^n is indicated when the relative difference
 # between successive three-point and five-point area approximations
 #  A_{3,j} = (b-a)(g_o + 4g_2 + g_4)/(3*2^{n+1})
 #  A_{5,j} = (b-a)(g_o + 4g_1 + 2g_2 + 4g_3 + g_4)/(3*2{n+2})
-# is less than or equal to an appropriate portion of the over-all tolerance 
-# epsilon (i.e., |(A_{5,j} - A_{3,j})/A_{5,j}| \le  \epsilon/2^n with n \le N). 
+# is less than or equal to an appropriate portion of the over-all tolerance
+# epsilon (i.e., |(A_{5,j} - A_{3,j})/A_{5,j}| \le  \epsilon/2^n with n \le N).
 # SIMPSON will reduce the size of each interval until this condition is satisfied.
-# Complete integration over [a,b] is indicated by i = b. A value 
-# a =< i < b indicates that the integration was terminated, leaving I_of_f the true 
-# area under f in [a,i]. Further integration over [i,b] will necessitate either 
-# the assignment of a larger N, a larger epsilon, or an integral substitution reducing 
-# the slope of the integrand in that interval. It is recommended that this 
+# Complete integration over [a,b] is indicated by i = b. A value
+# a =< i < b indicates that the integration was terminated, leaving I_of_f the true
+# area under f in [a,i]. Further integration over [i,b] will necessitate either
+# the assignment of a larger N, a larger epsilon, or an integral substitution reducing
+# the slope of the integrand in that interval. It is recommended that this
 # procedure be used between known integrand maxima and minima.
 
 third = one(T)/3
