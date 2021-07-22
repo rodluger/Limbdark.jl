@@ -1,18 +1,3 @@
-
-include("define_constants.jl")
-# Include linear algebara:
-if VERSION >= v"0.7"
-  using LinearAlgebra
-end
-
-# Include definition of Transit structure type:
-include("transit_structure.jl")
-# Include code which computes linear limb-darkening term:
-include("s2.jl")
-# Include code which computes M_n and N_n:
-include("Mn_compute.jl")
-include("Nn_compute.jl")
-
 """
     compute_uniform(t)
 
@@ -32,7 +17,7 @@ function compute_uniform!(t::Transit_Struct{T}) where {T <: Real}
     t.kap0 = convert(T,pi); t.kck = zero(T)
   else
     # Twice area of kite-shaped region connecting centers of circles & intersection points:
-  #  t.kite_area2 = sqrt(sqarea_triangle(one(T),b,r)) 
+  #  t.kite_area2 = sqrt(sqarea_triangle(one(T),b,r))
     t.kite_area2 = sqrt(t.sqarea)
     # Angle of section for occultor:
     t.kap0  = atan(t.kite_area2,(r-1)*(r+1)+b2)
@@ -54,7 +39,7 @@ end
 
 Function which computes sixteen times the square of the area
 of a triangle with sides a, b and c using Kahan method.
-How to compute (sixteen times the) area squared of triangle with 
+How to compute (sixteen times the) area squared of triangle with
 high precision (Goldberg 1991).
 """
 function sqarea_triangle(a::T,b::T,c::T) where {T <: Real}
@@ -77,7 +62,7 @@ end
 """
     transit_poly_g(t)
 
-Given a `TransitStruct` instance `t`, computes a limb-darkened transit light 
+Given a `TransitStruct` instance `t`, computes a limb-darkened transit light
 curve without gradient.
 
 
@@ -232,7 +217,7 @@ end
 
 Given a radius-ratio, impact parameter, vector of limb-darkening coefficients
 of size N, and pre-allocated vector for derivatives of size N+2, returns
-the flux (normalized to one for unocculted star) for a limb-darkened transit 
+the flux (normalized to one for unocculted star) for a limb-darkened transit
 light curve and its gradient with respect to the input parameters is returned.
 
 # Arguments
@@ -261,7 +246,7 @@ end
     transit_poly(r,b,u_n)
 
 Given a radius-ratio, impact parameter, vector of limb-darkening coefficients
-of size N, returns the flux (normalized to one for unocculted star) for a 
+of size N, returns the flux (normalized to one for unocculted star) for a
 limb-darkened transit.
 
 # Arguments
@@ -272,7 +257,7 @@ limb-darkened transit.
 function transit_poly(r::T,b::T,u_n::Array{T,1}) where {T <: Real}
   t = transit_init(r,b,u_n,false)
   # Pass g_n (without last two dummy values):
-  return transit_poly_g(t) 
+  return transit_poly_g(t)
 end
 
 """
@@ -365,7 +350,7 @@ function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
     t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
     t.onembpr2 = (1-r-b)*(1+b+r)
     t.sqarea = sqarea_triangle(one(T),r,b)
-    t.k2 = t.onembmr2*t.fourbrinv; 
+    t.k2 = t.onembmr2*t.fourbrinv;
     t.onemr2mb2 = (1.0-r)*(1.0+r)-b2
     if t.k2 > 0
       t.k = sqrt(t.k2)

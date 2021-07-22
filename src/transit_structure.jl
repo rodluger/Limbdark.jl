@@ -2,7 +2,7 @@
 """
     Transit_Struct
 
-Structure to hold arrays and other quantities for computing transit. 
+Structure to hold arrays and other quantities for computing transit.
 
 # Members
 - `r::T`: radius ratio
@@ -53,7 +53,7 @@ Structure to hold arrays and other quantities for computing transit.
 - `twothird:: T`: ``2/3``
 - `sqr1mr::T`: ``\\sqrt{r(1-r)}`` if ``r < 1``
 """
-mutable struct Transit_Struct{T}
+mutable struct Transit_Struct{T<:Real}
   # Structure to hold arrays and other quantities for computing transit:
   r      ::T           # radius ratio
   b      ::T           # impact parameter
@@ -83,7 +83,7 @@ mutable struct Transit_Struct{T}
   kap0   ::T           # kappa = sin^{-1}(k) (=kappa_0 in M&A)
   pimkap1::T           # pi-kappa_1
   sqarea::T            # (1-(b-r)^2)*((b+r)^2-1)
-  kite_area2::T        # 2*A_kite = 
+  kite_area2::T        # 2*A_kite =
   Eofk   ::T           # E(k^2) is complete elliptic integral of first kind
   Em1mKdm::T           # (E(m)-(1-m)K(m))/m is complete elliptic integral with m=k^2
   onembmr2:: T           # 1-(b-r)^2
@@ -104,11 +104,6 @@ mutable struct Transit_Struct{T}
   sqr1mr ::T           # sqrt(r*(1-r)) if r < 1
 end
 
-using SpecialFunctions
-include("compute_g_n_struct.jl")
-include("Mn_coeff.jl")
-include("Nn_coeff.jl")
-
 
 """
     transit_init(r,b,u_n,grad)
@@ -124,7 +119,7 @@ to `transit_poly()` to compute the actual flux.
 - `u_n::Array{Real,1}`: The array of limb darkening coefficients.
 - `grad::Bool`: Compute the gradient of the flux as well?
 """
-function transit_init(r::T,b::T,u_n::Array{T,1},grad::Bool) where {T <: Real}
+function transit_init(r::T,b::T,u_n::Array{T,1},grad::Bool) where T <: Real
   # Initializs a transit structure.
   n = length(u_n)
   # Maximum number of M_n integrals is n+2:

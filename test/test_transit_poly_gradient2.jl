@@ -1,8 +1,8 @@
 # Tests analytic differentiation on transit_poly.jl:
 #include("../src/transit_poly.jl")
-include("../src/transit_poly_struct.jl")
+# include("../src/transit_poly_struct.jl")
 #include("../src/dJv_seriesdk.jl")
-using PyPlot
+#=using PyPlot
 if VERSION >= v"0.7"
   using Test
   if !(eval(:(@isdefined skip_plots)))
@@ -14,7 +14,10 @@ else
     skip_plots = false
   end
 end
-
+=#
+if !(eval(:(@isdefined skip_plots)))
+  skip_plots = true
+end
 
 # Now, carry out finite-difference derivative computation:
 function transit_poly_grad_num(r::T,b::T,u_n::Array{T,1},dq0::T) where {T <: Real}

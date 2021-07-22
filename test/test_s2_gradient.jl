@@ -1,17 +1,15 @@
 # Tests automatic differentiation on s2.jl:
-include("../src/transit_structure.jl")
-include("../src/s2.jl")
-if VERSION >= v"0.7"
+# include("../src/transit_structure.jl")
+# include("../src/s2.jl")
+#= if VERSION >= v"0.7"
   using Test
 else
   using Base.Test
-end
+end=#
 
-using ForwardDiff
-using DiffResults
+import Limbdark: s2, s2!
 
 # Randomizer seed
-using Random
 Random.seed!(42)
 
 function s2_grad_func(r::T,b::T) where {T <: Real}
@@ -116,6 +114,7 @@ nb = 200
 l_max = 10
 n_max = l_max^2+2*l_max
 
+#=
 using PyPlot
 fig,axes = subplots(1,length(r0))
 get_cmap("plasma")
@@ -161,5 +160,5 @@ for i=1:length(r0)
 end
 
 savefig("test_s2_gradient.pdf", bbox_inches="tight")
-
+=#
 end
