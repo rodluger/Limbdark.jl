@@ -9,7 +9,8 @@ module Limbdark
 
 using SpecialFunctions, LinearAlgebra
 
-export transit_init, transit_poly, transit_poly!, integrate_lightcurve!
+export transit_init, transit_poly, transit_poly!, transit_poly_g, transit_poly_g!
+export integrate_lightcurve!
 
 include("transit_structure.jl")
 include("Mn_coeff.jl")
