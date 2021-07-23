@@ -1,8 +1,10 @@
 # Uses new formulation from limbdark paper.
+using Limbdark
+import Limbdark: Transit_Struct, s2
 
 #include("s2_stable.jl")
-include("../../../src/s2.jl")
-include("../../../src/define_constants.jl")
+#include("../../../src/s2.jl")
+#include("../../../src/define_constants.jl")
 
 if VERSION >= v"0.7"
   using DelimitedFiles

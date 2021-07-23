@@ -1,5 +1,7 @@
+using Limbdark
+import Limbdark: Transit_Struct
 include("occultquad.jl")
-include("../../../src/transit_poly_struct.jl")
+#include("../../../src/transit_poly_struct.jl")
 include("../../../test/loglinspace.jl")
 
 using Optim

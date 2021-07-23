@@ -4,10 +4,11 @@
 
 using Statistics
 using PyPlot
-
+using Limbdark, LinearAlgebra
+import Limbdark: Transit_Struct
 
 # Defines the function that computes the transit:
-include("../../../src/transit_poly_struct.jl")
+#include("../../../src/transit_poly_struct.jl")
 
 # Specify single-threading for BLAS routine:
 LinearAlgebra.BLAS.set_num_threads(1)

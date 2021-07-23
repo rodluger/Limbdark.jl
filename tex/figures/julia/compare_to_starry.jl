@@ -1,8 +1,9 @@
 # Defines the function that computes the transit:
-include("../../../src/transit_poly_struct.jl")
+#include("../../../src/transit_poly_struct.jl")
 using PyPlot
 using PyCall
-
+using Limbdark
+import Limbdark: Transit_Struct
 
 # System properties
 npts = 10000

@@ -1,8 +1,10 @@
 
 # Computes derivatives over the timestep.
 using PyPlot
+using Limbdark
+import Limbdark: Transit_Struct
 
-include("../../../src/integrate_lightcurve.jl")
+#include("../../../src/integrate_lightcurve.jl")
 
 # Test it out:
 
@@ -14,18 +16,18 @@ t .= linearspace(t1,t2,nt)
 #t = [t[1235]] ; nt =1
 # The following compares different tolerances and maxdepths:
 r = 0.1; b0 = 0.5; u_n = [0.3,0.3]; nu = length(u_n)
-favg0 = zeros(5+nu,nt)
-favg1 = zeros(5+nu,nt)
+favg0 = zeros(nt,5+nu)
+favg1 = zeros(nt,5+nu)
 neval1= zeros(Int64,nt)
 depthmax1= zeros(Int64,nt)
-favg2 = zeros(5+nu,nt)
+favg2 = zeros(nt,5+nu)
 neval2= zeros(Int64,nt)
 depthmax2= zeros(Int64,nt)
-favg3 = zeros(5+nu,nt)
-favg4 = zeros(5+nu,nt)
-favg5 = zeros(5+nu,nt)
-favg6 = zeros(5+nu,nt)
-favg7 = zeros(5+nu,nt)
+favg3 = zeros(nt,5+nu)
+favg4 = zeros(nt,5+nu)
+favg5 = zeros(nt,5+nu)
+favg6 = zeros(nt,5+nu)
+favg7 = zeros(nt,5+nu)
 neval3= zeros(Int64,nt)
 neval4= zeros(Int64,nt)
 neval5= zeros(Int64,nt)
@@ -44,12 +46,12 @@ param = [0.0,1.0,b0]   # [t_0,v,b_0]
 function compute_lightcurve!(trans::Transit_Struct{T},param::Array{T,1},t::Array{T,1},favg0::Array{T,2},nt::Int64) where {T <: Real}
 @inbounds for i=1:nt
   trans.b = sqrt(param[3]^2+(param[2]*(t[i]-param[1]))^2)
-  favg0[1,i] =  transit_poly!(trans)-1
-  favg0[2,i] =  trans.dfdrb[1]
-  favg0[3,i] =  trans.dfdrb[2]/trans.b*param[2]^2*(param[1]-t[i])
-  favg0[4,i] =  trans.dfdrb[2]*param[2]/trans.b*(t[i]-param[1])^2
-  favg0[5,i] =  trans.dfdrb[2]*param[3]/trans.b
-  favg0[6:5+trans.n,i] = trans.dfdu
+  favg0[i,1] =  transit_poly!(trans)-1
+  favg0[i,2] =  trans.dfdrb[1]
+  favg0[i,3] =  trans.dfdrb[2]/trans.b*param[2]^2*(param[1]-t[i])
+  favg0[i,4] =  trans.dfdrb[2]*param[2]/trans.b*(t[i]-param[1])^2
+  favg0[i,5] =  trans.dfdrb[2]*param[3]/trans.b
+  favg0[i,6:5+trans.n] = trans.dfdu
 end
 return
 end
@@ -83,28 +85,28 @@ fractional_precision = zeros(7,6)
 depthmax = [maximum(depthmax1),maximum(depthmax2),maximum(depthmax3),maximum(depthmax4),maximum(depthmax5)]
 neval = [sum(neval1),sum(neval2),sum(neval3),sum(neval4),sum(neval5),sum(neval6)]
 for j=1:7
-  absolute_precision[j,1] = maximum(abs.(favg1[j,:]-favg7[j,:]))
-  fractional_precision[j,1] = maximum(abs.(favg1[j,:]-favg7[j,:]))/maximum(abs.(favg7[j,:]))
+  absolute_precision[j,1] = maximum(abs.(favg1[:,j]-favg7[:,j]))
+  fractional_precision[j,1] = maximum(abs.(favg1[:,j]-favg7[:,j]))/maximum(abs.(favg7[:,j]))
 end
 for j=1:7
-  absolute_precision[j,2] = maximum(abs.(favg2[j,:]-favg7[j,:]))
-  fractional_precision[j,2] = maximum(abs.(favg2[j,:]-favg7[j,:]))/maximum(abs.(favg7[j,:]))
+  absolute_precision[j,2] = maximum(abs.(favg2[:,j]-favg7[:,j]))
+  fractional_precision[j,2] = maximum(abs.(favg2[:,j]-favg7[:,j]))/maximum(abs.(favg7[:,j]))
 end
 for j=1:7
-  absolute_precision[j,3] = maximum(abs.(favg3[j,:]-favg7[j,:]))
-  fractional_precision[j,3] = maximum(abs.(favg3[j,:]-favg7[j,:]))/maximum(abs.(favg7[j,:]))
+  absolute_precision[j,3] = maximum(abs.(favg3[:,j]-favg7[:,j]))
+  fractional_precision[j,3] = maximum(abs.(favg3[:,j]-favg7[:,j]))/maximum(abs.(favg7[:,j]))
 end
 for j=1:7
-  absolute_precision[j,4] = maximum(abs.(favg4[j,:]-favg7[j,:]))
-  fractional_precision[j,4] = maximum(abs.(favg4[j,:]-favg7[j,:]))/maximum(abs.(favg7[j,:]))
+  absolute_precision[j,4] = maximum(abs.(favg4[:,j]-favg7[:,j]))
+  fractional_precision[j,4] = maximum(abs.(favg4[:,j]-favg7[:,j]))/maximum(abs.(favg7[:,j]))
 end
 for j=1:7
-  absolute_precision[j,5] = maximum(abs.(favg5[j,:]-favg7[j,:]))
-  fractional_precision[j,5] = maximum(abs.(favg5[j,:]-favg7[j,:]))/maximum(abs.(favg7[j,:]))
+  absolute_precision[j,5] = maximum(abs.(favg5[:,j]-favg7[:,j]))
+  fractional_precision[j,5] = maximum(abs.(favg5[:,j]-favg7[:,j]))/maximum(abs.(favg7[:,j]))
 end
 for j=1:7
-  absolute_precision[j,6] = maximum(abs.(favg6[j,:]-favg7[j,:]))
-  fractional_precision[j,6] = maximum(abs.(favg6[j,:]-favg7[j,:]))/maximum(abs.(favg7[j,:]))
+  absolute_precision[j,6] = maximum(abs.(favg6[:,j]-favg7[:,j]))
+  fractional_precision[j,6] = maximum(abs.(favg6[:,j]-favg7[:,j]))/maximum(abs.(favg7[:,j]))
 end
 
 tol = [1e-4,1e-6,1e-8,1e-10,1e-12,1e-14]

@@ -1,10 +1,12 @@
 # Uses new formulation from limbdark paper
+using Limbdark
+import Limbdark: Transit_Struct, s2
 
 #include("s2_stable.jl")
-include("../../../src/transit_structure.jl")
+#include("../../../src/transit_structure.jl")
 include("../../../test/loglinspace.jl")
-include("../../../src/s2.jl")
-include("../../../src/define_constants.jl")
+#include("../../../src/s2.jl")
+#include("../../../src/define_constants.jl")
 
 s2diff(b,r) = s2(r,b)-convert(Float64,s2(big(r),big(b)))
 

@@ -4,7 +4,9 @@ if VERSION >= v"0.7"
   using DelimitedFiles
 end
 using PyPlot
-include("../../../src/transit_poly_struct.jl")
+#include("../../../src/transit_poly_struct.jl")
+using Limbdark
+import Limbdark: Transit_Struct
 
 data_pal = readdlm("ntiq_test.out")
 
