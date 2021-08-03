@@ -1,16 +1,18 @@
 # Uses new formulation from limbdark paper.
 # Plot of the flux of a linearly limb-darkened star with u_1=1.
 # Normalized so that uneclipsed star has a flux of unity.
-
-include("../../../src/s2.jl")
-include("../../../src/define_constants.jl")
+using Limbdark
+import Limbdark: s2
+#include("../../../src/s2.jl")
+#include("../../../src/define_constants.jl")
+include("../../../test/loglinspace.jl")
 
 # Run some tests:
 
 using PyPlot
 nb = 401; nr = 401
-b=linspace(0.0,2,nr)
-r=linspace(0.0,2,nr)
+b=linearspace(0.0,2,nr)
+r=linearspace(0.0,2,nr)
 fgrid = zeros(Float64,nr,nb)
 # Normalization constant (which is uneclipsed s_1):
 norm = 3/(2pi)
