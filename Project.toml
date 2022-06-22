@@ -1,7 +1,7 @@
 name = "Limbdark"
 uuid = "01eff828-7024-11e9-3df0-8b77921d67e3"
 authors = ["Eric Agol <agol@uw.edu>", "Rodrigo Luger <rodluger@gmail.com>", "Daniel Foreman-Mackey <foreman.mackey@gmail.com>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 DiffResults = "163ba53b-c6d8-5494-b064-1a9d43ac40c5"
