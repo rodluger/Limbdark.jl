@@ -345,12 +345,14 @@ function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
     return flux
   else
   # Next, compute k^2 = m:
-    t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
+    #t.onembmr2=(r-b+1)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
+    t.onembmr2=(r+1-b)*(1-r+b); t.fourbr = 4b*r; t.fourbrinv = inv(t.fourbr)
     t.sqbr = sqrt(b*r); t.sqbrinv = inv(t.sqbr)
     t.onembmr2inv=inv(t.onembmr2); t.sqonembmr2 = sqrt(t.onembmr2)
     t.onembpr2 = (1-r-b)*(1+b+r)
     t.sqarea = sqarea_triangle(one(T),r,b)
-    t.k2 = t.onembmr2*t.fourbrinv;
+    #t.k2 = t.onembmr2*t.fourbrinv;
+    t.k2 = t.onembpr2*t.fourbrinv+1
     t.onemr2mb2 = (1.0-r)*(1.0+r)-b2
     if t.k2 > 0
       t.k = sqrt(t.k2)
@@ -363,7 +365,8 @@ function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
         t.kc2 = 1.0-inv(t.k2)
         t.kc = sqrt(abs(t.kc2))
       else
-        t.kc2 = t.onembpr2/((1+r-b)*(1-r+b))
+        #t.kc2 = t.onembpr2/((1+r-b)*(1-r+b))
+        t.kc2 = t.onembpr2/((1-b+r)*(1-r+b))
         t.kc = sqrt(abs(t.kc2))
       end
     else
@@ -405,10 +408,11 @@ function transit_poly_g!(t::Transit_Struct{T}) where {T <: Real}
   #  if t.n == 2
   # Transformed expressions from Mandel & Agol for n=2:
     r2pb2 = r2+b2
-    eta2 = r2*(r2pb2+b2)
+    #eta2 = r2*(r2pb2+b2)
+    eta2 = r2*(r2+2*b2)
     deta2dr =  2*r*r2pb2
     deta2db = 2*b*r2
-    if t.k2 > 1
+    if t.k2 >= 1
       four_pi_eta = 2pi*(eta2-1.0)
       detadr = 4pi*deta2dr
       detadb = 4pi*deta2db

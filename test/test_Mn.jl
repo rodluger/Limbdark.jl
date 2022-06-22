@@ -1,4 +1,4 @@
-2
+
 # Tests the code for computing the derivatives
 # of M_n with respect to k.
 # include("../src/transit_poly_struct.jl")
@@ -48,7 +48,8 @@ transit_poly!(t_big)
 
 # Now compute with numerical integration, and compare:
 reltol = 1e-6
-abstol = 1e-15
+#abstol = 1e-15
+abstol = 1e-9
 # Compare with numerical integration:
 for m=0:t.n_max
   Mnn = Mn_num(t.k2,m)*(2*t.sqbr)^m
